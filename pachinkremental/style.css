@@ -1,0 +1,116 @@
+canvas.board {
+	position: absolute;
+	left: 5px;
+	top: 5px;
+	font-family: sans-serif;
+}
+
+button.notification {
+	float: right;
+	border: 2px solid #000;
+	border-radius: 5px;
+    font-size: 18px;
+    vertical-align: center;
+	overflow-y: hidden;
+	font-family: sans-serif;
+}
+
+div.notifications {
+	position: absolute;
+	top: 3px;
+	right: 3px;
+	font-family: sans-serif;
+}
+
+td.rightUI {
+	font-family: sans-serif;
+}
+
+div.menuPadding {
+	height: 5px;
+	clear: both;
+}
+
+div.upgradesContainer, div.statsContainer, div.optionsContainer {
+	border-radius: 15px;
+	clear: both;
+	padding: 5px;
+	font-family: sans-serif;
+}
+
+div.upgradesContainer {
+	border: 2px solid #080;
+	background: #CFC;
+}
+
+div.statsContainer {
+	border: 2px solid #008;
+	background: #CCF;
+}
+
+div.optionsContainer {
+	border: 2px solid #808;
+	background: #FCF;
+}
+
+button.upgradesHeader, button.statsHeader, button.optionsHeader {
+	width: 100%;
+	border: none;
+	text-align: center;
+	outline: none;
+	font-weight: bold;
+	font-family: sans-serif;
+	font-size: 20px;
+}
+
+button.upgradesHeader {
+	background: #CFC;
+}
+
+button.statsHeader {
+	background: #CCF;
+}
+
+button.optionsHeader {
+	background: #FCF;
+}
+
+div.upgradesContents, div.statsContents, div.optionsContents {
+	line-height: 14px;
+	font-family: sans-serif;
+    font-size: 14px;
+}
+
+div.statsEntry {
+	display: inline;
+}
+
+button.upgradeButton {
+	border: 1px solid #000;
+	border-radius: 10px;
+	background: #8C8;
+	font-family: sans-serif;
+    font-size: 14px;
+	color: #000;
+	padding: 5px;
+	transition-duration: 250ms;
+}
+
+button.upgradeButton:disabled {
+	background: #888;
+	transition-duration: 250ms;
+}
+
+button.optionButton {
+	border: 1px solid #000;
+	border-radius: 20px;
+	background: #C8C;
+	font-family: sans-serif;
+    font-size: 14px;
+	color: #000;
+}
+
+div.messageBox {
+	clear: both;
+	font-family: sans-serif;
+}

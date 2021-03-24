@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<head>
+	<title>Pachinkremental v0.1 beta</title>
+
+	<link rel="stylesheet" type="text/css" href="style.css" />
+	<link rel="preconnect" href="https://fonts.gstatic.com">
+	<link rel="preload" type="font/ttf" href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&display=swap" rel="stylesheet">
+	<script type="text/javascript" src="js/board.js"></script>
+	<script type="text/javascript" src="js/canvas.js"></script>
+	<script type="text/javascript" src="js/notifications.js"></script>
+	<script type="text/javascript" src="js/physics.js"></script>
+	<script type="text/javascript" src="js/upgrades.js"></script>
+	<script type="text/javascript" src="js/util.js"></script>
+
+	<script type="text/javascript" src="js/game.js"></script>
+
+</head>
+<body onload="Load()">
+	<table>
+		<tr>
+			<td id="board-td" rowspan="2">
+				<canvas id="canvas0" class="board" style="z-index: 0;"></canvas>
+				<canvas id="canvas1" class="board" style="z-index: 1;"></canvas>
+				<canvas id="canvas2" class="board" style="z-index: 2;"></canvas>
+				<canvas id="canvas3" class="board" style="z-index: 3;"></canvas>
+				<canvas id="canvas4" class="board" style="z-index: 4;"></canvas>
+				<canvas id="canvas5" class="board" style="z-index: 5;"></canvas>
+			</td>
+			<td class="rightUI" style="vertical-align: top;">
+				<div id="messageBox" class="messageBox">
+					<h1>Loading...</h1>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td class="rightUI" style="vertical-align: bottom;">
+				<div id="upgrades_container" class="upgradesContainer">
+					<button type="button" class="upgradesHeader"
+							id="button_upgrades_header" onclick="ToggleVisibility('Upgrades')">[+] Upgrades</button>
+					<div id="upgrades_contents" class="upgradesContents" style="display: none;">
+						<div class="menuPadding"></div>
+						Hover over an upgrade to see what it does.
+						<div class="menuPadding"></div>
+						<div id="upgrade_buttons" style="clear: both;">
+							<button type="button" class="upgradeButton" id="button_upgrade_multiplier" onclick="UpgradeButtonHandler(this)"
+									title="Multipiles all point gains.">
+							</button>
+							<button type="button" class="upgradeButton" id="button_upgrade_center_value" onclick="UpgradeButtonHandler(this)"
+									title="Point value of the bottom center slot.">
+							</button>
+							<button type="button" class="upgradeButton" id="button_upgrade_max_balls" onclick="UpgradeButtonHandler(this)"
+									title="Maximum number of balls allowed on the board at once.">
+							</button>
+							<div class="menuPadding"></div>
+							<button type="button" class="upgradeButton" id="button_upgrade_auto_drop" onclick="UpgradeButtonHandler(this)"
+									title="Automatically drops a ball when allowed, up to one per second. Click to move the drop position.">
+							</button>
+							<button type="button" class="upgradeButton" id="button_upgrade_auto_drop_delay" onclick="UpgradeButtonHandler(this)"
+									title="Decreases the auto drop delay.">
+							</button>
+							<div class="menuPadding"></div>
+							<button type="button" class="upgradeButton" id="button_upgrade_unlock_gold_balls" onclick="UpgradeButtonHandler(this)"
+									title="Unlocks gold balls, which are worth double points and don't count towards the max balls limit.">
+							</button>
+							<button type="button" class="upgradeButton" id="button_upgrade_gold_ball_rate" onclick="UpgradeButtonHandler(this)"
+									title="Increases the probability of a ball being gold.">
+							</button>
+						</div>
+					</div>
+				</div>
+				<div class="menuPadding"></div>
+				<div id="stats_container" class="statsContainer">
+					<button type="button" class="statsHeader"
+							id="button_stats_header" onclick="ToggleVisibility('Stats')">[+] Stats</button>
+					<div id="stats_contents" class="statsContents" style="display: none;">
+						<div class="menuPadding"></div>
+						<div id="stats_container_total_score" class="statsRow" style="display: block;">
+							<b>Total points earned: </b><div id="stats_total_score" class="statsEntry"></div>
+						</div>
+						<div id="stats_container_balls_dropped" class="statsRow" style="display: block;">
+							<b>Total balls dropped: </b><div id="stats_balls_dropped" class="statsEntry"></div>
+						</div>
+						<div id="stats_container_balls_dropped" class="statsRow" style="display: block;">
+							<b>Balls dropped manually: </b><div id="stats_balls_dropped_manual" class="statsEntry"></div>
+						</div>
+						<div id="stats_container_gold_balls" class="statsRow" style="display: none;">
+							<b>Gold balls: </b><div id="stats_gold_balls" class="statsEntry"></div>
+						</div>
+					</div>
+				</div>
+				<div class="menuPadding"></div>
+				<div id="options_container" class="optionsContainer">
+					<button type="button" class="optionsHeader"
+							id="button_options_header" onclick="ToggleVisibility('Options')">[+] Options</button>
+					<div id="options_contents" class="optionsContents" style="display: none;">
+						<div class="menuPadding"></div>
+						<button type="button" class="optionButton"
+								id="button_save" onclick="SaveToLocalStorage()">Save</button>
+						<button type="button" class="optionButton"
+								id="button_auto_save" onclick="ToggleAutoSave()">Auto Save</button>
+						<div class="menuPadding"></div>
+						<button type="button" class="optionButton"
+								id="button_export_save" onclick="ExportSave()">Export save file</button>
+						<button type="button" class="optionButton"
+								id="button_import_save" onclick="ImportSave()">Import save file</button>
+						<div class="menuPadding"></div>
+						<button type="button" class="optionButton"
+								id="button_quality" onclick="ToggleQuality()">Quality</button>
+						<div class="menuPadding"></div>
+						<button type="button" class="optionButton" style="background: #F88"
+								id="button_erase_save" onclick="EraseSave()">Erase save file</button>
+					</div>
+				</div>
+				<div class="menuPadding"></div>
+				Pachinkremental v0.1 beta by Poochy.EXE
+				| <a href="https://github.com/PoochyEXE/PoochyEXE.github.io/tree/main/pachinkremental#pachinkremental-by-poochyexe">manual</a>
+				| <a href="https://github.com/PoochyEXE/PoochyEXE.github.io/tree/main/pachinkremental#changelog">changelog</a>
+				| <a href="https://github.com/PoochyEXE/PoochyEXE.github.io/tree/main/pachinkremental">source&nbsp;code</a>
+			</td>
+		</tr>
+	</table>
+	<div id="notifications" class="notifications"> </div>
+</body>
