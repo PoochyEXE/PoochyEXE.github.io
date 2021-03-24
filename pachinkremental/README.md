@@ -35,6 +35,7 @@ A: This is intentional, both to make sure the game won't softlock with too many 
 * Implemented features so far:
 	* Realistic(ish) physics engine written from scratch
 	* Code optimized(ish) so it hopefully doesn't drain batteries
+	* Board automatically resizes to fit window
 	* Upgrades:
 		* Score value increases
 		* Auto-drop with speed upgrade
