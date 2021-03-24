@@ -326,7 +326,6 @@ function SaveToLocalStorage() {
 function LoadGame(save_file_str) {
 	let load_save = SaveFileFromString(save_file_str);
 	if (load_save && load_save.game_version) {
-		state = InitState();
 		default_state = InitState();
 		state.save_file = {...default_state.save_file, ...load_save};
 		state.save_file.stats = {...default_state.save_file.stats, ...load_save.stats};
@@ -340,6 +339,8 @@ function LoadGame(save_file_str) {
 		if (state.save_file.stats.total_score > 0) {
 			UpdateScoreDisplay(state, /*forceUpdate=*/true);
 		}
+		UpdateOptionsButtons();
+		UpdateAutoSaveInterval();
 		state.notifications.push(new Notification("Game loaded", "#8F8"));
 	} else {
 		state.notifications.push(new Notification("Error: Save file appears to be corrupted!", "#F88"));
