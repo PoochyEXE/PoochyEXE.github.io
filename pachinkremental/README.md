@@ -27,6 +27,8 @@ A: This is intentional, both to make sure the game won't softlock with too many 
 ## Known issues
 
 * Making the window too narrow can break some CSS and make the menu UI ugly.
+* Firefox seems to occasionally delete the save file upon closing the tab. If you're playing in Firefox, export your save frequently!
+* Auto-drop doesn't work correctly while the game is running in the background.
 
 ## Changelog
 
