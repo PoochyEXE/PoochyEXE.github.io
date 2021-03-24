@@ -261,7 +261,7 @@ function InitState() {
 		auto_drop_cooldown_left: 1000.0,
 		max_balls: 1,
 		gold_ball_multiplier: 2,
-		gold_ball_rate: 0.0,
+		gold_ball_rate: 0.01,
 		last_drawn: {
 			can_drop: true,
 			num_balls: 0,
