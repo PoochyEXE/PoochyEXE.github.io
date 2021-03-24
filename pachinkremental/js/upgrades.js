@@ -51,7 +51,6 @@ class Upgrade {
 		}
 		++state.save_file.upgrade_levels[this.id];
 		state.save_file.points -= cost;
-		state.save_file.display_points -= cost;
 		this.Update();
 		this.on_buy();
 		return true;
