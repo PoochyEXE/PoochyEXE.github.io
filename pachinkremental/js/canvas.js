@@ -150,7 +150,7 @@ function DrawScoreText(score_text, ctx) {
 		let fraction = elapsed / kDuration;
 		ctx.textAlign = "center";
 		ctx.font = 'bold ' + font_size + 'px sans-serif';
-		ctx.fillStyle = "rgba(0, 128, 0, " + (1 - fraction) + ")";
+		ctx.fillStyle = "rgba(" + curr_text.color_rgb + ", " + (1 - fraction) + ")";
 		ctx.fillText(curr_text.text, curr_text.pos.x, curr_text.pos.y - fraction * kRise);
 		
 		if (next_index != i) {

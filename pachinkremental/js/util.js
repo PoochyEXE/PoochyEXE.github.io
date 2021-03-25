@@ -76,10 +76,11 @@ class Ball {
 }
 
 class RisingText {
-	constructor(text, pos, time) {
+	constructor(text, pos, color_rgb) {
 		this.text = text;
 		this.pos = pos;
-		this.start_time = time;
+		this.color_rgb = color_rgb;
+		this.start_time = Date.now();
 	}
 }
 

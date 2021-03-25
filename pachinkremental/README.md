@@ -32,6 +32,12 @@ A: This is intentional, both to make sure the game won't softlock with too many 
 
 ## Changelog
 
+### v0.2.1 beta (2021-03-25)
+* Pop-up text is now color-coded:
+	* Points scored by regular balls are green.
+	* Points scored by gold balls are gold.
+	* Slot value increases when buying upgrades are blue.
+
 ### v0.2.0 beta (2021-03-25)
 * Auto-drop delay upgrade now shows balls/minute.
 * Added gold ball value multiplier upgrade.

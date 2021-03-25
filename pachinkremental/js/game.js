@@ -1,4 +1,4 @@
-const kVersion = "v0.2.0 beta";
+const kVersion = "v0.2.1 beta";
 const kTitleAndVersion = "Pachinkremental " + kVersion;
 
 var max_drop_y = 20;
@@ -144,7 +144,7 @@ function InitUpgrades() {
 				let bottom_targets = state.target_sets[0].targets;
 				let popup_text = kTimesSymbol + "5";
 				for (let i = 0; i < bottom_targets.length; ++i) {
-					state.score_text.push(new RisingText(popup_text, bottom_targets[i].pos, Date.now()));
+					state.score_text.push(new RisingText(popup_text, bottom_targets[i].pos, "0,0,255"));
 				}
 			}));
 	upgrades_list.push(new Upgrade("center_value", "Center Slot Value",
@@ -161,7 +161,7 @@ function InitUpgrades() {
 			/*on_buy=*/function() {
 				let target = state.target_sets[0].targets[4];
 				let popup_text = kTimesSymbol + "2";
-				state.score_text.push(new RisingText(popup_text, target.pos, Date.now()));
+				state.score_text.push(new RisingText(popup_text, target.pos, "0,0,255"));
 			}));
 	upgrades_list.push(new ToggleUnlockUpgrade("auto_drop", "Auto-Drop", /*cost=*/100000,
 			/*visible_func=*/function() {
@@ -388,6 +388,7 @@ function LoadGame(save_file_str) {
 		if (state.save_file.stats.total_score > 0) {
 			UpdateScoreDisplay(state, /*forceUpdate=*/true);
 		}
+		UpdateUpgradeButtons(state);
 		UpdateOptionsButtons();
 		UpdateAutoSaveInterval();
 		state.notifications.push(new Notification("Game loaded", "#8F8"));
