@@ -146,7 +146,7 @@ function InitUpgrades() {
 			}));
 	upgrades_list.push(new Upgrade("center_value", "Center Slot Value",
 			/*cost_func=*/function(level) {
-				return 200 * Math.pow(5, level);
+				return 100 * Math.pow(5, level);
 			},
 			/*value_func=*/function(level) {
 				return 250 * Math.pow(2, level);
@@ -162,7 +162,7 @@ function InitUpgrades() {
 			}));
 	upgrades_list.push(new ToggleUnlockUpgrade("auto_drop", "Auto-Drop", /*cost=*/100000,
 			/*visible_func=*/function() {
-				return GetUpgradeLevel("center_value") > 3;
+				return GetUpgradeLevel("center_value") > 1;
 			},
 			/*on_update=*/function() {
 				state.redraw_auto_drop = true;
@@ -198,7 +198,7 @@ function InitUpgrades() {
 			/*max_level=*/Infinity,
 			/*value_suffix=*/'',
 			/*visible_func=*/function() {
-				return GetUpgradeLevel("auto_drop") > 0;
+				return GetUpgradeLevel("center_value") > 1;
 			},
 			/*on_update=*/function() {
 				return state.max_balls = this.GetValue();
@@ -496,21 +496,27 @@ function CanDrop(state) {
 }
 
 function Draw(state) {
-	// Layer 0: Board
+	// Layer 0: Drop Zone
+	const can_drop = CanDrop(state) || (AutoDropOn() && state.auto_drop_cooldown < kMinCooldownToDraw);
+	if (state.redraw_all || state.last_drawn.can_drop != can_drop) {
+		const kLeftOffset = 5;
+		const kTopOffset = 5;
+		let drop_zone_elem = document.getElementById("drop_zone");
+		drop_zone_elem.disabled = !can_drop;
+		drop_zone_elem.style.top = kTopOffset;
+		drop_zone_elem.style.left = (kLeftOffset + min_drop_x * state.canvas_scale) + "px";
+		drop_zone_elem.style.width = ((max_drop_x - min_drop_x) * state.canvas_scale) + "px";
+		drop_zone_elem.style.height = (max_drop_y * state.canvas_scale) + "px";
+		state.last_drawn.can_drop = can_drop;
+	}
+	// Layer 1: Board
 	if (state.redraw_all) {
-		let ctx = ClearLayerAndReturnContext(0);
+		let ctx = ClearLayerAndReturnContext(1);
 		if (state.save_file.quality <= 1) {
 			DrawPegs(state.board.pegs, ctx);
 		} else {
 			DrawPegsNoGradient(state.board.pegs, ctx);
 		}
-	}
-	// Layer 1: Drop Zone
-	const can_drop = CanDrop(state) || (AutoDropOn() && state.auto_drop_cooldown < kMinCooldownToDraw);
-	if (state.redraw_all || state.last_drawn.can_drop != can_drop) {
-		let ctx = ClearLayerAndReturnContext(1);
-		DrawDropZone(max_drop_y, min_drop_x, max_drop_x, can_drop, ctx);
-		state.last_drawn.can_drop = can_drop;
 	}
 	// Layer 2: Balls
 	if (state.redraw_all || state.balls.length > 0 || state.gold_balls.length > 0 || state.last_drawn.num_balls > 0) {

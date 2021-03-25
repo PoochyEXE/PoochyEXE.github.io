@@ -114,3 +114,17 @@ div.messageBox {
 	clear: both;
 	font-family: sans-serif;
 }
+
+button.dropZone {
+	border: 0px;
+	position: absolute;
+	background: #0F0;
+	opacity: 0.25;
+	transition-duration: 200ms;
+	font-family: sans-serif;
+}
+
+button.dropZone:disabled {
+	background: #F00;
+	transition-duration: 200ms;
+}
