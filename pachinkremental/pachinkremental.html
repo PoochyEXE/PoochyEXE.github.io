@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <head>
-	<title>Pachinkremental v0.1.1 beta</title>
+	<title>Pachinkremental</title>
 
 	<link rel="stylesheet" type="text/css" href="style.css" />
 	<link rel="preconnect" href="https://fonts.gstatic.com">
@@ -20,7 +20,7 @@
 		<tr>
 			<td id="board-td" rowspan="2">
 				<button type="button" class="dropZone" id="drop_zone"
-						style="z-index: 0; left: 5px; top: 5px; width: 160px; height: 256px;"></button>
+						style="z-index: 0; left: 15px; top: 5px; width: 140px; height: 30px;"></button>
 				<canvas id="canvas1" class="board" style="z-index: 1;"></canvas>
 				<canvas id="canvas2" class="board" style="z-index: 2;"></canvas>
 				<canvas id="canvas3" class="board" style="z-index: 3;"></canvas>
@@ -66,6 +66,9 @@
 							<button type="button" class="upgradeButton" id="button_upgrade_gold_ball_rate" onclick="UpgradeButtonHandler(this)"
 									title="Increases the probability of a ball being gold.">
 							</button>
+							<button type="button" class="upgradeButton" id="button_upgrade_gold_ball_value" onclick="UpgradeButtonHandler(this)"
+									title="Increases point multiplier for gold balls.">
+							</button>
 						</div>
 					</div>
 				</div>
@@ -78,6 +81,16 @@
 						<div id="stats_container_total_score" class="statsRow" style="display: block;">
 							<b>Total points earned: </b><div id="stats_total_score" class="statsEntry"></div>
 						</div>
+						<div id="stats_container_total_score" class="statsRow" style="display: block;">
+							<b>Points earned in last 5 seconds: </b><div id="stats_score_last5s" class="statsEntry"></div>
+						</div>
+						<div id="stats_container_total_score" class="statsRow" style="display: block;">
+							<b>Points earned in last 15 seconds: </b><div id="stats_score_last15s" class="statsEntry"></div>
+						</div>
+						<div id="stats_container_total_score" class="statsRow" style="display: block;">
+							<b>Points earned in last 60 seconds: </b><div id="stats_score_last60s" class="statsEntry"></div>
+						</div>
+						<div class="menuPadding"></div>
 						<div id="stats_container_balls_dropped" class="statsRow" style="display: block;">
 							<b>Total balls dropped: </b><div id="stats_balls_dropped" class="statsEntry"></div>
 						</div>
@@ -108,12 +121,12 @@
 						<button type="button" class="optionButton"
 								id="button_quality" onclick="ToggleQuality()">Quality</button>
 						<div class="menuPadding"></div>
-						<button type="button" class="optionButton" style="background: #F88"
+						<button type="button" class="optionButton" style="background: #F88;"
 								id="button_erase_save" onclick="EraseSave()">Erase save file</button>
 					</div>
 				</div>
 				<div class="menuPadding"></div>
-				Pachinkremental v0.1.1 beta by Poochy.EXE
+				<div id="title_version" style="display: inline;">Pachinkremental</div> by Poochy.EXE
 				| <a href="https://github.com/PoochyEXE/PoochyEXE.github.io/tree/main/pachinkremental#pachinkremental-by-poochyexe">manual</a>
 				| <a href="https://github.com/PoochyEXE/PoochyEXE.github.io/tree/main/pachinkremental#changelog">changelog</a>
 				| <a href="https://github.com/PoochyEXE/PoochyEXE.github.io/tree/main/pachinkremental">source&nbsp;code</a>

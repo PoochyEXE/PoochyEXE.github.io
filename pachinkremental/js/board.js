@@ -41,12 +41,10 @@ class ScoreTarget extends Target {
 		ball.active = false;
 		if (ball.is_gold) {
 			let total_value = this.value * state.gold_ball_multiplier;
-			state.save_file.stats.total_score += total_value;
-			state.save_file.points += total_value;
+			AddScore(total_value);
 			state.score_text.push(new RisingText("+" + FormatNumberShort(total_value), ball.pos, Date.now()));
 		} else {
-			state.save_file.stats.total_score += this.value;
-			state.save_file.points += this.value;
+			AddScore(this.value);
 			state.score_text.push(new RisingText("+" + this.text, ball.pos, Date.now()));
 		}
 		state.stats_updated = true;

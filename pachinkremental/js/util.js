@@ -100,28 +100,32 @@ function SampleGaussianNoise(mu, sigma) {
     return new Point(z0, z1);
 }
 
+function FormatSmallNumberShort(num) {
+	const kPrecision = 3;
+	if (Number.isInteger(num)) {
+		return num.toString();
+	} else if (num < 100 && Number.isInteger(num * 10)) {
+		return num.toFixed(1);
+	} else {
+		return num.toPrecision(kPrecision);
+	}
+}
+
 function FormatNumberShort(num) {
 	const kSuffixes = ['', 'K', 'M', 'B', 'T', 'Qa', 'Qi', 'Sx', 'Sp', 'Oc', 'No', 'Dc'];
 	const kPrecision = 3;
 	if (num < 1000) {
-		return num.toString();
+		return FormatSmallNumberShort(num);
 	}
 	let suffix_index = Math.floor(Math.log10(num) / 3);
 	if (suffix_index >= kSuffixes.length) {
 		return num.toPrecision(kPrecision).replace('+','');
 	}
 	if (suffix_index == 0) {
-		return num.toString();
+		return FormatSmallNumberShort(num);
 	}
 	let prefix = num / Math.pow(1000, suffix_index);
-	let prefix_str;
-	if (Number.isInteger(prefix)) {
-		prefix_str = prefix.toString();
-	} else if (prefix < 100 && Number.isInteger(prefix * 10)) {
-		prefix_str = prefix.toFixed(1);
-	} else {
-		prefix_str = prefix.toPrecision(kPrecision);
-	}
+	let prefix_str = FormatSmallNumberShort(prefix);
 	return prefix_str + kSuffixes[suffix_index];
 }
 

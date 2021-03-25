@@ -1,3 +1,6 @@
+const kVersion = "v0.2.0 beta";
+const kTitleAndVersion = "Pachinkremental " + kVersion;
+
 var max_drop_y = 20;
 var min_drop_x = 10;
 var max_drop_x = 100;
@@ -168,7 +171,7 @@ function InitUpgrades() {
 				state.redraw_auto_drop = true;
 				state.update_upgrade_buttons = true;
 			}));
-	upgrades_list.push(new Upgrade("auto_drop_delay", "Auto-Drop Delay",
+	upgrades_list.push(new DelayReductionUpgrade("auto_drop_delay", "Auto-Drop Delay",
 			/*cost_func=*/function(level) {
 				return 200000 * Math.pow(2, level);
 			},
@@ -176,7 +179,7 @@ function InitUpgrades() {
 				return Math.max(100, Math.floor(Math.pow(0.9, level) * 1000.0));
 			},
 			/*max_level=*/22,
-			/*value_suffix=*/" ms",
+			/*item_suffix=*/"balls",
 			/*visible_func=*/function() {
 				return GetUpgradeLevel("auto_drop") > 0;
 			},
@@ -226,6 +229,22 @@ function InitUpgrades() {
 				state.gold_ball_rate = this.GetValue() / 100.0;
 			},
 			/*on_buy=*/null));
+	upgrades_list.push(new Upgrade("gold_ball_value", "Gold Ball Value",
+			/*cost_func=*/function(level) {
+				return 10000000 * Math.pow(10, level);
+			},
+			/*value_func=*/function(level) {
+				return level + 2;
+			},
+			/*max_level=*/Infinity,
+			/*value_suffix=*/kTimesSymbol,
+			/*visible_func=*/function() {
+				return GetUpgradeLevel("unlock_gold_balls") > 0;
+			},
+			/*on_update=*/function() {
+				state.gold_ball_multiplier = this.GetValue();
+			},
+			/*on_buy=*/null));
 	
 	let upgrades_map = {};
 	for (let i = 0; i < upgrades_list.length; ++i) {
@@ -240,6 +259,30 @@ function AutoDropOn() {
 	return GetUpgradeLevel("auto_drop") >= 1 && state.save_file.auto_drop_enabled;
 }
 
+function UpdateScoreHistory() {
+	let total = 0;
+	for (let i = 0; i < state.score_history.length; ++i) {
+		total += state.score_history[i];
+		if (i == 0) {
+			state.save_file.stats.score_last5s = total;
+		} else if (i == 2) {
+			state.save_file.stats.score_last15s = total;
+		} else if (i == 11) {
+			state.save_file.stats.score_last60s = total;
+		}
+	}
+	for (let i = state.score_history.length - 1; i > 0; --i) {
+		state.score_history[i] = state.score_history[i - 1];
+	}
+	state.score_history[0] = 0;
+}
+
+function AddScore(points) {
+	state.save_file.stats.total_score += points;
+	state.save_file.points += points;
+	state.score_history[0] += points;
+}
+
 function InitState() {
 	return {
 		last_update: Date.now(),
@@ -248,6 +291,7 @@ function InitState() {
 		balls: new Array(0),
 		gold_balls: new Array(0),
 		score_text: new Array(0),
+		score_history: [...Array(12)].map(_ => 0),
 		notifications: new Array(0),
 		upgrades: InitUpgrades(),
 		display_points: 0,
@@ -270,6 +314,7 @@ function InitState() {
 		intervals: {
 			auto_save: null,
 			update: null,
+			score_history: null,
 		},
 		save_file: {
 			game_version: 1,
@@ -280,6 +325,9 @@ function InitState() {
 			quality: 0,
 			stats: {
 				total_score: 0,
+				score_last5s: 0,
+				score_last15s: 0,
+				score_last60s: 0,
 				balls_dropped: 0,
 				balls_dropped_manual: 0,
 				gold_balls: 0,
@@ -292,6 +340,7 @@ function InitState() {
 				auto_drop_delay: 0,
 				unlock_gold_balls: 0,
 				gold_ball_rate: 0,
+				gold_ball_value: 0,
 			},
 		},
 	}
@@ -651,6 +700,8 @@ function OnResize() {
 function Load() {
 	// TODO: Save and load the game.
 	document.getElementById(kTopCanvasLayer).addEventListener('click', OnClick);
+	document.title = kTitleAndVersion;
+	document.getElementById("title_version").innerHTML = kTitleAndVersion;
 	document.getElementById("messageBox").innerHTML =
 		"<h1>Welcome to Pachinkremental!</h1>" +
 		"<h1>Click anywhere in the green box to drop a ball.</h1>"
@@ -663,4 +714,5 @@ function Load() {
 	Draw(state);
 	
 	state.intervals.update = setInterval(Update, kFrameInterval);
+	state.intervals.score_history = setInterval(UpdateScoreHistory, 5000.0);
 }

@@ -87,6 +87,35 @@ class Upgrade {
 	}
 }
 
+class DelayReductionUpgrade extends Upgrade {
+	constructor(id, name, cost_func, value_func, max_level, item_suffix, visible_func, on_update, on_buy) {
+		super(id, name, cost_func, value_func, max_level, /*value_suffix=*/" ms", visible_func, on_update, on_buy);
+		this.item_suffix = item_suffix;
+	}
+	
+	GetText() {
+		let result = "<b>" + this.name + "</b>";
+		let level = this.GetLevel();
+		let delay_now = this.value_func(level);
+		let rate_now = 60000.0 / delay_now;
+		if (level >= this.max_level) {
+			result += "<br/>" + FormatNumberShort(delay_now) + this.value_suffix + " (MAX)";
+			result += "<br/>(" + FormatNumberShort(rate_now) + " " + this.item_suffix + "/min)";
+		} else {
+			let delay_next = this.value_func(level + 1);
+			let rate_next = 60000.0 / delay_next;
+			result += "<br/>" + FormatNumberShort(delay_now) + this.value_suffix;
+			result += " \u2192 " + FormatNumberShort(delay_next) + this.value_suffix;
+			result += "<br/>(" + FormatNumberShort(rate_now);
+			result += " \u2192 " + FormatNumberShort(rate_next);
+			result += " " + this.item_suffix + "/min)";
+			result += "<br/>Cost: " + FormatNumberShort(this.cost_func(level));
+		}
+		result += "<br/>Bought: " + level;
+		return result;
+	}
+}
+
 class FeatureUnlockUpgrade extends Upgrade {
 	constructor(id, name, cost, visible_func, on_update, on_buy) {
 		super(id, name, function(level) { return cost; }, /*value_func=*/null,
