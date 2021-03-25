@@ -37,6 +37,7 @@ A: This is intentional, both to make sure the game won't softlock with too many 
 * Minor rebalancing buffs:
 	* Center slot value upgrade cost halved to reduce slog in the early game.
 	* Auto-drop and max balls upgrades reveal their existence earlier.
+	* Unlocking auto-drop is no longer a prerequisite for upgrading max balls.
 
 ### v0.1.0 beta (2021-03-24)
 * Initial version.
