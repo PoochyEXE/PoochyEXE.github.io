@@ -164,6 +164,10 @@ function InitState() {
 	return state;
 }
 
+function GetSlotValue(slot_id) {
+	return state.target_sets[0].targets[slot_id].value;
+}
+
 function UpdateScoreDisplay(state, forceUpdate) {
 	const kRatio = (1.0 / 9.0) + 0.2;
 	let update = forceUpdate;

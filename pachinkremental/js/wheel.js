@@ -73,7 +73,7 @@ class BonusWheelSpace {
 	constructor(active_color, inactive_color, text_func, on_hit_func) {
 		this.active_color = active_color;
 		this.inactive_color = inactive_color;
-		this.text = text_func();
+		this.text = text_func ? text_func() : "";
 		this.text_func = text_func;
 		this.on_hit_func = on_hit_func;
 	}
@@ -89,16 +89,23 @@ const kWheelPopupTextColor = "255,255,255"
 class BonusWheelPointSpace extends BonusWheelSpace {
 	constructor(active_color, inactive_color, value_func) {
 		super(active_color, inactive_color,
-				/*text_func=*/function() {
-					return FormatNumberShort(value_func()) + " points";
-				},
-				/*on_hit_func=*/function(multi_spin) {
-					let value = value_func() * multi_spin;
-					AddScore(value);
-					let text = "+" + FormatNumberShort(value) + " points";
-					state.wheel_popup_text.push(new RisingText(
-							text, kWheelPopupTextPos, kWheelPopupTextColor));
-				});
+				/*text_func=*/null,
+				/*on_hit_func=*/null);
+		this.text_func = this.GetText;
+		this.on_hit_func = this.OnHit;
+		this.value_func = value_func;
+	}
+	
+	GetText() {
+		return FormatNumberShort(this.value_func()) + " points";
+	}
+	
+	OnHit(multi_spin) {
+		let value = this.value_func() * multi_spin;
+		AddScore(value);
+		let text = "+" + FormatNumberShort(value) + " points";
+		state.wheel_popup_text.push(new RisingText(
+				text, kWheelPopupTextPos, kWheelPopupTextColor));
 	}
 	
 	Update() {
@@ -106,30 +113,27 @@ class BonusWheelPointSpace extends BonusWheelSpace {
 	}
 }
 
-function DefaultWheel(state) {
-	const AwardPoints = function(value, multi_spin) {
-		
-	}
+function DefaultWheel() {
 	let spaces = Array(0);
 	spaces.push(new BonusWheelPointSpace(
 		/*active_color=*/"#8F8",
 		/*inactive_color=*/"#7D7",
 		/*value_func=*/function() {
-			return state.target_sets[0].targets[4].value * state.gold_ball_multiplier;
+			return GetSlotValue(4) * state.gold_ball_multiplier;
 		},
 	));
 	spaces.push(new BonusWheelPointSpace(
 		/*active_color=*/"#8FF",
 		/*inactive_color=*/"#7DD",
 		/*value_func=*/function() {
-			return state.target_sets[0].targets[3].value;
+			return GetSlotValue(3);
 		},
 	));
 	spaces.push(new BonusWheelPointSpace(
 		/*active_color=*/"#88F",
 		/*inactive_color=*/"#77D",
 		/*value_func=*/function() {
-			return state.target_sets[0].targets[4].value;
+			return GetSlotValue(4);
 		},
 	));
 	spaces.push(new BonusWheelSpace(
