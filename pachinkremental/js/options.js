@@ -35,6 +35,8 @@ function LoadGame(save_file_str) {
 		state.display_score = state.save_file.stats.total_score;
 		state.display_points = state.save_file.points;
 		state.update_upgrade_buttons = true;
+		state.bonus_wheel = default_state.bonus_wheel;
+		state.redraw_wheel = true;
 		for (let id in state.upgrades) {
 			state.upgrades[id].Update();
 		}
