@@ -55,6 +55,10 @@ function AutoSpinOn() {
 	return GetUpgradeLevel("auto_spin") >= 1 && state.save_file.auto_spin_enabled;
 }
 
+function MultiSpinOn() {
+	return GetUpgradeLevel("multi_spin") >= 1 && state.save_file.multi_spin_enabled;
+}
+
 function UpdateScoreHistory() {
 	let total = 0;
 	for (let i = 0; i < state.score_history.length; ++i) {
@@ -124,10 +128,11 @@ function InitState() {
 			game_version: 1,
 			points: 0,
 			spins: 0,
+			auto_drop_pos: null,
 			auto_drop_enabled: false,
 			auto_save_enabled: true,
 			auto_spin_enabled: false,
-			auto_drop_pos: null,
+			multi_spin_enabled: false,
 			quality: 0,
 			stats: {
 				total_score: 0,
@@ -151,6 +156,7 @@ function InitState() {
 				unlock_bonus_wheel: 0,
 				add_spin_target: 0,
 				auto_spin: 0,
+				multi_spin: 0,
 			},
 		},
 	};
@@ -190,12 +196,8 @@ function UpdateSpinCounter() {
 	document.getElementById("bonus_wheel").style.display = (GetUpgradeLevel("unlock_bonus_wheel") > 0) ? "inline" : "none";
 	document.getElementById("spin_count").innerHTML = state.save_file.spins;
 	document.getElementById("button_spin").disabled = (state.bonus_wheel.IsSpinning() || state.save_file.spins <= 0);
-}
-
-function UpdateAllWheelSpaces() {
-	for (let i = 0; i < state.bonus_wheel.spaces.length; ++i) {
-		state.bonus_wheel.spaces[i].Update();
-	}
+	document.getElementById("multi_spin").style.display = (GetUpgradeLevel("multi_spin") > 0) ? "inline" : "none";
+	document.getElementById("multi_spin_count").innerHTML = state.bonus_wheel.multi_spin;
 }
 
 function UpdateStatsPanel(state) {

@@ -202,7 +202,7 @@ function InitUpgrades() {
 				for (let i = 0; i < bottom_targets.length; ++i) {
 					state.score_text.push(new RisingText(popup_text, bottom_targets[i].pos, "0,0,255"));
 				}
-				UpdateAllWheelSpaces();
+				state.bonus_wheel.UpdateAllSpaces();
 			}));
 	upgrades_list.push(new Upgrade("center_value", "Center Slot Value",
 			/*cost_func=*/function(level) {
@@ -219,7 +219,7 @@ function InitUpgrades() {
 				let target = state.target_sets[0].targets[4];
 				let popup_text = kTimesSymbol + "2";
 				state.score_text.push(new RisingText(popup_text, target.pos, "0,0,255"));
-				UpdateAllWheelSpaces();
+				state.bonus_wheel.UpdateAllSpaces();
 			}));
 	upgrades_list.push(new ToggleUnlockUpgrade("auto_drop", "Auto-Drop", /*cost=*/100000,
 			/*visible_func=*/function() {
@@ -301,7 +301,7 @@ function InitUpgrades() {
 			},
 			/*on_update=*/function() {
 				state.gold_ball_multiplier = this.GetValue();
-				UpdateAllWheelSpaces();
+				state.bonus_wheel.UpdateAllSpaces();
 			},
 			/*on_buy=*/null));
 	upgrades_list.push(new FeatureUnlockUpgrade("unlock_bonus_wheel", "Unlock Bonus Wheel", /*cost=*/2000000,
@@ -316,7 +316,7 @@ function InitUpgrades() {
 				spin_targets[0].active = unlocked;
 				spin_targets[2].active = unlocked;
 				UpdateSpinCounter();
-				UpdateAllWheelSpaces();
+				state.bonus_wheel.UpdateAllSpaces();
 				state.redraw_targets = true;
 			}));
 	upgrades_list.push(new FeatureUnlockUpgrade("add_spin_target", "Extra Spin Target", /*cost=*/10000000,
@@ -335,9 +335,12 @@ function InitUpgrades() {
 			/*visible_func=*/function() {
 				return GetUpgradeLevel("unlock_bonus_wheel") > 0;
 			},
-			/*on_update=*/function() {
-				state.update_upgrade_buttons = true;
-			}));
+			/*on_update=*/null));
+	upgrades_list.push(new ToggleUnlockUpgrade("multi_spin", "Multi-Spin", /*cost=*/50000000,
+			/*visible_func=*/function() {
+				return GetUpgradeLevel("unlock_bonus_wheel") > 0;
+			},
+			/*on_update=*/null));
 	
 	let upgrades_map = {};
 	for (let i = 0; i < upgrades_list.length; ++i) {

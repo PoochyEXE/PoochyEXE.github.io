@@ -3,17 +3,31 @@ class BonusWheel {
 		this.spaces = spaces;
 		this.pos = 0.5 / spaces.length;
 		this.spin_distance = 0.0;  // Revolutions left to turn on current spin
+		this.multi_spin = 1;
 	}
 	
 	IsSpinning() {
 		return this.spin_distance > 0.0;
 	}
 	
+	UpdateAllSpaces() {
+		for (let i = 0; i < this.spaces.length; ++i) {
+			this.spaces[i].Update();
+		}
+	}
+	
 	Spin() {
 		if (this.IsSpinning() || state.save_file.spins <= 0) {
 			return false;
 		}
+		if (MultiSpinOn()) {
+			this.multi_spin = Math.ceil(state.save_file.spins * 0.1);
+		} else {
+			this.multi_spin = 1;
+		}
 		this.spin_distance = Math.random() * 2 + 2.0;
+		this.UpdateAllSpaces();
+		UpdateSpinCounter();
 		return true;
 	}
 	
@@ -45,9 +59,9 @@ class BonusWheel {
 		if (this.spin_distance <= delta) {
 			this.Rotate(this.spin_distance);
 			this.spin_distance = 0;
-			--state.save_file.spins;
+			state.save_file.spins -= this.multi_spin;
 			UpdateSpinCounter();
-			this.PositionToSpace(this.pos).on_hit_func();
+			this.PositionToSpace(this.pos).on_hit_func(this.multi_spin);
 		} else {
 			this.Rotate(delta);
 			this.spin_distance -= delta;
@@ -69,37 +83,53 @@ class BonusWheelSpace {
 	}
 }
 
+const kWheelPopupTextPos = new Point(150, 75);
+const kWheelPopupTextColor = "255,255,255"
+
+class BonusWheelPointSpace extends BonusWheelSpace {
+	constructor(active_color, inactive_color, value_func) {
+		super(active_color, inactive_color,
+				/*text_func=*/function() {
+					return FormatNumberShort(value_func()) + " points";
+				},
+				/*on_hit_func=*/function(multi_spin) {
+					let value = value_func() * multi_spin;
+					AddScore(value);
+					let text = "+" + FormatNumberShort(value) + " points";
+					state.wheel_popup_text.push(new RisingText(
+							text, kWheelPopupTextPos, kWheelPopupTextColor));
+				});
+	}
+	
+	Update() {
+		this.text = this.text_func();
+	}
+}
+
 function DefaultWheel(state) {
-	const kPopupTextPos = new Point(150, 75);
-	const kPopupTextColor = "255,255,255"
+	const AwardPoints = function(value, multi_spin) {
+		
+	}
 	let spaces = Array(0);
-	spaces.push(new BonusWheelSpace(
+	spaces.push(new BonusWheelPointSpace(
 		/*active_color=*/"#8F8",
 		/*inactive_color=*/"#7D7",
-		/*text_func=*/function() {
-			return FormatNumberShort(state.target_sets[0].targets[4].value * state.gold_ball_multiplier) + " points";
-		},
-		/*on_hit_func=*/function() { 
-			AddScore(state.target_sets[0].targets[4].value * state.gold_ball_multiplier);
-			state.wheel_popup_text.push(new RisingText("+" + this.text, kPopupTextPos, kPopupTextColor));
+		/*value_func=*/function() {
+			return state.target_sets[0].targets[4].value * state.gold_ball_multiplier;
 		},
 	));
-	spaces.push(new BonusWheelSpace(
+	spaces.push(new BonusWheelPointSpace(
 		/*active_color=*/"#8FF",
 		/*inactive_color=*/"#7DD",
-		/*text_func=*/function() { return FormatNumberShort(state.target_sets[0].targets[3].value) + " points"; },
-		/*on_hit_func=*/function() {
-			AddScore(state.target_sets[0].targets[3].value);
-			state.wheel_popup_text.push(new RisingText("+" + this.text, kPopupTextPos, kPopupTextColor));
+		/*value_func=*/function() {
+			return state.target_sets[0].targets[3].value;
 		},
 	));
-	spaces.push(new BonusWheelSpace(
+	spaces.push(new BonusWheelPointSpace(
 		/*active_color=*/"#88F",
 		/*inactive_color=*/"#77D",
-		/*text_func=*/function() { return FormatNumberShort(state.target_sets[0].targets[4].value) + " points"; },
-		/*on_hit_func=*/function() {
-			AddScore(state.target_sets[0].targets[4].value);
-			state.wheel_popup_text.push(new RisingText("+" + this.text, kPopupTextPos, kPopupTextColor));
+		/*value_func=*/function() {
+			return state.target_sets[0].targets[4].value;
 		},
 	));
 	spaces.push(new BonusWheelSpace(
@@ -108,7 +138,8 @@ function DefaultWheel(state) {
 		/*text_func=*/function() { return "Drop 3 gold balls"; },
 		/*on_hit_func=*/function() {
 			DropBonusGoldBalls(3);
-			state.wheel_popup_text.push(new RisingText("3 gold balls!", kPopupTextPos, kPopupTextColor));
+			state.wheel_popup_text.push(new RisingText(
+					"3 gold balls!", kWheelPopupTextPos, kWheelPopupTextColor));
 		},
 	));
 	spaces.push(new BonusWheelSpace(
@@ -116,7 +147,8 @@ function DefaultWheel(state) {
 		/*inactive_color=*/"#D77",
 		/*text_func=*/function() { return "ZONK"; },
 		/*on_hit_func=*/function() {
-			state.wheel_popup_text.push(new RisingText("*sad trombone*", kPopupTextPos, kPopupTextColor));
+			state.wheel_popup_text.push(new RisingText(
+					"*sad trombone*", kWheelPopupTextPos, kWheelPopupTextColor));
 		},
 	));
 	spaces.push(new BonusWheelSpace(
@@ -125,7 +157,8 @@ function DefaultWheel(state) {
 		/*text_func=*/function() { return "Drop 7 gold balls"; },
 		/*on_hit_func=*/function() {
 			DropBonusGoldBalls(7); 
-			state.wheel_popup_text.push(new RisingText("7 gold balls!", kPopupTextPos, kPopupTextColor));
+			state.wheel_popup_text.push(new RisingText(
+					"7 gold balls!", kWheelPopupTextPos, kWheelPopupTextColor));
 		},
 	));
 	return new BonusWheel(spaces);

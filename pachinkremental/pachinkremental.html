@@ -36,9 +36,13 @@
 				</div>
 				<div id="bonus_wheel" class="bonusWheel" style="display: none;">
 					<button type="button" class="bonusWheel" id="button_spin" onclick="SpinBonusWheel()">Spin the wheel!</button>
-					Spins: <div id="spin_count" style="display: inline;">0</div>
+					Spins:&nbsp;<div id="spin_count" style="display: inline;">0</div>
+					<div id="multi_spin" style="display: inline;">
+					 | Multi&#x2011;Spin:&nbsp;<div id="multi_spin_count" style="display: inline;">1</div>&#xD7;
+					</div>
 					<div class="menuPadding"></div>
 					<canvas id="canvasBonusWheel" class="bonusWheel" style="z-index: 1;"></canvas>
+					<div class="menuPadding"></div>
 				</div>
 			</td>
 		</tr>
@@ -87,6 +91,9 @@
 							</button>
 							<button type="button" class="upgradeButton" id="button_upgrade_auto_spin" onclick="UpgradeButtonHandler(this)"
 									title="Automatically spin the Bonus Wheel.">
+							</button>
+							<button type="button" class="upgradeButton" id="button_upgrade_multi_spin" onclick="UpgradeButtonHandler(this)"
+									title="Uses 10% of your available spins at a time, multiplying any points you win from that spin. NOTE: Bonus gold ball drops are not multiplied.">
 							</button>
 						</div>
 					</div>
