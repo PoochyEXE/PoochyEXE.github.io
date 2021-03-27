@@ -71,6 +71,7 @@ class BonusWheelSpace {
 
 function DefaultWheel(state) {
 	const kPopupTextPos = new Point(150, 75);
+	const kPopupTextColor = "255,255,255"
 	let spaces = Array(0);
 	spaces.push(new BonusWheelSpace(
 		/*active_color=*/"#8F8",
@@ -80,7 +81,7 @@ function DefaultWheel(state) {
 		},
 		/*on_hit_func=*/function() { 
 			AddScore(state.target_sets[0].targets[4].value * state.gold_ball_multiplier);
-			state.wheel_popup_text.push(new RisingText("+" + this.text, kPopupTextPos, "0,170,0"));
+			state.wheel_popup_text.push(new RisingText("+" + this.text, kPopupTextPos, kPopupTextColor));
 		},
 	));
 	spaces.push(new BonusWheelSpace(
@@ -89,7 +90,7 @@ function DefaultWheel(state) {
 		/*text_func=*/function() { return FormatNumberShort(state.target_sets[0].targets[3].value) + " points"; },
 		/*on_hit_func=*/function() {
 			AddScore(state.target_sets[0].targets[3].value);
-			state.wheel_popup_text.push(new RisingText("+" + this.text, kPopupTextPos, "0,170,0"));
+			state.wheel_popup_text.push(new RisingText("+" + this.text, kPopupTextPos, kPopupTextColor));
 		},
 	));
 	spaces.push(new BonusWheelSpace(
@@ -98,7 +99,7 @@ function DefaultWheel(state) {
 		/*text_func=*/function() { return FormatNumberShort(state.target_sets[0].targets[4].value) + " points"; },
 		/*on_hit_func=*/function() {
 			AddScore(state.target_sets[0].targets[4].value);
-			state.wheel_popup_text.push(new RisingText("+" + this.text, kPopupTextPos, "0,170,0"));
+			state.wheel_popup_text.push(new RisingText("+" + this.text, kPopupTextPos, kPopupTextColor));
 		},
 	));
 	spaces.push(new BonusWheelSpace(
@@ -107,7 +108,7 @@ function DefaultWheel(state) {
 		/*text_func=*/function() { return "Drop 3 gold balls"; },
 		/*on_hit_func=*/function() {
 			DropBonusGoldBalls(3);
-			state.wheel_popup_text.push(new RisingText("3 gold balls!", kPopupTextPos, "0,170,0"));
+			state.wheel_popup_text.push(new RisingText("3 gold balls!", kPopupTextPos, kPopupTextColor));
 		},
 	));
 	spaces.push(new BonusWheelSpace(
@@ -115,7 +116,7 @@ function DefaultWheel(state) {
 		/*inactive_color=*/"#D77",
 		/*text_func=*/function() { return "ZONK"; },
 		/*on_hit_func=*/function() {
-			state.wheel_popup_text.push(new RisingText("*sad trombone*", kPopupTextPos, "0,170,0"));
+			state.wheel_popup_text.push(new RisingText("*sad trombone*", kPopupTextPos, kPopupTextColor));
 		},
 	));
 	spaces.push(new BonusWheelSpace(
@@ -124,7 +125,7 @@ function DefaultWheel(state) {
 		/*text_func=*/function() { return "Drop 7 gold balls"; },
 		/*on_hit_func=*/function() {
 			DropBonusGoldBalls(7); 
-			state.wheel_popup_text.push(new RisingText("7 gold balls!", kPopupTextPos, "0,170,0"));
+			state.wheel_popup_text.push(new RisingText("7 gold balls!", kPopupTextPos, kPopupTextColor));
 		},
 	));
 	return new BonusWheel(spaces);

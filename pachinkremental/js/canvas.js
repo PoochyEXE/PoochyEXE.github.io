@@ -210,7 +210,7 @@ const kWheelWidth = 250;
 
 function DrawWheelSpace(space, is_active, left_x, top_y, ctx) {
 	const kTextWidth = 150;
-	const kFontSize = 14;
+	const kFontSize = 20;
 	const kFont = "bold " + kFontSize + "px sans-serif";
 	ctx.fillStyle = is_active ? space.active_color : space.inactive_color;
 	ctx.fillRect(left_x, top_y, kWheelWidth, kSpaceHeight);
@@ -220,7 +220,7 @@ function DrawWheelSpace(space, is_active, left_x, top_y, ctx) {
 
 	ctx.textAlign = "center";
 	ctx.fillStyle = "#000";
-	ctx.font = "bold 14px sans-serif";
+	ctx.font = kFont;
 	ctx.fillText(space.text, center_x, center_y + kFontSize / 3, kTextWidth);
 }
 
