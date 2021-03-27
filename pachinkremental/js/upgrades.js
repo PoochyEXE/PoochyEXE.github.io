@@ -181,3 +181,207 @@ class ToggleUnlockUpgrade extends FeatureUnlockUpgrade {
 		}
 	}
 }
+
+function InitUpgrades() {
+	const kTimesSymbol = "\u00D7";
+	let upgrades_list = new Array();
+	upgrades_list.push(new Upgrade("multiplier", "Point Multiplier",
+			/*cost_func=*/function(level) {
+				return 200 * Math.pow(200, level);
+			},
+			/*value_func=*/function(level) {
+				return Math.pow(5, level);
+			},
+			/*max_level=*/Infinity,
+			/*value_suffix=*/kTimesSymbol,
+			/*visible_func=*/null,
+			/*on_update=*/UpdateBottomTargets,
+			/*on_buy=*/function() {
+				let bottom_targets = state.target_sets[0].targets;
+				let popup_text = kTimesSymbol + "5";
+				for (let i = 0; i < bottom_targets.length; ++i) {
+					state.score_text.push(new RisingText(popup_text, bottom_targets[i].pos, "0,0,255"));
+				}
+				UpdateAllWheelSpaces();
+			}));
+	upgrades_list.push(new Upgrade("center_value", "Center Slot Value",
+			/*cost_func=*/function(level) {
+				return 100 * Math.pow(5, level);
+			},
+			/*value_func=*/function(level) {
+				return 250 * Math.pow(2, level);
+			},
+			/*max_level=*/Infinity,
+			/*value_suffix=*/'',
+			/*visible_func=*/null,
+			/*on_update=*/UpdateBottomTargets,
+			/*on_buy=*/function() {
+				let target = state.target_sets[0].targets[4];
+				let popup_text = kTimesSymbol + "2";
+				state.score_text.push(new RisingText(popup_text, target.pos, "0,0,255"));
+				UpdateAllWheelSpaces();
+			}));
+	upgrades_list.push(new ToggleUnlockUpgrade("auto_drop", "Auto-Drop", /*cost=*/100000,
+			/*visible_func=*/function() {
+				return GetUpgradeLevel("center_value") > 1;
+			},
+			/*on_update=*/function() {
+				state.redraw_auto_drop = true;
+				state.update_upgrade_buttons = true;
+			}));
+	upgrades_list.push(new DelayReductionUpgrade("auto_drop_delay", "Auto-Drop Delay",
+			/*cost_func=*/function(level) {
+				return 200000 * Math.pow(2, level);
+			},
+			/*value_func=*/function(level) {
+				return Math.max(100, Math.floor(Math.pow(0.9, level) * 1000.0));
+			},
+			/*max_level=*/22,
+			/*item_suffix=*/"balls",
+			/*visible_func=*/function() {
+				return GetUpgradeLevel("auto_drop") > 0;
+			},
+			/*on_update=*/function() {
+				state.auto_drop_cooldown = this.GetValue();
+				if (state.auto_drop_cooldown_left > state.auto_drop_cooldown) {
+					state.auto_drop_cooldown_left = state.auto_drop_cooldown;
+				}
+				state.redraw_auto_drop = true;
+			},
+			/*on_buy=*/null));
+	upgrades_list.push(new Upgrade("max_balls", "Max Balls",
+			/*cost_func=*/function(level) {
+				return 200000 * Math.pow(2, level);
+			},
+			/*value_func=*/function(level) {
+				return level + 1;
+			},
+			/*max_level=*/Infinity,
+			/*value_suffix=*/'',
+			/*visible_func=*/function() {
+				return GetUpgradeLevel("center_value") > 1;
+			},
+			/*on_update=*/function() {
+				return state.max_balls = this.GetValue();
+			},
+			/*on_buy=*/null));
+	upgrades_list.push(new FeatureUnlockUpgrade("unlock_gold_balls", "Unlock Gold Balls", /*cost=*/500000,
+			/*visible_func=*/function() {
+				return GetUpgradeLevel("max_balls") > 0;
+			},
+			/*on_update=*/function() {
+			}));
+	upgrades_list.push(new Upgrade("gold_ball_rate", "Gold Ball Rate",
+			/*cost_func=*/function(level) {
+				return 1000000 * Math.pow(2, level);
+			},
+			/*value_func=*/function(level) {
+				return level + 1;
+			},
+			/*max_level=*/49,
+			/*value_suffix=*/"%",
+			/*visible_func=*/function() {
+				return GetUpgradeLevel("unlock_gold_balls") > 0;
+			},
+			/*on_update=*/function() {
+				state.gold_ball_rate = this.GetValue() / 100.0;
+			},
+			/*on_buy=*/null));
+	upgrades_list.push(new Upgrade("gold_ball_value", "Gold Ball Value",
+			/*cost_func=*/function(level) {
+				return 10000000 * Math.pow(10, level);
+			},
+			/*value_func=*/function(level) {
+				return level + 2;
+			},
+			/*max_level=*/Infinity,
+			/*value_suffix=*/kTimesSymbol,
+			/*visible_func=*/function() {
+				return GetUpgradeLevel("unlock_gold_balls") > 0;
+			},
+			/*on_update=*/function() {
+				state.gold_ball_multiplier = this.GetValue();
+				UpdateAllWheelSpaces();
+			},
+			/*on_buy=*/null));
+	upgrades_list.push(new FeatureUnlockUpgrade("unlock_bonus_wheel", "Unlock Bonus Wheel", /*cost=*/2000000,
+			/*visible_func=*/function() {
+				return GetUpgradeLevel("unlock_gold_balls") > 0;
+			},
+			/*on_update=*/function() {
+				let unlocked = (this.GetValue() > 0);
+				document.getElementById("bonus_wheel").style.display = unlocked ? "inline" : "none";
+				let spin_targets = state.target_sets[1].targets;
+				console.assert(spin_targets.length == 3);
+				spin_targets[0].active = unlocked;
+				spin_targets[2].active = unlocked;
+				UpdateSpinCounter();
+				UpdateAllWheelSpaces();
+				state.redraw_targets = true;
+			}));
+	upgrades_list.push(new FeatureUnlockUpgrade("add_spin_target", "Extra Spin Target", /*cost=*/10000000,
+			/*visible_func=*/function() {
+				return GetUpgradeLevel("unlock_bonus_wheel") > 0;
+			},
+			/*on_update=*/function() {
+				let unlocked = (this.GetValue() > 0);
+				document.getElementById("bonus_wheel").style.display = unlocked ? "inline" : "none";
+				let spin_targets = state.target_sets[1].targets;
+				console.assert(spin_targets.length == 3);
+				spin_targets[1].active = unlocked;
+				state.redraw_targets = true;
+			}));
+	upgrades_list.push(new ToggleUnlockUpgrade("auto_spin", "Auto-Spin", /*cost=*/50000000,
+			/*visible_func=*/function() {
+				return GetUpgradeLevel("unlock_bonus_wheel") > 0;
+			},
+			/*on_update=*/function() {
+				state.update_upgrade_buttons = true;
+			}));
+	
+	let upgrades_map = {};
+	for (let i = 0; i < upgrades_list.length; ++i) {
+		let upgrade = upgrades_list[i];
+		upgrades_map[upgrade.id] = upgrade;
+	}
+	
+	return upgrades_map;
+}
+
+function UpdateBottomTargets() {
+	let bottom_targets = state.target_sets[0].targets;
+	console.assert(bottom_targets.length == 9);
+	let multiplier_upgrade = state.upgrades["multiplier"];
+	let multiplier = multiplier_upgrade.GetValue();
+	let center_value_upgrade = state.upgrades["center_value"];
+	for (let i = 0; i < kBaseSlotValues.length; ++i) {
+		let base_value = kBaseSlotValues[i];
+		if (i == 4) {
+			base_value = center_value_upgrade.GetValue();
+		}
+		bottom_targets[i].SetValue(base_value * multiplier);
+	}
+	state.redraw_targets = true;
+}
+
+function UpgradeButtonHandler(elem) {
+	const kPrefix = "button_upgrade_";
+	console.assert(elem.id.indexOf(kPrefix) == 0);
+	let upgrade_id = elem.id.slice(kPrefix.length);
+	state.upgrades[upgrade_id].OnClick();
+}
+
+function UpdateUpgradeButtons(state) {
+	if (!state.update_upgrade_buttons) {
+		return;
+	}
+	state.update_upgrade_buttons = false;
+	
+	for (let id in state.upgrades) {
+		let upgrade = state.upgrades[id];
+		let elem = document.getElementById("button_upgrade_" + id);
+		elem.innerHTML = upgrade.GetText();
+		elem.disabled = !upgrade.ShouldEnableButton();
+		elem.style.display = upgrade.visible_func() ? "inline" : "none";
+	}
+}

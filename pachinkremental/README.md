@@ -28,9 +28,14 @@ A: This is intentional, both to make sure the game won't softlock with too many 
 
 * Making the window too narrow can break some CSS and make the menu UI ugly.
 * Firefox seems to occasionally delete the save file upon closing the tab. If you're playing in Firefox, export your save frequently!
-* Auto-drop doesn't work correctly while the game is running in the background.
 
 ## Changelog
+
+### v0.3.0 beta (2021-03-27)
+* New feature: Bonus wheel!
+* Bugfix: Auto-drop should now work correctly while the game is running in the background.
+* Gold balls now create a gold ripple when they're dropped.
+* Moved some code from game.js to other files so I don't have a giant monolithic file.
 
 ### v0.2.1 beta (2021-03-25)
 * Pop-up text is now color-coded:

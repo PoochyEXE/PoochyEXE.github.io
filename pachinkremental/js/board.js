@@ -24,6 +24,12 @@ class Target {
 			return;
 		}
 		if (this.pos.DistanceSqrToPoint(ball.pos) < this.hitbox_radius_sqr) {
+			if (state.save_file.stats.target_hits[this.id]) {
+				++state.save_file.stats.target_hits[this.id];
+			} else {
+				state.save_file.stats.target_hits[this.id] = 1;
+			}
+			
 			this.on_hit(ball);
 			ball.last_hit = this.id;
 		}
@@ -32,7 +38,7 @@ class Target {
 
 class ScoreTarget extends Target {
 	constructor(pos, draw_radius, hitbox_radius, color, id, active, value) {
-		super(pos, draw_radius, hitbox_radius, color, FormatNumberShort(value), id, active, null);
+		super(pos, draw_radius, hitbox_radius, color, /*text=*/FormatNumberShort(value), id, active, /*on_hit=*/null);
 		this.on_hit = this.OnHit;
 		this.value = value;
 	}
@@ -47,13 +53,25 @@ class ScoreTarget extends Target {
 			AddScore(this.value);
 			state.score_text.push(new RisingText("+" + this.text, ball.pos, "0,170,0"));
 		}
-		state.stats_updated = true;
-		state.update_upgrade_buttons = true;
 	}
 	
 	SetValue(new_value) {
 		this.value = new_value;
 		this.text = FormatNumberShort(new_value);
+	}
+}
+
+class SpinTarget extends Target {
+	constructor(pos, draw_radius, hitbox_radius, color, id) {
+		
+		super(pos, draw_radius, hitbox_radius, color, /*text=*/"Spin", id, /*on_hit=*/null);
+		this.on_hit = this.OnHit;
+	}
+
+	OnHit(ball) {
+		++state.save_file.spins;
+		UpdateSpinCounter();
+		state.score_text.push(new RisingText("+1 Spin", ball.pos, "0,170,0"));
 	}
 }
 
@@ -148,4 +166,100 @@ class PegBoard {
 		}
 		return result;
 	}
+}
+
+const kHorizontalSpacing = 18;
+const kWallSpacing = 4;
+const kHalfWallSpace = kWallSpacing / 2;
+const kVerticalSpacing = Math.sqrt(3) * kHorizontalSpacing / 2;
+const kColumns = 9;
+const kRows = 13;
+const kBottomSlotRows = 5;
+const kWidth = kHorizontalSpacing * kColumns + kWallSpacing;
+const kHeight = 256;
+const kBaseSlotValues = [20, 100, 200, 1, 250, 1, 200, 100, 20];
+
+function DefaultBoard() {
+	let pegs = Array(0);
+	for (let y = kHeight - kHalfWallSpace; y >= kHalfWallSpace; y -= kWallSpacing) {
+		pegs.push(new Point(kHalfWallSpace, y));
+		pegs.push(new Point(kWidth - kHalfWallSpace, y));
+	}
+	var y = kHeight - kHalfWallSpace;
+	for (let col = 0; col < kColumns; ++col) {
+		const prev_x = col * kHorizontalSpacing + kHalfWallSpace;
+		const next_x = (col + 1) * kHorizontalSpacing + kHalfWallSpace;
+		const delta_x = next_x - prev_x;
+		const mid_pegs = Math.floor(delta_x / kWallSpacing);
+		for (let subcol = 1; subcol <= mid_pegs; ++subcol) {
+			const x = prev_x + (subcol * delta_x / mid_pegs);
+			pegs.push(new Point(x, y));
+		}
+	}
+	y -= kWallSpacing;
+	for (let row = 1; row < kBottomSlotRows; ++row) {
+		for (let col = 1; col < kColumns; ++col) {
+			const x = col * kHorizontalSpacing + kHalfWallSpace;
+			pegs.push(new Point(x, y));
+		}
+		y -= kWallSpacing;
+	}
+	for (let row = 0; row < kRows; ++row) {
+		if (row % 2 == 0) {
+			for (let col = 1; col < kColumns; ++col) {
+				const x = col * kHorizontalSpacing + kHalfWallSpace;
+				pegs.push(new Point(x, y));
+			}
+		} else {
+			for (let col = 0; col < kColumns; ++col) {
+				const x = (col + 0.5) * kHorizontalSpacing + kHalfWallSpace;
+				pegs.push(new Point(x, y));
+			}
+			const y_above = y - kVerticalSpacing / 4;
+			const x_left = 0.25 * kHorizontalSpacing + kHalfWallSpace;
+			const x_right = kWidth - x_left;
+			pegs.push(new Point(x_left, y_above));
+			pegs.push(new Point(x_right, y_above));
+		}
+		y -= kVerticalSpacing;
+	}
+	max_drop_y = y;
+	min_drop_x = 10;
+	max_drop_x = kWidth - 10;
+	return new PegBoard(kWidth, kHeight, pegs);
+}
+
+function DefaultTargets() {
+	const kDrawRadius = (kHorizontalSpacing - kWallSpacing) / 2;
+	const kTargetColor = "#8FF";
+	const kHitboxRadius = Math.min(kDrawRadius * 1.5 - kBallRadius);
+
+	let target_sets = Array(0);
+	
+	const kBottomTargetY = kHeight - kDrawRadius - kWallSpacing;
+	let bottom_targets = Array(0);
+	for (let col = 0; col < kBaseSlotValues.length; ++col) {
+		const x = (col + 0.5) * kHorizontalSpacing + kHalfWallSpace;
+		const pos = new Point(x, kBottomTargetY);
+		const value = kBaseSlotValues[col];
+		bottom_targets.push(new ScoreTarget(
+				pos, kDrawRadius, kHitboxRadius, kTargetColor, col, /*active=*/true, value));
+	}
+	target_sets.push(new TargetSet(bottom_targets));
+	
+	const kSpinTargetColor = "rgba(0, 0, 255, 0.5)";
+	const kSpinTargetY = kHeight - (kWallSpacing * (kBottomSlotRows + 0.5)) - kVerticalSpacing * 2;
+	let spin_targets = Array(0);
+	const left_x = 1.5 * kHorizontalSpacing + kHalfWallSpace;
+	const center_x = 4.5 * kHorizontalSpacing + kHalfWallSpace;
+	const right_x = 7.5 * kHorizontalSpacing + kHalfWallSpace;
+	spin_targets.push(new SpinTarget(
+			new Point(left_x, kSpinTargetY), kDrawRadius, kHitboxRadius, kSpinTargetColor, "spin_left"));
+	spin_targets.push(new SpinTarget(
+			new Point(center_x, kSpinTargetY), kDrawRadius, kHitboxRadius, kSpinTargetColor, "spin_center"));
+	spin_targets.push(new SpinTarget(
+			new Point(right_x, kSpinTargetY), kDrawRadius, kHitboxRadius, kSpinTargetColor, "spin_right"));
+	target_sets.push(new TargetSet(spin_targets));
+
+	return target_sets;
 }

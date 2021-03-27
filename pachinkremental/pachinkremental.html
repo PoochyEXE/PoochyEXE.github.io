@@ -8,9 +8,11 @@
 	<script type="text/javascript" src="js/board.js"></script>
 	<script type="text/javascript" src="js/canvas.js"></script>
 	<script type="text/javascript" src="js/notifications.js"></script>
+	<script type="text/javascript" src="js/options.js"></script>
 	<script type="text/javascript" src="js/physics.js"></script>
 	<script type="text/javascript" src="js/upgrades.js"></script>
 	<script type="text/javascript" src="js/util.js"></script>
+	<script type="text/javascript" src="js/wheel.js"></script>
 
 	<script type="text/javascript" src="js/game.js"></script>
 
@@ -26,10 +28,17 @@
 				<canvas id="canvas3" class="board" style="z-index: 3;"></canvas>
 				<canvas id="canvas4" class="board" style="z-index: 4;"></canvas>
 				<canvas id="canvas5" class="board" style="z-index: 5;"></canvas>
+				<canvas id="canvas6" class="board" style="z-index: 6;"></canvas>
 			</td>
 			<td class="rightUI" style="vertical-align: top;">
-				<div id="messageBox" class="messageBox">
+				<div id="message_box" class="messageBox">
 					<h1>Loading...</h1>
+				</div>
+				<div id="bonus_wheel" class="bonusWheel" style="display: none;">
+					<button type="button" class="bonusWheel" id="button_spin" onclick="SpinBonusWheel()">Spin the wheel!</button>
+					Spins: <div id="spin_count" style="display: inline;">0</div>
+					<div class="menuPadding"></div>
+					<canvas id="canvasBonusWheel" class="bonusWheel" style="z-index: 1;"></canvas>
 				</div>
 			</td>
 		</tr>
@@ -68,6 +77,16 @@
 							</button>
 							<button type="button" class="upgradeButton" id="button_upgrade_gold_ball_value" onclick="UpgradeButtonHandler(this)"
 									title="Increases point multiplier for gold balls.">
+							</button>
+							<div class="menuPadding"></div>
+							<button type="button" class="upgradeButton" id="button_upgrade_unlock_bonus_wheel" onclick="UpgradeButtonHandler(this)"
+									title="Unlocks the Bonus Wheel. Also adds 2 targets, which award a spin for each ball that passes through them. Point values on the wheel scale based on your upgrades.">
+							</button>
+							<button type="button" class="upgradeButton" id="button_upgrade_add_spin_target" onclick="UpgradeButtonHandler(this)"
+									title="Adds an extra target that awards Bonus Wheel spins.">
+							</button>
+							<button type="button" class="upgradeButton" id="button_upgrade_auto_spin" onclick="UpgradeButtonHandler(this)"
+									title="Automatically spin the Bonus Wheel.">
 							</button>
 						</div>
 					</div>

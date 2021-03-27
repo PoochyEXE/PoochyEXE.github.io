@@ -84,6 +84,15 @@ class RisingText {
 	}
 }
 
+class RippleEffect {
+	constructor(pos, color_rgb, start_radius) {
+		this.pos = pos;
+		this.color_rgb = color_rgb;
+		this.start_radius = start_radius;
+		this.start_time = Date.now();
+	}
+}
+
 function SampleGaussianNoise(mu, sigma) {
     const two_pi = 2.0 * Math.PI;
 

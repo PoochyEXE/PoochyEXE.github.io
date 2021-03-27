@@ -78,15 +78,6 @@ function ResizeCanvas() {
 	}
 }
 
-function DrawDropZone(max_drop_y, min_drop_x, max_drop_x, can_drop, ctx) {
-	if (can_drop) {
-		ctx.fillStyle = "rgba(0, 255, 0, 0.25)";
-	} else {
-		ctx.fillStyle = "rgba(255, 0, 0, 0.25)";
-	}
-	ctx.fillRect(min_drop_x, 0, (max_drop_x - min_drop_x), max_drop_y);
-}
-
 function DrawPegs(positions, ctx) {
 	for (let i = 0; i < positions.length; ++i) {
 		DrawGradientCircle(ctx, positions[i], kPegRadius, kPegColor);
@@ -128,30 +119,27 @@ function DrawTargets(target_sets, ctx) {
 			
 			ctx.textAlign = "center";
 			ctx.fillStyle = "#000";
-			ctx.font = font_size + 'px sans-serif';
+			ctx.font = font_size + "px sans-serif";
 			let text_width = target.draw_radius * 1.5;
 			ctx.fillText(target.text, pos.x, pos.y + font_size / 3, text_width);
 		}
 	}
 }
 
-function DrawScoreText(score_text, ctx) {
-	const kDuration = 1000.0;
-	const kRise = 15.0;
-	let font_size = 8;
+function DrawScoreText(score_text, font_size, duration, rise, ctx) {
 	let next_index = 0;
 	const time = Date.now();
 	for (let i = 0; i < score_text.length; ++i) {
 		let curr_text = score_text[i];
 		let elapsed = time - curr_text.start_time;
-		if (elapsed > kDuration) {
+		if (elapsed > duration) {
 			continue;
 		}
-		let fraction = elapsed / kDuration;
+		let fraction = elapsed / duration;
 		ctx.textAlign = "center";
-		ctx.font = 'bold ' + font_size + 'px sans-serif';
+		ctx.font = "bold " + font_size + "px sans-serif";
 		ctx.fillStyle = "rgba(" + curr_text.color_rgb + ", " + (1 - fraction) + ")";
-		ctx.fillText(curr_text.text, curr_text.pos.x, curr_text.pos.y - fraction * kRise);
+		ctx.fillText(curr_text.text, curr_text.pos.x, curr_text.pos.y - fraction * rise);
 		
 		if (next_index != i) {
 			score_text[next_index] = score_text[i];
@@ -159,6 +147,30 @@ function DrawScoreText(score_text, ctx) {
 		++next_index;
 	}
 	score_text.length = next_index;
+}
+
+function DrawRipples(ripples, duration, expand, ctx) {
+	let next_index = 0;
+	const time = Date.now();
+	ctx.lineWidth = "1px";
+	for (let i = 0; i < ripples.length; ++i) {
+		let curr_ripples = ripples[i];
+		let elapsed = time - curr_ripples.start_time;
+		if (elapsed > duration) {
+			continue;
+		}
+		let fraction = elapsed / duration;
+		let radius = curr_ripples.start_radius + (expand * fraction);
+		ctx.strokeStyle = "rgba(" + curr_ripples.color_rgb + ", " + (1 - fraction) + ")";
+		ctx.beginPath();
+		ctx.arc(curr_ripples.pos.x, curr_ripples.pos.y, radius, 0, 2 * Math.PI);
+		ctx.stroke();
+		if (next_index != i) {
+			ripples[next_index] = ripples[i];
+		}
+		++next_index;
+	}
+	ripples.length = next_index;
 }
 
 function DrawAutoDropPosition(pos, cooldown, ctx) {
@@ -191,4 +203,152 @@ function DrawAutoDropPosition(pos, cooldown, ctx) {
 	ctx.beginPath();
 	ctx.arc(center_x, center_y, kBallRadius, 0, 2 * Math.PI);
 	ctx.stroke();
+}
+
+const kSpaceHeight = 50;
+const kWheelWidth = 250;
+
+function DrawWheelSpace(space, is_active, left_x, top_y, ctx) {
+	const kTextWidth = 150;
+	const kFontSize = 14;
+	const kFont = "bold " + kFontSize + "px sans-serif";
+	ctx.fillStyle = is_active ? space.active_color : space.inactive_color;
+	ctx.fillRect(left_x, top_y, kWheelWidth, kSpaceHeight);
+	
+	let center_x = left_x + (kWheelWidth / 2.0);
+	let center_y = top_y + (kSpaceHeight / 2.0);
+
+	ctx.textAlign = "center";
+	ctx.fillStyle = "#000";
+	ctx.font = "bold 14px sans-serif";
+	ctx.fillText(space.text, center_x, center_y + kFontSize / 3, kTextWidth);
+}
+
+function DrawWheel(wheel) {
+	let canvas = GetCanvasLayer("BonusWheel");
+	let ctx = canvas.getContext("2d");
+	ctx.setTransform(1, 0, 0, 1, 0, 0);
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
+	let center_y = canvas.height / 2;
+	
+	// Draw wheel
+	let wheel_left_x = (canvas.width - kWheelWidth) / 2;
+	let space_pos = wheel.pos * wheel.spaces.length;
+	let space_id = Math.floor(space_pos);
+	let pos_in_space = space_pos - space_id;
+	for (let offset = -2; offset <= 2; ++offset) {
+		let curr_space_y = (offset - 1 + pos_in_space) * kSpaceHeight + center_y;;
+		let curr_space = wheel.SpaceAt(space_id - offset);
+		DrawWheelSpace(curr_space, /*is_active=*/(offset == 0), wheel_left_x, curr_space_y, ctx);
+	}
+	
+	// Draw arrows
+	const kArrowHeight = 50;
+	let arrow_width = Math.sqrt(3) * kArrowHeight / 2;
+	let y1 = (canvas.height - kArrowHeight) / 2;
+	let y2 = canvas.height - y1;
+	ctx.fillStyle = "#F00";
+
+	ctx.beginPath();
+	ctx.moveTo(0, y1);
+	ctx.lineTo(0, y2);
+	ctx.lineTo(arrow_width, center_y);
+	ctx.fill();
+	
+	ctx.beginPath();
+	ctx.moveTo(canvas.width, y1);
+	ctx.lineTo(canvas.width, y2);
+	ctx.lineTo(canvas.width - arrow_width, center_y);
+	ctx.fill();
+	
+	if (state.wheel_popup_text.length > 0) {
+		DrawScoreText(state.wheel_popup_text, /*font_size=*/18, /*duration=*/2000.0, /*rise=*/50.0, ctx);
+	}
+}
+
+function Draw(state) {
+	// Layer 0: Drop Zone
+	const can_drop = CanDrop(state) || (AutoDropOn() && state.auto_drop_cooldown < kMinCooldownToDraw);
+	if (state.redraw_all || state.last_drawn.can_drop != can_drop) {
+		let drop_zone_elem = document.getElementById("drop_zone");
+		drop_zone_elem.disabled = !can_drop;
+		if (state.redraw_all) {
+			const kLeftOffset = 5;
+			const kTopOffset = 5;
+			drop_zone_elem.style.top = kTopOffset;
+			drop_zone_elem.style.left = (kLeftOffset + min_drop_x * state.canvas_scale) + "px";
+			drop_zone_elem.style.width = ((max_drop_x - min_drop_x) * state.canvas_scale) + "px";
+			drop_zone_elem.style.height = (max_drop_y * state.canvas_scale) + "px";
+		}
+		state.last_drawn.can_drop = can_drop;
+	}
+	// Layer 1: Board
+	if (state.redraw_all) {
+		let ctx = ClearLayerAndReturnContext(1);
+		if (state.save_file.quality <= 1) {
+			DrawPegs(state.board.pegs, ctx);
+		} else {
+			DrawPegsNoGradient(state.board.pegs, ctx);
+		}
+	}
+	// Layer 2: Balls
+	if (state.redraw_all || state.balls.length > 0 || state.gold_balls.length > 0 || state.last_drawn.num_balls > 0) {
+		let ctx = ClearLayerAndReturnContext(2);
+		if (state.save_file.quality == 0) {
+			DrawBalls(state.balls, /*gold=*/false, ctx);
+			DrawBalls(state.gold_balls, /*gold=*/true, ctx);
+		} else {
+			DrawBallsNoGradient(state.balls, /*gold=*/false, ctx);
+			DrawBallsNoGradient(state.gold_balls, /*gold=*/true, ctx);
+		}
+		state.last_drawn.num_balls = state.balls.length + state.gold_balls.length;
+	}
+	// Layer 3: Targets
+	if (state.redraw_all || state.redraw_targets) {
+		let ctx = ClearLayerAndReturnContext(3);
+		DrawTargets(state.target_sets, ctx);
+		state.redraw_targets = false;
+	}
+	// Layer 4: Auto-Drop position
+	if (state.redraw_all || state.redraw_auto_drop) {
+		let ctx = ClearLayerAndReturnContext(4);
+		if (AutoDropOn()) {
+			let cooldown = 0;
+			if (state.auto_drop_cooldown >= kMinCooldownToDraw) {
+				cooldown = state.auto_drop_cooldown_left / state.auto_drop_cooldown;
+			}
+			DrawAutoDropPosition(state.save_file.auto_drop_pos, cooldown, ctx);
+		}
+		state.redraw_auto_drop = false;
+	}
+	// Layer 5: Score text
+	if (state.redraw_all || state.score_text.length > 0 || state.last_drawn.num_score_text > 0) {
+		let ctx = ClearLayerAndReturnContext(5);
+		DrawScoreText(state.score_text, /*font_size=*/8, /*duration=*/1000.0, /*rise=*/15.0, ctx);
+		state.last_drawn.num_score_texts = state.score_text.length;
+	}
+	// Layer 6: Ripple effects
+	if (state.redraw_all || state.ripples.length > 0 || state.last_drawn.num_ripples > 0) {
+		let ctx = ClearLayerAndReturnContext(6);
+		DrawRipples(state.ripples, /*duration=*/1000.0, /*expand=*/20.0, ctx);
+		state.last_drawn.num_ripples = state.ripples.length;
+	}
+
+	// Bonus wheel
+	if (state.redraw_all || state.redraw_wheel || state.wheel_popup_text.length > 0 ||
+			state.last_drawn.num_wheel_popup_texts > 0) {
+		state.redraw_wheel = false;
+		DrawWheel(state.bonus_wheel);
+		state.last_drawn.num_wheel_popup_texts = state.wheel_popup_text.length;
+	}
+	
+	if (state.redraw_all) {
+		UpdateAutoSaveInterval();
+		UpdateOptionsButtons();
+		UpdateSpinCounter();
+	}
+
+	UpdateNotifications(state);
+	
+	state.redraw_all = false;
 }
