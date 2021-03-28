@@ -55,46 +55,72 @@
 						<div class="menuPadding"></div>
 						Hover over an upgrade to see what it does.
 						<div class="menuPadding"></div>
-						<div id="upgrade_buttons" style="clear: both;">
-							<button type="button" class="upgradeButton" id="button_upgrade_multiplier" onclick="UpgradeButtonHandler(this)"
-									title="Multipiles all point gains.">
-							</button>
-							<button type="button" class="upgradeButton" id="button_upgrade_center_value" onclick="UpgradeButtonHandler(this)"
-									title="Point value of the bottom center slot.">
-							</button>
-							<button type="button" class="upgradeButton" id="button_upgrade_max_balls" onclick="UpgradeButtonHandler(this)"
-									title="Maximum number of balls allowed on the board at once.">
-							</button>
-							<div class="menuPadding"></div>
-							<button type="button" class="upgradeButton" id="button_upgrade_auto_drop" onclick="UpgradeButtonHandler(this)"
-									title="Automatically drops a ball when allowed. Click in the drop zone to move the drop position.">
-							</button>
-							<button type="button" class="upgradeButton" id="button_upgrade_auto_drop_delay" onclick="UpgradeButtonHandler(this)"
-									title="Decreases the auto drop delay.">
-							</button>
-							<div class="menuPadding"></div>
-							<button type="button" class="upgradeButton" id="button_upgrade_unlock_gold_balls" onclick="UpgradeButtonHandler(this)"
-									title="Unlocks gold balls, which are worth double points and don't count towards the max balls limit.">
-							</button>
-							<button type="button" class="upgradeButton" id="button_upgrade_gold_ball_rate" onclick="UpgradeButtonHandler(this)"
-									title="Increases the probability of a ball being gold.">
-							</button>
-							<button type="button" class="upgradeButton" id="button_upgrade_gold_ball_value" onclick="UpgradeButtonHandler(this)"
-									title="Increases point multiplier for gold balls.">
-							</button>
-							<div class="menuPadding"></div>
-							<button type="button" class="upgradeButton" id="button_upgrade_unlock_bonus_wheel" onclick="UpgradeButtonHandler(this)"
-									title="Unlocks the Bonus Wheel. Also adds 2 targets, which award a spin for each ball that passes through them. Point values on the wheel scale based on your upgrades.">
-							</button>
-							<button type="button" class="upgradeButton" id="button_upgrade_add_spin_target" onclick="UpgradeButtonHandler(this)"
-									title="Adds an extra target that awards Bonus Wheel spins.">
-							</button>
-							<button type="button" class="upgradeButton" id="button_upgrade_auto_spin" onclick="UpgradeButtonHandler(this)"
-									title="Automatically spin the Bonus Wheel.">
-							</button>
-							<button type="button" class="upgradeButton" id="button_upgrade_multi_spin" onclick="UpgradeButtonHandler(this)"
-									title="Uses 10% of your available spins at a time, multiplying any points you win from that spin. NOTE: Bonus gold ball drops are not multiplied.">
-							</button>
+						<div id="basic_upgrades_container" class="upgradesContainer">
+							<button type="button" class="upgradesSubHeader"
+									id="button_basic_upgrades_header" onclick="ToggleVisibility('Basic Upgrades')">[&ndash;] Basic Upgrades</button>
+							<div id="basic_upgrades_contents" class="upgradesContents" style="display: block;">
+								<div class="menuPadding"></div>
+								<button type="button" class="upgradeButton" id="button_upgrade_multiplier" onclick="UpgradeButtonHandler(this)"
+										title="Multipiles all point gains.">
+								</button>
+								<button type="button" class="upgradeButton" id="button_upgrade_center_value" onclick="UpgradeButtonHandler(this)"
+										title="Point value of the bottom center slot.">
+								</button>
+								<button type="button" class="upgradeButton" id="button_upgrade_max_balls" onclick="UpgradeButtonHandler(this)"
+										title="Maximum number of balls allowed on the board at once.">
+								</button>
+							</div>
+						</div>
+						<div class="menuPadding"></div>
+						<div id="auto-drop_upgrades_container" class="upgradesContainer" style="display: none;">
+							<button type="button" class="upgradesSubHeader"
+									id="button_auto-drop_header" onclick="ToggleVisibility('Auto-Drop')">[&ndash;] Auto-Drop</button>
+							<div id="auto-drop_contents" class="upgradesContents" style="display: block;">
+								<div class="menuPadding"></div>
+								<button type="button" class="upgradeButton" id="button_upgrade_auto_drop" onclick="UpgradeButtonHandler(this)"
+										title="Automatically drops a ball when allowed. Click in the drop zone to move the drop position.">
+								</button>
+								<button type="button" class="upgradeButton" id="button_upgrade_auto_drop_delay" onclick="UpgradeButtonHandler(this)"
+										title="Decreases the auto drop delay.">
+								</button>
+							</div>
+						</div>
+						<div class="menuPadding"></div>
+						<div id="gold_balls_upgrades_container" class="upgradesContainer" style="display: none;">
+							<button type="button" class="upgradesSubHeader"
+									id="button_gold_balls_header" onclick="ToggleVisibility('Gold Balls')">[&ndash;] Gold Balls</button>
+							<div id="gold_balls_contents" class="upgradesContents" style="display: block;">
+								<div class="menuPadding"></div>
+								<button type="button" class="upgradeButton" id="button_upgrade_unlock_gold_balls" onclick="UpgradeButtonHandler(this)"
+										title="Unlocks gold balls, which are worth double points and don't count towards the max balls limit.">
+								</button>
+								<button type="button" class="upgradeButton" id="button_upgrade_gold_ball_rate" onclick="UpgradeButtonHandler(this)"
+										title="Increases the probability of a ball being gold.">
+								</button>
+								<button type="button" class="upgradeButton" id="button_upgrade_gold_ball_value" onclick="UpgradeButtonHandler(this)"
+										title="Increases point multiplier for gold balls.">
+								</button>
+							</div>
+						</div>
+						<div class="menuPadding"></div>
+						<div id="bonus_wheel_upgrades_container" class="upgradesContainer" style="display: none;">
+							<button type="button" class="upgradesSubHeader"
+									id="button_bonus_wheel_header" onclick="ToggleVisibility('Bonus Wheel')">[&ndash;] Bonus Wheel</button>
+							<div id="bonus_wheel_contents" class="upgradesContents" style="display: block;">
+								<div class="menuPadding"></div>
+								<button type="button" class="upgradeButton" id="button_upgrade_unlock_bonus_wheel" onclick="UpgradeButtonHandler(this)"
+										title="Unlocks the Bonus Wheel. Also adds 2 targets, which award a spin for each ball that passes through them. Point values on the wheel scale based on your upgrades.">
+								</button>
+								<button type="button" class="upgradeButton" id="button_upgrade_add_spin_target" onclick="UpgradeButtonHandler(this)"
+										title="Adds an extra target that awards Bonus Wheel spins.">
+								</button>
+								<button type="button" class="upgradeButton" id="button_upgrade_auto_spin" onclick="UpgradeButtonHandler(this)"
+										title="Automatically spin the Bonus Wheel.">
+								</button>
+								<button type="button" class="upgradeButton" id="button_upgrade_multi_spin" onclick="UpgradeButtonHandler(this)"
+										title="Uses 10% of your available spins at a time, multiplying any points you win from that spin. NOTE: Bonus gold ball drops are not multiplied.">
+								</button>
+							</div>
 						</div>
 					</div>
 				</div>

@@ -1,4 +1,4 @@
-const kVersion = "v0.3.0 beta";
+const kVersion = "v0.3.1 beta";
 const kTitleAndVersion = "Pachinkremental " + kVersion;
 
 var max_drop_y = 20;
@@ -240,7 +240,7 @@ function CanDrop(state) {
 }
 
 function ToggleVisibility(panel_name) {
-	let id = panel_name.toLowerCase();
+	let id = panel_name.toLowerCase().replaceAll(" ", "_");
 	let header = document.getElementById("button_" + id + "_header");
 	let contents = document.getElementById(id + "_contents");
     if (contents.style.display == "block") {
@@ -248,7 +248,7 @@ function ToggleVisibility(panel_name) {
 	  header.innerHTML = "[+] " + panel_name;
     } else {
       contents.style.display = "block";
-	  header.innerHTML = "[-] " + panel_name;
+	  header.innerHTML = "[&ndash;] " + panel_name;
     }
 }
 

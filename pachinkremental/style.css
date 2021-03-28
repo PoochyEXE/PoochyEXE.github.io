@@ -59,17 +59,24 @@ div.optionsContainer {
 	background: #FCF;
 }
 
-button.upgradesHeader, button.statsHeader, button.optionsHeader {
+button.upgradesHeader, button.upgradesSubHeader, button.statsHeader, button.optionsHeader {
 	width: 100%;
 	border: none;
 	text-align: center;
 	outline: none;
 	font-weight: bold;
 	font-family: sans-serif;
+}
+
+button.upgradesHeader, button.statsHeader, button.optionsHeader {
 	font-size: 20px;
 }
 
-button.upgradesHeader {
+button.upgradesSubHeader {
+	font-size: 16px;
+}
+
+button.upgradesHeader, button.upgradesSubHeader {
 	background: #CFC;
 }
 

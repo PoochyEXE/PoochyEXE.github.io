@@ -256,7 +256,7 @@ function InitUpgrades() {
 			/*value_func=*/function(level) {
 				return level + 1;
 			},
-			/*max_level=*/Infinity,
+			/*max_level=*/49,
 			/*value_suffix=*/'',
 			/*visible_func=*/function() {
 				return GetUpgradeLevel("center_value") > 1;
@@ -374,6 +374,11 @@ function UpgradeButtonHandler(elem) {
 	state.upgrades[upgrade_id].OnClick();
 }
 
+function UpdateUpgradeSubHeader(header_id, visible) {
+	let elem = document.getElementById(header_id);
+	elem.style.display = visible ? "block" : "none";
+}
+
 function UpdateUpgradeButtons(state) {
 	if (!state.update_upgrade_buttons) {
 		return;
@@ -387,4 +392,8 @@ function UpdateUpgradeButtons(state) {
 		elem.disabled = !upgrade.ShouldEnableButton();
 		elem.style.display = upgrade.visible_func() ? "inline" : "none";
 	}
+	UpdateUpgradeSubHeader("basic_upgrades_container", true);
+	UpdateUpgradeSubHeader("auto-drop_upgrades_container", state.upgrades["auto_drop"].visible_func());
+	UpdateUpgradeSubHeader("gold_balls_upgrades_container", state.upgrades["unlock_gold_balls"].visible_func());
+	UpdateUpgradeSubHeader("bonus_wheel_upgrades_container", state.upgrades["unlock_bonus_wheel"].visible_func());
 }

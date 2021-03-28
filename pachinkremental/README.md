@@ -31,6 +31,10 @@ A: This is intentional, both to make sure the game won't softlock with too many 
 
 ## Changelog
 
+### v0.3.1 beta (2021-03-27)
+* Upgrades are now organized into collapsible sub-sections.
+* Cap max balls at 50 since the upgrade becomes useless by that point anyway, due to gold balls not counting against the limit.
+
 ### v0.3.0 beta (2021-03-27)
 * New feature: Bonus wheel!
 * Bugfix: Auto-drop should now work correctly while the game is running in the background.
