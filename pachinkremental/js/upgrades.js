@@ -219,6 +219,15 @@ function GemstoneBallUnlockCost() {
 		if (IsUnlocked("unlock_emerald_balls")) {
 			exp += 4;
 		}
+		if (IsUnlocked("unlock_topaz_balls")) {
+			exp += 4;
+		}
+		if (IsUnlocked("unlock_turquoise_balls")) {
+			exp += 4;
+		}
+		if (IsUnlocked("unlock_amethyst_balls")) {
+			exp += 4;
+		}
 	}
 	return Math.pow(10, exp);
 }

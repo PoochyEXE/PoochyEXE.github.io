@@ -178,6 +178,17 @@ class BallType {
 	}
 }
 
+function ShuffleArray(array) {
+	let result = array.slice(0);
+    for (let i = result.length - 1; i > 0; i--) {
+        let j = Math.floor(Math.random() * (i + 1));
+        let temp = result[i];
+        result[i] = result[j];
+        result[j] = temp;
+    }
+	return result;
+}
+
 // Lightweight checksum. Not meant to be cryptographically secure.
 // If anyone else is reading this, I don't care if people edit their save
 // files. I just want to prevent crazy bugs caused by loading
