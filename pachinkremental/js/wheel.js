@@ -103,9 +103,8 @@ class BonusWheelPointSpace extends BonusWheelSpace {
 	OnHit(multi_spin) {
 		let value = this.value_func() * multi_spin;
 		AddScore(value);
-		let text = "+" + FormatNumberShort(value) + " points";
-		state.wheel_popup_text.push(new RisingText(
-				text, kWheelPopupTextPos, kWheelPopupTextColor));
+		MaybeAddBonusWheelText("+" + FormatNumberShort(value) + " points",
+				kWheelPopupTextPos, kWheelPopupTextColor);
 	}
 	
 	Update() {
@@ -119,7 +118,7 @@ function DefaultWheel() {
 		/*active_color=*/"#8F8",
 		/*inactive_color=*/"#7D7",
 		/*value_func=*/function() {
-			return GetSlotValue(4) * state.gold_ball_multiplier;
+			return GetSlotValue(4) * state.special_ball_multiplier;
 		},
 	));
 	spaces.push(new BonusWheelPointSpace(
@@ -139,11 +138,24 @@ function DefaultWheel() {
 	spaces.push(new BonusWheelSpace(
 		/*active_color=*/"#F8F",
 		/*inactive_color=*/"#D7D",
-		/*text_func=*/function() { return "Drop 3 gold balls"; },
+		/*text_func=*/function() {
+			if (AllTier1GemstoneBallsUnlocked()) {
+				return "Drop 3 gemstone balls";
+			} else {
+				return "Drop 3 gold balls";
+			}
+		},
 		/*on_hit_func=*/function() {
-			DropBonusGoldBalls(3);
-			state.wheel_popup_text.push(new RisingText(
-					"3 gold balls!", kWheelPopupTextPos, kWheelPopupTextColor));
+			if (AllTier2GemstoneBallsUnlocked()) {
+				DropBonusBalls([kBallTypeIDs.TOPAZ, kBallTypeIDs.TURQUOISE, kBallTypeIDs.AMETHYST]);
+				MaybeAddBonusWheelText("3 gemstone balls!", kWheelPopupTextPos, kWheelPopupTextColor);
+			} else if (AllTier1GemstoneBallsUnlocked()) {
+				DropBonusBalls([kBallTypeIDs.RUBY, kBallTypeIDs.SAPPHIRE, kBallTypeIDs.EMERALD]);
+				MaybeAddBonusWheelText("3 gemstone balls!", kWheelPopupTextPos, kWheelPopupTextColor);
+			} else {
+				DropBonusBalls([kBallTypeIDs.GOLD, kBallTypeIDs.GOLD, kBallTypeIDs.GOLD]);
+				MaybeAddBonusWheelText("3 gold balls!", kWheelPopupTextPos, kWheelPopupTextColor);
+			}
 		},
 	));
 	spaces.push(new BonusWheelSpace(
@@ -151,18 +163,29 @@ function DefaultWheel() {
 		/*inactive_color=*/"#D77",
 		/*text_func=*/function() { return "ZONK"; },
 		/*on_hit_func=*/function() {
-			state.wheel_popup_text.push(new RisingText(
-					"*sad trombone*", kWheelPopupTextPos, kWheelPopupTextColor));
+			MaybeAddBonusWheelText("*sad trombone*", kWheelPopupTextPos, kWheelPopupTextColor);
 		},
 	));
 	spaces.push(new BonusWheelSpace(
 		/*active_color=*/"#FF8",
 		/*inactive_color=*/"#DD7",
-		/*text_func=*/function() { return "Drop 7 gold balls"; },
+		/*text_func=*/function() {
+			if (AnyTier1GemstoneBallsUnlocked()) {
+				return "Drop 7 special balls";
+			} else {
+				return "Drop 7 gold balls";
+			}
+		},
 		/*on_hit_func=*/function() {
-			DropBonusGoldBalls(7); 
-			state.wheel_popup_text.push(new RisingText(
-					"7 gold balls!", kWheelPopupTextPos, kWheelPopupTextColor));
+			let bonus_balls = [kBallTypeIDs.GOLD]
+			bonus_balls.push(IsUnlocked("unlock_ruby_balls")      ? kBallTypeIDs.RUBY      : kBallTypeIDs.GOLD);
+			bonus_balls.push(IsUnlocked("unlock_sapphire_balls")  ? kBallTypeIDs.SAPPHIRE  : kBallTypeIDs.GOLD);
+			bonus_balls.push(IsUnlocked("unlock_emerald_balls")   ? kBallTypeIDs.EMERALD   : kBallTypeIDs.GOLD);
+			bonus_balls.push(IsUnlocked("unlock_topaz_balls")     ? kBallTypeIDs.TOPAZ     : kBallTypeIDs.GOLD);
+			bonus_balls.push(IsUnlocked("unlock_turquoise_balls") ? kBallTypeIDs.TURQUOISE : kBallTypeIDs.GOLD);
+			bonus_balls.push(IsUnlocked("unlock_amethyst_balls")  ? kBallTypeIDs.AMETHYST  : kBallTypeIDs.GOLD);
+			DropBonusBalls(bonus_balls);
+			MaybeAddBonusWheelText(AnyTier1GemstoneBallsUnlocked() ? "7 special balls!" : "7 gold balls!", kWheelPopupTextPos, kWheelPopupTextColor);
 		},
 	));
 	return new BonusWheel(spaces);

@@ -117,15 +117,15 @@ class DelayReductionUpgrade extends Upgrade {
 }
 
 class FeatureUnlockUpgrade extends Upgrade {
-	constructor(id, name, cost, visible_func, on_update, on_buy) {
-		super(id, name, function(level) { return cost; }, /*value_func=*/null,
-				/*max_level=*/1, /*value_suffix=*/'', visible_func, on_update, on_buy);
+	constructor(id, name, cost_func, visible_func, on_update, on_buy) {
+		super(id, name, cost_func, /*value_func=*/null, /*max_level=*/1,
+				/*value_suffix=*/'', visible_func, on_update, on_buy);
 	}
 	
 	GetText() {
 		let result = "<b>" + this.name + "</b><br/>";
 		if (this.GetLevel() == 0) {
-			result += "Cost: " + FormatNumberShort(this.cost);
+			result += "Cost: " + FormatNumberShort(this.cost_func());
 		} else {
 			result += "Unlocked!"
 		}
@@ -133,7 +133,13 @@ class FeatureUnlockUpgrade extends Upgrade {
 	}
 }
 
-class ToggleUnlockUpgrade extends FeatureUnlockUpgrade {
+class FixedCostFeatureUnlockUpgrade extends FeatureUnlockUpgrade {
+	constructor(id, name, cost, visible_func, on_update, on_buy) {
+		super(id, name, function(level) { return cost; }, visible_func, on_update, on_buy);
+	}
+}
+
+class ToggleUnlockUpgrade extends FixedCostFeatureUnlockUpgrade {
 	constructor(id, name, cost, visible_func, on_update, on_buy) {
 		super(id, name, cost, visible_func, on_update, on_buy);
 	}
@@ -182,6 +188,61 @@ class ToggleUnlockUpgrade extends FeatureUnlockUpgrade {
 	}
 }
 
+function ActivateOrExtendDoubleScoreBuff() {
+	state.save_file.score_buff_multiplier = 2.0;
+	state.save_file.score_buff_duration = 60000.0;
+}
+
+function OnCenterSlotHit(ball) {
+	if (ball.ball_type_index == kBallTypeIDs.RUBY ||
+			ball.ball_type_index == kBallTypeIDs.TOPAZ ||
+			ball.ball_type_index == kBallTypeIDs.AMETHYST) {
+		let text_pos = new Point(ball.pos.x, ball.pos.y - 10);
+		MaybeAddScoreText("2\u00D7 scoring!", text_pos, "255,0,0");
+		ActivateOrExtendDoubleScoreBuff();
+	}
+}
+
+function ShouldDisplayGemstoneBallUpgrades() {
+	return GetUpgradeLevel("gold_ball_rate") >= 24;
+}
+
+function GemstoneBallUnlockCost() {
+	let exp = 12;
+	if (state) {
+		if (IsUnlocked("unlock_ruby_balls")) {
+			exp += 4;
+		}
+		if (IsUnlocked("unlock_sapphire_balls")) {
+			exp += 4;
+		}
+		if (IsUnlocked("unlock_emerald_balls")) {
+			exp += 4;
+		}
+	}
+	return Math.pow(10, exp);
+}
+
+function AllTier1GemstoneBallsUnlocked() {
+	if (!state) return undefined;
+	return IsUnlocked("unlock_ruby_balls") && IsUnlocked("unlock_sapphire_balls") && IsUnlocked("unlock_emerald_balls");
+}
+
+function AnyTier1GemstoneBallsUnlocked() {
+	if (!state) return undefined;
+	return IsUnlocked("unlock_ruby_balls") || IsUnlocked("unlock_sapphire_balls") || IsUnlocked("unlock_emerald_balls");
+}
+
+function AllTier2GemstoneBallsUnlocked() {
+	if (!state) return undefined;
+	return IsUnlocked("unlock_topaz_balls") && IsUnlocked("unlock_turquoise_balls") && IsUnlocked("unlock_amethyst_balls");
+}
+
+function AnyTier2GemstoneBallsUnlocked() {
+	if (!state) return undefined;
+	return IsUnlocked("unlock_topaz_balls") || IsUnlocked("unlock_turquoise_balls") || IsUnlocked("unlock_amethyst_balls");
+}
+
 function InitUpgrades() {
 	const kTimesSymbol = "\u00D7";
 	let upgrades_list = new Array();
@@ -200,7 +261,7 @@ function InitUpgrades() {
 				let bottom_targets = state.target_sets[0].targets;
 				let popup_text = kTimesSymbol + "5";
 				for (let i = 0; i < bottom_targets.length; ++i) {
-					state.score_text.push(new RisingText(popup_text, bottom_targets[i].pos, "0,0,255"));
+					MaybeAddScoreText(popup_text, bottom_targets[i].pos, "0,0,255");
 				}
 				state.bonus_wheel.UpdateAllSpaces();
 			}));
@@ -218,7 +279,7 @@ function InitUpgrades() {
 			/*on_buy=*/function() {
 				let target = state.target_sets[0].targets[4];
 				let popup_text = kTimesSymbol + "2";
-				state.score_text.push(new RisingText(popup_text, target.pos, "0,0,255"));
+				MaybeAddScoreText(popup_text, target.pos, "0,0,255");
 				state.bonus_wheel.UpdateAllSpaces();
 			}));
 	upgrades_list.push(new ToggleUnlockUpgrade("auto_drop", "Auto-Drop", /*cost=*/100000,
@@ -239,7 +300,7 @@ function InitUpgrades() {
 			/*max_level=*/22,
 			/*item_suffix=*/"balls",
 			/*visible_func=*/function() {
-				return GetUpgradeLevel("auto_drop") > 0;
+				return IsUnlocked("auto_drop");
 			},
 			/*on_update=*/function() {
 				state.auto_drop_cooldown = this.GetValue();
@@ -265,7 +326,7 @@ function InitUpgrades() {
 				return state.max_balls = this.GetValue();
 			},
 			/*on_buy=*/null));
-	upgrades_list.push(new FeatureUnlockUpgrade("unlock_gold_balls", "Unlock Gold Balls", /*cost=*/500000,
+	upgrades_list.push(new FixedCostFeatureUnlockUpgrade("unlock_gold_balls", "Unlock Gold Balls", /*cost=*/500000,
 			/*visible_func=*/function() {
 				return GetUpgradeLevel("max_balls") > 0;
 			},
@@ -281,10 +342,10 @@ function InitUpgrades() {
 			/*max_level=*/49,
 			/*value_suffix=*/"%",
 			/*visible_func=*/function() {
-				return GetUpgradeLevel("unlock_gold_balls") > 0;
+				return IsUnlocked("unlock_gold_balls");
 			},
 			/*on_update=*/function() {
-				state.gold_ball_rate = this.GetValue() / 100.0;
+				state.ball_type_rates[kBallTypeIDs.GOLD] = this.GetValue() / 100.0;
 			},
 			/*on_buy=*/null));
 	upgrades_list.push(new Upgrade("gold_ball_value", "Gold Ball Value",
@@ -297,16 +358,16 @@ function InitUpgrades() {
 			/*max_level=*/Infinity,
 			/*value_suffix=*/kTimesSymbol,
 			/*visible_func=*/function() {
-				return GetUpgradeLevel("unlock_gold_balls") > 0;
+				return IsUnlocked("unlock_gold_balls");
 			},
 			/*on_update=*/function() {
-				state.gold_ball_multiplier = this.GetValue();
+				state.special_ball_multiplier = this.GetValue();
 				state.bonus_wheel.UpdateAllSpaces();
 			},
 			/*on_buy=*/null));
-	upgrades_list.push(new FeatureUnlockUpgrade("unlock_bonus_wheel", "Unlock Bonus Wheel", /*cost=*/2000000,
+	upgrades_list.push(new FixedCostFeatureUnlockUpgrade("unlock_bonus_wheel", "Unlock Bonus Wheel", /*cost=*/2000000,
 			/*visible_func=*/function() {
-				return GetUpgradeLevel("unlock_gold_balls") > 0;
+				return IsUnlocked("unlock_gold_balls");
 			},
 			/*on_update=*/function() {
 				let unlocked = (this.GetValue() > 0);
@@ -319,9 +380,9 @@ function InitUpgrades() {
 				state.bonus_wheel.UpdateAllSpaces();
 				state.redraw_targets = true;
 			}));
-	upgrades_list.push(new FeatureUnlockUpgrade("add_spin_target", "Extra Spin Target", /*cost=*/10000000,
+	upgrades_list.push(new FixedCostFeatureUnlockUpgrade("add_spin_target", "Extra Spin Target", /*cost=*/10000000,
 			/*visible_func=*/function() {
-				return GetUpgradeLevel("unlock_bonus_wheel") > 0;
+				return IsUnlocked("unlock_bonus_wheel");
 			},
 			/*on_update=*/function() {
 				let unlocked = (this.GetValue() > 0);
@@ -333,14 +394,134 @@ function InitUpgrades() {
 			}));
 	upgrades_list.push(new ToggleUnlockUpgrade("auto_spin", "Auto-Spin", /*cost=*/50000000,
 			/*visible_func=*/function() {
-				return GetUpgradeLevel("unlock_bonus_wheel") > 0;
+				return IsUnlocked("unlock_bonus_wheel");
 			},
 			/*on_update=*/null));
 	upgrades_list.push(new ToggleUnlockUpgrade("multi_spin", "Multi-Spin", /*cost=*/50000000,
 			/*visible_func=*/function() {
-				return GetUpgradeLevel("unlock_bonus_wheel") > 0;
+				return IsUnlocked("unlock_bonus_wheel");
 			},
 			/*on_update=*/null));
+	upgrades_list.push(new FeatureUnlockUpgrade("unlock_ruby_balls", "Unlock Ruby Balls",
+			/*cost_func=*/GemstoneBallUnlockCost,
+			/*visible_func=*/ShouldDisplayGemstoneBallUpgrades));
+	upgrades_list.push(new Upgrade("ruby_ball_rate", "Ruby Ball Rate",
+			/*cost_func=*/function(level) {
+				return 5e12 * Math.pow(5, level);
+			},
+			/*value_func=*/function(level) {
+				return (level + 1) / 10.0;
+			},
+			/*max_level=*/49,
+			/*value_suffix=*/"%",
+			/*visible_func=*/function() {
+				return IsUnlocked("unlock_ruby_balls");
+			},
+			/*on_update=*/function() {
+				state.ball_type_rates[kBallTypeIDs.RUBY] = this.GetValue() / 100.0;
+			},
+			/*on_buy=*/null));
+	upgrades_list.push(new FeatureUnlockUpgrade("unlock_sapphire_balls", "Unlock Sapphire Balls",
+			/*cost_func=*/GemstoneBallUnlockCost,
+			/*visible_func=*/ShouldDisplayGemstoneBallUpgrades));
+	upgrades_list.push(new Upgrade("sapphire_ball_rate", "Sapphire Ball Rate",
+			/*cost_func=*/function(level) {
+				return 5e12 * Math.pow(5, level);
+			},
+			/*value_func=*/function(level) {
+				return (level + 1) / 10.0;
+			},
+			/*max_level=*/49,
+			/*value_suffix=*/"%",
+			/*visible_func=*/function() {
+				return IsUnlocked("unlock_sapphire_balls");
+			},
+			/*on_update=*/function() {
+				state.ball_type_rates[kBallTypeIDs.SAPPHIRE] = this.GetValue() / 100.0;
+			},
+			/*on_buy=*/null));
+	upgrades_list.push(new FeatureUnlockUpgrade("unlock_emerald_balls", "Unlock Emerald Balls",
+			/*cost_func=*/GemstoneBallUnlockCost,
+			/*visible_func=*/ShouldDisplayGemstoneBallUpgrades));
+	upgrades_list.push(new Upgrade("emerald_ball_rate", "Emerald Ball Rate",
+			/*cost_func=*/function(level) {
+				return 5e12 * Math.pow(5, level);
+			},
+			/*value_func=*/function(level) {
+				return (level + 1) / 10.0;
+			},
+			/*max_level=*/49,
+			/*value_suffix=*/"%",
+			/*visible_func=*/function() {
+				return IsUnlocked("unlock_emerald_balls");
+			},
+			/*on_update=*/function() {
+				state.ball_type_rates[kBallTypeIDs.EMERALD] = this.GetValue() / 100.0;
+			},
+			/*on_buy=*/null));
+	upgrades_list.push(new FeatureUnlockUpgrade("unlock_topaz_balls", "Unlock Topaz Balls",
+			/*cost_func=*/GemstoneBallUnlockCost,
+			/*visible_func=*/function() {
+				return IsUnlocked("unlock_ruby_balls") && IsUnlocked("unlock_emerald_balls");
+			}));
+	upgrades_list.push(new Upgrade("topaz_ball_rate", "Topaz Ball Rate",
+			/*cost_func=*/function(level) {
+				return 5e20 * Math.pow(5, level);
+			},
+			/*value_func=*/function(level) {
+				return (level + 1) / 10.0;
+			},
+			/*max_level=*/49,
+			/*value_suffix=*/"%",
+			/*visible_func=*/function() {
+				return IsUnlocked("unlock_topaz_balls");
+			},
+			/*on_update=*/function() {
+				state.ball_type_rates[kBallTypeIDs.TOPAZ] = this.GetValue() / 100.0;
+			},
+			/*on_buy=*/null));
+	upgrades_list.push(new FeatureUnlockUpgrade("unlock_turquoise_balls", "Unlock Turquoise Balls",
+			/*cost_func=*/GemstoneBallUnlockCost,
+			/*visible_func=*/function() {
+				return IsUnlocked("unlock_emerald_balls") && IsUnlocked("unlock_sapphire_balls");
+			}));
+	upgrades_list.push(new Upgrade("turquoise_ball_rate", "Turquoise Ball Rate",
+			/*cost_func=*/function(level) {
+				return 5e20 * Math.pow(5, level);
+			},
+			/*value_func=*/function(level) {
+				return (level + 1) / 10.0;
+			},
+			/*max_level=*/49,
+			/*value_suffix=*/"%",
+			/*visible_func=*/function() {
+				return IsUnlocked("unlock_turquoise_balls");
+			},
+			/*on_update=*/function() {
+				state.ball_type_rates[kBallTypeIDs.TURQUOISE] = this.GetValue() / 100.0;
+			},
+			/*on_buy=*/null));
+	upgrades_list.push(new FeatureUnlockUpgrade("unlock_amethyst_balls", "Unlock Amethyst Balls",
+			/*cost_func=*/GemstoneBallUnlockCost,
+			/*visible_func=*/function() {
+				return IsUnlocked("unlock_ruby_balls") && IsUnlocked("unlock_sapphire_balls");
+			}));
+	upgrades_list.push(new Upgrade("amethyst_ball_rate", "Amethyst Ball Rate",
+			/*cost_func=*/function(level) {
+				return 5e20 * Math.pow(5, level);
+			},
+			/*value_func=*/function(level) {
+				return (level + 1) / 10.0;
+			},
+			/*max_level=*/49,
+			/*value_suffix=*/"%",
+			/*visible_func=*/function() {
+				return IsUnlocked("unlock_amethyst_balls");
+			},
+			/*on_update=*/function() {
+				state.ball_type_rates[kBallTypeIDs.AMETHYST] = this.GetValue() / 100.0;
+			},
+			/*on_buy=*/null));
 	
 	let upgrades_map = {};
 	for (let i = 0; i < upgrades_list.length; ++i) {
@@ -376,7 +557,7 @@ function UpgradeButtonHandler(elem) {
 
 function UpdateUpgradeSubHeader(header_id, visible) {
 	let elem = document.getElementById(header_id);
-	elem.style.display = visible ? "block" : "none";
+	elem.style.display = visible ? "inline-block" : "none";
 }
 
 function UpdateUpgradeButtons(state) {
@@ -394,6 +575,7 @@ function UpdateUpgradeButtons(state) {
 	}
 	UpdateUpgradeSubHeader("basic_upgrades_container", true);
 	UpdateUpgradeSubHeader("auto-drop_upgrades_container", state.upgrades["auto_drop"].visible_func());
-	UpdateUpgradeSubHeader("gold_balls_upgrades_container", state.upgrades["unlock_gold_balls"].visible_func());
 	UpdateUpgradeSubHeader("bonus_wheel_upgrades_container", state.upgrades["unlock_bonus_wheel"].visible_func());
+	UpdateUpgradeSubHeader("gold_balls_upgrades_container", state.upgrades["unlock_gold_balls"].visible_func());
+	UpdateUpgradeSubHeader("gemstone_balls_upgrades_container", ShouldDisplayGemstoneBallUpgrades());
 }

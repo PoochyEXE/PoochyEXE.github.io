@@ -31,6 +31,11 @@ A: This is intentional, both to make sure the game won't softlock with too many 
 
 ## Changelog
 
+### v0.4.0 beta (2021-03-29)
+* New feature: 6 types of gemstone balls, which have the value multipiler of gold balls plus additional bonuses.
+* Suppress pop-up text when the game is running in the background, to avoid the bug where all the pop-up text accumulates while the tab is inactive and then they all appear at once when you switch back to the tab.
+* Various UI tweaks
+
 ### v0.3.1 beta (2021-03-27)
 * Upgrades are now organized into collapsible sub-sections.
 * Cap max balls at 50 since the upgrade becomes useless by that point anyway, due to gold balls not counting against the limit.

@@ -2,16 +2,8 @@ const kPegColor = {
 	inner: "#888",
 	outer: "#000",
 };
-const kBallColor = {
-	inner: "#CCC",
-	outer: "#888",
-};
-const kGoldBallColor = {
-	inner: "#FFD700",
-	outer: "#AA8F00",
-};
 
-function DrawGradientCircle(ctx, pos, radius, colors) {
+function DrawGradientCircle(ctx, pos, radius, inner_color, outer_color) {
 	let inner_x = pos.x - radius / 3;
 	let inner_y = pos.y - radius / 3;
 	let inner_r = radius / 10;
@@ -19,8 +11,8 @@ function DrawGradientCircle(ctx, pos, radius, colors) {
 	let outer_y = pos.y;
 	let outer_r = radius;
 	let gradient = ctx.createRadialGradient(inner_x, inner_y, inner_r, outer_x, outer_y, outer_r);
-	gradient.addColorStop(0, colors.inner);
-	gradient.addColorStop(1, colors.outer);
+	gradient.addColorStop(0, inner_color);
+	gradient.addColorStop(1, outer_color);
 	ctx.fillStyle = gradient;
 	ctx.beginPath();
 	ctx.arc(pos.x, pos.y, radius, 0, 2 * Math.PI);
@@ -70,6 +62,7 @@ function ResizeCanvas() {
 		canvas.height = height;
 		canvas.width = width;
 	}
+	document.getElementById("outer_table").style.height = height + "px";
 	
 	const right_ui_width = window.innerWidth - width - 30;
 	let right_ui_cells = document.getElementsByClassName("rightUI");
@@ -80,7 +73,7 @@ function ResizeCanvas() {
 
 function DrawPegs(positions, ctx) {
 	for (let i = 0; i < positions.length; ++i) {
-		DrawGradientCircle(ctx, positions[i], kPegRadius, kPegColor);
+		DrawGradientCircle(ctx, positions[i], kPegRadius, kPegColor.inner, kPegColor.outer);
 	}
 }
 
@@ -90,15 +83,15 @@ function DrawPegsNoGradient(positions, ctx) {
 	}
 }
 
-function DrawBalls(balls, gold, ctx) {
+function DrawBalls(balls, inner_color, outer_color, ctx) {
 	for (let i = 0; i < balls.length; ++i) {
-		DrawGradientCircle(ctx, balls[i].pos, kBallRadius, gold ? kGoldBallColor : kBallColor);
+		DrawGradientCircle(ctx, balls[i].pos, kBallRadius, inner_color, outer_color);
 	}
 }
 
-function DrawBallsNoGradient(balls, gold, ctx) {
+function DrawBallsNoGradient(balls, color, ctx) {
 	for (let i = 0; i < balls.length; ++i) {
-		DrawCircle(ctx, balls[i].pos, kBallRadius, gold ? kGoldBallColor.outer : kBallColor.outer);
+		DrawCircle(ctx, balls[i].pos, kBallRadius, color);
 	}
 }
 
@@ -181,7 +174,7 @@ function DrawAutoDropPosition(pos, cooldown, ctx) {
 	let font_size = 6;
 	let center_x = pos.x;
 	let center_y = pos.y;
-	let radius =  kBallRadius;
+	let radius = kBallRadius;
 	
 	ctx.textAlign = "center";
 	ctx.fillStyle = kColor;
@@ -292,16 +285,19 @@ function Draw(state) {
 		}
 	}
 	// Layer 2: Balls
-	if (state.redraw_all || state.balls.length > 0 || state.gold_balls.length > 0 || state.last_drawn.num_balls > 0) {
+	let total_balls = TotalBalls(state);
+	if (state.redraw_all || total_balls > 0 || state.last_drawn.num_balls > 0) {
 		let ctx = ClearLayerAndReturnContext(2);
 		if (state.save_file.quality == 0) {
-			DrawBalls(state.balls, /*gold=*/false, ctx);
-			DrawBalls(state.gold_balls, /*gold=*/true, ctx);
+			for (let i = 0; i < state.balls_by_type.length; ++i) {
+				DrawBalls(state.balls_by_type[i], kBallTypes[i].inner_color, kBallTypes[i].outer_color, ctx);
+			}
 		} else {
-			DrawBallsNoGradient(state.balls, /*gold=*/false, ctx);
-			DrawBallsNoGradient(state.gold_balls, /*gold=*/true, ctx);
+			for (let i = 0; i < state.balls_by_type.length; ++i) {
+				DrawBallsNoGradient(state.balls_by_type[i], kBallTypes[i].outer_color, ctx);
+			}
 		}
-		state.last_drawn.num_balls = state.balls.length + state.gold_balls.length;
+		state.last_drawn.num_balls = total_balls;
 	}
 	// Layer 3: Targets
 	if (state.redraw_all || state.redraw_targets) {

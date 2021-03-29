@@ -66,10 +66,10 @@ class Vector {
 }
 
 class Ball {
-	constructor(x, y, dx, dy, is_gold) {
+	constructor(x, y, dx, dy, ball_type_index) {
 		this.pos = new Point(x, y);
 		this.vel = new Vector(dx, dy);
-		this.is_gold = is_gold;
+		this.ball_type_index = ball_type_index;
 		this.active = true;
 		this.last_hit = null;
 	}
@@ -84,6 +84,18 @@ class RisingText {
 	}
 }
 
+function MaybeAddScoreText(text, pos, color_rgb) {
+	if (state.enable_score_text) {
+		state.score_text.push(new RisingText(text, pos, color_rgb));
+	}
+}
+
+function MaybeAddBonusWheelText(text, pos, color_rgb) {
+	if (state.enable_score_text) {
+		state.wheel_popup_text.push(new RisingText(text, pos, color_rgb));
+	}
+}
+
 class RippleEffect {
 	constructor(pos, color_rgb, start_radius) {
 		this.pos = pos;
@@ -94,20 +106,20 @@ class RippleEffect {
 }
 
 function SampleGaussianNoise(mu, sigma) {
-    const two_pi = 2.0 * Math.PI;
+	const two_pi = 2.0 * Math.PI;
 
-    let u1 = 0.0;
-    let u2 = 0.0;
-    do {
-        u1 = Math.random();
-        u2 = Math.random();
-    } while (u1 <= Number.EPSILON);
+	let u1 = 0.0;
+	let u2 = 0.0;
+	do {
+		u1 = Math.random();
+		u2 = Math.random();
+	} while (u1 <= Number.EPSILON);
 
-    const magnitude = sigma * Math.sqrt(-2.0 * Math.log(u1));
-    const z0 = magnitude * Math.cos(two_pi * u2) + mu;
-    const z1 = magnitude * Math.sin(two_pi * u2) + mu;
+	const magnitude = sigma * Math.sqrt(-2.0 * Math.log(u1));
+	const z0 = magnitude * Math.cos(two_pi * u2) + mu;
+	const z1 = magnitude * Math.sin(two_pi * u2) + mu;
 
-    return new Point(z0, z1);
+	return new Point(z0, z1);
 }
 
 function FormatSmallNumberShort(num) {
@@ -155,6 +167,15 @@ function FormatNumberLong(num) {
 	}
 	let prefix = num / Math.pow(1000, suffix_index);
 	return prefix.toFixed(kPrecision) + ' ' + kSuffixes[suffix_index];
+}
+
+class BallType {
+	constructor(name, inner_color, outer_color, ripple_color_rgb) {
+		this.name = name;
+		this.inner_color = inner_color;
+		this.outer_color = outer_color;
+		this.ripple_color_rgb = ripple_color_rgb;
+	}
 }
 
 // Lightweight checksum. Not meant to be cryptographically secure.

@@ -1,4 +1,4 @@
-const kVersion = "v0.3.1 beta";
+const kVersion = "v0.4.0 beta";
 const kTitleAndVersion = "Pachinkremental " + kVersion;
 
 var max_drop_y = 20;
@@ -11,52 +11,98 @@ const kMinCooldownToDraw = 300.0;
 const kTopCanvasLayer = "canvas6";
 const kQualityOptions = ["High", "Medium", "Low"];
 
-const kGoldBallRippleColor = "170,143,0";
+const kBallTypes = [
+	//          |   name    | inner_color | outer_color | ripple_color_rgb |
+	new BallType("normal",    "#CCC",       "#888",       null             ),
+	new BallType("gold",      "#FFD700",    "#AA8F00",    "170,143,0"      ),
+	new BallType("ruby",      "#FBB",       "#F33",       "255, 48, 48"    ),
+	new BallType("sapphire",  "#BBF",       "#33F",       " 48, 48,255"    ),
+	new BallType("emerald",   "#BFB",       "#3F3",       " 48,255, 48"    ),
+	new BallType("topaz",     "#FFB",       "#FF3",       "255,255, 48"    ),
+	new BallType("turquoise", "#BFF",       "#3FF",       " 48,255,255"    ),
+	new BallType("amethyst",  "#FBF",       "#F3F",       "255, 48,255"    ),
+];
 
-function CreateBallWithNoise(x, y, dx, dy, is_gold) {
+const kBallTypeIDs = {
+	NORMAL: 0,
+	GOLD: 1,
+	RUBY: 2,
+	SAPPHIRE: 3,
+	EMERALD: 4,
+	TOPAZ: 5,
+	TURQUOISE: 6,
+	AMETHYST: 7,
+}
+
+function CreateBallWithNoise(x, y, dx, dy, ball_type_index) {
 	let dNoise = SampleGaussianNoise(0.0, 20.0);
-	return new Ball(x, y, dx + dNoise.x, dy + dNoise.y, is_gold);
+	return new Ball(x, y, dx + dNoise.x, dy + dNoise.y, ball_type_index);
 }
 
-function DropGoldBall(x, y) {
-	state.gold_balls.push(CreateBallWithNoise(x, y, 0.0, 0.0, true));
-	++state.save_file.stats.gold_balls;
-	state.ripples.push(new RippleEffect(new Point(x, y), kGoldBallRippleColor, kBallRadius));
-}
-
-function DropBall(x, y) {
-	if (GetUpgradeLevel("unlock_gold_balls") > 0 && Math.random() < state.gold_ball_rate) {
-		DropGoldBall(x, y);
-	} else {
-		state.balls.push(CreateBallWithNoise(x, y, 0.0, 0.0, false));
+function RollBallType() {
+	let ball_type_roll = Math.random();
+	for (i = kBallTypes.length - 1; i > 0; --i) {
+		if (!IsUnlocked("unlock_" + kBallTypes[i].name + "_balls")) {
+			continue;
+		}
+		if (ball_type_roll < state.ball_type_rates[i]) {
+			return i;
+		} else {
+			ball_type_roll -= state.ball_type_rates[i];
+		}
 	}
+	return 0;
+}
+
+function DropBall(x, y, ball_type_index) {
+	if (!ball_type_index) {
+		ball_type_index = RollBallType();
+	}
+	const ball_type = kBallTypes[ball_type_index];
+	state.balls_by_type[ball_type_index].push(CreateBallWithNoise(x, y, 0.0, 0.0, ball_type_index));
 	++state.save_file.stats.balls_dropped;
+	++state.save_file.stats[ball_type.name + "_balls"];
+	if (ball_type.ripple_color_rgb) {
+		state.ripples.push(new RippleEffect(new Point(x, y), ball_type.ripple_color_rgb, kBallRadius));
+	}
 	state.stats_updated = true;
 }
 
-function DropBonusGoldBalls(num_to_drop) {
+function DropBonusBalls(ball_types) {
 	let y = max_drop_y / 2;
-	let spacing = (max_drop_x - min_drop_x) / (num_to_drop + 1);
-	for (let i = 1; i <= num_to_drop; ++i) {
-		let x = spacing * i + min_drop_x;
-		DropGoldBall(x, y);
+	let spacing = (max_drop_x - min_drop_x) / (ball_types.length + 1);
+	for (let i = 0; i < ball_types.length; ++i) {
+		let x = spacing * (i + 1) + min_drop_x;
+		DropBall(x, y, ball_types[i]);
 	}
+}
+
+function TotalBalls(state) {
+	let total = 0;
+	for (let i = 0; i < state.balls_by_type.length; ++i) {
+		total += state.balls_by_type[i].length;
+	}
+	return total;
 }
 
 function GetUpgradeLevel(upgrade_id) {
 	return state.save_file.upgrade_levels[upgrade_id];
 }
 
+function IsUnlocked(upgrade_id) {
+	return GetUpgradeLevel(upgrade_id) > 0;
+}
+
 function AutoDropOn() {
-	return GetUpgradeLevel("auto_drop") >= 1 && state.save_file.auto_drop_enabled;
+	return IsUnlocked("auto_drop") && state.save_file.auto_drop_enabled;
 }
 
 function AutoSpinOn() {
-	return GetUpgradeLevel("auto_spin") >= 1 && state.save_file.auto_spin_enabled;
+	return IsUnlocked("auto_spin") && state.save_file.auto_spin_enabled;
 }
 
 function MultiSpinOn() {
-	return GetUpgradeLevel("multi_spin") >= 1 && state.save_file.multi_spin_enabled;
+	return IsUnlocked("multi_spin") && state.save_file.multi_spin_enabled;
 }
 
 function UpdateScoreHistory() {
@@ -90,8 +136,7 @@ function InitState() {
 		last_update: Date.now(),
 		board: DefaultBoard(),
 		target_sets: DefaultTargets(),
-		balls: new Array(0),
-		gold_balls: new Array(0),
+		balls_by_type: [...Array(kBallTypes.length)].map(_ => new Array(0)),
 		score_text: new Array(0),
 		score_history: [...Array(12)].map(_ => 0),
 		notifications: new Array(0),
@@ -104,11 +149,13 @@ function InitState() {
 		redraw_wheel: false,
 		stats_updated: true,
 		update_upgrade_buttons: true,
+		enable_score_text: true,
 		auto_drop_cooldown: 1000.0,
 		auto_drop_cooldown_left: 1000.0,
 		max_balls: 1,
-		gold_ball_multiplier: 2,
-		gold_ball_rate: 0.01,
+		ball_types_unlocked: [...Array(kBallTypes.length)].map(i => i == 0),
+		ball_type_rates: [1.0, 0.01, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001],
+		special_ball_multiplier: 2,
 		bonus_wheel: null,
 		wheel_popup_text: new Array(0),
 		ripples: new Array(0),
@@ -134,6 +181,8 @@ function InitState() {
 			auto_spin_enabled: false,
 			multi_spin_enabled: false,
 			quality: 0,
+			score_buff_multiplier: 1,
+			score_buff_duration: 0,
 			stats: {
 				total_score: 0,
 				score_last5s: 0,
@@ -141,7 +190,6 @@ function InitState() {
 				score_last60s: 0,
 				balls_dropped: 0,
 				balls_dropped_manual: 0,
-				gold_balls: 0,
 				target_hits: {},
 			},
 			upgrade_levels: {
@@ -150,8 +198,6 @@ function InitState() {
 				auto_drop: 0,
 				max_balls: 0,
 				auto_drop_delay: 0,
-				unlock_gold_balls: 0,
-				gold_ball_rate: 0,
 				gold_ball_value: 0,
 				unlock_bonus_wheel: 0,
 				add_spin_target: 0,
@@ -160,6 +206,11 @@ function InitState() {
 			},
 		},
 	};
+	for (let i = 0; i < kBallTypes.length; ++i) {
+		state.save_file.stats[kBallTypes[i].name + "_balls"] = 0;
+		state.save_file.upgrade_levels["unlock_" + kBallTypes[i].name + "_balls"] = 0;
+		state.save_file.upgrade_levels[kBallTypes[i].name + "_ball_rate"] = 0;
+	}
 	state.bonus_wheel = DefaultWheel(state);
 	return state;
 }
@@ -168,9 +219,9 @@ function GetSlotValue(slot_id) {
 	return state.target_sets[0].targets[slot_id].value;
 }
 
-function UpdateScoreDisplay(state, forceUpdate) {
+function UpdateScoreDisplay(state, force_update) {
 	const kRatio = (1.0 / 9.0) + 0.2;
-	let update = forceUpdate;
+	let update = force_update || (state.save_file.score_buff_duration > 0);
 	if (state.display_points != state.save_file.points) {
 		let delta = Math.abs(state.save_file.points - state.display_points);
 		if (delta < state.save_file.points * 1e-6) {
@@ -186,8 +237,13 @@ function UpdateScoreDisplay(state, forceUpdate) {
 		update = true;
 	}
 	if (update) {
-		document.getElementById("message_box").innerHTML =
-			"<h1>Points: " + FormatNumberLong(state.display_points) + "</h1>"
+		let html = '<div class="messageBoxLarge">Points: ' + FormatNumberLong(state.display_points) + '</div>'
+		if (state.save_file.score_buff_duration > 0) {
+			let duration_sec = Math.round(state.save_file.score_buff_duration / 1000.0);
+			html += '<div class="buff">All scoring \u00D7' + FormatNumberShort(state.save_file.score_buff_multiplier);
+			html += ' for ' + duration_sec + ' seconds!</div>';
+		}
+		document.getElementById("message_box").innerHTML = html;
 	}
 }
 
@@ -197,10 +253,10 @@ function SpinBonusWheel() {
 }
 
 function UpdateSpinCounter() {
-	document.getElementById("bonus_wheel").style.display = (GetUpgradeLevel("unlock_bonus_wheel") > 0) ? "inline" : "none";
+	document.getElementById("bonus_wheel").style.display = IsUnlocked("unlock_bonus_wheel") ? "inline" : "none";
 	document.getElementById("spin_count").innerHTML = state.save_file.spins;
 	document.getElementById("button_spin").disabled = (state.bonus_wheel.IsSpinning() || state.save_file.spins <= 0);
-	document.getElementById("multi_spin").style.display = (GetUpgradeLevel("multi_spin") > 0) ? "inline" : "none";
+	document.getElementById("multi_spin").style.display = IsUnlocked("multi_spin") ? "inline" : "none";
 	document.getElementById("multi_spin_count").innerHTML = state.bonus_wheel.multi_spin;
 }
 
@@ -233,7 +289,7 @@ function UpdateStatsPanel(state) {
 }
 
 function CanDrop(state) {
-	if (state.balls.length >= state.max_balls) {
+	if (state.balls_by_type[0].length >= state.max_balls) {
 		return false;
 	}
 	return true;
@@ -243,22 +299,29 @@ function ToggleVisibility(panel_name) {
 	let id = panel_name.toLowerCase().replaceAll(" ", "_");
 	let header = document.getElementById("button_" + id + "_header");
 	let contents = document.getElementById(id + "_contents");
-    if (contents.style.display == "block") {
-      contents.style.display = "none";
-	  header.innerHTML = "[+] " + panel_name;
-    } else {
-      contents.style.display = "block";
-	  header.innerHTML = "[&ndash;] " + panel_name;
-    }
+	if (contents.style.height == "0px") {
+		contents.style.height = "auto";
+		header.innerHTML = "[&ndash;] " + panel_name;
+	} else {
+		contents.style.height = "0px";
+		header.innerHTML = "[+] " + panel_name;
+	}
 }
 
 function UpdateOneFrame(state, draw) {
-	if (state.balls.length > 0) {
-		UpdateBalls(state.balls, state.board, state.target_sets);
+	for (let i = 0; i < state.balls_by_type.length; ++i) {
+		if (state.balls_by_type[i].length > 0) {
+			UpdateBalls(state.balls_by_type[i], state.board, state.target_sets);
+		}
 	}
-	if (state.gold_balls.length > 0) {
-		UpdateBalls(state.gold_balls, state.board, state.target_sets);
+	
+	if (state.save_file.score_buff_duration > 0) {
+		state.save_file.score_buff_duration -= kFrameInterval;
+		if (state.save_file.score_buff_duration < 0) {
+			state.save_file.score_buff_duration = 0;
+		}
 	}
+	
 	UpdateScoreDisplay(state);
 	
 	if (AutoDropOn() && state.save_file.auto_drop_pos) {
@@ -292,6 +355,7 @@ function Update() {
 		return;
 	}
 	for (let i = 0; i < num_frames; ++i) {
+		state.enable_score_text = (num_frames - i < 60);
 		UpdateOneFrame(state, false);
 	}
 	
