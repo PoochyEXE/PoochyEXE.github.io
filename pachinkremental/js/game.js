@@ -242,6 +242,8 @@ function UpdateScoreDisplay(state, force_update) {
 			let duration_sec = Math.round(state.save_file.score_buff_duration / 1000.0);
 			html += '<div class="buff">All scoring \u00D7' + FormatNumberShort(state.save_file.score_buff_multiplier);
 			html += ' for ' + duration_sec + ' seconds!</div>';
+		} else if (IsUnlocked("unlock_ruby_balls")) {
+			html += '<div class="buff">Score multiplier: \u00D71</div>';
 		}
 		document.getElementById("message_box").innerHTML = html;
 	}
@@ -315,14 +317,16 @@ function UpdateOneFrame(state, draw) {
 		}
 	}
 	
+	let force_score_update = false;
 	if (state.save_file.score_buff_duration > 0) {
 		state.save_file.score_buff_duration -= kFrameInterval;
 		if (state.save_file.score_buff_duration < 0) {
 			state.save_file.score_buff_duration = 0;
+			force_score_update = true;
 		}
 	}
 	
-	UpdateScoreDisplay(state);
+	UpdateScoreDisplay(state, force_score_update);
 	
 	if (AutoDropOn() && state.save_file.auto_drop_pos) {
 		if (CanDrop(state)) {
