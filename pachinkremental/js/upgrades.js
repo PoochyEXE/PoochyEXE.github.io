@@ -511,7 +511,9 @@ function InitUpgrades() {
 			/*ball_type=*/kBallTypes[kBallTypeIDs.TOPAZ],
 			"Topaz balls have the bonuses of both ruby and emerald balls.",
 			/*cost_func=*/GemstoneBallUnlockCost,
-			/*visible_func=*/ShouldDisplayGemstoneBallUpgrades));
+			/*visible_func=*/function() {
+				return IsUnlocked("unlock_ruby_balls") && IsUnlocked("unlock_emerald_balls");
+			}));
 	upgrades_list.push(new BallTypeRateUpgrade(
 			/*ball_type=*/kBallTypes[kBallTypeIDs.TOPAZ],
 			/*cost_func=*/Tier2GemstoneBallRateCostFunc,
@@ -521,7 +523,9 @@ function InitUpgrades() {
 			/*ball_type=*/kBallTypes[kBallTypeIDs.TURQUOISE],
 			"Turquoise balls have the bonuses of both emerald and sapphire balls.",
 			/*cost_func=*/GemstoneBallUnlockCost,
-			/*visible_func=*/ShouldDisplayGemstoneBallUpgrades));
+			/*visible_func=*/function() {
+				return IsUnlocked("unlock_emerald_balls") && IsUnlocked("unlock_sapphire_balls");
+			}));
 	upgrades_list.push(new BallTypeRateUpgrade(
 			/*ball_type=*/kBallTypes[kBallTypeIDs.TURQUOISE],
 			/*cost_func=*/Tier2GemstoneBallRateCostFunc,
@@ -531,7 +535,9 @@ function InitUpgrades() {
 			/*ball_type=*/kBallTypes[kBallTypeIDs.AMETHYST],
 			"Amethyst balls have the bonuses of both ruby and sapphire balls.",
 			/*cost_func=*/GemstoneBallUnlockCost,
-			/*visible_func=*/ShouldDisplayGemstoneBallUpgrades));
+			/*visible_func=*/function() {
+				return IsUnlocked("unlock_ruby_balls") && IsUnlocked("unlock_sapphire_balls");
+			}));
 	upgrades_list.push(new BallTypeRateUpgrade(
 			/*ball_type=*/kBallTypes[kBallTypeIDs.AMETHYST],
 			/*cost_func=*/Tier2GemstoneBallRateCostFunc,
