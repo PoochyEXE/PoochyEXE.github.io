@@ -229,7 +229,8 @@ function ActivateOrExtendDoubleScoreBuff() {
 function OnCenterSlotHit(ball) {
 	if (ball.ball_type_index == kBallTypeIDs.RUBY ||
 			ball.ball_type_index == kBallTypeIDs.TOPAZ ||
-			ball.ball_type_index == kBallTypeIDs.AMETHYST) {
+			ball.ball_type_index == kBallTypeIDs.AMETHYST ||
+			ball.ball_type_index == kBallTypeIDs.OPAL) {
 		let text_pos = new Point(ball.pos.x, ball.pos.y - 10);
 		MaybeAddScoreText(/*level=*/2, "2\u00D7 scoring!", text_pos, "255,0,0");
 		ActivateOrExtendDoubleScoreBuff();

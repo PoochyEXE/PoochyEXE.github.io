@@ -57,7 +57,8 @@ class ScoreTarget extends Target {
 			color_rgb = "170,143,0";
 			if (ball.ball_type_index == kBallTypeIDs.EMERALD ||
 					ball.ball_type_index == kBallTypeIDs.TOPAZ ||
-					ball.ball_type_index == kBallTypeIDs.TURQUOISE) {
+					ball.ball_type_index == kBallTypeIDs.TURQUOISE||
+					ball.ball_type_index == kBallTypeIDs.OPAL) {
 				total_value *= state.special_ball_multiplier;
 				popup_text_level = 2;
 				color_rgb = "0,192,0";
@@ -86,7 +87,8 @@ class SpinTarget extends Target {
 	OnHit(ball) {
 		if (ball.ball_type_index == kBallTypeIDs.SAPPHIRE ||
 				ball.ball_type_index == kBallTypeIDs.TURQUOISE ||
-				ball.ball_type_index == kBallTypeIDs.AMETHYST) {
+				ball.ball_type_index == kBallTypeIDs.AMETHYST ||
+				ball.ball_type_index == kBallTypeIDs.OPAL) {
 			let value = state.special_ball_multiplier;
 			state.save_file.spins += value;
 			UpdateSpinCounter();
