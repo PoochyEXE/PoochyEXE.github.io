@@ -170,8 +170,13 @@ function FormatNumberLong(num) {
 }
 
 class BallType {
-	constructor(name, inner_color, outer_color, ripple_color_rgb) {
+	
+	//          | id |    name    | display_name | inner_color | outer_color | ripple_color_rgb |
+	
+	constructor(id, name, display_name, inner_color, outer_color, ripple_color_rgb) {
+		this.id = id;
 		this.name = name;
+		this.display_name = display_name;
 		this.inner_color = inner_color;
 		this.outer_color = outer_color;
 		this.ripple_color_rgb = ripple_color_rgb;

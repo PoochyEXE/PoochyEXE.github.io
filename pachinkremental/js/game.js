@@ -1,4 +1,4 @@
-const kVersion = "v0.4.0 beta";
+const kVersion = "v0.4.1 beta";
 const kTitleAndVersion = "Pachinkremental " + kVersion;
 
 var max_drop_y = 20;
@@ -12,15 +12,15 @@ const kTopCanvasLayer = "canvas6";
 const kQualityOptions = ["High", "Medium", "Low"];
 
 const kBallTypes = [
-	//          |   name    | inner_color | outer_color | ripple_color_rgb |
-	new BallType("normal",    "#CCC",       "#888",       null             ),
-	new BallType("gold",      "#FFD700",    "#AA8F00",    "170,143,0"      ),
-	new BallType("ruby",      "#FBB",       "#F33",       "255, 48, 48"    ),
-	new BallType("sapphire",  "#BBF",       "#33F",       " 48, 48,255"    ),
-	new BallType("emerald",   "#BFB",       "#3F3",       " 48,255, 48"    ),
-	new BallType("topaz",     "#FFB",       "#FF3",       "255,255, 48"    ),
-	new BallType("turquoise", "#BFF",       "#3FF",       " 48,255,255"    ),
-	new BallType("amethyst",  "#FBF",       "#F3F",       "255, 48,255"    ),
+	//          | id |    name    | display_name | inner_color | outer_color | ripple_color_rgb |
+	new BallType(0,   "normal",    "Normal",      "#CCC",       "#888",       null             ),
+	new BallType(1,   "gold",      "Gold",        "#FFD700",    "#AA8F00",    "170,143,0"      ),
+	new BallType(2,   "ruby",      "Ruby",        "#FBB",       "#F33",       "255, 48, 48"    ),
+	new BallType(3,   "sapphire",  "Sapphire",    "#BBF",       "#33F",       " 48, 48,255"    ),
+	new BallType(4,   "emerald",   "Emerald",     "#BFB",       "#3F3",       " 48,255, 48"    ),
+	new BallType(5,   "topaz",     "Topaz",       "#FFB",       "#FF3",       "255,255, 48"    ),
+	new BallType(6,   "turquoise", "Turquoise",   "#BFF",       "#3FF",       " 48,255,255"    ),
+	new BallType(7,   "amethyst",  "Amethyst",    "#FBF",       "#F3F",       "255, 48,255"    ),
 ];
 
 const kBallTypeIDs = {
@@ -157,6 +157,7 @@ function InitState() {
 		ball_type_rates: [1.0, 0.01, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001],
 		special_ball_multiplier: 2,
 		bonus_wheel: null,
+		active_tooltip: null,
 		wheel_popup_text: new Array(0),
 		ripples: new Array(0),
 		last_drawn: {
@@ -398,7 +399,7 @@ function OnResize() {
 }
 
 function Load() {
-	// TODO: Save and load the game.
+	InitUpgradeButtons(state.upgrades);
 	document.getElementById(kTopCanvasLayer).addEventListener('click', OnClick);
 	document.title = kTitleAndVersion;
 	document.getElementById("title_version").innerHTML = kTitleAndVersion;

@@ -31,6 +31,13 @@ A: This is intentional, both to make sure the game won't softlock with too many 
 
 ## Changelog
 
+### v0.4.1 beta (2021-03-31)
+* Better tooltips on upgrade buttons.
+* Better export save UI, which also fixes a bug that would corrupt the exported save when it's too long.
+* Overhauled a bunch of the upgrade code to reduce the amount of copy-and-paste code.
+* Gemstone ball unlocks now reveal themselves earlier.
+* Buff: Reduced cost scaling for gemstone ball unlocks.
+
 ### v0.4.0 beta (2021-03-29)
 * New feature: 6 types of gemstone balls, which have the value multipiler of gold balls plus additional bonuses.
 * Suppress pop-up text when the game is running in the background, to avoid the bug where all the pop-up text accumulates while the tab is inactive and then they all appear at once when you switch back to the tab.

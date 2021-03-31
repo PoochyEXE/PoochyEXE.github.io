@@ -64,11 +64,16 @@ function ImportSave() {
 
 	if (save_file_str != null && save_file_str != "") {
 		LoadGame(save_file_str);
-	} 
+	}
+}
+
+function CloseModal(id) {
+	document.getElementById(id).style.display = "none";
 }
 
 function ExportSave() {
-	prompt("Your save file is below. Copy the text and keep it someplace safe.", SaveFileToString(state));
+	document.getElementById("exported_save").innerHTML = SaveFileToString(state);
+	document.getElementById("export_save_modal").style.display = "block";
 }
 
 function EraseSave() {
@@ -76,10 +81,8 @@ function EraseSave() {
 	let answer = prompt(kCaution + "This will erase all your progress and restart the game from scratch!\n\n" + kCaution +
 			"\nIf you are really sure, type \"DELETE\" in all caps below, then click OK.", "");
 	if (answer == "DELETE") {
-		localStorage.removeItem('save_file')
-		state = InitState();
-		Load();
-		state.notifications.push(new Notification("Save file erased", "#F88"));
+		localStorage.removeItem('save_file');
+		location.reload();
 	}
 }
 

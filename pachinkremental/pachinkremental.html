@@ -36,10 +36,10 @@
 				</div>
 				<div id="bonus_wheel" class="bonusWheel" style="display: none;">
 					<button type="button" class="bonusWheel" id="button_spin" onclick="SpinBonusWheel()">Spin the wheel!</button>
-					Spins:&nbsp;<div id="spin_count" style="display: inline;">0</div>
-					<div id="multi_spin" style="display: inline;">
-						| Multi&#x2011;Spin:&nbsp;<div id="multi_spin_count" style="display: inline;">1</div>&#xD7;
-					</div>
+					Spins:&nbsp;<span id="spin_count">0</span>
+					<span id="multi_spin">
+						| Multi&#x2011;Spin:&nbsp;<span id="multi_spin_count">1</span>&#xD7;
+					</span>
 					<canvas id="canvasBonusWheel" class="bonusWheel" style="display: block; z-index: 1; margin: 5px"></canvas>
 				</div>
 			</td>
@@ -57,15 +57,6 @@
 							<button type="button" class="upgradesSubHeader"
 									id="button_board_header" onclick="ToggleVisibility('Board')">[&ndash;] Board</button>
 							<div id="board_contents" class="upgradesContents" style="display: block;">
-								<button type="button" class="upgradeButton" id="button_upgrade_multiplier" onclick="UpgradeButtonHandler(this)"
-										title="Multipiles all point gains.">
-								</button>
-								<button type="button" class="upgradeButton" id="button_upgrade_center_value" onclick="UpgradeButtonHandler(this)"
-										title="Point value of the bottom center slot.">
-								</button>
-								<button type="button" class="upgradeButton" id="button_upgrade_max_balls" onclick="UpgradeButtonHandler(this)"
-										title="Maximum number of balls allowed on the board at once.">
-								</button>
 							</div>
 						</div>
 						<br/>
@@ -73,31 +64,12 @@
 							<button type="button" class="upgradesSubHeader"
 									id="button_auto-drop_header" onclick="ToggleVisibility('Auto-Drop')">[&ndash;] Auto-Drop</button>
 							<div id="auto-drop_contents" class="upgradesContents" style="display: block;">
-								<button type="button" class="upgradeButton" id="button_upgrade_auto_drop" onclick="UpgradeButtonHandler(this)"
-										title="Automatically drops a ball when allowed. Click in the drop zone to move the drop position.">
-								</button>
-								<button type="button" class="upgradeButton" id="button_upgrade_auto_drop_delay" onclick="UpgradeButtonHandler(this)"
-										title="Decreases the auto drop delay.">
-								</button>
 							</div>
 						</div>
 						<div id="bonus_wheel_upgrades_container" class="upgradesContainer" style="display: none;">
 							<button type="button" class="upgradesSubHeader"
 									id="button_bonus_wheel_header" onclick="ToggleVisibility('Bonus Wheel')">[&ndash;] Bonus Wheel</button>
 							<div id="bonus_wheel_contents" class="upgradesContents" style="display: block;">
-								<button type="button" class="upgradeButton" id="button_upgrade_unlock_bonus_wheel" onclick="UpgradeButtonHandler(this)"
-										title="Unlocks the Bonus Wheel. Also adds 2 targets, which award a spin for each ball that passes through them. Point values on the wheel scale based on your upgrades.">
-								</button>
-								<button type="button" class="upgradeButton" id="button_upgrade_add_spin_target" onclick="UpgradeButtonHandler(this)"
-										title="Adds an extra target that awards Bonus Wheel spins.">
-								</button>
-								<br/>
-								<button type="button" class="upgradeButton" id="button_upgrade_auto_spin" onclick="UpgradeButtonHandler(this)"
-										title="Automatically spin the Bonus Wheel.">
-								</button>
-								<button type="button" class="upgradeButton" id="button_upgrade_multi_spin" onclick="UpgradeButtonHandler(this)"
-										title="Uses 10% of your available spins at a time, multiplying any points you win from that spin. NOTE: Bonus gold ball drops are not multiplied.">
-								</button>
 							</div>
 						</div>
 						<br/>
@@ -105,63 +77,19 @@
 							<button type="button" class="upgradesSubHeader"
 									id="button_gold_balls_header" onclick="ToggleVisibility('Gold Balls')">[&ndash;] Gold Balls</button>
 							<div id="gold_balls_contents" class="upgradesContents" style="display: block;">
-								<button type="button" class="upgradeButton" id="button_upgrade_unlock_gold_balls" onclick="UpgradeButtonHandler(this)"
-										title="Unlocks gold balls, which are worth double points and don't count towards the max balls limit.">
-								</button>
-								<button type="button" class="upgradeButton" id="button_upgrade_gold_ball_rate" onclick="UpgradeButtonHandler(this)"
-										title="Increases the probability of a ball being gold.">
-								</button>
-								<button type="button" class="upgradeButton" id="button_upgrade_gold_ball_value" onclick="UpgradeButtonHandler(this)"
-										title="Increases point multiplier for gold balls.">
-								</button>
 							</div>
 						</div>
 						<div id="gemstone_balls_upgrades_container" class="upgradesContainer" style="display: none;">
 							<button type="button" class="upgradesSubHeader"
 									id="button_gemstone_balls_header" onclick="ToggleVisibility('Gemstone Balls')">[&ndash;] Gemstone Balls</button>
 							<div id="gemstone_balls_contents" class="upgradesContents" style="display: block;">
-								<div id="gemstone_balls_note" style="padding-top: 5px; padding-bottom: 5px;">NOTE: Unlocking one gemstone ball sharply increases the cost of unlocking the others!</div>
-								<button type="button" class="rubyUpgradeButton" id="button_upgrade_unlock_ruby_balls" onclick="UpgradeButtonHandler(this)"
-										title="Unlocks ruby balls. Ruby balls are worth the same as a gold ball, plus if a ruby ball falls in the center slot, it activates a buff that doubles all points scored for 60 seconds.">
-								</button>
-								<button type="button" class="rubyUpgradeButton" id="button_upgrade_ruby_ball_rate" onclick="UpgradeButtonHandler(this)"
-										title="Increases the probability of a ball being ruby.">
-								</button>
-								<br/>
-								<button type="button" class="topazUpgradeButton" id="button_upgrade_unlock_topaz_balls" onclick="UpgradeButtonHandler(this)"
-										title="Unlocks topaz balls, which have the bonuses of both ruby and emerald balls.">
-								</button>
-								<button type="button" class="topazUpgradeButton" id="button_upgrade_topaz_ball_rate" onclick="UpgradeButtonHandler(this)"
-										title="Increases the probability of a ball being topaz.">
-								</button>
-								<br/>
-								<button type="button" class="emeraldUpgradeButton" id="button_upgrade_unlock_emerald_balls" onclick="UpgradeButtonHandler(this)"
-										title="Unlocks emerald balls. Points scored by emerald balls are multiplied by the square of the gold ball multiplier.">
-								</button>
-								<button type="button" class="emeraldUpgradeButton" id="button_upgrade_emerald_ball_rate" onclick="UpgradeButtonHandler(this)"
-										title="Increases the probability of a ball being emerald.">
-								</button>
-								<br/>
-								<button type="button" class="turquoiseUpgradeButton" id="button_upgrade_unlock_turquoise_balls" onclick="UpgradeButtonHandler(this)"
-										title="Unlocks turquoise balls, which have the bonuses of both emerald and sapphire balls.">
-								</button>
-								<button type="button" class="turquoiseUpgradeButton" id="button_upgrade_turquoise_ball_rate" onclick="UpgradeButtonHandler(this)"
-										title="Increases the probability of a ball being turquoise.">
-								</button>
-								<br/>
-								<button type="button" class="sapphireUpgradeButton" id="button_upgrade_unlock_sapphire_balls" onclick="UpgradeButtonHandler(this)"
-										title="Unlocks sapphire balls. Sapphire balls are worth the same as a gold ball, plus the gold ball multiplier is also applied to any bonus wheel spins earned.">
-								</button>
-								<button type="button" class="sapphireUpgradeButton" id="button_upgrade_sapphire_ball_rate" onclick="UpgradeButtonHandler(this)"
-										title="Increases the probability of a ball being sapphire.">
-								</button>
-								<br/>
-								<button type="button" class="amethystUpgradeButton" id="button_upgrade_unlock_amethyst_balls" onclick="UpgradeButtonHandler(this)"
-										title="Unlocks amethyst balls, which have the bonuses of both ruby and sapphire balls.">
-								</button>
-								<button type="button" class="amethystUpgradeButton" id="button_upgrade_amethyst_ball_rate" onclick="UpgradeButtonHandler(this)"
-										title="Increases the probability of a ball being amethyst.">
-								</button>
+								<div id="gemstone_balls_note" style="padding-top: 5px; padding-bottom: 5px;">Gemstone balls have the benefits of gold balls, plus additional bonuses.<br/>NOTE: Unlocking one gemstone ball sharply increases the cost of unlocking the others!</div>
+								<div id="ruby_balls_contents" class="upgradesContents" style="display: block;"></div>
+								<div id="topaz_balls_contents" class="upgradesContents" style="display: block;"></div>
+								<div id="emerald_balls_contents" class="upgradesContents" style="display: block;"></div>
+								<div id="turquoise_balls_contents" class="upgradesContents" style="display: block;"></div>
+								<div id="sapphire_balls_contents" class="upgradesContents" style="display: block;"></div>
+								<div id="amethyst_balls_contents" class="upgradesContents" style="display: block;"></div>
 							</div>
 						</div>
 					</div>
@@ -236,7 +164,7 @@
 					</div>
 				</div>
 				<br/>
-				<div id="title_version" style="display: inline;">Pachinkremental</div> by Poochy.EXE
+				<span id="title_version">Pachinkremental</span> by Poochy.EXE
 				| <a href="https://github.com/PoochyEXE/PoochyEXE.github.io/tree/main/pachinkremental#pachinkremental-by-poochyexe">manual</a>
 				| <a href="https://github.com/PoochyEXE/PoochyEXE.github.io/tree/main/pachinkremental#changelog">changelog</a>
 				| <a href="https://github.com/PoochyEXE/PoochyEXE.github.io/tree/main/pachinkremental">source&nbsp;code</a>
@@ -244,4 +172,14 @@
 		</tr>
 	</table>
 	<div id="notifications" class="notifications"> </div>
+	<div id="tooltip" class="tooltip" style="display: none;"> </div>
+	<div id="export_save_modal" class="modal">
+		<div class="modalContent">
+			<span class="modalCloseButton" onmousedown="CloseModal('export_save_modal')">&#xD7</span>
+			Your save file is below. Copy the text and keep it someplace safe.
+			<br/>
+			<br/>
+			<div id="exported_save" class="exportedSave"></div>
+		</div>
+	</div>
 </body>
