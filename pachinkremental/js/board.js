@@ -83,12 +83,12 @@ class ScoreTarget extends Target {
 			}
 		}
 		AddScore(total_value);
-		MaybeAddScoreText(
-			popup_text_level,
-			`+${FormatNumberShort(total_value)}`,
-			ball.pos,
+		MaybeAddScoreText({
+			level: popup_text_level,
+			text: `+${FormatNumberShort(total_value)}`,
+			pos: ball.pos,
 			color_rgb
-		);
+		});
 	}
 
 	SetValue(new_value) {
@@ -119,16 +119,21 @@ class SpinTarget extends Target {
 			let value = state.special_ball_multiplier;
 			state.save_file.spins += value;
 			UpdateSpinCounter();
-			MaybeAddScoreText(
-				/*level=*/ 2,
-				`+${value} Spins`,
-				ball.pos,
-				"0,0,255"
-			);
+			MaybeAddScoreText({
+				level: 2,
+				text: `+${value} Spins`,
+				pos: ball.pos,
+				color_rgb: "0,0,255"
+			});
 		} else {
 			++state.save_file.spins;
 			UpdateSpinCounter();
-			MaybeAddScoreText(/*level=*/ 0, "+1 Spin", ball.pos, "0,170,0");
+			MaybeAddScoreText({
+				level: 0,
+				text: "+1 Spin",
+				pos: ball.pos,
+				color_rgb: "0,170,0"
+			});
 		}
 	}
 }

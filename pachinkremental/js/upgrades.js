@@ -347,7 +347,12 @@ function OnCenterSlotHit(ball) {
 		ball.ball_type_index == kBallTypeIDs.OPAL
 	) {
 		let text_pos = new Point(ball.pos.x, ball.pos.y - 10);
-		MaybeAddScoreText(2, "2\u00D7 scoring!", text_pos, "255,0,0");
+		MaybeAddScoreText({
+			level: 2,
+			text: "2\u00D7 scoring!",
+			pos: text_pos,
+			color_rgb: "255,0,0"
+		});
 		ActivateOrExtendDoubleScoreBuff();
 	}
 }
@@ -448,12 +453,12 @@ function InitUpgrades() {
 				let bottom_targets = state.target_sets[0].targets;
 				let popup_text = kTimesSymbol + "5";
 				for (let i = 0; i < bottom_targets.length; ++i) {
-					MaybeAddScoreText(
-						2,
-						popup_text,
-						bottom_targets[i].pos,
-						"0,0,255"
-					);
+					MaybeAddScoreText({
+						level: 2,
+						text: popup_text,
+						pos: bottom_targets[i].pos,
+						color_rgb: "0,0,255"
+					});
 				}
 				state.bonus_wheel.UpdateAllSpaces();
 			}
@@ -474,7 +479,12 @@ function InitUpgrades() {
 			on_buy: () => {
 				let target = state.target_sets[0].targets[4];
 				let popup_text = kTimesSymbol + "2";
-				MaybeAddScoreText(2, popup_text, target.pos, "0,0,255");
+				MaybeAddScoreText({
+					level: 2,
+					text: popup_text,
+					pos: target.pos,
+					color_rgb: "0,0,255"
+				});
 				state.bonus_wheel.UpdateAllSpaces();
 			}
 		})

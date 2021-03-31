@@ -89,7 +89,7 @@ const kWheelPopupTextPos = new Point(150, 75);
 const kWheelPopupTextColor = "255,255,255";
 
 class BonusWheelPointSpace extends BonusWheelSpace {
-	constructor({active_color, value_func}) {
+	constructor({ active_color, value_func }) {
 		super({ active_color });
 		this.text_func = this.GetText;
 		this.on_hit_func = this.OnHit;
@@ -103,11 +103,11 @@ class BonusWheelPointSpace extends BonusWheelSpace {
 	OnHit(multi_spin) {
 		let value = this.value_func() * multi_spin;
 		AddScore(value);
-		MaybeAddBonusWheelText(
-			"+" + FormatNumberShort(value) + " points",
-			kWheelPopupTextPos,
-			kWheelPopupTextColor
-		);
+		MaybeAddBonusWheelText({
+			text: `+${FormatNumberShort(value)} points`,
+			pos: kWheelPopupTextPos,
+			color_rgb: kWheelPopupTextColor
+		});
 	}
 
 	Update() {
@@ -152,11 +152,11 @@ function DefaultWheel() {
 							kBallTypeIDs.AMETHYST
 						])
 					);
-					MaybeAddBonusWheelText(
-						"3 gemstone balls!",
-						kWheelPopupTextPos,
-						kWheelPopupTextColor
-					);
+					MaybeAddBonusWheelText({
+						text: "3 gemstone balls!",
+						pos: kWheelPopupTextPos,
+						color_rgb: kWheelPopupTextColor
+					});
 				} else if (AllTier1GemstoneBallsUnlocked()) {
 					DropBonusBalls(
 						ShuffleArray([
@@ -165,22 +165,22 @@ function DefaultWheel() {
 							kBallTypeIDs.EMERALD
 						])
 					);
-					MaybeAddBonusWheelText(
-						"3 gemstone balls!",
-						kWheelPopupTextPos,
-						kWheelPopupTextColor
-					);
+					MaybeAddBonusWheelText({
+						text: "3 gemstone balls!",
+						pos: kWheelPopupTextPos,
+						color_rgb: kWheelPopupTextColor
+					});
 				} else {
 					DropBonusBalls([
 						kBallTypeIDs.GOLD,
 						kBallTypeIDs.GOLD,
 						kBallTypeIDs.GOLD
 					]);
-					MaybeAddBonusWheelText(
-						"3 gold balls!",
-						kWheelPopupTextPos,
-						kWheelPopupTextColor
-					);
+					MaybeAddBonusWheelText({
+						text: "3 gold balls!",
+						pos: kWheelPopupTextPos,
+						color_rgb: kWheelPopupTextColor
+					});
 				}
 			}
 		})
@@ -190,11 +190,11 @@ function DefaultWheel() {
 			active_color: "#F88",
 			text_func: () => "ZONK",
 			on_hit_func: () => {
-				MaybeAddBonusWheelText(
-					"*sad trombone*",
-					kWheelPopupTextPos,
-					kWheelPopupTextColor
-				);
+				MaybeAddBonusWheelText({
+					text: "*sad trombone*",
+					pos: kWheelPopupTextPos,
+					color_rgb: kWheelPopupTextColor
+				});
 			}
 		})
 	);
@@ -253,18 +253,18 @@ function DefaultWheel() {
 					let popup_text = IsUnlocked("unlock_opal_balls")
 						? "7 gemstone balls!"
 						: "7 special balls!";
-					MaybeAddBonusWheelText(
-						popup_text,
-						kWheelPopupTextPos,
-						kWheelPopupTextColor
-					);
+					MaybeAddBonusWheelText({
+						text: popup_text,
+						pos: kWheelPopupTextPos,
+						color_rgb: kWheelPopupTextColor
+					});
 				} else {
 					DropBonusBalls([...Array(7)].map(_ => kBallTypeIDs.GOLD));
-					MaybeAddBonusWheelText(
-						"7 gold balls!",
-						kWheelPopupTextPos,
-						kWheelPopupTextColor
-					);
+					MaybeAddBonusWheelText({
+						text: "7 gold balls!",
+						pos: kWheelPopupTextPos,
+						color_rgb: kWheelPopupTextColor
+					});
 				}
 			}
 		})
