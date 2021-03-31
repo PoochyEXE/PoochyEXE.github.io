@@ -137,27 +137,28 @@ function FormatSmallNumberShort(num) {
 	}
 }
 
+const shortSuffixes = [
+	"",
+	"K",
+	"M",
+	"B",
+	"T",
+	"Qa",
+	"Qi",
+	"Sx",
+	"Sp",
+	"Oc",
+	"No",
+	"Dc"
+];
+
 function FormatNumberShort(num) {
-	const kSuffixes = [
-		"",
-		"K",
-		"M",
-		"B",
-		"T",
-		"Qa",
-		"Qi",
-		"Sx",
-		"Sp",
-		"Oc",
-		"No",
-		"Dc"
-	];
 	const kPrecision = 3;
 	if (num < 1000) {
 		return FormatSmallNumberShort(num);
 	}
 	let suffix_index = Math.floor(Math.log10(num) / 3);
-	if (suffix_index >= kSuffixes.length) {
+	if (suffix_index >= shortSuffixes.length) {
 		return num.toPrecision(kPrecision).replace("+", "");
 	}
 	if (suffix_index == 0) {
@@ -165,37 +166,38 @@ function FormatNumberShort(num) {
 	}
 	let prefix = num / Math.pow(1000, suffix_index);
 	let prefix_str = FormatSmallNumberShort(prefix);
-	return prefix_str + kSuffixes[suffix_index];
+	return prefix_str + shortSuffixes[suffix_index];
 }
 
+const longSuffixes = [
+	"",
+	"",
+	"",
+	"billion",
+	"trillion",
+	"quadrillion",
+	"quintillion",
+	"sextillion",
+	"septillion",
+	"octillion",
+	"nonillion",
+	"decillion"
+];
+
 function FormatNumberLong(num) {
-	const kSuffixes = [
-		"",
-		"",
-		"",
-		"billion",
-		"trillion",
-		"quadrillion",
-		"quintillion",
-		"sextillion",
-		"septillion",
-		"octillion",
-		"nonillion",
-		"decillion"
-	];
 	const kPrecision = 3;
 	if (num < 1000) {
 		return num.toString();
 	}
 	let suffix_index = Math.floor(Math.log10(num) / 3);
-	if (suffix_index >= kSuffixes.length) {
+	if (suffix_index >= longSuffixes.length) {
 		return num.toPrecision(kPrecision).replace("+", "");
 	}
-	if (kSuffixes[suffix_index] == "") {
+	if (longSuffixes[suffix_index] == "") {
 		return num.toLocaleString();
 	}
 	let prefix = num / Math.pow(1000, suffix_index);
-	return prefix.toFixed(kPrecision) + " " + kSuffixes[suffix_index];
+	return prefix.toFixed(kPrecision) + " " + longSuffixes[suffix_index];
 }
 
 class BallType {
