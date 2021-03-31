@@ -231,7 +231,7 @@ function OnCenterSlotHit(ball) {
 			ball.ball_type_index == kBallTypeIDs.TOPAZ ||
 			ball.ball_type_index == kBallTypeIDs.AMETHYST) {
 		let text_pos = new Point(ball.pos.x, ball.pos.y - 10);
-		MaybeAddScoreText("2\u00D7 scoring!", text_pos, "255,0,0");
+		MaybeAddScoreText(/*level=*/2, "2\u00D7 scoring!", text_pos, "255,0,0");
 		ActivateOrExtendDoubleScoreBuff();
 	}
 }
@@ -262,7 +262,7 @@ function GemstoneBallUnlockCost() {
 			++prev_unlocks;
 		}
 	}
-	return 1e12 * Math.pow(5000, prev_unlocks);
+	return 1e12 * Math.pow(2000, prev_unlocks);
 }
 
 function Tier1GemstoneBallRateCostFunc(level) {
@@ -270,7 +270,7 @@ function Tier1GemstoneBallRateCostFunc(level) {
 }
 
 function Tier2GemstoneBallRateCostFunc(level) {
-	return 5e20 * Math.pow(5, level);
+	return 5e18 * Math.pow(5, level);
 }
 
 function GemstoneBallRateValueFunc(level) {
@@ -317,7 +317,7 @@ function InitUpgrades() {
 				let bottom_targets = state.target_sets[0].targets;
 				let popup_text = kTimesSymbol + "5";
 				for (let i = 0; i < bottom_targets.length; ++i) {
-					MaybeAddScoreText(popup_text, bottom_targets[i].pos, "0,0,255");
+					MaybeAddScoreText(/*level=*/2, popup_text, bottom_targets[i].pos, "0,0,255");
 				}
 				state.bonus_wheel.UpdateAllSpaces();
 			}));
@@ -337,7 +337,7 @@ function InitUpgrades() {
 			/*on_buy=*/function() {
 				let target = state.target_sets[0].targets[4];
 				let popup_text = kTimesSymbol + "2";
-				MaybeAddScoreText(popup_text, target.pos, "0,0,255");
+				MaybeAddScoreText(/*level=*/2, popup_text, target.pos, "0,0,255");
 				state.bonus_wheel.UpdateAllSpaces();
 			}));
 	upgrades_list.push(new ToggleUnlockUpgrade("auto_drop", "Auto-Drop",
@@ -543,6 +543,18 @@ function InitUpgrades() {
 			/*cost_func=*/Tier2GemstoneBallRateCostFunc,
 			/*value_func=*/GemstoneBallRateValueFunc,
 			/*max_level=*/49));
+	upgrades_list.push(new BallTypeUnlockUpgrade(
+			/*ball_type=*/kBallTypes[kBallTypeIDs.OPAL],
+			"Opal balls have the combined bonuses of ruby, sapphire, and emerald balls.",
+			/*cost_func=*/GemstoneBallUnlockCost,
+			/*visible_func=*/AllTier2GemstoneBallsUnlocked));
+	upgrades_list.push(new BallTypeRateUpgrade(
+			/*ball_type=*/kBallTypes[kBallTypeIDs.OPAL],
+			/*cost_func=*/function (level) {
+				return 5e24 * Math.pow(5, level);
+			},
+			/*value_func=*/GemstoneBallRateValueFunc,
+			/*max_level=*/49));
 	
 	let upgrades_map = {};
 	for (let i = 0; i < upgrades_list.length; ++i) {
@@ -566,6 +578,8 @@ function ButtonClassForUpgradeCategory(category) {
 		return "turquoiseUpgradeButton";
 	} else if (category == "amethyst_balls") {
 		return "amethystUpgradeButton";
+	} else if (category == "opal_balls") {
+		return "opalUpgradeButton";
 	} else {
 		return "upgradeButton";
 	}

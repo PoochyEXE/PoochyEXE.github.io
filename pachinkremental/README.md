@@ -31,6 +31,12 @@ A: This is intentional, both to make sure the game won't softlock with too many 
 
 ## Changelog
 
+### v0.5.0 beta (2021-03-31)
+* New ball type: Opal!
+* Buff: Further reduced cost scaling for gemstone ball unlocks.
+* Buff: Reduced cost of drop rate upgrades for Topaz, Turquoise, and Amethyst balls.
+* Add option to disable some or all pop-up text.
+
 ### v0.4.1 beta (2021-03-31)
 * Better tooltips on upgrade buttons.
 * Better export save UI, which also fixes a bug that would corrupt the exported save when it's too long.

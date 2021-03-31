@@ -56,28 +56,24 @@
 						<div id="basic_upgrades_container" class="upgradesContainer" style="display: inline-block;">
 							<button type="button" class="upgradesSubHeader"
 									id="button_board_header" onclick="ToggleVisibility('Board')">[&ndash;] Board</button>
-							<div id="board_contents" class="upgradesContents" style="display: block;">
-							</div>
+							<div id="board_contents" class="upgradesContents" style="display: block;"></div>
 						</div>
 						<br/>
 						<div id="auto-drop_upgrades_container" class="upgradesContainer" style="display: none;">
 							<button type="button" class="upgradesSubHeader"
 									id="button_auto-drop_header" onclick="ToggleVisibility('Auto-Drop')">[&ndash;] Auto-Drop</button>
-							<div id="auto-drop_contents" class="upgradesContents" style="display: block;">
-							</div>
+							<div id="auto-drop_contents" class="upgradesContents" style="display: block;"></div>
 						</div>
 						<div id="bonus_wheel_upgrades_container" class="upgradesContainer" style="display: none;">
 							<button type="button" class="upgradesSubHeader"
 									id="button_bonus_wheel_header" onclick="ToggleVisibility('Bonus Wheel')">[&ndash;] Bonus Wheel</button>
-							<div id="bonus_wheel_contents" class="upgradesContents" style="display: block;">
-							</div>
+							<div id="bonus_wheel_contents" class="upgradesContents" style="display: block;"></div>
 						</div>
 						<br/>
 						<div id="gold_balls_upgrades_container" class="upgradesContainer" style="display: none;">
 							<button type="button" class="upgradesSubHeader"
 									id="button_gold_balls_header" onclick="ToggleVisibility('Gold Balls')">[&ndash;] Gold Balls</button>
-							<div id="gold_balls_contents" class="upgradesContents" style="display: block;">
-							</div>
+							<div id="gold_balls_contents" class="upgradesContents" style="display: block;"></div>
 						</div>
 						<div id="gemstone_balls_upgrades_container" class="upgradesContainer" style="display: none;">
 							<button type="button" class="upgradesSubHeader"
@@ -90,6 +86,7 @@
 								<div id="turquoise_balls_contents" class="upgradesContents" style="display: block;"></div>
 								<div id="sapphire_balls_contents" class="upgradesContents" style="display: block;"></div>
 								<div id="amethyst_balls_contents" class="upgradesContents" style="display: block;"></div>
+								<div id="opal_balls_contents" class="upgradesContents" style="display: block;"></div>
 							</div>
 						</div>
 					</div>
@@ -139,6 +136,9 @@
 						<div id="stats_container_amethyst_balls" class="statsRow" style="display: none;">
 							<b>Amethyst balls: </b><div id="stats_amethyst_balls" class="statsEntry"></div>
 						</div>
+						<div id="stats_container_opal_balls" class="statsRow" style="display: none;">
+							<b>Opal balls: </b><div id="stats_opal_balls" class="statsEntry"></div>
+						</div>
 					</div>
 				</div>
 				<div id="options_container" class="optionsContainer">
@@ -158,6 +158,8 @@
 						<br/>
 						<button type="button" class="optionButton"
 								id="button_quality" onclick="ToggleQuality()">Quality</button>
+						<button type="button" class="optionButton"
+								id="button_popup_text" onclick="TogglePopupText()">Popup text</button>
 						<br/>
 						<button type="button" class="optionButton" style="background: #F88;"
 								id="button_erase_save" onclick="EraseSave()">Erase save file</button>

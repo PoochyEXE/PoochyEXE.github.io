@@ -72,6 +72,7 @@ class Ball {
 		this.ball_type_index = ball_type_index;
 		this.active = true;
 		this.last_hit = null;
+		this.start_time = Date.now();
 	}
 }
 
@@ -84,8 +85,8 @@ class RisingText {
 	}
 }
 
-function MaybeAddScoreText(text, pos, color_rgb) {
-	if (state.enable_score_text) {
+function MaybeAddScoreText(level, text, pos, color_rgb) {
+	if (state.enable_score_text && level >= state.save_file.display_popup_text) {
 		state.score_text.push(new RisingText(text, pos, color_rgb));
 	}
 }
@@ -170,9 +171,6 @@ function FormatNumberLong(num) {
 }
 
 class BallType {
-	
-	//          | id |    name    | display_name | inner_color | outer_color | ripple_color_rgb |
-	
 	constructor(id, name, display_name, inner_color, outer_color, ripple_color_rgb) {
 		this.id = id;
 		this.name = name;

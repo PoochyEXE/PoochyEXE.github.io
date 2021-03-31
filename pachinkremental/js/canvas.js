@@ -3,6 +3,24 @@ const kPegColor = {
 	outer: "#000",
 };
 
+const kPrismatic = "PRISMATIC";
+
+function GetPrismaticColor(start_time, time_now, cycle_duration, saturation) {
+	const kCycleColors = [[0,1,0], [0,1,1], [0,0,1], [1,0,1], [1,0,0], [1,1,0]];
+	let point_in_cycle = (time_now - start_time) * kCycleColors.length / cycle_duration;
+	let index_before = Math.floor(point_in_cycle);
+	let fraction = point_in_cycle - index_before;
+	let color_before = kCycleColors[index_before % kCycleColors.length];
+	let color_after = kCycleColors[(index_before + 1) % kCycleColors.length];
+	let color_rgb = [0,0,0];
+	let lo = Math.round((1 - saturation) * 255);
+	for (let i = 0; i < 3; ++i) {
+		let channel_fraction = color_before[i] * (1 - fraction) + color_after[i] * fraction;
+		color_rgb[i] = Math.round(lo + (255 - lo) * channel_fraction);
+	}
+	return color_rgb[0] + ", " + color_rgb[1] + ", " + color_rgb[2];
+}
+
 function DrawGradientCircle(ctx, pos, radius, inner_color, outer_color) {
 	let inner_x = pos.x - radius / 3;
 	let inner_y = pos.y - radius / 3;
@@ -84,14 +102,33 @@ function DrawPegsNoGradient(positions, ctx) {
 }
 
 function DrawBalls(balls, inner_color, outer_color, ctx) {
+	const kPrismaticSaturationOuter = 0.8;
+	const kPrismaticSaturationInner = 0.25;
+	const kPrismaticCycleDuration = 2000.0;
+	const time = Date.now();
 	for (let i = 0; i < balls.length; ++i) {
-		DrawGradientCircle(ctx, balls[i].pos, kBallRadius, inner_color, outer_color);
+		let inner_color_rgb = inner_color;
+		if (inner_color == kPrismatic) {
+			inner_color_rgb = "rgb(" + GetPrismaticColor(balls[i].start_time, time, kPrismaticCycleDuration, /*saturation=*/kPrismaticSaturationInner) + ")";
+		}
+		let outer_color_rgb = outer_color;
+		if (outer_color == kPrismatic) {
+			outer_color_rgb = "rgb(" + GetPrismaticColor(balls[i].start_time, time, kPrismaticCycleDuration, /*saturation=*/kPrismaticSaturationOuter) + ")";
+		}
+		DrawGradientCircle(ctx, balls[i].pos, kBallRadius, inner_color_rgb, outer_color_rgb);
 	}
 }
 
 function DrawBallsNoGradient(balls, color, ctx) {
+	const kPrismaticSaturation = 0.8;
+	const kPrismaticCycleDuration = 2000.0;
+	const time = Date.now();
 	for (let i = 0; i < balls.length; ++i) {
-		DrawCircle(ctx, balls[i].pos, kBallRadius, color);
+		let color_rgb = color;
+		if (color == kPrismatic) {
+			color_rgb = "rgb(" + GetPrismaticColor(balls[i].start_time, time, kPrismaticCycleDuration, /*saturation=*/kPrismaticSaturation) + ")";
+		}
+		DrawCircle(ctx, balls[i].pos, kBallRadius, color_rgb);
 	}
 }
 
@@ -120,6 +157,7 @@ function DrawTargets(target_sets, ctx) {
 }
 
 function DrawScoreText(score_text, font_size, duration, rise, ctx) {
+	const kPrismaticSaturation = 0.8;
 	let next_index = 0;
 	const time = Date.now();
 	for (let i = 0; i < score_text.length; ++i) {
@@ -129,9 +167,13 @@ function DrawScoreText(score_text, font_size, duration, rise, ctx) {
 			continue;
 		}
 		let fraction = elapsed / duration;
+		let color_rgb = curr_text.color_rgb;
+		if (color_rgb == kPrismatic) {
+			color_rgb = GetPrismaticColor(curr_text.start_time, time, duration / 2, /*saturation=*/kPrismaticSaturation);
+		}
 		ctx.textAlign = "center";
 		ctx.font = "bold " + font_size + "px sans-serif";
-		ctx.fillStyle = "rgba(" + curr_text.color_rgb + ", " + (1 - fraction) + ")";
+		ctx.fillStyle = "rgba(" + color_rgb + ", " + (1 - fraction) + ")";
 		ctx.fillText(curr_text.text, curr_text.pos.x, curr_text.pos.y - fraction * rise);
 		
 		if (next_index != i) {
@@ -143,6 +185,7 @@ function DrawScoreText(score_text, font_size, duration, rise, ctx) {
 }
 
 function DrawRipples(ripples, duration, expand, ctx) {
+	const kPrismaticSaturation = 0.8;
 	let next_index = 0;
 	const time = Date.now();
 	ctx.lineWidth = "1px";
@@ -153,8 +196,12 @@ function DrawRipples(ripples, duration, expand, ctx) {
 			continue;
 		}
 		let fraction = elapsed / duration;
+		let color_rgb = curr_ripples.color_rgb;
+		if (color_rgb == kPrismatic) {
+			color_rgb = GetPrismaticColor(curr_ripples.start_time, time, duration / 2, /*saturation=*/kPrismaticSaturation);
+		}
 		let radius = curr_ripples.start_radius + (expand * fraction);
-		ctx.strokeStyle = "rgba(" + curr_ripples.color_rgb + ", " + (1 - fraction) + ")";
+		ctx.strokeStyle = "rgba(" + color_rgb + ", " + (1 - fraction) + ")";
 		ctx.beginPath();
 		ctx.arc(curr_ripples.pos.x, curr_ripples.pos.y, radius, 0, 2 * Math.PI);
 		ctx.stroke();

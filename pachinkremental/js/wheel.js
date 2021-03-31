@@ -170,7 +170,9 @@ function DefaultWheel() {
 		/*active_color=*/"#FF8",
 		/*inactive_color=*/"#DD7",
 		/*text_func=*/function() {
-			if (AnyTier1GemstoneBallsUnlocked()) {
+			if (IsUnlocked("unlock_opal_balls")) {
+				return "Drop 7 gemstone balls";
+			} else if (AnyTier1GemstoneBallsUnlocked()) {
 				return "Drop 7 special balls";
 			} else {
 				return "Drop 7 gold balls";
@@ -178,16 +180,18 @@ function DefaultWheel() {
 		},
 		/*on_hit_func=*/function() {
 			if (AnyTier1GemstoneBallsUnlocked()) {
-				let bonus_balls = [kBallTypeIDs.GOLD]
+				let bonus_balls = []
 				bonus_balls.push(IsUnlocked("unlock_ruby_balls")      ? kBallTypeIDs.RUBY      : kBallTypeIDs.GOLD);
 				bonus_balls.push(IsUnlocked("unlock_sapphire_balls")  ? kBallTypeIDs.SAPPHIRE  : kBallTypeIDs.GOLD);
 				bonus_balls.push(IsUnlocked("unlock_emerald_balls")   ? kBallTypeIDs.EMERALD   : kBallTypeIDs.GOLD);
 				bonus_balls.push(IsUnlocked("unlock_topaz_balls")     ? kBallTypeIDs.TOPAZ     : kBallTypeIDs.GOLD);
 				bonus_balls.push(IsUnlocked("unlock_turquoise_balls") ? kBallTypeIDs.TURQUOISE : kBallTypeIDs.GOLD);
 				bonus_balls.push(IsUnlocked("unlock_amethyst_balls")  ? kBallTypeIDs.AMETHYST  : kBallTypeIDs.GOLD);
+				bonus_balls.push(IsUnlocked("unlock_opal_balls")      ? kBallTypeIDs.OPAL      : kBallTypeIDs.GOLD);
 				bonus_balls = ShuffleArray(bonus_balls);
 				DropBonusBalls(bonus_balls);
-				MaybeAddBonusWheelText("7 special balls!", kWheelPopupTextPos, kWheelPopupTextColor);
+				let popup_text = IsUnlocked("unlock_opal_balls") ? "7 gemstone balls!" : "7 special balls!";
+				MaybeAddBonusWheelText(popup_text, kWheelPopupTextPos, kWheelPopupTextColor);
 			} else {
 				DropBonusBalls([...Array(7)].map(_ => kBallTypeIDs.GOLD));
 				MaybeAddBonusWheelText("7 gold balls!", kWheelPopupTextPos, kWheelPopupTextColor);

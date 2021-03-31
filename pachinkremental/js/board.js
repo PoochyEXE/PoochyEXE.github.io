@@ -50,13 +50,16 @@ class ScoreTarget extends Target {
 		if (state.save_file.score_buff_multiplier > 1 && state.save_file.score_buff_duration > 0) {
 			total_value *= state.save_file.score_buff_multiplier;
 		}
+		let popup_text_level = 0;
 		if (ball.ball_type_index != kBallTypeIDs.NORMAL) {
+			popup_text_level = 1;
 			total_value *= state.special_ball_multiplier;
 			color_rgb = "170,143,0";
 			if (ball.ball_type_index == kBallTypeIDs.EMERALD ||
 					ball.ball_type_index == kBallTypeIDs.TOPAZ ||
 					ball.ball_type_index == kBallTypeIDs.TURQUOISE) {
 				total_value *= state.special_ball_multiplier;
+				popup_text_level = 2;
 				color_rgb = "0,192,0";
 			}
 			if (this.id == 4) {
@@ -64,7 +67,7 @@ class ScoreTarget extends Target {
 			}
 		}
 		AddScore(total_value);
-		MaybeAddScoreText("+" + FormatNumberShort(total_value), ball.pos, color_rgb);
+		MaybeAddScoreText(popup_text_level, "+" + FormatNumberShort(total_value), ball.pos, color_rgb);
 	}
 	
 	SetValue(new_value) {
@@ -87,11 +90,11 @@ class SpinTarget extends Target {
 			let value = state.special_ball_multiplier;
 			state.save_file.spins += value;
 			UpdateSpinCounter();
-			MaybeAddScoreText("+" + value + " Spins", ball.pos, "0,0,255");
+			MaybeAddScoreText(/*level=*/2, "+" + value + " Spins", ball.pos, "0,0,255");
 		} else {
 			++state.save_file.spins;
 			UpdateSpinCounter();
-			MaybeAddScoreText("+1 Spin", ball.pos, "0,170,0");
+			MaybeAddScoreText(/*level=*/0, "+1 Spin", ball.pos, "0,170,0");
 		}
 	}
 }

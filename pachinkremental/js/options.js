@@ -1,3 +1,5 @@
+const kQualityOptions = ["High", "Medium", "Low"];
+const kPopupTextOptions = ["Enabled", "Gold+ only", "Gemstone+ only", "Disabled"];
 
 function SaveFileToString(state) {
 	let inner_data = JSON.stringify(state.save_file);
@@ -91,6 +93,8 @@ function UpdateOptionsButtons() {
 		(state.save_file.auto_save_enabled ? "ON" : "OFF");
 	document.getElementById("button_quality").innerHTML = "Quality: " + 
 		kQualityOptions[state.save_file.quality];
+	document.getElementById("button_popup_text").innerHTML = "Pop-up text: " + 
+		kPopupTextOptions[state.save_file.display_popup_text];
 }
 
 function UpdateAutoSaveInterval() {
@@ -111,6 +115,19 @@ function UpdateAutoSaveInterval() {
 function ToggleAutoSave() {
 	state.save_file.auto_save_enabled = !state.save_file.auto_save_enabled;
 	UpdateAutoSaveInterval();
+	UpdateOptionsButtons();
+}
+
+function TogglePopupText() {
+	++state.save_file.display_popup_text;
+	if (state.save_file.display_popup_text == 1 && !IsUnlocked("unlock_gold_balls")) {
+		state.save_file.display_popup_text = kPopupTextOptions.length - 1;
+	} else if (state.save_file.display_popup_text == 2 && !AnyTier1GemstoneBallsUnlocked()) {
+		state.save_file.display_popup_text = kPopupTextOptions.length - 1;
+	}
+	if (state.save_file.display_popup_text >= kPopupTextOptions.length) {
+		state.save_file.display_popup_text = 0;
+	}
 	UpdateOptionsButtons();
 }
 

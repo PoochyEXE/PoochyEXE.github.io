@@ -1,4 +1,4 @@
-const kVersion = "v0.4.1 beta";
+const kVersion = "v0.5.0 beta";
 const kTitleAndVersion = "Pachinkremental " + kVersion;
 
 var max_drop_y = 20;
@@ -9,7 +9,6 @@ const kFrameInterval = 1000.0 / kFPS;
 	
 const kMinCooldownToDraw = 300.0;
 const kTopCanvasLayer = "canvas6";
-const kQualityOptions = ["High", "Medium", "Low"];
 
 const kBallTypes = [
 	//          | id |    name    | display_name | inner_color | outer_color | ripple_color_rgb |
@@ -21,6 +20,7 @@ const kBallTypes = [
 	new BallType(5,   "topaz",     "Topaz",       "#FFB",       "#FF3",       "255,255, 48"    ),
 	new BallType(6,   "turquoise", "Turquoise",   "#BFF",       "#3FF",       " 48,255,255"    ),
 	new BallType(7,   "amethyst",  "Amethyst",    "#FBF",       "#F3F",       "255, 48,255"    ),
+	new BallType(8,   "opal",      "Opal",        kPrismatic,   kPrismatic,   kPrismatic       ),
 ];
 
 const kBallTypeIDs = {
@@ -32,6 +32,7 @@ const kBallTypeIDs = {
 	TOPAZ: 5,
 	TURQUOISE: 6,
 	AMETHYST: 7,
+	OPAL: 8,
 }
 
 function CreateBallWithNoise(x, y, dx, dy, ball_type_index) {
@@ -86,6 +87,9 @@ function TotalBalls(state) {
 }
 
 function GetUpgradeLevel(upgrade_id) {
+	if (!state) {
+		return undefined;
+	}
 	return state.save_file.upgrade_levels[upgrade_id];
 }
 
@@ -154,7 +158,7 @@ function InitState() {
 		auto_drop_cooldown_left: 1000.0,
 		max_balls: 1,
 		ball_types_unlocked: [...Array(kBallTypes.length)].map(i => i == 0),
-		ball_type_rates: [1.0, 0.01, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001],
+		ball_type_rates: [1.0, 0.01, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001],
 		special_ball_multiplier: 2,
 		bonus_wheel: null,
 		active_tooltip: null,
@@ -182,6 +186,7 @@ function InitState() {
 			auto_spin_enabled: false,
 			multi_spin_enabled: false,
 			quality: 0,
+			display_popup_text: 0,
 			score_buff_multiplier: 1,
 			score_buff_duration: 0,
 			stats: {

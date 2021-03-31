@@ -115,7 +115,7 @@ div.upgradeButtonWrapper {
 	margin: 2.5px;
 }
 
-button.upgradeButton, button.rubyUpgradeButton, button.sapphireUpgradeButton, button.emeraldUpgradeButton, button.topazUpgradeButton, button.turquoiseUpgradeButton, button.amethystUpgradeButton {
+button.upgradeButton, button.rubyUpgradeButton, button.sapphireUpgradeButton, button.emeraldUpgradeButton, button.topazUpgradeButton, button.turquoiseUpgradeButton, button.amethystUpgradeButton, button.opalUpgradeButton {
 	border: 1px solid #000;
 	border-radius: 10px;
 	font-family: sans-serif;
@@ -179,6 +179,40 @@ button.amethystUpgradeButton {
 
 button.amethystUpgradeButton:disabled {
 	background: #A7A;
+}
+
+@-webkit-keyframes opalUpgradeButtonColor {  
+  0% { background: #F88; }
+  17% { background: #FF8; }
+  33% { background: #8F8; }
+  50% { background: #8FF; }
+  67% { background: #88F; }
+  83% { background: #F8F; }
+  100% { background: #F88; }
+}
+
+@-webkit-keyframes opalUpgradeButtonDisabledColor {  
+  0% { background: #A77; }
+  17% { background: #AA7; }
+  33% { background: #7A7; }
+  50% { background: #7AA; }
+  67% { background: #77A; }
+  83% { background: #A7A; }
+  100% { background: #A77; }
+}
+
+button.opalUpgradeButton {
+    background: white;
+    -webkit-animation-name: opalUpgradeButtonColor;  
+    -webkit-animation-iteration-count: infinite;  
+    -webkit-animation-duration: 2s; 
+}
+
+button.opalUpgradeButton:disabled {
+    background: #AAA;
+    -webkit-animation-name: opalUpgradeButtonDisabledColor;  
+    -webkit-animation-iteration-count: infinite;  
+    -webkit-animation-duration: 2s; 
 }
 
 button.optionButton {
