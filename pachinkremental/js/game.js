@@ -261,7 +261,7 @@ function SpinBonusWheel() {
 }
 
 function UpdateSpinCounter() {
-	document.getElementById("bonus_wheel").style.display = IsUnlocked("unlock_bonus_wheel") ? "inline" : "none";
+	document.getElementById("bonus_wheel").style.display = IsUnlocked("unlock_bonus_wheel") ? "block" : "none";
 	document.getElementById("spin_count").innerHTML = state.save_file.spins;
 	document.getElementById("button_spin").disabled = (state.bonus_wheel.IsSpinning() || state.save_file.spins <= 0);
 	document.getElementById("multi_spin").style.display = IsUnlocked("multi_spin") ? "inline" : "none";

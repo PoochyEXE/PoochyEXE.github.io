@@ -438,7 +438,7 @@ function InitUpgrades() {
 			},
 			/*on_update=*/function() {
 				let unlocked = (this.GetValue() > 0);
-				document.getElementById("bonus_wheel").style.display = unlocked ? "inline" : "none";
+				document.getElementById("bonus_wheel").style.display = unlocked ? "block" : "none";
 				let spin_targets = state.target_sets[1].targets;
 				console.assert(spin_targets.length == 3);
 				spin_targets[0].active = unlocked;
