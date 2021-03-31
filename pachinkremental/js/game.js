@@ -6,21 +6,21 @@ var min_drop_x = 10;
 var max_drop_x = 100;
 
 const kFrameInterval = 1000.0 / kFPS;
-	
+
 const kMinCooldownToDraw = 300.0;
 const kTopCanvasLayer = "canvas6";
 
 const kBallTypes = [
 	//          | id |    name    | display_name | inner_color | outer_color | ripple_color_rgb |
-	new BallType(0,   "normal",    "Normal",      "#CCC",       "#888",       null             ),
-	new BallType(1,   "gold",      "Gold",        "#FFD700",    "#AA8F00",    "170,143,0"      ),
-	new BallType(2,   "ruby",      "Ruby",        "#FBB",       "#F33",       "255, 48, 48"    ),
-	new BallType(3,   "sapphire",  "Sapphire",    "#BBF",       "#33F",       " 48, 48,255"    ),
-	new BallType(4,   "emerald",   "Emerald",     "#BFB",       "#3F3",       " 48,255, 48"    ),
-	new BallType(5,   "topaz",     "Topaz",       "#FFB",       "#FF3",       "255,255, 48"    ),
-	new BallType(6,   "turquoise", "Turquoise",   "#BFF",       "#3FF",       " 48,255,255"    ),
-	new BallType(7,   "amethyst",  "Amethyst",    "#FBF",       "#F3F",       "255, 48,255"    ),
-	new BallType(8,   "opal",      "Opal",        kPrismatic,   kPrismatic,   kPrismatic       ),
+	new BallType(0, "normal", "Normal", "#CCC", "#888", null),
+	new BallType(1, "gold", "Gold", "#FFD700", "#AA8F00", "170,143,0"),
+	new BallType(2, "ruby", "Ruby", "#FBB", "#F33", "255, 48, 48"),
+	new BallType(3, "sapphire", "Sapphire", "#BBF", "#33F", " 48, 48,255"),
+	new BallType(4, "emerald", "Emerald", "#BFB", "#3F3", " 48,255, 48"),
+	new BallType(5, "topaz", "Topaz", "#FFB", "#FF3", "255,255, 48"),
+	new BallType(6, "turquoise", "Turquoise", "#BFF", "#3FF", " 48,255,255"),
+	new BallType(7, "amethyst", "Amethyst", "#FBF", "#F3F", "255, 48,255"),
+	new BallType(8, "opal", "Opal", kPrismatic, kPrismatic, kPrismatic)
 ];
 
 const kBallTypeIDs = {
@@ -32,8 +32,8 @@ const kBallTypeIDs = {
 	TOPAZ: 5,
 	TURQUOISE: 6,
 	AMETHYST: 7,
-	OPAL: 8,
-}
+	OPAL: 8
+};
 
 function CreateBallWithNoise(x, y, dx, dy, ball_type_index) {
 	let dNoise = SampleGaussianNoise(0.0, 20.0);
@@ -60,11 +60,19 @@ function DropBall(x, y, ball_type_index) {
 		ball_type_index = RollBallType();
 	}
 	const ball_type = kBallTypes[ball_type_index];
-	state.balls_by_type[ball_type_index].push(CreateBallWithNoise(x, y, 0.0, 0.0, ball_type_index));
+	state.balls_by_type[ball_type_index].push(
+		CreateBallWithNoise(x, y, 0.0, 0.0, ball_type_index)
+	);
 	++state.save_file.stats.balls_dropped;
 	++state.save_file.stats[ball_type.name + "_balls"];
 	if (ball_type.ripple_color_rgb) {
-		state.ripples.push(new RippleEffect(new Point(x, y), ball_type.ripple_color_rgb, kBallRadius));
+		state.ripples.push(
+			new RippleEffect(
+				new Point(x, y),
+				ball_type.ripple_color_rgb,
+				kBallRadius
+			)
+		);
 	}
 	state.stats_updated = true;
 }
@@ -158,7 +166,17 @@ function InitState() {
 		auto_drop_cooldown_left: 1000.0,
 		max_balls: 1,
 		ball_types_unlocked: [...Array(kBallTypes.length)].map(i => i == 0),
-		ball_type_rates: [1.0, 0.01, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.001],
+		ball_type_rates: [
+			1.0,
+			0.01,
+			0.001,
+			0.001,
+			0.001,
+			0.001,
+			0.001,
+			0.001,
+			0.001
+		],
 		special_ball_multiplier: 2,
 		bonus_wheel: null,
 		active_tooltip: null,
@@ -169,12 +187,12 @@ function InitState() {
 			num_balls: 0,
 			num_score_texts: 0,
 			num_wheel_popup_texts: 0,
-			num_ripples: 0,
+			num_ripples: 0
 		},
 		intervals: {
 			auto_save: null,
 			update: null,
-			score_history: null,
+			score_history: null
 		},
 		save_file: {
 			game_version: 1,
@@ -196,7 +214,7 @@ function InitState() {
 				score_last60s: 0,
 				balls_dropped: 0,
 				balls_dropped_manual: 0,
-				target_hits: {},
+				target_hits: {}
 			},
 			upgrade_levels: {
 				multiplier: 0,
@@ -208,13 +226,15 @@ function InitState() {
 				unlock_bonus_wheel: 0,
 				add_spin_target: 0,
 				auto_spin: 0,
-				multi_spin: 0,
-			},
-		},
+				multi_spin: 0
+			}
+		}
 	};
 	for (let i = 0; i < kBallTypes.length; ++i) {
 		state.save_file.stats[kBallTypes[i].name + "_balls"] = 0;
-		state.save_file.upgrade_levels["unlock_" + kBallTypes[i].name + "_balls"] = 0;
+		state.save_file.upgrade_levels[
+			"unlock_" + kBallTypes[i].name + "_balls"
+		] = 0;
 		state.save_file.upgrade_levels[kBallTypes[i].name + "_ball_rate"] = 0;
 	}
 	state.bonus_wheel = DefaultWheel(state);
@@ -226,8 +246,8 @@ function GetSlotValue(slot_id) {
 }
 
 function UpdateScoreDisplay(state, force_update) {
-	const kRatio = (1.0 / 9.0) + 0.2;
-	let update = force_update || (state.save_file.score_buff_duration > 0);
+	const kRatio = 1.0 / 9.0 + 0.2;
+	let update = force_update || state.save_file.score_buff_duration > 0;
 	if (state.display_points != state.save_file.points) {
 		let delta = Math.abs(state.save_file.points - state.display_points);
 		if (delta < state.save_file.points * 1e-6) {
@@ -243,11 +263,18 @@ function UpdateScoreDisplay(state, force_update) {
 		update = true;
 	}
 	if (update) {
-		let html = '<div class="messageBoxLarge">Points: ' + FormatNumberLong(state.display_points) + '</div>'
+		let html =
+			'<div class="messageBoxLarge">Points: ' +
+			FormatNumberLong(state.display_points) +
+			"</div>";
 		if (state.save_file.score_buff_duration > 0) {
-			let duration_sec = Math.round(state.save_file.score_buff_duration / 1000.0);
-			html += '<div class="buff">All scoring \u00D7' + FormatNumberShort(state.save_file.score_buff_multiplier);
-			html += ' for ' + duration_sec + ' seconds!</div>';
+			let duration_sec = Math.round(
+				state.save_file.score_buff_duration / 1000.0
+			);
+			html +=
+				'<div class="buff">All scoring \u00D7' +
+				FormatNumberShort(state.save_file.score_buff_multiplier);
+			html += " for " + duration_sec + " seconds!</div>";
 		} else if (IsUnlocked("unlock_ruby_balls")) {
 			html += '<div class="buff">Score multiplier: \u00D71</div>';
 		}
@@ -261,11 +288,21 @@ function SpinBonusWheel() {
 }
 
 function UpdateSpinCounter() {
-	document.getElementById("bonus_wheel").style.display = IsUnlocked("unlock_bonus_wheel") ? "inline" : "none";
+	document.getElementById("bonus_wheel").style.display = IsUnlocked(
+		"unlock_bonus_wheel"
+	)
+		? "inline"
+		: "none";
 	document.getElementById("spin_count").innerHTML = state.save_file.spins;
-	document.getElementById("button_spin").disabled = (state.bonus_wheel.IsSpinning() || state.save_file.spins <= 0);
-	document.getElementById("multi_spin").style.display = IsUnlocked("multi_spin") ? "inline" : "none";
-	document.getElementById("multi_spin_count").innerHTML = state.bonus_wheel.multi_spin;
+	document.getElementById("button_spin").disabled =
+		state.bonus_wheel.IsSpinning() || state.save_file.spins <= 0;
+	document.getElementById("multi_spin").style.display = IsUnlocked(
+		"multi_spin"
+	)
+		? "inline"
+		: "none";
+	document.getElementById("multi_spin_count").innerHTML =
+		state.bonus_wheel.multi_spin;
 }
 
 function UpdateStatsPanel(state) {
@@ -322,7 +359,7 @@ function UpdateOneFrame(state, draw) {
 			UpdateBalls(state.balls_by_type[i], state.board, state.target_sets);
 		}
 	}
-	
+
 	let force_score_update = false;
 	if (state.save_file.score_buff_duration > 0) {
 		state.save_file.score_buff_duration -= kFrameInterval;
@@ -331,9 +368,9 @@ function UpdateOneFrame(state, draw) {
 			force_score_update = true;
 		}
 	}
-	
+
 	UpdateScoreDisplay(state, force_score_update);
-	
+
 	if (AutoDropOn() && state.save_file.auto_drop_pos) {
 		if (CanDrop(state)) {
 			if (state.auto_drop_cooldown_left <= kFrameInterval) {
@@ -348,7 +385,7 @@ function UpdateOneFrame(state, draw) {
 			}
 		}
 	}
-	
+
 	if (state.bonus_wheel.IsSpinning()) {
 		state.redraw_wheel = true;
 		state.bonus_wheel.UpdateOneFrame();
@@ -359,16 +396,18 @@ function UpdateOneFrame(state, draw) {
 
 function Update() {
 	const this_update = Date.now();
-	const num_frames = Math.floor((this_update - state.last_update) / kFrameInterval);
+	const num_frames = Math.floor(
+		(this_update - state.last_update) / kFrameInterval
+	);
 	const elapsed = num_frames * kFrameInterval;
 	if (num_frames <= 0) {
 		return;
 	}
 	for (let i = 0; i < num_frames; ++i) {
-		state.enable_score_text = (num_frames - i < 60);
+		state.enable_score_text = num_frames - i < 60;
 		UpdateOneFrame(state, false);
 	}
-	
+
 	Draw(state);
 	UpdateStatsPanel(state);
 	UpdateUpgradeButtons(state);
@@ -384,7 +423,12 @@ function OnClick(event) {
 	let board_x = canvas_x / state.canvas_scale;
 	let board_y = canvas_y / state.canvas_scale;
 	let pos = new Point(board_x, board_y);
-	if (board_x >= min_drop_x && board_x <= max_drop_x && board_y >= 0 && board_y <= max_drop_y) {
+	if (
+		board_x >= min_drop_x &&
+		board_x <= max_drop_x &&
+		board_y >= 0 &&
+		board_y <= max_drop_y
+	) {
 		if (CanDrop(state)) {
 			DropBall(board_x, board_y);
 			++state.save_file.stats.balls_dropped_manual;
@@ -405,12 +449,12 @@ function OnResize() {
 
 function Load() {
 	InitUpgradeButtons(state.upgrades);
-	document.getElementById(kTopCanvasLayer).addEventListener('click', OnClick);
+	document.getElementById(kTopCanvasLayer).addEventListener("click", OnClick);
 	document.title = kTitleAndVersion;
 	document.getElementById("title_version").innerHTML = kTitleAndVersion;
 	document.getElementById("message_box").innerHTML =
 		"<h1>Welcome to Pachinkremental!</h1>" +
-		"<h1>Click anywhere in the green box to drop a ball.</h1>"
+		"<h1>Click anywhere in the green box to drop a ball.</h1>";
 	LoadFromLocalStorage();
 	var last_update = Date.now();
 
@@ -418,7 +462,7 @@ function Load() {
 	window.onresize = OnResize;
 
 	Draw(state);
-	
+
 	state.intervals.update = setInterval(Update, kFrameInterval);
 	state.intervals.score_history = setInterval(UpdateScoreHistory, 5000.0);
 }
