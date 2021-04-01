@@ -126,7 +126,7 @@ class SpinTarget extends Target {
 			UpdateSpinCounter();
 			MaybeAddScoreText({
 				level: 2,
-				text: `+${value} Spins`,
+				text: `+${FormatNumberShort(value)} Spins`,
 				pos: ball.pos,
 				color_rgb: "0,0,255"
 			});

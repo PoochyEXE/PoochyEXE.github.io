@@ -122,6 +122,8 @@ function UpdateOptionsButtons() {
 		"Quality: " + kQualityOptions[state.save_file.quality];
 	document.getElementById("button_popup_text").innerHTML =
 		"Pop-up text: " + kPopupTextOptions[state.save_file.display_popup_text];
+	document.getElementById("button_april_fools").innerHTML =
+		"April Fools: " + (state.save_file.april_fools_enabled ? "Enabled" : "Disabled");
 }
 
 function UpdateAutoSaveInterval() {
@@ -171,5 +173,10 @@ function ToggleQuality() {
 		state.save_file.quality = 0;
 	}
 	state.redraw_all = true;
+	UpdateOptionsButtons();
+}
+
+function ToggleAprilFools() {
+	state.save_file.april_fools_enabled = !state.save_file.april_fools_enabled;
 	UpdateOptionsButtons();
 }

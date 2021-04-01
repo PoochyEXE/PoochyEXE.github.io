@@ -1,4 +1,4 @@
-const kVersion = "v0.6.0 beta";
+const kVersion = "v0.6.1 beta";
 const kTitleAndVersion = "Pachinkremental " + kVersion;
 
 var max_drop_y = 20;
@@ -165,7 +165,6 @@ function InitState() {
 		auto_drop_cooldown: 1000.0,
 		auto_drop_cooldown_left: 1000.0,
 		max_balls: 1,
-		ball_types_unlocked: [...Array(kBallTypes.length)].map(i => i == 0),
 		ball_type_rates: [
 			1.0,
 			0.01,
@@ -184,6 +183,7 @@ function InitState() {
 		active_tooltip: null,
 		wheel_popup_text: new Array(0),
 		ripples: new Array(0),
+		april_fools: false,
 		last_drawn: {
 			can_drop: true,
 			num_balls: 0,
@@ -205,6 +205,7 @@ function InitState() {
 			auto_save_enabled: true,
 			auto_spin_enabled: false,
 			multi_spin_enabled: false,
+			april_fools_enabled: true,
 			quality: 0,
 			display_popup_text: 0,
 			score_buff_multiplier: 1,
@@ -401,6 +402,17 @@ function UpdateOneFrame(state, draw) {
 
 function Update() {
 	const this_update = Date.now();
+	const date = new Date();
+	let now_april_fools =
+		state.save_file.april_fools_enabled &&
+		date.getMonth() == 3 && date.getDate() == 1;
+	if (now_april_fools != state.april_fools) {
+		state.redraw_all = true;
+		state.april_fools = now_april_fools;
+		if (now_april_fools) {
+			state.notifications.push(new Notification("Happy April Fools Day!", "#F8F"));
+		}
+	}
 	const num_frames = Math.floor(
 		(this_update - state.last_update) / kFrameInterval
 	);
@@ -425,6 +437,10 @@ function OnClick(event) {
 	let canvas_top = canvas.offsetTop + canvas.clientTop;
 	let canvas_x = event.pageX - canvas_left;
 	let canvas_y = event.pageY - canvas_top;
+	if (state.april_fools) {
+		canvas_x = canvas.width - canvas_x;
+		canvas_y = canvas.height - canvas_y;
+	}
 	let board_x = canvas_x / state.canvas_scale;
 	let board_y = canvas_y / state.canvas_scale;
 	let pos = new Point(board_x, board_y);

@@ -74,6 +74,10 @@ function ClearLayerAndReturnContext(layer_id) {
 	let ctx = canvas.getContext("2d");
 	ctx.setTransform(1, 0, 0, 1, 0, 0);
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
+	if (state.april_fools) {
+		ctx.translate(canvas.width, canvas.height);
+		ctx.rotate(Math.PI);
+	}
 	ctx.scale(state.canvas_scale, state.canvas_scale);
 	return ctx;
 }
@@ -129,6 +133,7 @@ function DrawBalls(balls, inner_color, outer_color, ctx) {
 	const kPrismaticSaturationOuter = 0.8;
 	const kPrismaticSaturationInner = 0.25;
 	const kPrismaticCycleDuration = 2000.0;
+	const kPrismaticCycleShift = kPrismaticCycleDuration / 6.0;
 	const time = Date.now();
 	for (let i = 0; i < balls.length; ++i) {
 		let inner_color_rgb = inner_color;
@@ -137,7 +142,7 @@ function DrawBalls(balls, inner_color, outer_color, ctx) {
 				"rgb(" +
 				GetPrismaticColor(
 					balls[i].start_time,
-					time,
+					time + kPrismaticCycleShift,
 					kPrismaticCycleDuration,
 					/*saturation=*/ kPrismaticSaturationInner
 				) +
@@ -403,13 +408,20 @@ function Draw(state) {
 		if (state.redraw_all) {
 			const kLeftOffset = 5;
 			const kTopOffset = 5;
-			drop_zone_elem.style.top = kTopOffset;
-			drop_zone_elem.style.left =
-				kLeftOffset + min_drop_x * state.canvas_scale + "px";
-			drop_zone_elem.style.width =
-				(max_drop_x - min_drop_x) * state.canvas_scale + "px";
-			drop_zone_elem.style.height =
-				max_drop_y * state.canvas_scale + "px";
+			let width_px = (max_drop_x - min_drop_x) * state.canvas_scale;
+			let height_px = max_drop_y * state.canvas_scale;
+			drop_zone_elem.style.width = width_px + "px";
+			drop_zone_elem.style.height = height_px + "px";
+			if (state.april_fools) {
+				let top_px = state.board.height * state.canvas_scale - height_px
+				let left_px = kLeftOffset + (state.board.width - max_drop_x) * state.canvas_scale;
+				drop_zone_elem.style.top = top_px + "px";
+				drop_zone_elem.style.left = left_px + "px";
+			} else {
+				let left_px = kLeftOffset + min_drop_x * state.canvas_scale;
+				drop_zone_elem.style.top = kTopOffset + "px";
+				drop_zone_elem.style.left = left_px + "px";
+			}
 		}
 		state.last_drawn.can_drop = can_drop;
 	}

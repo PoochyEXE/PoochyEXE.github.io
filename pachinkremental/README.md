@@ -31,6 +31,12 @@ A: This is intentional, both to make sure the game won't softlock with too many 
 
 ## Changelog
 
+### v0.6.1 beta (2021-04-01)
+* Happy April Fools' Day! (You can turn the game back to normal in the options.)
+* Abbreviate spins earned by sapphire balls in popup text.
+* Tweak opal ball coloring to make them easier to distinguish.
+* Keep notifications on the top right corner of the window, not the page.
+
 ### v0.6.0 beta (2021-03-31)
 * Added some upgrades to buff the gemstone balls. (Sapphire's upgrade is significantly cheaper because it was probably the most underpowered previously.)
 * Big code refactor. Thanks vadimjprokopev!

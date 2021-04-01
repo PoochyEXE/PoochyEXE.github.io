@@ -137,7 +137,7 @@ function FormatSmallNumberShort(num) {
 	}
 }
 
-const shortSuffixes = [
+const kShortSuffixes = [
 	"",
 	"K",
 	"M",
@@ -149,7 +149,16 @@ const shortSuffixes = [
 	"Sp",
 	"Oc",
 	"No",
-	"Dc"
+	"Dc",
+	"UDc",
+	"DDc",
+	"TDc",
+	"QaDc",
+	"QiDc",
+	"SxDc",
+	"SpDc",
+	"OcDc",
+	"NoDc",
 ];
 
 function FormatNumberShort(num) {
@@ -158,7 +167,7 @@ function FormatNumberShort(num) {
 		return FormatSmallNumberShort(num);
 	}
 	let suffix_index = Math.floor(Math.log10(num) / 3);
-	if (suffix_index >= shortSuffixes.length) {
+	if (suffix_index >= kShortSuffixes.length) {
 		return num.toPrecision(kPrecision).replace("+", "");
 	}
 	if (suffix_index == 0) {
@@ -166,10 +175,10 @@ function FormatNumberShort(num) {
 	}
 	let prefix = num / Math.pow(1000, suffix_index);
 	let prefix_str = FormatSmallNumberShort(prefix);
-	return prefix_str + shortSuffixes[suffix_index];
+	return prefix_str + kShortSuffixes[suffix_index];
 }
 
-const longSuffixes = [
+const kLongSuffixes = [
 	"",
 	"",
 	"",
@@ -181,7 +190,17 @@ const longSuffixes = [
 	"septillion",
 	"octillion",
 	"nonillion",
-	"decillion"
+	"decillion",
+	"undecillion",
+	"duodecillion",
+	"tredecillion",
+	"quattuordecillion",
+	"quindecillion",
+	"sexdecillion",
+	"septedecillion",
+	"octodecillion",
+	"novemdecillion",
+	"vigintillion",
 ];
 
 function FormatNumberLong(num) {
@@ -190,14 +209,14 @@ function FormatNumberLong(num) {
 		return num.toString();
 	}
 	let suffix_index = Math.floor(Math.log10(num) / 3);
-	if (suffix_index >= longSuffixes.length) {
+	if (suffix_index >= kLongSuffixes.length) {
 		return num.toPrecision(kPrecision).replace("+", "");
 	}
-	if (longSuffixes[suffix_index] == "") {
+	if (kLongSuffixes[suffix_index] == "") {
 		return num.toLocaleString();
 	}
 	let prefix = num / Math.pow(1000, suffix_index);
-	return prefix.toFixed(kPrecision) + " " + longSuffixes[suffix_index];
+	return prefix.toFixed(kPrecision) + " " + kLongSuffixes[suffix_index];
 }
 
 class BallType {

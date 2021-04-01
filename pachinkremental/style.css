@@ -22,7 +22,7 @@ button.notification {
 }
 
 div.notifications {
-	position: absolute;
+	position: fixed;
 	top: 3px;
 	right: 3px;
 	font-family: sans-serif;
