@@ -85,6 +85,20 @@ class RisingText {
 	}
 }
 
+function UpdateInnerHTML(elem_id, html) {
+	let elem = document.getElementById(elem_id);
+	if (elem.innerHTML != html) {
+		elem.innerHTML = html;
+	}
+}
+
+function UpdateDisplay(elem_id, display) {
+	let elem = document.getElementById(elem_id);
+	if (elem.style.display != display) {
+		elem.style.display = display;
+	}
+}
+
 function MaybeAddScoreText({ level, text, pos, color_rgb }) {
 	if (
 		state.enable_score_text &&

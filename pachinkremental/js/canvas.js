@@ -404,7 +404,9 @@ function Draw(state) {
 		(AutoDropOn() && state.auto_drop_cooldown < kMinCooldownToDraw);
 	if (state.redraw_all || state.last_drawn.can_drop != can_drop) {
 		let drop_zone_elem = document.getElementById("drop_zone");
-		drop_zone_elem.disabled = !can_drop;
+		if (drop_zone_elem.disabled == can_drop) {
+			drop_zone_elem.disabled = !can_drop;
+		}
 		if (state.redraw_all) {
 			const kLeftOffset = 5;
 			const kTopOffset = 5;

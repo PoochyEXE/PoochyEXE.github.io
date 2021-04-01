@@ -31,6 +31,9 @@ A: This is intentional, both to make sure the game won't softlock with too many 
 
 ## Changelog
 
+### v0.6.2 beta (2021-04-01)
+* Optimized performance some more.
+
 ### v0.6.1 beta (2021-04-01)
 * Happy April Fools' Day! (You can turn the game back to normal in the options.)
 * Abbreviate spins earned by sapphire balls in popup text.

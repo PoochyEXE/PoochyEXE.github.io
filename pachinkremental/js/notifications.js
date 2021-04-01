@@ -65,5 +65,7 @@ function UpdateNotifications(state) {
 		notif_html += "</button></div>";
 		html += notif_html;
 	}
-	notifs_div.innerHTML = html;
+	if (notifs_div.innerHTML != html) {
+		notifs_div.innerHTML = html;
+	}
 }

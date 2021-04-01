@@ -90,7 +90,7 @@ class Upgrade {
 		let result = "<b>" + this.name + "</b>";
 		let level = this.GetLevel();
 		result +=
-			"<br/>" +
+			"<br>" +
 			FormatNumberShort(this.value_func(level)) +
 			this.value_suffix;
 		if (level >= this.max_level) {
@@ -100,9 +100,9 @@ class Upgrade {
 				" \u2192 " +
 				FormatNumberShort(this.value_func(level + 1)) +
 				this.value_suffix;
-			result += "<br/>Cost: " + FormatNumberShort(this.cost_func(level));
+			result += "<br>Cost: " + FormatNumberShort(this.cost_func(level));
 		}
-		result += "<br/>Bought: " + level;
+		result += "<br>Bought: " + level;
 		return result;
 	}
 }
@@ -144,9 +144,9 @@ class DelayReductionUpgrade extends Upgrade {
 		let rate_now = 60000.0 / delay_now;
 		if (level >= this.max_level) {
 			result +=
-				"<br/>" + FormatNumberShort(delay_now) + this.value_suffix;
+				"<br>" + FormatNumberShort(delay_now) + this.value_suffix;
 			result +=
-				"<br/>(" +
+				"<br>(" +
 				FormatNumberShort(rate_now) +
 				" " +
 				this.item_suffix +
@@ -155,15 +155,15 @@ class DelayReductionUpgrade extends Upgrade {
 			let delay_next = this.value_func(level + 1);
 			let rate_next = 60000.0 / delay_next;
 			result +=
-				"<br/>" + FormatNumberShort(delay_now) + this.value_suffix;
+				"<br>" + FormatNumberShort(delay_now) + this.value_suffix;
 			result +=
 				" \u2192 " + FormatNumberShort(delay_next) + this.value_suffix;
-			result += "<br/>(" + FormatNumberShort(rate_now);
+			result += "<br>(" + FormatNumberShort(rate_now);
 			result += " \u2192 " + FormatNumberShort(rate_next);
 			result += " " + this.item_suffix + "/min)";
-			result += "<br/>Cost: " + FormatNumberShort(this.cost_func(level));
+			result += "<br>Cost: " + FormatNumberShort(this.cost_func(level));
 		}
-		result += "<br/>Bought: " + level;
+		result += "<br>Bought: " + level;
 		return result;
 	}
 }
@@ -195,7 +195,7 @@ class FeatureUnlockUpgrade extends Upgrade {
 	}
 
 	GetText() {
-		let result = "<b>" + this.name + "</b><br/>";
+		let result = "<b>" + this.name + "</b><br>";
 		if (this.GetLevel() == 0) {
 			result += "Cost: " + FormatNumberShort(this.cost_func());
 		} else {
@@ -276,7 +276,7 @@ class ToggleUnlockUpgrade extends FixedCostFeatureUnlockUpgrade {
 	}
 
 	GetText() {
-		let result = "<b>" + this.name + "</b><br/>";
+		let result = "<b>" + this.name + "</b><br>";
 		if (this.GetLevel() == 0) {
 			result += "Cost: " + FormatNumberShort(this.cost);
 		} else if (this.GetToggleState()) {
@@ -600,9 +600,7 @@ function InitUpgrades() {
 			visible_func: () => IsUnlocked("unlock_gold_balls"),
 			on_update: function() {
 				let unlocked = this.GetValue() > 0;
-				document.getElementById("bonus_wheel").style.display = unlocked
-					? "inline"
-					: "none";
+				UpdateDisplay("bonus_wheel", unlocked ? "inline" : "none");
 				let spin_targets = state.target_sets[1].targets;
 				console.assert(spin_targets.length == 3);
 				spin_targets[0].active = unlocked;
@@ -900,8 +898,7 @@ function UpgradeButtonHandler(elem) {
 }
 
 function UpdateUpgradeSubHeader(header_id, visible) {
-	let elem = document.getElementById(header_id);
-	elem.style.display = visible ? "inline-block" : "none";
+	UpdateDisplay(header_id, visible ? "inline-block" : "none");
 }
 
 function UpdateUpgradeButtons(state) {
@@ -913,9 +910,18 @@ function UpdateUpgradeButtons(state) {
 	for (let id in state.upgrades) {
 		let upgrade = state.upgrades[id];
 		let elem = document.getElementById("button_upgrade_" + id);
-		elem.innerHTML = upgrade.GetText();
-		elem.disabled = !upgrade.ShouldEnableButton();
-		elem.style.display = upgrade.visible_func() ? "inline" : "none";
+		let html = upgrade.GetText();
+		if (elem.innerHTML != html) {
+			elem.innerHTML = html;
+		}
+		let disabled = !upgrade.ShouldEnableButton();
+		if (elem.disabled != disabled) {
+			elem.disabled = disabled;
+		}
+		let display = upgrade.visible_func() ? "inline" : "none";
+		if (elem.style.display != display) {
+			elem.style.display = display;
+		}
 	}
 	UpdateUpgradeSubHeader("basic_upgrades_container", true);
 	UpdateUpgradeSubHeader(

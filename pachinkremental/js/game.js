@@ -1,4 +1,4 @@
-const kVersion = "v0.6.1 beta";
+const kVersion = "v0.6.2 beta";
 const kTitleAndVersion = "Pachinkremental " + kVersion;
 
 var max_drop_y = 20;
@@ -162,6 +162,7 @@ function InitState() {
 		stats_updated: true,
 		update_upgrade_buttons: true,
 		enable_score_text: true,
+		update_buff_display: true,
 		auto_drop_cooldown: 1000.0,
 		auto_drop_cooldown_left: 1000.0,
 		max_balls: 1,
@@ -253,7 +254,7 @@ function GetSlotValue(slot_id) {
 
 function UpdateScoreDisplay(state, force_update) {
 	const kRatio = 1.0 / 9.0 + 0.2;
-	let update = force_update || state.save_file.score_buff_duration > 0;
+	let update = force_update;
 	if (state.display_points != state.save_file.points) {
 		let delta = Math.abs(state.save_file.points - state.display_points);
 		if (delta < state.save_file.points * 1e-6) {
@@ -270,22 +271,31 @@ function UpdateScoreDisplay(state, force_update) {
 	}
 	if (update) {
 		let html =
-			'<div class="messageBoxLarge">Points: ' +
+			'<span class="messageBoxLarge">Points: ' +
 			FormatNumberLong(state.display_points) +
-			"</div>";
-		if (state.save_file.score_buff_duration > 0) {
-			let duration_sec = Math.round(
-				state.save_file.score_buff_duration / 1000.0
-			);
-			html +=
-				'<div class="buff">All scoring \u00D7' +
-				FormatNumberShort(state.save_file.score_buff_multiplier);
-			html += " for " + duration_sec + " seconds!</div>";
-		} else if (IsUnlocked("unlock_ruby_balls")) {
-			html += '<div class="buff">Score multiplier: \u00D71</div>';
-		}
-		document.getElementById("message_box").innerHTML = html;
+			"</span>";
+		UpdateInnerHTML("message_box", html);
 	}
+}
+
+function UpdateBuffDisplay() {
+	if (!state.update_buff_display) {
+		return;
+	}
+	state.update_buff_display = false;
+	let html = "";
+	if (state.save_file.score_buff_duration > 0) {
+		let duration_sec = Math.round(
+			state.save_file.score_buff_duration / 1000.0
+		);
+		html =
+			"All scoring \u00D7" +
+			FormatNumberShort(state.save_file.score_buff_multiplier) +
+			" for " + duration_sec + " seconds!";
+	} else if (IsUnlocked("unlock_ruby_balls")) {
+		html = 'Score multiplier: \u00D71';
+	}
+	UpdateInnerHTML("buff", html);
 }
 
 function SpinBonusWheel() {
@@ -294,21 +304,12 @@ function SpinBonusWheel() {
 }
 
 function UpdateSpinCounter() {
-	document.getElementById("bonus_wheel").style.display = IsUnlocked(
-		"unlock_bonus_wheel"
-	)
-		? "inline"
-		: "none";
-	document.getElementById("spin_count").innerHTML = state.save_file.spins;
+	UpdateDisplay("bonus_wheel", IsUnlocked("unlock_bonus_wheel") ? "inline" : "none");
+	UpdateInnerHTML("spin_count", state.save_file.spins);
 	document.getElementById("button_spin").disabled =
 		state.bonus_wheel.IsSpinning() || state.save_file.spins <= 0;
-	document.getElementById("multi_spin").style.display = IsUnlocked(
-		"multi_spin"
-	)
-		? "inline"
-		: "none";
-	document.getElementById("multi_spin_count").innerHTML =
-		state.bonus_wheel.multi_spin;
+	UpdateDisplay("multi_spin", IsUnlocked("multi_spin") ? "inline" : "none");
+	UpdateInnerHTML("multi_spin_count", state.bonus_wheel.multi_spin);
 }
 
 function UpdateStatsPanel(state) {
@@ -327,14 +328,13 @@ function UpdateStatsPanel(state) {
 		}
 		if (val != 0) {
 			let container = document.getElementById("stats_container_" + key);
-			if (container) {
+			if (container && container.style.display != "block") {
 				container.style.display = "block";
 			}
 		}
-		if (Number.isFinite(val)) {
-			elem.innerHTML = FormatNumberLong(val);
-		} else {
-			elem.innerHTML = val;
+		let html = Number.isFinite(val) ? FormatNumberLong(val) : val;
+		if (elem.innerHTML != html) {
+			elem.innerHTML = html;
 		}
 	}
 }
@@ -366,16 +366,13 @@ function UpdateOneFrame(state, draw) {
 		}
 	}
 
-	let force_score_update = false;
 	if (state.save_file.score_buff_duration > 0) {
 		state.save_file.score_buff_duration -= kFrameInterval;
 		if (state.save_file.score_buff_duration < 0) {
 			state.save_file.score_buff_duration = 0;
-			force_score_update = true;
 		}
+		state.update_buff_display = true;
 	}
-
-	UpdateScoreDisplay(state, force_score_update);
 
 	if (AutoDropOn() && state.save_file.auto_drop_pos) {
 		if (CanDrop(state)) {
@@ -424,6 +421,9 @@ function Update() {
 		state.enable_score_text = num_frames - i < 60;
 		UpdateOneFrame(state, false);
 	}
+
+	UpdateScoreDisplay(state, /*force_update=*/false);
+	UpdateBuffDisplay(state, /*force_update=*/false);
 
 	Draw(state);
 	UpdateStatsPanel(state);

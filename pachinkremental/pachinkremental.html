@@ -32,8 +32,9 @@
 			</td>
 			<td class="rightUI" style="vertical-align: top;">
 				<div id="message_box" class="messageBox">
-					<div class="messageBoxLarge">Loading...</div>
+					<span class="messageBoxLarge">Loading...</div>
 				</div>
+				<div id="buff" class="messageBox"> </div>
 				<div id="bonus_wheel" class="bonusWheel" style="display: none;">
 					<button type="button" class="bonusWheel" id="button_spin" onclick="SpinBonusWheel()">Spin the wheel!</button>
 					Spins:&nbsp;<span id="spin_count">0</span>
@@ -58,7 +59,7 @@
 									id="button_board_header" onclick="ToggleVisibility('Board')">[&ndash;] Board</button>
 							<div id="board_contents" class="upgradesContents" style="display: block;"></div>
 						</div>
-						<br/>
+						<br>
 						<div id="auto-drop_upgrades_container" class="upgradesContainer" style="display: none;">
 							<button type="button" class="upgradesSubHeader"
 									id="button_auto-drop_header" onclick="ToggleVisibility('Auto-Drop')">[&ndash;] Auto-Drop</button>
@@ -69,7 +70,7 @@
 									id="button_bonus_wheel_header" onclick="ToggleVisibility('Bonus Wheel')">[&ndash;] Bonus Wheel</button>
 							<div id="bonus_wheel_contents" class="upgradesContents" style="display: block;"></div>
 						</div>
-						<br/>
+						<br>
 						<div id="gold_balls_upgrades_container" class="upgradesContainer" style="display: none;">
 							<button type="button" class="upgradesSubHeader"
 									id="button_gold_balls_header" onclick="ToggleVisibility('Gold Balls')">[&ndash;] Gold Balls</button>
@@ -79,7 +80,7 @@
 							<button type="button" class="upgradesSubHeader"
 									id="button_gemstone_balls_header" onclick="ToggleVisibility('Gemstone Balls')">[&ndash;] Gemstone Balls</button>
 							<div id="gemstone_balls_contents" class="upgradesContents" style="display: block;">
-								<div id="gemstone_balls_note" style="padding-top: 5px; padding-bottom: 5px;">Gemstone balls have the benefits of gold balls, plus additional bonuses.<br/>NOTE: Unlocking one gemstone ball sharply increases the cost of unlocking the others!</div>
+								<div id="gemstone_balls_note" style="padding-top: 5px; padding-bottom: 5px;">Gemstone balls have the benefits of gold balls, plus additional bonuses.<br>NOTE: Unlocking one gemstone ball sharply increases the cost of unlocking the others!</div>
 								<div id="ruby_balls_contents" class="upgradesContents" style="display: block;"></div>
 								<div id="topaz_balls_contents" class="upgradesContents" style="display: block;"></div>
 								<div id="emerald_balls_contents" class="upgradesContents" style="display: block;"></div>
@@ -150,24 +151,24 @@
 								id="button_save" onclick="SaveToLocalStorage()">Save</button>
 						<button type="button" class="optionButton"
 								id="button_auto_save" onclick="ToggleAutoSave()">Auto Save</button>
-						<br/>
+						<br>
 						<button type="button" class="optionButton"
 								id="button_export_save" onclick="ExportSave()">Export save file</button>
 						<button type="button" class="optionButton"
 								id="button_import_save" onclick="ImportSave()">Import save file</button>
-						<br/>
+						<br>
 						<button type="button" class="optionButton"
 								id="button_quality" onclick="ToggleQuality()">Quality</button>
 						<button type="button" class="optionButton"
 								id="button_popup_text" onclick="TogglePopupText()">Popup text</button>
 						<button type="button" class="optionButton"
 								id="button_april_fools" onclick="ToggleAprilFools()">April Fools</button>
-						<br/>
+						<br>
 						<button type="button" class="optionButton" style="background: #F88;"
 								id="button_erase_save" onclick="EraseSave()">Erase save file</button>
 					</div>
 				</div>
-				<br/>
+				<br>
 				<span id="title_version">Pachinkremental</span> by Poochy.EXE
 				| <a href="https://github.com/PoochyEXE/PoochyEXE.github.io/tree/main/pachinkremental#pachinkremental-by-poochyexe" target="_blank" rel="noopener noreferrer">manual</a>
 				| <a href="https://github.com/PoochyEXE/PoochyEXE.github.io/tree/main/pachinkremental#changelog" target="_blank" rel="noopener noreferrer">changelog</a>
@@ -181,8 +182,8 @@
 		<div class="modalContent">
 			<span class="modalCloseButton" onmousedown="CloseModal('export_save_modal')">&#xD7</span>
 			Your save file is below. Copy the text and keep it someplace safe.
-			<br/>
-			<br/>
+			<br>
+			<br>
 			<div id="exported_save" class="exportedSave"></div>
 		</div>
 	</div>
