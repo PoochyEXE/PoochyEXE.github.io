@@ -34,6 +34,7 @@ A: This is intentional, both to make sure the game won't softlock with too many 
 ### v0.6.0 beta (2021-03-31)
 * Added some upgrades to buff the gemstone balls. (Sapphire's upgrade is significantly cheaper because it was probably the most underpowered previously.)
 * Big code refactor. Thanks vadimjprokopev!
+* Fixed manual, changelog, and source code links so they open in a new tab.
 
 ### v0.5.1 beta (2021-03-31)
 * Hopefully fixed the issue that causes the game to start lagging after being open for a while. Thanks a million to /u/Alexandreclalex!
