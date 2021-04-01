@@ -1,4 +1,4 @@
-const kVersion = "v0.5.1 beta";
+const kVersion = "v0.6.0 beta";
 const kTitleAndVersion = "Pachinkremental " + kVersion;
 
 var max_drop_y = 20;
@@ -12,15 +12,15 @@ const kTopCanvasLayer = "canvas6";
 
 const kBallTypes = [
 	//          | id |    name    | display_name | inner_color | outer_color | ripple_color_rgb |
-	new BallType(0, "normal", "Normal", "#CCC", "#888", null),
-	new BallType(1, "gold", "Gold", "#FFD700", "#AA8F00", "170,143,0"),
-	new BallType(2, "ruby", "Ruby", "#FBB", "#F33", "255, 48, 48"),
-	new BallType(3, "sapphire", "Sapphire", "#BBF", "#33F", " 48, 48,255"),
-	new BallType(4, "emerald", "Emerald", "#BFB", "#3F3", " 48,255, 48"),
-	new BallType(5, "topaz", "Topaz", "#FFB", "#FF3", "255,255, 48"),
-	new BallType(6, "turquoise", "Turquoise", "#BFF", "#3FF", " 48,255,255"),
-	new BallType(7, "amethyst", "Amethyst", "#FBF", "#F3F", "255, 48,255"),
-	new BallType(8, "opal", "Opal", kPrismatic, kPrismatic, kPrismatic)
+	new BallType(0,   "normal",    "Normal",      "#CCC",       "#888",       null             ),
+	new BallType(1,   "gold",      "Gold",        "#FFD700",    "#AA8F00",    "170,143,0"      ),
+	new BallType(2,   "ruby",      "Ruby",        "#FBB",       "#F33",       "255, 48, 48"    ),
+	new BallType(3,   "sapphire",  "Sapphire",    "#BBF",       "#33F",       " 48, 48,255"    ),
+	new BallType(4,   "emerald",   "Emerald",     "#BFB",       "#3F3",       " 48,255, 48"    ),
+	new BallType(5,   "topaz",     "Topaz",       "#FFB",       "#FF3",       "255,255, 48"    ),
+	new BallType(6,   "turquoise", "Turquoise",   "#BFF",       "#3FF",       " 48,255,255"    ),
+	new BallType(7,   "amethyst",  "Amethyst",    "#FBF",       "#F3F",       "255, 48,255"    ),
+	new BallType(8,   "opal",      "Opal",        kPrismatic,   kPrismatic,   kPrismatic       )
 ];
 
 const kBallTypeIDs = {
@@ -178,6 +178,8 @@ function InitState() {
 			0.001
 		],
 		special_ball_multiplier: 2,
+		sapphire_ball_exponent: 1.0,
+		emerald_ball_exponent: 2.0,
 		bonus_wheel: null,
 		active_tooltip: null,
 		wheel_popup_text: new Array(0),
@@ -226,7 +228,10 @@ function InitState() {
 				unlock_bonus_wheel: 0,
 				add_spin_target: 0,
 				auto_spin: 0,
-				multi_spin: 0
+				multi_spin: 0,
+				ruby_ball_buff_stackable: 0,
+				sapphire_ball_exponent: 0,
+				emerald_ball_exponent: 0
 			}
 		}
 	};
@@ -288,7 +293,11 @@ function SpinBonusWheel() {
 }
 
 function UpdateSpinCounter() {
-	document.getElementById("bonus_wheel").style.display = IsUnlocked("unlock_bonus_wheel") ? "block" : "none";
+	document.getElementById("bonus_wheel").style.display = IsUnlocked(
+		"unlock_bonus_wheel"
+	)
+		? "inline"
+		: "none";
 	document.getElementById("spin_count").innerHTML = state.save_file.spins;
 	document.getElementById("button_spin").disabled =
 		state.bonus_wheel.IsSpinning() || state.save_file.spins <= 0;

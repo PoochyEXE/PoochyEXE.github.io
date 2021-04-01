@@ -65,18 +65,21 @@ class ScoreTarget extends Target {
 		}
 		let popup_text_level = 0;
 		if (ball.ball_type_index != kBallTypeIDs.NORMAL) {
-			popup_text_level = 1;
-			total_value *= state.special_ball_multiplier;
-			color_rgb = "170,143,0";
 			if (
 				ball.ball_type_index == kBallTypeIDs.EMERALD ||
 				ball.ball_type_index == kBallTypeIDs.TOPAZ ||
 				ball.ball_type_index == kBallTypeIDs.TURQUOISE ||
 				ball.ball_type_index == kBallTypeIDs.OPAL
 			) {
-				total_value *= state.special_ball_multiplier;
+				total_value *= Math.pow(
+					state.special_ball_multiplier, state.emerald_ball_exponent
+				);
 				popup_text_level = 2;
 				color_rgb = "0,192,0";
+			} else {
+				popup_text_level = 1;
+				total_value *= state.special_ball_multiplier;
+				color_rgb = "170,143,0";
 			}
 			if (this.id == 4) {
 				OnCenterSlotHit(ball);
@@ -116,7 +119,9 @@ class SpinTarget extends Target {
 			ball.ball_type_index == kBallTypeIDs.AMETHYST ||
 			ball.ball_type_index == kBallTypeIDs.OPAL
 		) {
-			let value = state.special_ball_multiplier;
+			let value = Math.floor(Math.pow(
+				state.special_ball_multiplier, state.sapphire_ball_exponent
+			));
 			state.save_file.spins += value;
 			UpdateSpinCounter();
 			MaybeAddScoreText({

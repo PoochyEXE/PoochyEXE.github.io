@@ -227,7 +227,7 @@ button.optionButton {
 }
 
 div.messageBox {
-	display: block;
+	display: inline;
 	font-family: sans-serif;
 }
 

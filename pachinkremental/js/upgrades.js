@@ -335,8 +335,18 @@ class BallTypeRateUpgrade extends Upgrade {
 }
 
 function ActivateOrExtendDoubleScoreBuff() {
-	state.save_file.score_buff_multiplier = 2.0;
-	state.save_file.score_buff_duration = 60000.0;
+	const kBuffDuration = 60000.0;
+	if (!IsUnlocked("ruby_ball_buff_stackable") || state.save_file.score_buff_duration <= 0.0 || state.save_file.score_buff_multiplier <= 1.0) {
+		state.save_file.score_buff_multiplier = 2.0;
+		state.save_file.score_buff_duration = kBuffDuration;
+	} else {
+		let stacks = state.save_file.score_buff_multiplier - 1.0;
+		state.save_file.score_buff_duration += (kBuffDuration / stacks);
+		if (state.save_file.score_buff_duration > kBuffDuration) {
+			state.save_file.score_buff_multiplier *= (state.save_file.score_buff_duration / kBuffDuration);
+			state.save_file.score_buff_duration = kBuffDuration;
+		}
+	}
 }
 
 function OnCenterSlotHit(ball) {
@@ -547,7 +557,7 @@ function InitUpgrades() {
 	upgrades_list.push(
 		new BallTypeUnlockUpgrade({
 			ball_type: kBallTypes[kBallTypeIDs.GOLD],
-			description:
+			ball_description:
 				"Gold balls are worth double points and don't count towards the max balls limit.",
 			cost_func: () => 500000,
 			visible_func: () => GetUpgradeLevel("max_balls") > 0
@@ -591,7 +601,7 @@ function InitUpgrades() {
 			on_update: function() {
 				let unlocked = this.GetValue() > 0;
 				document.getElementById("bonus_wheel").style.display = unlocked
-					? "block"
+					? "inline"
 					: "none";
 				let spin_targets = state.target_sets[1].targets;
 				console.assert(spin_targets.length == 3);
@@ -650,7 +660,7 @@ function InitUpgrades() {
 	upgrades_list.push(
 		new BallTypeUnlockUpgrade({
 			ball_type: kBallTypes[kBallTypeIDs.RUBY],
-			description:
+			ball_description:
 				"Ruby balls are worth the same as a gold ball, plus if a ruby ball falls in the center slot, it activates a buff that doubles all points scored for 60 seconds.",
 			cost_func: GemstoneBallUnlockCost,
 			visible_func: ShouldDisplayGemstoneBallUpgrades
@@ -665,9 +675,20 @@ function InitUpgrades() {
 		})
 	);
 	upgrades_list.push(
+		new FixedCostFeatureUnlockUpgrade({
+			id: "ruby_ball_buff_stackable",
+			name: "Stackable Buff",
+			category: "ruby_balls",
+			description:
+				"Makes the ruby ball buff stackable. If a ruby ball falls in the center slot while the buff is already active, it extends the duration. Any time over 60 seconds is converted to a multiplier increase. The time extension is inversely proportional to the existing multiplier.",
+			cost: 1e18,
+			visible_func: () => IsUnlocked("unlock_ruby_balls")
+		})
+	);
+	upgrades_list.push(
 		new BallTypeUnlockUpgrade({
 			ball_type: kBallTypes[kBallTypeIDs.SAPPHIRE],
-			description:
+			ball_description:
 				"Sapphire balls are worth the same as a gold ball, plus the gold ball multiplier is also applied to any bonus wheel spins earned.",
 			cost_func: GemstoneBallUnlockCost,
 			visible_func: ShouldDisplayGemstoneBallUpgrades
@@ -682,9 +703,26 @@ function InitUpgrades() {
 		})
 	);
 	upgrades_list.push(
+		new Upgrade({
+			id: "sapphire_ball_exponent",
+			name: "Sapphire Exponent",
+			category: "sapphire_balls",
+			description: "Increases the exponent on the gold ball value multiplier for sapphire balls. Note: The number of spins earned per sapphire ball is rounded down to the nearest whole number.",
+			cost_func: level => 1e15 * Math.pow(5, level),
+			value_func: level => (level / 10.0) + 1,
+			max_level: 20,
+			value_suffix: "",
+			visible_func: () => IsUnlocked("unlock_sapphire_balls"),
+			on_update: function() {
+				state.sapphire_ball_exponent = this.GetValue();
+			},
+			on_buy: null
+		})
+	);
+	upgrades_list.push(
 		new BallTypeUnlockUpgrade({
 			ball_type: kBallTypes[kBallTypeIDs.EMERALD],
-			description:
+			ball_description:
 				"Points scored by emerald balls are multiplied by the square of the gold ball multiplier.",
 			cost_func: GemstoneBallUnlockCost,
 			visible_func: ShouldDisplayGemstoneBallUpgrades
@@ -699,9 +737,26 @@ function InitUpgrades() {
 		})
 	);
 	upgrades_list.push(
+		new Upgrade({
+			id: "emerald_ball_exponent",
+			name: "Emerald Exponent",
+			category: "emerald_balls",
+			description: "Increases the exponent on the gold ball value multiplier for emerald balls.",
+			cost_func: level => 1e15 * Math.pow(25, level),
+			value_func: level => (level / 10.0) + 2,
+			max_level: 10,
+			value_suffix: "",
+			visible_func: () => IsUnlocked("unlock_emerald_balls"),
+			on_update: function() {
+				state.emerald_ball_exponent = this.GetValue();
+			},
+			on_buy: null
+		})
+	);
+	upgrades_list.push(
 		new BallTypeUnlockUpgrade({
 			ball_type: kBallTypes[kBallTypeIDs.TOPAZ],
-			description:
+			ball_description:
 				"Topaz balls have the bonuses of both ruby and emerald balls.",
 			cost_func: GemstoneBallUnlockCost,
 			visible_func: () =>
@@ -720,7 +775,7 @@ function InitUpgrades() {
 	upgrades_list.push(
 		new BallTypeUnlockUpgrade({
 			ball_type: kBallTypes[kBallTypeIDs.TURQUOISE],
-			description:
+			ball_description:
 				"Turquoise balls have the bonuses of both emerald and sapphire balls.",
 			cost_func: GemstoneBallUnlockCost,
 			visible_func: () =>
@@ -739,7 +794,7 @@ function InitUpgrades() {
 	upgrades_list.push(
 		new BallTypeUnlockUpgrade({
 			ball_type: kBallTypes[kBallTypeIDs.AMETHYST],
-			description:
+			ball_description:
 				"Amethyst balls have the bonuses of both ruby and sapphire balls.",
 			cost_func: GemstoneBallUnlockCost,
 			visible_func: () =>
@@ -758,7 +813,7 @@ function InitUpgrades() {
 	upgrades_list.push(
 		new BallTypeUnlockUpgrade({
 			ball_type: kBallTypes[kBallTypeIDs.OPAL],
-			description:
+			ball_description:
 				"Opal balls have the combined bonuses of ruby, sapphire, and emerald balls.",
 			cost_func: GemstoneBallUnlockCost,
 			visible_func: AllTier2GemstoneBallsUnlocked
