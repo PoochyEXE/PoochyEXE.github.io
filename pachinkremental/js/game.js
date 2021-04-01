@@ -1,4 +1,4 @@
-const kVersion = "v0.5.0 beta";
+const kVersion = "v0.5.1 beta";
 const kTitleAndVersion = "Pachinkremental " + kVersion;
 
 var max_drop_y = 20;
@@ -288,11 +288,7 @@ function SpinBonusWheel() {
 }
 
 function UpdateSpinCounter() {
-	document.getElementById("bonus_wheel").style.display = IsUnlocked(
-		"unlock_bonus_wheel"
-	)
-		? "inline"
-		: "none";
+	document.getElementById("bonus_wheel").style.display = IsUnlocked("unlock_bonus_wheel") ? "block" : "none";
 	document.getElementById("spin_count").innerHTML = state.save_file.spins;
 	document.getElementById("button_spin").disabled =
 		state.bonus_wheel.IsSpinning() || state.save_file.spins <= 0;

@@ -31,6 +31,9 @@ A: This is intentional, both to make sure the game won't softlock with too many 
 
 ## Changelog
 
+### v0.5.1 beta (2021-03-31)
+* Hopefully fixed the issue that causes the game to start lagging after being open for a while. Thanks a million to /u/Alexandreclalex!
+
 ### v0.5.0 beta (2021-03-31)
 * New ball type: Opal!
 * Buff: Further reduced cost scaling for gemstone ball unlocks.
