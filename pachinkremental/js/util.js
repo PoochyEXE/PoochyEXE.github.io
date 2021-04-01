@@ -3,17 +3,17 @@ class Point {
 		this.x = x;
 		this.y = y;
 	}
-	
+
 	DistanceSqrToPoint(other) {
 		const dx = this.x - other.x;
 		const dy = this.y - other.y;
-		return dx * dx + dy * dy
+		return dx * dx + dy * dy;
 	}
-	
+
 	DeltaToPoint(other) {
 		return new Vector(other.x - this.x, other.y - this.y);
 	}
-	
+
 	Add(vec) {
 		return new Point(this.x + vec.x, this.y + vec.y);
 	}
@@ -24,44 +24,44 @@ class Vector {
 		this.x = x;
 		this.y = y;
 	}
-	
+
 	Add(other) {
 		return new Vector(this.x + other.x, this.y + other.y);
 	}
-	
+
 	Subtract(other) {
 		return new Vector(this.x - other.x, this.y - other.y);
 	}
-	
+
 	Multiply(mult) {
 		return new Vector(this.x * mult, this.y * mult);
 	}
-	
+
 	MagnitudeSqr() {
 		return this.x * this.x + this.y * this.y;
 	}
-	
+
 	Magnitude() {
 		return Math.sqrt(this.MagnitudeSqr());
 	}
-	
+
 	Normalize() {
 		const magnitude = this.Magnitude();
 		return new Vector(this.x / magnitude, this.y / magnitude);
 	}
-	
+
 	DotProduct(other) {
-		return this.x * other.x + this.y * other.y
+		return this.x * other.x + this.y * other.y;
 	}
-	
+
 	ProjectionOnto(other) {
 		const other_norm = other.Normalize();
 		return other_norm.Multiply(other_norm.DotProduct(this));
 	}
-	
+
 	// Rotates 90 degrees left.
 	Perpendicular() {
-		return new Vector(-this.y, this.x)
+		return new Vector(-this.y, this.x);
 	}
 }
 
@@ -85,13 +85,16 @@ class RisingText {
 	}
 }
 
-function MaybeAddScoreText(level, text, pos, color_rgb) {
-	if (state.enable_score_text && level >= state.save_file.display_popup_text) {
+function MaybeAddScoreText({ level, text, pos, color_rgb }) {
+	if (
+		state.enable_score_text &&
+		level >= state.save_file.display_popup_text
+	) {
 		state.score_text.push(new RisingText(text, pos, color_rgb));
 	}
 }
 
-function MaybeAddBonusWheelText(text, pos, color_rgb) {
+function MaybeAddBonusWheelText({ text, pos, color_rgb }) {
 	if (state.enable_score_text) {
 		state.wheel_popup_text.push(new RisingText(text, pos, color_rgb));
 	}
@@ -134,44 +137,78 @@ function FormatSmallNumberShort(num) {
 	}
 }
 
+const shortSuffixes = [
+	"",
+	"K",
+	"M",
+	"B",
+	"T",
+	"Qa",
+	"Qi",
+	"Sx",
+	"Sp",
+	"Oc",
+	"No",
+	"Dc"
+];
+
 function FormatNumberShort(num) {
-	const kSuffixes = ['', 'K', 'M', 'B', 'T', 'Qa', 'Qi', 'Sx', 'Sp', 'Oc', 'No', 'Dc'];
 	const kPrecision = 3;
 	if (num < 1000) {
 		return FormatSmallNumberShort(num);
 	}
 	let suffix_index = Math.floor(Math.log10(num) / 3);
-	if (suffix_index >= kSuffixes.length) {
-		return num.toPrecision(kPrecision).replace('+','');
+	if (suffix_index >= shortSuffixes.length) {
+		return num.toPrecision(kPrecision).replace("+", "");
 	}
 	if (suffix_index == 0) {
 		return FormatSmallNumberShort(num);
 	}
 	let prefix = num / Math.pow(1000, suffix_index);
 	let prefix_str = FormatSmallNumberShort(prefix);
-	return prefix_str + kSuffixes[suffix_index];
+	return prefix_str + shortSuffixes[suffix_index];
 }
 
+const longSuffixes = [
+	"",
+	"",
+	"",
+	"billion",
+	"trillion",
+	"quadrillion",
+	"quintillion",
+	"sextillion",
+	"septillion",
+	"octillion",
+	"nonillion",
+	"decillion"
+];
+
 function FormatNumberLong(num) {
-	const kSuffixes = ['', '', '', 'billion', 'trillion', 'quadrillion', 'quintillion',
-			'sextillion', 'septillion', 'octillion', 'nonillion', 'decillion'];
 	const kPrecision = 3;
 	if (num < 1000) {
 		return num.toString();
 	}
 	let suffix_index = Math.floor(Math.log10(num) / 3);
-	if (suffix_index >= kSuffixes.length) {
-		return num.toPrecision(kPrecision).replace('+','');
+	if (suffix_index >= longSuffixes.length) {
+		return num.toPrecision(kPrecision).replace("+", "");
 	}
-	if (kSuffixes[suffix_index] == '') {
+	if (longSuffixes[suffix_index] == "") {
 		return num.toLocaleString();
 	}
 	let prefix = num / Math.pow(1000, suffix_index);
-	return prefix.toFixed(kPrecision) + ' ' + kSuffixes[suffix_index];
+	return prefix.toFixed(kPrecision) + " " + longSuffixes[suffix_index];
 }
 
 class BallType {
-	constructor(id, name, display_name, inner_color, outer_color, ripple_color_rgb) {
+	constructor(
+		id,
+		name,
+		display_name,
+		inner_color,
+		outer_color,
+		ripple_color_rgb
+	) {
 		this.id = id;
 		this.name = name;
 		this.display_name = display_name;
@@ -183,12 +220,12 @@ class BallType {
 
 function ShuffleArray(array) {
 	let result = array.slice(0);
-    for (let i = result.length - 1; i > 0; i--) {
-        let j = Math.floor(Math.random() * (i + 1));
-        let temp = result[i];
-        result[i] = result[j];
-        result[j] = temp;
-    }
+	for (let i = result.length - 1; i > 0; i--) {
+		let j = Math.floor(Math.random() * (i + 1));
+		let temp = result[i];
+		result[i] = result[j];
+		result[j] = temp;
+	}
 	return result;
 }
 
@@ -199,9 +236,9 @@ function ShuffleArray(array) {
 function SaveFileChecksum(save_file) {
 	let result = 0;
 	for (let i = 0; i < save_file.length; ++i) {
-		result = (result >>> 1) | (result << 63)
+		result = (result >>> 1) | (result << 63);
 		result ^= save_file.charCodeAt(i);
-		result &= 0xFFFFFFFF;
+		result &= 0xffffffff;
 	}
 	return result;
 }

@@ -1,5 +1,10 @@
 const kQualityOptions = ["High", "Medium", "Low"];
-const kPopupTextOptions = ["Enabled", "Gold+ only", "Gemstone+ only", "Disabled"];
+const kPopupTextOptions = [
+	"Enabled",
+	"Gold+ only",
+	"Gemstone+ only",
+	"Disabled"
+];
 
 function SaveFileToString(state) {
 	let inner_data = JSON.stringify(state.save_file);
@@ -23,7 +28,7 @@ function SaveFileFromString(save_file_str) {
 }
 
 function SaveToLocalStorage() {
-	localStorage.setItem('save_file', SaveFileToString(state));
+	localStorage.setItem("save_file", SaveFileToString(state));
 	state.notifications.push(new Notification("Game saved", "#8F8"));
 }
 
@@ -31,9 +36,15 @@ function LoadGame(save_file_str) {
 	let load_save = SaveFileFromString(save_file_str);
 	if (load_save && load_save.game_version) {
 		default_state = InitState();
-		state.save_file = {...default_state.save_file, ...load_save};
-		state.save_file.stats = {...default_state.save_file.stats, ...load_save.stats};
-		state.save_file.upgrade_levels = {...default_state.save_file.upgrade_levels, ...load_save.upgrade_levels};
+		state.save_file = { ...default_state.save_file, ...load_save };
+		state.save_file.stats = {
+			...default_state.save_file.stats,
+			...load_save.stats
+		};
+		state.save_file.upgrade_levels = {
+			...default_state.save_file.upgrade_levels,
+			...load_save.upgrade_levels
+		};
 		state.display_score = state.save_file.stats.total_score;
 		state.display_points = state.save_file.points;
 		state.update_upgrade_buttons = true;
@@ -43,26 +54,34 @@ function LoadGame(save_file_str) {
 			state.upgrades[id].Update();
 		}
 		if (state.save_file.stats.total_score > 0) {
-			UpdateScoreDisplay(state, /*forceUpdate=*/true);
+			UpdateScoreDisplay(state, /*forceUpdate=*/ true);
 		}
 		UpdateUpgradeButtons(state);
 		UpdateOptionsButtons();
 		UpdateAutoSaveInterval();
 		state.notifications.push(new Notification("Game loaded", "#8F8"));
 	} else {
-		state.notifications.push(new Notification("Error: Save file appears to be corrupted!", "#F88"));
+		state.notifications.push(
+			new Notification(
+				"Error: Save file appears to be corrupted!",
+				"#F88"
+			)
+		);
 	}
 }
 
 function LoadFromLocalStorage() {
-	let save_file_str = localStorage.getItem('save_file');
+	let save_file_str = localStorage.getItem("save_file");
 	if (save_file_str) {
 		LoadGame(save_file_str);
 	}
 }
 
 function ImportSave() {
-	let save_file_str = prompt("Paste your save file below.\nCAUTION: This will overwrite your current save file!", "");
+	let save_file_str = prompt(
+		"Paste your save file below.\nCAUTION: This will overwrite your current save file!",
+		""
+	);
 
 	if (save_file_str != null && save_file_str != "") {
 		LoadGame(save_file_str);
@@ -74,27 +93,35 @@ function CloseModal(id) {
 }
 
 function ExportSave() {
-	document.getElementById("exported_save").innerHTML = SaveFileToString(state);
+	document.getElementById("exported_save").innerHTML = SaveFileToString(
+		state
+	);
 	document.getElementById("export_save_modal").style.display = "block";
 }
 
 function EraseSave() {
-	const kCaution = "\u26A0 CAUTION!! \u26A0 CAUTION!! \u26A0 CAUTION!! \u26A0 CAUTION!! \u26A0 CAUTION!! \u26A0\n\n"
-	let answer = prompt(kCaution + "This will erase all your progress and restart the game from scratch!\n\n" + kCaution +
-			"\nIf you are really sure, type \"DELETE\" in all caps below, then click OK.", "");
+	const kCaution =
+		"\u26A0 CAUTION!! \u26A0 CAUTION!! \u26A0 CAUTION!! \u26A0 CAUTION!! \u26A0 CAUTION!! \u26A0\n\n";
+	let answer = prompt(
+		kCaution +
+			"This will erase all your progress and restart the game from scratch!\n\n" +
+			kCaution +
+			'\nIf you are really sure, type "DELETE" in all caps below, then click OK.',
+		""
+	);
 	if (answer == "DELETE") {
-		localStorage.removeItem('save_file');
+		localStorage.removeItem("save_file");
 		location.reload();
 	}
 }
 
 function UpdateOptionsButtons() {
-	document.getElementById("button_auto_save").innerHTML = "Auto Save: " + 
-		(state.save_file.auto_save_enabled ? "ON" : "OFF");
-	document.getElementById("button_quality").innerHTML = "Quality: " + 
-		kQualityOptions[state.save_file.quality];
-	document.getElementById("button_popup_text").innerHTML = "Pop-up text: " + 
-		kPopupTextOptions[state.save_file.display_popup_text];
+	document.getElementById("button_auto_save").innerHTML =
+		"Auto Save: " + (state.save_file.auto_save_enabled ? "ON" : "OFF");
+	document.getElementById("button_quality").innerHTML =
+		"Quality: " + kQualityOptions[state.save_file.quality];
+	document.getElementById("button_popup_text").innerHTML =
+		"Pop-up text: " + kPopupTextOptions[state.save_file.display_popup_text];
 }
 
 function UpdateAutoSaveInterval() {
@@ -102,13 +129,14 @@ function UpdateAutoSaveInterval() {
 		if (!state.intervals.auto_save) {
 			state.intervals.auto_save = setInterval(SaveToLocalStorage, 60000);
 		}
-		document.getElementById("button_auto_save").innerHTML = "Auto Save: ON"
+		document.getElementById("button_auto_save").innerHTML = "Auto Save: ON";
 	} else {
 		if (state.intervals.auto_save) {
 			clearInterval(state.intervals.auto_save);
 			state.intervals.auto_save = null;
 		}
-		document.getElementById("button_auto_save").innerHTML = "Auto Save: OFF"
+		document.getElementById("button_auto_save").innerHTML =
+			"Auto Save: OFF";
 	}
 }
 
@@ -120,9 +148,15 @@ function ToggleAutoSave() {
 
 function TogglePopupText() {
 	++state.save_file.display_popup_text;
-	if (state.save_file.display_popup_text == 1 && !IsUnlocked("unlock_gold_balls")) {
+	if (
+		state.save_file.display_popup_text == 1 &&
+		!IsUnlocked("unlock_gold_balls")
+	) {
 		state.save_file.display_popup_text = kPopupTextOptions.length - 1;
-	} else if (state.save_file.display_popup_text == 2 && !AnyTier1GemstoneBallsUnlocked()) {
+	} else if (
+		state.save_file.display_popup_text == 2 &&
+		!AnyTier1GemstoneBallsUnlocked()
+	) {
 		state.save_file.display_popup_text = kPopupTextOptions.length - 1;
 	}
 	if (state.save_file.display_popup_text >= kPopupTextOptions.length) {
