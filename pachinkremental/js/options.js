@@ -99,6 +99,8 @@ function LoadGame(save_file_str) {
 			delete state.save_file.auto_save_enabled;
 			state.save_file.options.auto_drop_enabled = state.save_file.auto_drop_enabled;
 			delete state.save_file.auto_drop_enabled;
+			state.save_file.options.auto_spin_enabled = state.save_file.auto_spin_enabled;
+			delete state.save_file.auto_spin_enabled;
 			state.save_file.options.multi_spin_enabled = state.save_file.multi_spin_enabled;
 			delete state.save_file.multi_spin_enabled;
 			state.save_file.options.april_fools_enabled = state.save_file.april_fools_enabled ? 2 : 0;
