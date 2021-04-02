@@ -430,7 +430,7 @@ function Draw(state) {
 	// Layer 1: Board
 	if (state.redraw_all) {
 		let ctx = ClearLayerAndReturnContext(1);
-		if (state.save_file.quality <= 1) {
+		if (state.save_file.options.quality <= 1) {
 			DrawPegs(state.board.pegs, ctx);
 		} else {
 			DrawPegsNoGradient(state.board.pegs, ctx);
@@ -440,17 +440,21 @@ function Draw(state) {
 	let total_balls = TotalBalls(state);
 	if (state.redraw_all || total_balls > 0 || state.last_drawn.num_balls > 0) {
 		let ctx = ClearLayerAndReturnContext(2);
-		if (state.save_file.quality == 0) {
-			for (let i = 0; i < state.balls_by_type.length; ++i) {
+		for (let i = 0; i < state.balls_by_type.length; ++i) {
+			let opacity_id = kBallTypes[i].name + "_ball_opacity";
+			let opacity_pct = state.save_file.options[opacity_id];
+			if (opacity_pct <= 0) {
+				continue;
+			}
+			ctx.globalAlpha = opacity_pct / 100.0;
+			if (state.save_file.options.quality == 0) {
 				DrawBalls(
 					state.balls_by_type[i],
 					kBallTypes[i].inner_color,
 					kBallTypes[i].outer_color,
 					ctx
 				);
-			}
-		} else {
-			for (let i = 0; i < state.balls_by_type.length; ++i) {
+			} else {
 				DrawBallsNoGradient(
 					state.balls_by_type[i],
 					kBallTypes[i].outer_color,

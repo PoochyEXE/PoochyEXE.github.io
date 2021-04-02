@@ -31,6 +31,12 @@ A: This is intentional, both to make sure the game won't softlock with too many 
 
 ## Changelog
 
+### v0.6.3 beta (2021-04-02)
+* Added opacity sliders for each ball type.
+* Added the option to keep April Fools' Day mode on all the time.
+* Reorganized save file data structure. Note that this means save files exported from this version will not import correctly into older versions -- doing so will reset all your options to defaults. Starting in this version, importing a save from an incompatible future version will fail entirely.
+* "Balls dropped manually" stat is now hidden until Auto-Drop is unlocked, since it'll be exactly the same as "Total balls dropped" right above it until then.
+
 ### v0.6.2 beta (2021-04-01)
 * Optimized performance some more.
 

@@ -106,10 +106,6 @@ div.upgradesContents, div.statsContents, div.optionsContents {
 	overflow: hidden;
 }
 
-div.statsEntry {
-	display: inline;
-}
-
 div.upgradeButtonWrapper {
 	display: inline-block;
 	margin: 2.5px;

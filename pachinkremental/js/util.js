@@ -102,7 +102,7 @@ function UpdateDisplay(elem_id, display) {
 function MaybeAddScoreText({ level, text, pos, color_rgb }) {
 	if (
 		state.enable_score_text &&
-		level >= state.save_file.display_popup_text
+		level >= state.save_file.options.display_popup_text
 	) {
 		state.score_text.push(new RisingText(text, pos, color_rgb));
 	}

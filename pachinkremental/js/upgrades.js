@@ -257,11 +257,11 @@ class ToggleUnlockUpgrade extends FixedCostFeatureUnlockUpgrade {
 	}
 
 	GetToggleState() {
-		return state.save_file[this.SaveFileKey()];
+		return state.save_file.options[this.SaveFileKey()];
 	}
 
 	SetToggleState(new_state) {
-		state.save_file[this.SaveFileKey()] = new_state;
+		state.save_file.options[this.SaveFileKey()] = new_state;
 	}
 
 	OnClick() {
@@ -305,7 +305,12 @@ class BallTypeUnlockUpgrade extends FeatureUnlockUpgrade {
 			description:
 				"Unlock " + ball_type.name + " balls. " + ball_description,
 			cost_func,
-			visible_func
+			visible_func,
+			on_update: () => {
+				let div_id = ball_type.name + "_ball_opacity_wrapper";
+				let display = (this.GetValue() > 0) ? "block" : "none";
+				UpdateDisplay(div_id, display);
+			},
 		});
 	}
 }
@@ -858,9 +863,8 @@ function ButtonClassForUpgradeCategory(category) {
 function InitUpgradeButtons(upgrades) {
 	for (let upgrade_id in upgrades) {
 		let upgrade = upgrades[upgrade_id];
-		let category_div = document.getElementById(
-			upgrade.category + "_contents"
-		);
+		let category_div_id = upgrade.category + "_contents";
+		let category_div = document.getElementById(category_div_id);
 		let button_class = ButtonClassForUpgradeCategory(upgrade.category);
 		category_div.innerHTML +=
 			'<div class="upgradeButtonWrapper" id="' +

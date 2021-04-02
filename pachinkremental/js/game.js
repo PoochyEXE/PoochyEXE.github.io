@@ -1,4 +1,4 @@
-const kVersion = "v0.6.2 beta";
+const kVersion = "v0.6.3 beta";
 const kTitleAndVersion = "Pachinkremental " + kVersion;
 
 var max_drop_y = 20;
@@ -20,7 +20,7 @@ const kBallTypes = [
 	new BallType(5,   "topaz",     "Topaz",       "#FFB",       "#FF3",       "255,255, 48"    ),
 	new BallType(6,   "turquoise", "Turquoise",   "#BFF",       "#3FF",       " 48,255,255"    ),
 	new BallType(7,   "amethyst",  "Amethyst",    "#FBF",       "#F3F",       "255, 48,255"    ),
-	new BallType(8,   "opal",      "Opal",        kPrismatic,   kPrismatic,   kPrismatic       )
+	new BallType(8,   "opal",      "Opal",        kPrismatic,   kPrismatic,   kPrismatic       ),
 ];
 
 const kBallTypeIDs = {
@@ -32,7 +32,7 @@ const kBallTypeIDs = {
 	TOPAZ: 5,
 	TURQUOISE: 6,
 	AMETHYST: 7,
-	OPAL: 8
+	OPAL: 8,
 };
 
 function CreateBallWithNoise(x, y, dx, dy, ball_type_index) {
@@ -106,15 +106,15 @@ function IsUnlocked(upgrade_id) {
 }
 
 function AutoDropOn() {
-	return IsUnlocked("auto_drop") && state.save_file.auto_drop_enabled;
+	return IsUnlocked("auto_drop") && state.save_file.options.auto_drop_enabled;
 }
 
 function AutoSpinOn() {
-	return IsUnlocked("auto_spin") && state.save_file.auto_spin_enabled;
+	return IsUnlocked("auto_spin") && state.save_file.options.auto_spin_enabled;
 }
 
 function MultiSpinOn() {
-	return IsUnlocked("multi_spin") && state.save_file.multi_spin_enabled;
+	return IsUnlocked("multi_spin") && state.save_file.options.multi_spin_enabled;
 }
 
 function UpdateScoreHistory() {
@@ -198,17 +198,10 @@ function InitState() {
 			score_history: null
 		},
 		save_file: {
-			game_version: 1,
+			game_version: 2,
 			points: 0,
 			spins: 0,
 			auto_drop_pos: null,
-			auto_drop_enabled: false,
-			auto_save_enabled: true,
-			auto_spin_enabled: false,
-			multi_spin_enabled: false,
-			april_fools_enabled: true,
-			quality: 0,
-			display_popup_text: 0,
 			score_buff_multiplier: 1,
 			score_buff_duration: 0,
 			stats: {
@@ -234,7 +227,16 @@ function InitState() {
 				ruby_ball_buff_stackable: 0,
 				sapphire_ball_exponent: 0,
 				emerald_ball_exponent: 0
-			}
+			},
+			options: {
+				auto_save_enabled: true,
+				auto_drop_enabled: false,
+				auto_spin_enabled: false,
+				multi_spin_enabled: false,
+				april_fools_enabled: 0,
+				quality: 0,
+				display_popup_text: 0,
+			},
 		}
 	};
 	for (let i = 0; i < kBallTypes.length; ++i) {
@@ -243,6 +245,7 @@ function InitState() {
 			"unlock_" + kBallTypes[i].name + "_balls"
 		] = 0;
 		state.save_file.upgrade_levels[kBallTypes[i].name + "_ball_rate"] = 0;
+		state.save_file.options[kBallTypes[i].name + "_ball_opacity"] = 100;
 	}
 	state.bonus_wheel = DefaultWheel(state);
 	return state;
@@ -326,7 +329,11 @@ function UpdateStatsPanel(state) {
 		if (val == null || val == undefined) {
 			continue;
 		}
-		if (val != 0) {
+		let visible = (val != 0);
+		if (key == "balls_dropped_manual") {
+			visible = IsUnlocked("auto_drop");
+		}
+		if (visible) {
 			let container = document.getElementById("stats_container_" + key);
 			if (container && container.style.display != "block") {
 				container.style.display = "block";
@@ -397,12 +404,20 @@ function UpdateOneFrame(state, draw) {
 	}
 }
 
+function IsAprilFoolsActive() {
+	if (state.save_file.options.april_fools_enabled == 0) {
+		return false;
+	}
+	if (state.save_file.options.april_fools_enabled == 1) {
+		return true;
+	}
+	const date = new Date();
+	return date.getMonth() == 3 && date.getDate() == 1;
+}
+
 function Update() {
 	const this_update = Date.now();
-	const date = new Date();
-	let now_april_fools =
-		state.save_file.april_fools_enabled &&
-		date.getMonth() == 3 && date.getDate() == 1;
+	let now_april_fools = IsAprilFoolsActive();
 	if (now_april_fools != state.april_fools) {
 		state.redraw_all = true;
 		state.april_fools = now_april_fools;
@@ -470,6 +485,7 @@ function OnResize() {
 
 function Load() {
 	InitUpgradeButtons(state.upgrades);
+	InitOptions(state);
 	document.getElementById(kTopCanvasLayer).addEventListener("click", OnClick);
 	document.title = kTitleAndVersion;
 	document.getElementById("title_version").innerHTML = kTitleAndVersion;

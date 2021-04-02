@@ -98,47 +98,47 @@
 					<div id="stats_contents" class="statsContents" style="height: 0px;">
 						<div class="menuPadding"></div>
 						<div id="stats_container_total_score" class="statsRow" style="display: block;">
-							<b>Total points earned: </b><div id="stats_total_score" class="statsEntry"></div>
+							<b>Total points earned: </b><span id="stats_total_score" class="statsEntry"></span>
 						</div>
-						<div id="stats_container_total_score" class="statsRow" style="display: block;">
-							<b>Points earned in last 5 seconds: </b><div id="stats_score_last5s" class="statsEntry"></div>
+						<div id="stats_container_total_last5s" class="statsRow" style="display: block;">
+							<b>Points earned in last 5 seconds: </b><span id="stats_score_last5s" class="statsEntry"></span>
 						</div>
-						<div id="stats_container_total_score" class="statsRow" style="display: block;">
-							<b>Points earned in last 15 seconds: </b><div id="stats_score_last15s" class="statsEntry"></div>
+						<div id="stats_container_total_last15s" class="statsRow" style="display: block;">
+							<b>Points earned in last 15 seconds: </b><span id="stats_score_last15s" class="statsEntry"></span>
 						</div>
-						<div id="stats_container_total_score" class="statsRow" style="display: block;">
-							<b>Points earned in last 60 seconds: </b><div id="stats_score_last60s" class="statsEntry"></div>
+						<div id="stats_container_total_last60s" class="statsRow" style="display: block;">
+							<b>Points earned in last 60 seconds: </b><span id="stats_score_last60s" class="statsEntry"></span>
 						</div>
 						<div class="menuPadding"></div>
 						<div id="stats_container_balls_dropped" class="statsRow" style="display: block;">
-							<b>Total balls dropped: </b><div id="stats_balls_dropped" class="statsEntry"></div>
+							<b>Total balls dropped: </b><span id="stats_balls_dropped" class="statsEntry"></span>
 						</div>
-						<div id="stats_container_balls_dropped" class="statsRow" style="display: block;">
-							<b>Balls dropped manually: </b><div id="stats_balls_dropped_manual" class="statsEntry"></div>
+						<div id="stats_container_balls_dropped_manual" class="statsRow" style="display: none;">
+							<b>Balls dropped manually: </b><span id="stats_balls_dropped_manual" class="statsEntry"></span>
 						</div>
 						<div id="stats_container_gold_balls" class="statsRow" style="display: none;">
-							<b>Gold balls: </b><div id="stats_gold_balls" class="statsEntry"></div>
+							<b>Gold balls: </b><span id="stats_gold_balls" class="statsEntry"></span>
 						</div>
 						<div id="stats_container_ruby_balls" class="statsRow" style="display: none;">
-							<b>Ruby balls: </b><div id="stats_ruby_balls" class="statsEntry"></div>
+							<b>Ruby balls: </b><span id="stats_ruby_balls" class="statsEntry"></span>
 						</div>
 						<div id="stats_container_sapphire_balls" class="statsRow" style="display: none;">
-							<b>Sapphire balls: </b><div id="stats_sapphire_balls" class="statsEntry"></div>
+							<b>Sapphire balls: </b><span id="stats_sapphire_balls" class="statsEntry"></span>
 						</div>
 						<div id="stats_container_emerald_balls" class="statsRow" style="display: none;">
-							<b>Emerald balls: </b><div id="stats_emerald_balls" class="statsEntry"></div>
+							<b>Emerald balls: </b><span id="stats_emerald_balls" class="statsEntry"></span>
 						</div>
 						<div id="stats_container_topaz_balls" class="statsRow" style="display: none;">
-							<b>Topaz balls: </b><div id="stats_topaz_balls" class="statsEntry"></div>
+							<b>Topaz balls: </b><span id="stats_topaz_balls" class="statsEntry"></span>
 						</div>
 						<div id="stats_container_turquoise_balls" class="statsRow" style="display: none;">
-							<b>Turquoise balls: </b><div id="stats_turquoise_balls" class="statsEntry"></div>
+							<b>Turquoise balls: </b><span id="stats_turquoise_balls" class="statsEntry"></span>
 						</div>
 						<div id="stats_container_amethyst_balls" class="statsRow" style="display: none;">
-							<b>Amethyst balls: </b><div id="stats_amethyst_balls" class="statsEntry"></div>
+							<b>Amethyst balls: </b><span id="stats_amethyst_balls" class="statsEntry"></span>
 						</div>
 						<div id="stats_container_opal_balls" class="statsRow" style="display: none;">
-							<b>Opal balls: </b><div id="stats_opal_balls" class="statsEntry"></div>
+							<b>Opal balls: </b><span id="stats_opal_balls" class="statsEntry"></span>
 						</div>
 					</div>
 				</div>
@@ -163,6 +163,9 @@
 								id="button_popup_text" onclick="TogglePopupText()">Popup text</button>
 						<button type="button" class="optionButton"
 								id="button_april_fools" onclick="ToggleAprilFools()">April Fools</button>
+						<br>
+						<div id="options_opacity" class="optionsContents"></div>
+						<br>
 						<br>
 						<button type="button" class="optionButton" style="background: #F88;"
 								id="button_erase_save" onclick="EraseSave()">Erase save file</button>
