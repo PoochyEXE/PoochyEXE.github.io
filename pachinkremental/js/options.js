@@ -12,6 +12,38 @@ const kAprilFoolsOptions = [
 ];
 const kSaveFileVersion = 2;
 
+class ColorSchemeClassMapping {
+	constructor(base_class, light_class, dark_class) {
+		this.base = base_class;
+		this.light = light_class;
+		this.dark = dark_class;
+	}
+}
+
+const kColorSchemes = ["light", "dark"];
+
+const kColorSchemeClasses = [
+	new ColorSchemeClassMapping("messageBox", "messageBoxLight", "messageBoxDark"),
+	new ColorSchemeClassMapping("upgradesContainer", "upgradesContainerLight", "upgradesContainerDark"),
+	new ColorSchemeClassMapping("upgradesSubContainer", "upgradesSubContainerLight", "upgradesSubContainerDark"),
+	new ColorSchemeClassMapping("statsContainer", "statsContainerLight", "statsContainerDark"),
+	new ColorSchemeClassMapping("optionsContainer", "optionsContainerLight", "optionsContainerDark"),
+	new ColorSchemeClassMapping("upgradesHeader", "upgradesHeaderLight", "upgradesHeaderDark"),
+	new ColorSchemeClassMapping("upgradesSubHeader", "upgradesSubHeaderLight", "upgradesSubHeaderDark"),
+	new ColorSchemeClassMapping("statsHeader", "statsHeaderLight", "statsHeaderDark"),
+	new ColorSchemeClassMapping("optionsHeader", "optionsHeaderLight", "optionsHeaderDark"),
+	new ColorSchemeClassMapping("upgradeButton", "upgradeButtonLight", "upgradeButtonDark"),
+	new ColorSchemeClassMapping("rubyUpgradeButton", "rubyUpgradeButtonLight", "rubyUpgradeButtonDark"),
+	new ColorSchemeClassMapping("sapphireUpgradeButton", "sapphireUpgradeButtonLight", "sapphireUpgradeButtonDark"),
+	new ColorSchemeClassMapping("emeraldUpgradeButton", "emeraldUpgradeButtonLight", "emeraldUpgradeButtonDark"),
+	new ColorSchemeClassMapping("topazUpgradeButton", "topazUpgradeButtonLight", "topazUpgradeButtonDark"),
+	new ColorSchemeClassMapping("turquoiseUpgradeButton", "turquoiseUpgradeButtonLight", "turquoiseUpgradeButtonDark"),
+	new ColorSchemeClassMapping("amethystUpgradeButton", "amethystUpgradeButtonLight", "amethystUpgradeButtonDark"),
+	new ColorSchemeClassMapping("opalUpgradeButton", "opalUpgradeButtonLight", "opalUpgradeButtonDark"),
+	new ColorSchemeClassMapping("optionButton", "optionButtonLight", "optionButtonDark"),
+	new ColorSchemeClassMapping("optionButtonRed", "optionButtonRedLight", "optionButtonRedDark"),
+];
+
 function UpdateBallOpacity(elem) {
 	state.save_file.options[elem.id] = elem.value;
 }
@@ -187,6 +219,8 @@ function UpdateOptionsButtons() {
 		"Auto Save: " + (state.save_file.options.auto_save_enabled ? "ON" : "OFF");
 	document.getElementById("button_quality").innerHTML =
 		"Quality: " + kQualityOptions[state.save_file.options.quality];
+	document.getElementById("button_dark_mode").innerHTML =
+		"Dark Mode: " + (state.save_file.options.dark_mode ? "ON" : "OFF");
 	document.getElementById("button_popup_text").innerHTML =
 		"Pop-up text: " + kPopupTextOptions[state.save_file.options.display_popup_text];
 	document.getElementById("button_april_fools").innerHTML =
@@ -240,6 +274,13 @@ function ToggleQuality() {
 		state.save_file.options.quality = 0;
 	}
 	state.redraw_all = true;
+	UpdateOptionsButtons();
+}
+
+function ToggleDarkMode() {
+	state.save_file.options.dark_mode = !state.save_file.options.dark_mode;
+	state.redraw_all = true;
+	UpdateDarkMode();
 	UpdateOptionsButtons();
 }
 

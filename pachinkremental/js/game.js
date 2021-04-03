@@ -234,6 +234,7 @@ function InitState() {
 				auto_drop_enabled: false,
 				auto_spin_enabled: false,
 				multi_spin_enabled: false,
+				dark_mode: false,
 				april_fools_enabled: 0,
 				quality: 0,
 				display_popup_text: 0,
@@ -489,6 +490,38 @@ function OnClick(event) {
 	}
 }
 
+function UpdateDarkMode() {
+	var color_scheme;
+	if (state.save_file.options.dark_mode) {
+		document.body.style.backgroundColor = "#000";
+		color_scheme = "dark";
+	} else {
+		document.body.style.backgroundColor = "#FFF";
+		color_scheme = "light";
+	}
+	console.log(color_scheme);
+	
+	for (let i = 0; i < kColorSchemeClasses.length; ++i) {
+		let class_mapping = kColorSchemeClasses[i];
+		console.log(class_mapping);
+		let elems = document.getElementsByClassName(class_mapping.base);
+		for (let j = elems.length - 1; j >= 0; --j) {
+			let elem = elems[j];
+			console.log("elem: " + elem.id);
+			for (let k = 0; k < kColorSchemes.length; ++k) {
+				console.log("kColorSchemes[k]: " + kColorSchemes[k]);
+				if (kColorSchemes[k] == color_scheme) {
+					console.log("add: " + class_mapping[kColorSchemes[k]]);
+					elem.classList.add(class_mapping[kColorSchemes[k]]);
+				} else {
+					console.log("remove: " + class_mapping[kColorSchemes[k]]);
+					elem.classList.remove(class_mapping[kColorSchemes[k]]);
+				}
+			}
+		}
+	}
+}
+
 var state = InitState();
 
 function OnResize() {
@@ -506,6 +539,7 @@ function Load() {
 		"<h1>Welcome to Pachinkremental!</h1>" +
 		"<h1>Click anywhere in the green box to drop a ball.</h1>";
 	LoadFromLocalStorage();
+	UpdateDarkMode();
 	var last_update = Date.now();
 
 	OnResize();

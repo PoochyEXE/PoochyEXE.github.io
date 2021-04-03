@@ -51,8 +51,15 @@ div.upgradesContainer, div.upgradesSubContainer, div.statsContainer, div.options
 
 div.upgradesContainer, div.upgradesSubContainer {
 	border: 2px solid #080;
-	background: #CFC;
 	vertical-align: top;
+}
+
+div.upgradesContainerLight, div.upgradesSubContainerLight {
+	background: #CFC;
+}
+
+div.upgradesContainerDark, div.upgradesSubContainerDark {
+	background: #030;
 }
 
 div.upgradesSubContainer {
@@ -60,14 +67,24 @@ div.upgradesSubContainer {
 	display: inline-block;
 }
 
-div.statsContainer {
+div.statsContainerLight {
 	border: 2px solid #008;
 	background: #CCF;
 }
 
-div.optionsContainer {
+div.statsContainerDark {
+	border: 2px solid #008;
+	background: #003;
+}
+
+div.optionsContainerLight {
 	border: 2px solid #808;
 	background: #FCF;
+}
+
+div.optionsContainerDark {
+	border: 2px solid #808;
+	background: #303;
 }
 
 span.upgradeHeaderNew {
@@ -92,16 +109,34 @@ button.upgradesSubHeader {
 	font-size: 16px;
 }
 
-button.upgradesHeader, button.upgradesSubHeader {
+button.upgradesHeaderLight, button.upgradesSubHeaderLight {
 	background: #CFC;
+	color: #000;
 }
 
-button.statsHeader {
+button.upgradesHeaderDark, button.upgradesSubHeaderDark {
+	background: #030;
+	color: #FFF;
+}
+
+button.statsHeaderLight {
 	background: #CCF;
+	color: #000;
 }
 
-button.optionsHeader {
+button.statsHeaderDark {
+	background: #003;
+	color: #FFF;
+}
+
+button.optionsHeaderLight {
 	background: #FCF;
+	color: #000;
+}
+
+button.optionsHeaderDark {
+	background: #303;
+	color: #FFF;
 }
 
 div.upgradesContents, div.statsContents, div.optionsContents {
@@ -121,68 +156,151 @@ button.upgradeButton, button.rubyUpgradeButton, button.sapphireUpgradeButton, bu
 	border-radius: 10px;
 	font-family: sans-serif;
 	font-size: 14px;
-	color: #000;
 	padding: 5px;
 	transition-duration: 250ms;
 }
 
-button.upgradeButton {
+button.upgradeButtonLight {
 	background: #8C8;
+	color: #000;
 }
 
-button.upgradeButton:disabled {
+button.upgradeButtonDark {
+	background: #383;
+	color: #FFF;
+}
+
+button.upgradeButtonLight:disabled {
 	background: #888;
+	color: #000;
 }
 
-button.rubyUpgradeButton {
+button.upgradeButtonDark:disabled {
+	background: #333;
+	color: #FFF;
+}
+
+button.rubyUpgradeButtonLight {
 	background: #F88;
+	color: #000;
 }
 
-button.rubyUpgradeButton:disabled {
+button.rubyUpgradeButtonDark {
+	background: #833;
+	color: #FFF;
+}
+
+button.rubyUpgradeButtonLight:disabled {
 	background: #A77;
+	color: #000;
 }
 
-button.sapphireUpgradeButton {
+button.rubyUpgradeButtonDark:disabled {
+	background: #300;
+	color: #FFF;
+}
+
+button.sapphireUpgradeButtonLight {
 	background: #88F;
+	color: #000;
 }
 
-button.sapphireUpgradeButton:disabled {
+button.sapphireUpgradeButtonDark {
+	background: #338;
+	color: #FFF;
+}
+
+button.sapphireUpgradeButtonLight:disabled {
 	background: #77A;
+	color: #000;
 }
 
-button.emeraldUpgradeButton {
+button.sapphireUpgradeButtonDark:disabled {
+	background: #003;
+	color: #FFF;
+}
+
+button.emeraldUpgradeButtonLight {
 	background: #8F8;
+	color: #000;
 }
 
-button.emeraldUpgradeButton:disabled {
+button.emeraldUpgradeButtonDark {
+	background: #383;
+	color: #FFF;
+}
+
+button.emeraldUpgradeButtonLight:disabled {
 	background: #7A7;
+	color: #000;
 }
 
-button.topazUpgradeButton {
+button.emeraldUpgradeButtonDark:disabled {
+	background: #303;
+	color: #FFF;
+}
+
+button.topazUpgradeButtonLight {
 	background: #FF8;
+	color: #000;
 }
 
-button.topazUpgradeButton:disabled {
+button.topazUpgradeButtonDark {
+	background: #883;
+	color: #FFF;
+}
+
+button.topazUpgradeButtonLight:disabled {
 	background: #AA7;
+	color: #000;
 }
 
-button.turquoiseUpgradeButton {
+button.topazUpgradeButtonDark:disabled {
+	background: #330;
+	color: #FFF;
+}
+
+button.turquoiseUpgradeButtonLight {
 	background: #8FF;
+	color: #000;
 }
 
-button.turquoiseUpgradeButton:disabled {
+button.turquoiseUpgradeButtonDark {
+	background: #388;
+	color: #FFF;
+}
+
+button.turquoiseUpgradeButtonLight:disabled {
 	background: #7AA;
+	color: #000;
 }
 
-button.amethystUpgradeButton {
+button.turquoiseUpgradeButtonDark:disabled {
+	background: #033;
+	color: #FFF;
+}
+
+button.amethystUpgradeButtonLight {
 	background: #F8F;
+	color: #000;
 }
 
-button.amethystUpgradeButton:disabled {
+button.amethystUpgradeButtonDark {
+	background: #838;
+	color: #FFF;
+}
+
+button.amethystUpgradeButtonLight:disabled {
 	background: #A7A;
+	color: #000;
 }
 
-@-webkit-keyframes opalUpgradeButtonColor {  
+button.amethystUpgradeButtonDark:disabled {
+	background: #303;
+	color: #FFF;
+}
+
+@-webkit-keyframes opalUpgradeButtonLightColor {  
   0% { background: #F88; }
   17% { background: #FF8; }
   33% { background: #8F8; }
@@ -192,7 +310,17 @@ button.amethystUpgradeButton:disabled {
   100% { background: #F88; }
 }
 
-@-webkit-keyframes opalUpgradeButtonDisabledColor {  
+@-webkit-keyframes opalUpgradeButtonDarkColor {  
+  0% { background: #833; }
+  17% { background: #883; }
+  33% { background: #383; }
+  50% { background: #388; }
+  67% { background: #338; }
+  83% { background: #838; }
+  100% { background: #833; }
+}
+
+@-webkit-keyframes opalUpgradeButtonLightDisabledColor {  
   0% { background: #A77; }
   17% { background: #AA7; }
   33% { background: #7A7; }
@@ -202,34 +330,88 @@ button.amethystUpgradeButton:disabled {
   100% { background: #A77; }
 }
 
-button.opalUpgradeButton {
+@-webkit-keyframes opalUpgradeButtonDarkDisabledColor {  
+  0% { background: #300; }
+  17% { background: #330; }
+  33% { background: #030; }
+  50% { background: #033; }
+  67% { background: #003; }
+  83% { background: #303; }
+  100% { background: #300; }
+}
+
+button.opalUpgradeButtonLight {
     background: white;
-    -webkit-animation-name: opalUpgradeButtonColor;  
+	color: #000;
+    -webkit-animation-name: opalUpgradeButtonLightColor;  
     -webkit-animation-iteration-count: infinite;  
     -webkit-animation-duration: 2s; 
 }
 
-button.opalUpgradeButton:disabled {
+button.opalUpgradeButtonDark {
+    background: black;
+	color: #FFF;
+    -webkit-animation-name: opalUpgradeButtonDarkColor;  
+    -webkit-animation-iteration-count: infinite;  
+    -webkit-animation-duration: 2s; 
+}
+
+button.opalUpgradeButtonLight:disabled {
     background: #AAA;
-    -webkit-animation-name: opalUpgradeButtonDisabledColor;  
+	color: #000;
+    -webkit-animation-name: opalUpgradeButtonLightDisabledColor;  
     -webkit-animation-iteration-count: infinite;  
     -webkit-animation-duration: 2s; 
 }
 
-button.optionButton {
+button.opalUpgradeButtonDark:disabled {
+    background: #333;
+	color: #FFF;
+    -webkit-animation-name: opalUpgradeButtonDarkDisabledColor;  
+    -webkit-animation-iteration-count: infinite;  
+    -webkit-animation-duration: 2s; 
+}
+
+button.optionButton, button.optionButtonRed {
 	border: 1px solid #000;
 	border-radius: 20px;
-	background: #C8C;
 	font-family: sans-serif;
 	font-size: 14px;
-	color: #000;
 	margin-top: 2.5px;
 	margin-bottom: 2.5px;
+}
+
+button.optionButtonLight {
+	background: #C8C;
+	color: #000;
+}
+
+button.optionButtonDark {
+	background: #838;
+	color: #FFF;
+}
+
+button.optionButtonRedLight {
+	background: #F88;
+	color: #000;
+}
+
+button.optionButtonRedDark {
+	background: #833;
+	color: #FFF;
 }
 
 div.messageBox {
 	display: block;
 	font-family: sans-serif;
+}
+
+div.messageBoxLight {
+	color: #000;
+}
+
+div.messageBoxDark {
+	color: #FFF;
 }
 
 span.messageBoxLarge {
