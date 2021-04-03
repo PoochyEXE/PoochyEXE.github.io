@@ -780,7 +780,7 @@ function InitUpgrades() {
 		new BallTypeUnlockUpgrade({
 			ball_type: kBallTypes[kBallTypeIDs.SAPPHIRE],
 			ball_description:
-				"Sapphire balls are worth the same as a gold ball, plus the gold ball multiplier is also applied to any bonus wheel spins earned.",
+				"Sapphire balls are worth the same as a gold ball, plus the gold ball multiplier is also applied to the number of bonus wheel spins earned by sapphire balls.",
 			collapsible_header: "gemstone_balls",
 			cost_func: GemstoneBallUnlockCost,
 			visible_func: ShouldDisplayGemstoneBallUpgrades
