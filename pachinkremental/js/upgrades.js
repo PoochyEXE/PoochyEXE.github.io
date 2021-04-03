@@ -3,6 +3,7 @@ class Upgrade {
 		id,
 		name,
 		category,
+		collapsible_header,
 		description,
 		cost_func,
 		value_func,
@@ -15,6 +16,11 @@ class Upgrade {
 		this.id = id;
 		this.name = name;
 		this.category = category;
+		if (collapsible_header) {
+			this.collapsible_header = collapsible_header;
+		} else {
+			this.collapsible_header = category;
+		}
 		this.description = description;
 		this.cost_func = cost_func;
 		if (value_func) {
@@ -112,6 +118,7 @@ class DelayReductionUpgrade extends Upgrade {
 		id,
 		name,
 		category,
+		collapsible_header,
 		description,
 		cost_func,
 		value_func,
@@ -125,6 +132,7 @@ class DelayReductionUpgrade extends Upgrade {
 			id,
 			name,
 			category,
+			collapsible_header,
 			description,
 			cost_func,
 			value_func,
@@ -173,6 +181,7 @@ class FeatureUnlockUpgrade extends Upgrade {
 		id,
 		name,
 		category,
+		collapsible_header,
 		description,
 		cost_func,
 		visible_func,
@@ -183,6 +192,7 @@ class FeatureUnlockUpgrade extends Upgrade {
 			id,
 			name,
 			category,
+			collapsible_header,
 			description,
 			cost_func,
 			value_func: null,
@@ -210,6 +220,7 @@ class FixedCostFeatureUnlockUpgrade extends FeatureUnlockUpgrade {
 		id,
 		name,
 		category,
+		collapsible_header,
 		description,
 		cost,
 		visible_func,
@@ -220,6 +231,7 @@ class FixedCostFeatureUnlockUpgrade extends FeatureUnlockUpgrade {
 			id,
 			name,
 			category,
+			collapsible_header,
 			description,
 			cost_func: () => cost,
 			visible_func,
@@ -234,6 +246,7 @@ class ToggleUnlockUpgrade extends FixedCostFeatureUnlockUpgrade {
 		id,
 		name,
 		category,
+		collapsible_header,
 		description,
 		cost,
 		visible_func,
@@ -244,6 +257,7 @@ class ToggleUnlockUpgrade extends FixedCostFeatureUnlockUpgrade {
 			id,
 			name,
 			category,
+			collapsible_header,
 			description,
 			cost,
 			visible_func,
@@ -297,11 +311,12 @@ class ToggleUnlockUpgrade extends FixedCostFeatureUnlockUpgrade {
 }
 
 class BallTypeUnlockUpgrade extends FeatureUnlockUpgrade {
-	constructor({ ball_type, ball_description, cost_func, visible_func }) {
+	constructor({ ball_type, ball_description, collapsible_header, cost_func, visible_func }) {
 		super({
 			id: `unlock_${ball_type.name}_balls`,
 			name: "Unlock " + ball_type.display_name + " Balls",
 			category: ball_type.name + "_balls",
+			collapsible_header: collapsible_header,
 			description:
 				"Unlock " + ball_type.name + " balls. " + ball_description,
 			cost_func,
@@ -316,11 +331,12 @@ class BallTypeUnlockUpgrade extends FeatureUnlockUpgrade {
 }
 
 class BallTypeRateUpgrade extends Upgrade {
-	constructor({ ball_type, cost_func, value_func, max_level }) {
+	constructor({ ball_type, collapsible_header, cost_func, value_func, max_level }) {
 		super({
 			id: ball_type.name + "_ball_rate",
 			name: ball_type.display_name + " Ball Rate",
 			category: ball_type.name + "_balls",
+			collapsible_header: collapsible_header,
 			description:
 				"Increases the probability of a ball being " +
 				ball_type.name +
@@ -376,6 +392,10 @@ function ShouldDisplayGemstoneBallUpgrades() {
 	return GetUpgradeLevel("gold_ball_rate") >= 19;
 }
 
+function NthGemstoneBallUnlockCost(n) {
+	return 1e12 * Math.pow(2000, n - 1);
+}
+
 function GemstoneBallUnlockCost() {
 	let prev_unlocks = 0;
 	if (state) {
@@ -398,7 +418,7 @@ function GemstoneBallUnlockCost() {
 			++prev_unlocks;
 		}
 	}
-	return 1e12 * Math.pow(2000, prev_unlocks);
+	return NthGemstoneBallUnlockCost(prev_unlocks + 1);
 }
 
 function Tier1GemstoneBallRateCostFunc(level) {
@@ -564,6 +584,7 @@ function InitUpgrades() {
 			ball_type: kBallTypes[kBallTypeIDs.GOLD],
 			ball_description:
 				"Gold balls are worth double points and don't count towards the max balls limit.",
+			collapsible_header: "gold_balls",
 			cost_func: () => 500000,
 			visible_func: () => GetUpgradeLevel("max_balls") > 0
 		})
@@ -598,7 +619,8 @@ function InitUpgrades() {
 		new FixedCostFeatureUnlockUpgrade({
 			id: "unlock_bonus_wheel",
 			name: "Unlock Bonus Wheel",
-			category: "bonus_wheel",
+			category: "bonus_wheel_basic",
+			collapsible_header: "bonus_wheel",
 			description:
 				"Unlocks the Bonus Wheel. Also adds 2 targets, which award a spin for each ball that passes through them. Point values on the wheel scale based on your upgrades.",
 			cost: 2000000,
@@ -620,7 +642,8 @@ function InitUpgrades() {
 		new FixedCostFeatureUnlockUpgrade({
 			id: "add_spin_target",
 			name: "Extra Spin Target",
-			category: "bonus_wheel",
+			category: "bonus_wheel_basic",
+			collapsible_header: "bonus_wheel",
 			description: "Adds an extra target that awards Bonus Wheel spins.",
 			cost: 10000000,
 			visible_func: () => IsUnlocked("unlock_bonus_wheel"),
@@ -641,7 +664,8 @@ function InitUpgrades() {
 		new ToggleUnlockUpgrade({
 			id: "auto_spin",
 			name: "Auto-Spin",
-			category: "bonus_wheel",
+			category: "bonus_wheel_basic",
+			collapsible_header: "bonus_wheel",
 			description: "Automatically spin the Bonus Wheel.",
 			cost: 50000000,
 			visible_func: () => IsUnlocked("unlock_bonus_wheel"),
@@ -652,7 +676,8 @@ function InitUpgrades() {
 		new ToggleUnlockUpgrade({
 			id: "multi_spin",
 			name: "Multi-Spin",
-			category: "bonus_wheel",
+			category: "bonus_wheel_basic",
+			collapsible_header: "bonus_wheel",
 			description:
 				"Uses 10% of your available spins at a time, multiplying any points you win from that spin. NOTE: Bonus gold ball drops are not multiplied.",
 			cost: 50000000,
@@ -661,10 +686,71 @@ function InitUpgrades() {
 		})
 	);
 	upgrades_list.push(
+		new FixedCostFeatureUnlockUpgrade({
+			id: "better_drops_1",
+			name: "Better Ball Drops",
+			category: "bonus_wheel_gemstone_balls",
+			collapsible_header: "bonus_wheel",
+			description:
+				'Change the "Drop 7 gold balls" space to "Drop 7 special balls". One gemstone ball of each type you have unlocked replaces one of the gold balls. This automatically updates as you unlock more gemstone balls.',
+			cost: NthGemstoneBallUnlockCost(1),
+			visible_func: AnyTier1GemstoneBallsUnlocked,
+			on_update: null
+		})
+	);
+	upgrades_list.push(
+		new FixedCostFeatureUnlockUpgrade({
+			id: "better_drops_2",
+			name: "Better Ball Drops 2",
+			category: "bonus_wheel_gemstone_balls",
+			collapsible_header: "bonus_wheel",
+			description:
+				'Change the "Drop 3 gold balls" space to "Drop 3 gemstone balls", which drops 1 Ruby, 1 Emerald, and 1 Sapphire ball.',
+			cost: NthGemstoneBallUnlockCost(3),
+			visible_func: AllTier1GemstoneBallsUnlocked,
+			on_update: null
+		})
+	);
+	upgrades_list.push(
+		new FixedCostFeatureUnlockUpgrade({
+			id: "better_drops_3",
+			name: "Better Ball Drops 3",
+			category: "bonus_wheel_gemstone_balls",
+			collapsible_header: "bonus_wheel",
+			description:
+				'Change the "Drop 3 gemstone balls" space to drop 1 Topaz, 1 Turquoise, and 1 Amethyst ball.',
+			cost: NthGemstoneBallUnlockCost(6),
+			visible_func: AllTier2GemstoneBallsUnlocked,
+			on_update: null
+		})
+	);
+	upgrades_list.push(
+		new Upgrade({
+			id: "bonus_wheel_speed",
+			name: "Wheel Speed",
+			category: "bonus_wheel_row3",
+			collapsible_header: "bonus_wheel",
+			description: "Makes bonus wheel spins play out faster.",
+			cost_func: level => 1e12 * Math.pow(10, level),
+			value_func: level => level * 0.1 + 1.0,
+			max_level: 20,
+			value_suffix: kTimesSymbol,
+			visible_func: () =>
+				IsUnlocked("better_drops_1") ||
+				IsUnlocked("better_drops_2") ||
+				IsUnlocked("better_drops_3"),
+			on_update: function() {
+				state.bonus_wheel_speed = this.GetValue();
+			},
+			on_buy: null
+		})
+	);
+	upgrades_list.push(
 		new BallTypeUnlockUpgrade({
 			ball_type: kBallTypes[kBallTypeIDs.RUBY],
 			ball_description:
 				"Ruby balls are worth the same as a gold ball, plus if a ruby ball falls in the center slot, it activates a buff that doubles all points scored for 60 seconds.",
+			collapsible_header: "gemstone_balls",
 			cost_func: GemstoneBallUnlockCost,
 			visible_func: ShouldDisplayGemstoneBallUpgrades
 		})
@@ -672,6 +758,7 @@ function InitUpgrades() {
 	upgrades_list.push(
 		new BallTypeRateUpgrade({
 			ball_type: kBallTypes[kBallTypeIDs.RUBY],
+			collapsible_header: "gemstone_balls",
 			cost_func: Tier1GemstoneBallRateCostFunc,
 			value_func: GemstoneBallRateValueFunc,
 			max_level: 49
@@ -682,6 +769,7 @@ function InitUpgrades() {
 			id: "ruby_ball_buff_stackable",
 			name: "Stackable Buff",
 			category: "ruby_balls",
+			collapsible_header: "gemstone_balls",
 			description:
 				"Makes the ruby ball buff stackable. If a ruby ball falls in the center slot while the buff is already active, it extends the duration. Any time over 60 seconds is converted to a multiplier increase. The time extension is inversely proportional to the existing multiplier.",
 			cost: 1e18,
@@ -693,6 +781,7 @@ function InitUpgrades() {
 			ball_type: kBallTypes[kBallTypeIDs.SAPPHIRE],
 			ball_description:
 				"Sapphire balls are worth the same as a gold ball, plus the gold ball multiplier is also applied to any bonus wheel spins earned.",
+			collapsible_header: "gemstone_balls",
 			cost_func: GemstoneBallUnlockCost,
 			visible_func: ShouldDisplayGemstoneBallUpgrades
 		})
@@ -700,6 +789,7 @@ function InitUpgrades() {
 	upgrades_list.push(
 		new BallTypeRateUpgrade({
 			ball_type: kBallTypes[kBallTypeIDs.SAPPHIRE],
+			collapsible_header: "gemstone_balls",
 			cost_func: Tier1GemstoneBallRateCostFunc,
 			value_func: GemstoneBallRateValueFunc,
 			max_level: 49
@@ -710,6 +800,7 @@ function InitUpgrades() {
 			id: "sapphire_ball_exponent",
 			name: "Sapphire Exponent",
 			category: "sapphire_balls",
+			collapsible_header: "gemstone_balls",
 			description: "Increases the exponent on the gold ball value multiplier for sapphire balls. Note: The number of spins earned per sapphire ball is rounded down to the nearest whole number.",
 			cost_func: level => 1e15 * Math.pow(5, level),
 			value_func: level => (level / 10.0) + 1,
@@ -727,6 +818,7 @@ function InitUpgrades() {
 			ball_type: kBallTypes[kBallTypeIDs.EMERALD],
 			ball_description:
 				"Points scored by emerald balls are multiplied by the square of the gold ball multiplier.",
+			collapsible_header: "gemstone_balls",
 			cost_func: GemstoneBallUnlockCost,
 			visible_func: ShouldDisplayGemstoneBallUpgrades
 		})
@@ -734,6 +826,7 @@ function InitUpgrades() {
 	upgrades_list.push(
 		new BallTypeRateUpgrade({
 			ball_type: kBallTypes[kBallTypeIDs.EMERALD],
+			collapsible_header: "gemstone_balls",
 			cost_func: Tier1GemstoneBallRateCostFunc,
 			value_func: GemstoneBallRateValueFunc,
 			max_level: 49
@@ -744,6 +837,7 @@ function InitUpgrades() {
 			id: "emerald_ball_exponent",
 			name: "Emerald Exponent",
 			category: "emerald_balls",
+			collapsible_header: "gemstone_balls",
 			description: "Increases the exponent on the gold ball value multiplier for emerald balls.",
 			cost_func: level => 1e15 * Math.pow(25, level),
 			value_func: level => (level / 10.0) + 2,
@@ -761,6 +855,7 @@ function InitUpgrades() {
 			ball_type: kBallTypes[kBallTypeIDs.TOPAZ],
 			ball_description:
 				"Topaz balls have the bonuses of both ruby and emerald balls.",
+			collapsible_header: "gemstone_balls",
 			cost_func: GemstoneBallUnlockCost,
 			visible_func: () =>
 				IsUnlocked("unlock_ruby_balls") &&
@@ -770,6 +865,7 @@ function InitUpgrades() {
 	upgrades_list.push(
 		new BallTypeRateUpgrade({
 			ball_type: kBallTypes[kBallTypeIDs.TOPAZ],
+			collapsible_header: "gemstone_balls",
 			cost_func: Tier2GemstoneBallRateCostFunc,
 			value_func: GemstoneBallRateValueFunc,
 			max_level: 49
@@ -780,6 +876,7 @@ function InitUpgrades() {
 			ball_type: kBallTypes[kBallTypeIDs.TURQUOISE],
 			ball_description:
 				"Turquoise balls have the bonuses of both emerald and sapphire balls.",
+			collapsible_header: "gemstone_balls",
 			cost_func: GemstoneBallUnlockCost,
 			visible_func: () =>
 				IsUnlocked("unlock_emerald_balls") &&
@@ -789,6 +886,7 @@ function InitUpgrades() {
 	upgrades_list.push(
 		new BallTypeRateUpgrade({
 			ball_type: kBallTypes[kBallTypeIDs.TURQUOISE],
+			collapsible_header: "gemstone_balls",
 			cost_func: Tier2GemstoneBallRateCostFunc,
 			value_func: GemstoneBallRateValueFunc,
 			max_level: 49
@@ -799,6 +897,7 @@ function InitUpgrades() {
 			ball_type: kBallTypes[kBallTypeIDs.AMETHYST],
 			ball_description:
 				"Amethyst balls have the bonuses of both ruby and sapphire balls.",
+			collapsible_header: "gemstone_balls",
 			cost_func: GemstoneBallUnlockCost,
 			visible_func: () =>
 				IsUnlocked("unlock_ruby_balls") &&
@@ -808,6 +907,7 @@ function InitUpgrades() {
 	upgrades_list.push(
 		new BallTypeRateUpgrade({
 			ball_type: kBallTypes[kBallTypeIDs.AMETHYST],
+			collapsible_header: "gemstone_balls",
 			cost_func: Tier2GemstoneBallRateCostFunc,
 			value_func: GemstoneBallRateValueFunc,
 			max_level: 49
@@ -818,6 +918,7 @@ function InitUpgrades() {
 			ball_type: kBallTypes[kBallTypeIDs.OPAL],
 			ball_description:
 				"Opal balls have the combined bonuses of ruby, sapphire, and emerald balls.",
+			collapsible_header: "gemstone_balls",
 			cost_func: GemstoneBallUnlockCost,
 			visible_func: AllTier2GemstoneBallsUnlocked
 		})
@@ -825,6 +926,7 @@ function InitUpgrades() {
 	upgrades_list.push(
 		new BallTypeRateUpgrade({
 			ball_type: kBallTypes[kBallTypeIDs.OPAL],
+			collapsible_header: "gemstone_balls",
 			cost_func: level => 5e24 * Math.pow(5, level),
 			value_func: GemstoneBallRateValueFunc,
 			max_level: 49
@@ -922,9 +1024,19 @@ function UpdateUpgradeButtons(state) {
 		if (elem.disabled != disabled) {
 			elem.disabled = disabled;
 		}
-		let display = upgrade.visible_func() ? "inline" : "none";
+		let visible = upgrade.visible_func();
+		let display = visible ? "inline" : "none";
 		if (elem.style.display != display) {
 			elem.style.display = display;
+			if (visible) {
+				let header = upgrade.collapsible_header;
+				if (IsCollapsed(header)) {
+					UpdateDisplay(header + "_header_new", "inline");
+				}
+				if (IsCollapsed("upgrades")) {
+					UpdateDisplay("upgrades_header_new", "inline");
+				}
+			}
 		}
 	}
 	UpdateUpgradeSubHeader("basic_upgrades_container", true);

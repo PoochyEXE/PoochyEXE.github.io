@@ -181,6 +181,7 @@ function InitState() {
 		sapphire_ball_exponent: 1.0,
 		emerald_ball_exponent: 2.0,
 		bonus_wheel: null,
+		bonus_wheel_speed: 1.0,
 		active_tooltip: null,
 		wheel_popup_text: new Array(0),
 		ripples: new Array(0),
@@ -239,12 +240,11 @@ function InitState() {
 			},
 		}
 	};
+	for (upgrade in state.upgrades) {
+		state.save_file.upgrade_levels[upgrade] = 0;
+	}
 	for (let i = 0; i < kBallTypes.length; ++i) {
 		state.save_file.stats[kBallTypes[i].name + "_balls"] = 0;
-		state.save_file.upgrade_levels[
-			"unlock_" + kBallTypes[i].name + "_balls"
-		] = 0;
-		state.save_file.upgrade_levels[kBallTypes[i].name + "_ball_rate"] = 0;
 		state.save_file.options[kBallTypes[i].name + "_ball_opacity"] = 100;
 	}
 	state.bonus_wheel = DefaultWheel(state);
@@ -355,7 +355,7 @@ function CanDrop(state) {
 
 function ToggleVisibility(panel_name) {
 	let id = panel_name.toLowerCase().replaceAll(" ", "_");
-	let header = document.getElementById("button_" + id + "_header");
+	let header = document.getElementById(id + "_header");
 	let contents = document.getElementById(id + "_contents");
 	if (contents.style.height == "0px") {
 		contents.style.height = "auto";
@@ -364,6 +364,19 @@ function ToggleVisibility(panel_name) {
 		contents.style.height = "0px";
 		header.innerHTML = "[+] " + panel_name;
 	}
+	let header_new = document.getElementById(id + "_header_new");
+	if (header_new) {
+		header_new.style.display = "none";
+	}
+}
+
+function IsCollapsed(panel_name) {
+	let contents = document.getElementById(panel_name + "_contents");
+	if (!contents) {
+		console.log(panel_name);
+		return undefined;
+	}
+	return contents.style.height == "0px";
 }
 
 function UpdateOneFrame(state, draw) {

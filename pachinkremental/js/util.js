@@ -87,15 +87,25 @@ class RisingText {
 
 function UpdateInnerHTML(elem_id, html) {
 	let elem = document.getElementById(elem_id);
-	if (elem.innerHTML != html) {
+	if (!elem) {
+		return false;
+	} else if (elem.innerHTML != html) {
 		elem.innerHTML = html;
+		return true;
+	} else {
+		return false;
 	}
 }
 
 function UpdateDisplay(elem_id, display) {
 	let elem = document.getElementById(elem_id);
-	if (elem.style.display != display) {
+	if (!elem) {
+		return false;
+	} else if (elem.style.display != display) {
 		elem.style.display = display;
+		return true;
+	} else {
+		return false;
 	}
 }
 

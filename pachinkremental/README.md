@@ -31,6 +31,11 @@ A: This is intentional, both to make sure the game won't softlock with too many 
 
 ## Changelog
 
+### v0.7.0 beta (2021-04-03)
+* New upgrade: Make bonus wheel spins play out faster.
+* QoL: Add a "New!" indicator that appears when a new upgrade becomes available while the section is collapsed.
+* Minor nerf: Bonus wheel ball drops scaling to gemstone ball unlocks are no longer automatic, but need to be purchased as upgrades.
+
 ### v0.6.3 beta (2021-04-02)
 * Added opacity sliders for each ball type.
 * Added the option to keep April Fools' Day mode on all the time.

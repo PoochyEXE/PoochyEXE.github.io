@@ -70,6 +70,11 @@ div.optionsContainer {
 	background: #FCF;
 }
 
+span.upgradeHeaderNew {
+	font-family: sans-serif;
+	color: #F00;
+}
+
 button.upgradesHeader, button.upgradesSubHeader, button.statsHeader, button.optionsHeader {
 	width: 100%;
 	border: none;

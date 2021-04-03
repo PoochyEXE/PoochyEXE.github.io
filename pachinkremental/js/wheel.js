@@ -54,8 +54,9 @@ class BonusWheel {
 		if (!this.IsSpinning()) {
 			return;
 		}
-		const kDecel = 0.001; // 0.002 revs/sec/sec
-		let delta = Math.sqrt(kDecel * this.spin_distance);
+		const kBaseDecel = 0.001; // 0.002 revs/frame/frame
+		let decel = kBaseDecel * state.bonus_wheel_speed;
+		let delta = Math.sqrt(decel * this.spin_distance);
 		if (this.spin_distance <= delta) {
 			this.Rotate(this.spin_distance);
 			this.spin_distance = 0;
@@ -139,12 +140,12 @@ function DefaultWheel() {
 		new BonusWheelSpace({
 			active_color: "#F8F",
 			text_func: () =>
-				AllTier1GemstoneBallsUnlocked()
+				IsUnlocked("better_drops_2")
 					? "Drop 3 gemstone balls"
 					: "Drop 3 gold balls",
 
 			on_hit_func: () => {
-				if (AllTier2GemstoneBallsUnlocked()) {
+				if (IsUnlocked("better_drops_3")) {
 					DropBonusBalls(
 						ShuffleArray([
 							kBallTypeIDs.TOPAZ,
@@ -157,7 +158,7 @@ function DefaultWheel() {
 						pos: kWheelPopupTextPos,
 						color_rgb: kWheelPopupTextColor
 					});
-				} else if (AllTier1GemstoneBallsUnlocked()) {
+				} else if (IsUnlocked("better_drops_2")) {
 					DropBonusBalls(
 						ShuffleArray([
 							kBallTypeIDs.RUBY,
@@ -202,16 +203,16 @@ function DefaultWheel() {
 		new BonusWheelSpace({
 			active_color: "#FF8",
 			text_func: () => {
-				if (IsUnlocked("unlock_opal_balls")) {
-					return "Drop 7 gemstone balls";
-				} else if (AnyTier1GemstoneBallsUnlocked()) {
-					return "Drop 7 special balls";
-				} else {
+				if (!IsUnlocked("better_drops_1")) {
 					return "Drop 7 gold balls";
+				} else if (IsUnlocked("unlock_opal_balls")) {
+					return "Drop 7 gemstone balls";
+				} else {
+					return "Drop 7 special balls";
 				}
 			},
 			on_hit_func: () => {
-				if (AnyTier1GemstoneBallsUnlocked()) {
+				if (IsUnlocked("better_drops_1")) {
 					let bonus_balls = [];
 					bonus_balls.push(
 						IsUnlocked("unlock_ruby_balls")

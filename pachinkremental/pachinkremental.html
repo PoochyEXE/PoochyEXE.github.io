@@ -49,36 +49,56 @@
 			<td class="rightUI" style="vertical-align: bottom;">
 				<div id="upgrades_container" class="upgradesContainer">
 					<button type="button" class="upgradesHeader"
-							id="button_upgrades_header" onclick="ToggleVisibility('Upgrades')">[&ndash;] Upgrades</button>
+							id="button_upgrades_header" onclick="ToggleVisibility('Upgrades')">
+						<span id="upgrades_header">[&ndash;] Upgrades</span>
+						<span id="upgrades_header_new" class="upgradeHeaderNew" style="display: none;"><sup>New!</sup></span>
+					</button>
 					<div id="upgrades_contents" class="upgradesContents">
 						<div class="menuPadding"></div>
 						Hover over an upgrade to see what it does.
 						<div class="menuPadding"></div>
 						<div id="basic_upgrades_container" class="upgradesContainer" style="display: inline-block;">
 							<button type="button" class="upgradesSubHeader"
-									id="button_board_header" onclick="ToggleVisibility('Board')">[&ndash;] Board</button>
+									id="button_board_header" onclick="ToggleVisibility('Board')">
+								<span id="board_header">[&ndash;] Board</span>
+								<span id="board_header_new" class="upgradeHeaderNew" style="display: none;"><sup>New!</sup></span>
+							</button>
 							<div id="board_contents" class="upgradesContents" style="display: block;"></div>
 						</div>
-						<br>
 						<div id="auto-drop_upgrades_container" class="upgradesContainer" style="display: none;">
 							<button type="button" class="upgradesSubHeader"
-									id="button_auto-drop_header" onclick="ToggleVisibility('Auto-Drop')">[&ndash;] Auto-Drop</button>
+									id="button_auto-drop_header" onclick="ToggleVisibility('Auto-Drop')">
+								<span id="auto-drop_header">[&ndash;] Auto-Drop</span>
+								<span id="auto-drop_header_new" class="upgradeHeaderNew" style="display: none;"><sup>New!</sup></span>
+							</button>
 							<div id="auto-drop_contents" class="upgradesContents" style="display: block;"></div>
 						</div>
 						<div id="bonus_wheel_upgrades_container" class="upgradesContainer" style="display: none;">
 							<button type="button" class="upgradesSubHeader"
-									id="button_bonus_wheel_header" onclick="ToggleVisibility('Bonus Wheel')">[&ndash;] Bonus Wheel</button>
-							<div id="bonus_wheel_contents" class="upgradesContents" style="display: block;"></div>
+									id="button_bonus_wheel_header" onclick="ToggleVisibility('Bonus Wheel')">
+								<span id="bonus_wheel_header">[&ndash;] Bonus Wheel</span>
+								<span id="bonus_wheel_header_new" class="upgradeHeaderNew" style="display: none;"><sup>New!</sup></span>
+							</button>
+							<div id="bonus_wheel_contents" class="upgradesContents" style="display: block;">
+								<div id="bonus_wheel_basic_contents" class="upgradesContents" style="display: block;"></div>
+								<div id="bonus_wheel_gemstone_balls_contents" class="upgradesContents" style="display: block;"></div>
+								<div id="bonus_wheel_row3_contents" class="upgradesContents" style="display: block;"></div>
+							</div>
 						</div>
-						<br>
 						<div id="gold_balls_upgrades_container" class="upgradesContainer" style="display: none;">
 							<button type="button" class="upgradesSubHeader"
-									id="button_gold_balls_header" onclick="ToggleVisibility('Gold Balls')">[&ndash;] Gold Balls</button>
+									id="button_gold_balls_header" onclick="ToggleVisibility('Gold Balls')">
+								<span id="gold_balls_header">[&ndash;] Gold Balls</span>
+								<span id="gold_balls_header_new" class="upgradeHeaderNew" style="display: none;"><sup>New!</sup></span>
+							</button>
 							<div id="gold_balls_contents" class="upgradesContents" style="display: block;"></div>
 						</div>
 						<div id="gemstone_balls_upgrades_container" class="upgradesContainer" style="display: none;">
 							<button type="button" class="upgradesSubHeader"
-									id="button_gemstone_balls_header" onclick="ToggleVisibility('Gemstone Balls')">[&ndash;] Gemstone Balls</button>
+									id="button_gemstone_balls_header" onclick="ToggleVisibility('Gemstone Balls')">
+								<span id="gemstone_balls_header">[&ndash;] Gemstone Balls</span>
+								<span id="gemstone_balls_header_new" class="upgradeHeaderNew" style="display: none;"><sup>New!</sup></span>
+							</button>
 							<div id="gemstone_balls_contents" class="upgradesContents" style="display: block;">
 								<div id="gemstone_balls_note" style="padding-top: 5px; padding-bottom: 5px;">Gemstone balls have the benefits of gold balls, plus additional bonuses.<br>NOTE: Unlocking one gemstone ball sharply increases the cost of unlocking the others!</div>
 								<div id="ruby_balls_contents" class="upgradesContents" style="display: block;"></div>
@@ -94,7 +114,9 @@
 				</div>
 				<div id="stats_container" class="statsContainer">
 					<button type="button" class="statsHeader"
-							id="button_stats_header" onclick="ToggleVisibility('Stats')">[+] Stats</button>
+							id="button_stats_header" onclick="ToggleVisibility('Stats')">
+						<span id="stats_header">[+] Stats</span>
+					</button>
 					<div id="stats_contents" class="statsContents" style="height: 0px;">
 						<div class="menuPadding"></div>
 						<div id="stats_container_total_score" class="statsRow" style="display: block;">
@@ -144,7 +166,9 @@
 				</div>
 				<div id="options_container" class="optionsContainer">
 					<button type="button" class="optionsHeader"
-							id="button_options_header" onclick="ToggleVisibility('Options')">[+] Options</button>
+							id="button_options_header" onclick="ToggleVisibility('Options')">
+						<span id="options_header">[+] Options</span>
+					</button>
 					<div id="options_contents" class="optionsContents" style="height: 0px;">
 						<div class="menuPadding"></div>
 						<button type="button" class="optionButton"
