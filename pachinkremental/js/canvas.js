@@ -3,23 +3,41 @@ const kPegColor = {
 	outer: "#000"
 };
 
+const kPegColorDarkMode = {
+	inner: "#AAA",
+	outer: "#333"
+};
+
 const kPrismatic = "PRISMATIC";
 
-function GetPrismaticColor(start_time, time_now, cycle_duration, saturation) {
-	const kCycleColors = [
-		[0, 1, 0],
-		[0, 1, 1],
-		[0, 0, 1],
-		[1, 0, 1],
-		[1, 0, 0],
-		[1, 1, 0]
-	];
-	let point_in_cycle =
-		((time_now - start_time) * kCycleColors.length) / cycle_duration;
+const kPrismaticCycleColors = [
+	[0, 1, 0],
+	[0, 1, 1],
+	[0, 0, 1],
+	[1, 0, 1],
+	[1, 0, 0],
+	[1, 1, 0]
+];
+
+function GetPegColor() {
+	if (state.save_file.options.dark_mode && !state.april_fools) {
+		return kPegColorDarkMode;
+	} else {
+		return kPegColor;
+	}
+}
+
+function ToRGBAString(r, g, b, a) {
+	return "rgba(" + r + ", " + g + ", " + b + ", " + a + ")";
+}
+
+function GetPrismaticColor(time_elapsed, cycle_duration, saturation, alpha) {
+	const kCycleLength = kPrismaticCycleColors.length;
+	let point_in_cycle = (time_elapsed * kCycleLength) / cycle_duration;
 	let index_before = Math.floor(point_in_cycle);
 	let fraction = point_in_cycle - index_before;
-	let color_before = kCycleColors[index_before % kCycleColors.length];
-	let color_after = kCycleColors[(index_before + 1) % kCycleColors.length];
+	let color_before = kPrismaticCycleColors[index_before % kCycleLength];
+	let color_after = kPrismaticCycleColors[(index_before + 1) % kCycleLength];
 	let color_rgb = [0, 0, 0];
 	let lo = Math.round((1 - saturation) * 255);
 	for (let i = 0; i < 3; ++i) {
@@ -27,7 +45,70 @@ function GetPrismaticColor(start_time, time_now, cycle_duration, saturation) {
 			color_before[i] * (1 - fraction) + color_after[i] * fraction;
 		color_rgb[i] = Math.round(lo + (255 - lo) * channel_fraction);
 	}
-	return color_rgb[0] + ", " + color_rgb[1] + ", " + color_rgb[2];
+	return ToRGBAString(color_rgb[0], color_rgb[1], color_rgb[2], alpha);
+}
+
+function DrawPrismaticBalls(balls, ctx) {
+	const kPrismaticSaturationOuter = 0.8;
+	const kPrismaticSaturationInner = 0.25;
+	const kPrismaticCycleDuration = 1000.0;
+	const time = Date.now();
+	for (let i = 0; i < balls.length; ++i) {
+		let time_elapsed = time - balls[i].start_time;
+		let pos = balls[i].pos;
+		let inner_color = GetPrismaticColor(
+			time_elapsed,
+			kPrismaticCycleDuration,
+			kPrismaticSaturationInner,
+			/*alpha=*/1.0
+		);
+		let outer_color = GetPrismaticColor(
+			time_elapsed,
+			kPrismaticCycleDuration,
+			kPrismaticSaturationOuter,
+			/*alpha=*/1.0
+		);
+		
+		let inner_x = pos.x - kBallRadius / 3;
+		let inner_y = pos.y - kBallRadius / 3;
+		let inner_r = kBallRadius / 10;
+		let outer_x = pos.x;
+		let outer_y = pos.y;
+		let outer_r = kBallRadius;
+		let gradient = ctx.createRadialGradient(
+			inner_x,
+			inner_y,
+			inner_r,
+			outer_x,
+			outer_y,
+			outer_r
+		);
+		gradient.addColorStop(0, inner_color);
+		const kCycleLength = kPrismaticCycleColors.length;
+		let point_in_cycle =
+			(time_elapsed * kCycleLength) / kPrismaticCycleDuration;
+		let color_stop =
+			(1.0 - point_in_cycle + Math.floor(point_in_cycle)) / kCycleLength;
+		let color_stop_interval = 1.0 / kCycleLength;
+		while (color_stop < 1.0) {
+			let saturation =
+				kPrismaticSaturationOuter * color_stop +
+				kPrismaticSaturationInner * (1.0 - color_stop);
+			let color_rgba = GetPrismaticColor(
+				time_elapsed + (1.0 - color_stop) * kPrismaticCycleDuration,
+				kPrismaticCycleDuration,
+				saturation,
+				/*alpha=*/1.0
+			);
+			gradient.addColorStop(color_stop, color_rgba);
+			color_stop += color_stop_interval;
+		}
+		gradient.addColorStop(1, outer_color);
+		ctx.fillStyle = gradient;
+		ctx.beginPath();
+		ctx.arc(pos.x, pos.y, kBallRadius, 0, 2 * Math.PI);
+		ctx.fill();
+	}
 }
 
 function DrawGradientCircle(ctx, pos, radius, inner_color, outer_color) {
@@ -112,24 +193,34 @@ function ResizeCanvas() {
 }
 
 function DrawPegs(positions, ctx) {
+	let peg_color = GetPegColor();
 	for (let i = 0; i < positions.length; ++i) {
 		DrawGradientCircle(
 			ctx,
 			positions[i],
 			kPegRadius,
-			kPegColor.inner,
-			kPegColor.outer
+			peg_color.inner,
+			peg_color.outer
 		);
 	}
 }
 
 function DrawPegsNoGradient(positions, ctx) {
+	let peg_color = GetPegColor();
 	for (let i = 0; i < positions.length; ++i) {
-		DrawCircle(ctx, positions[i], kPegRadius, kPegColor.outer);
+		DrawCircle(ctx, positions[i], kPegRadius, peg_color.outer);
 	}
 }
 
 function DrawBalls(balls, inner_color, outer_color, ctx) {
+	if (
+		!state.save_file.options.classic_opal_balls &&
+		inner_color == kPrismatic &&
+		outer_color == kPrismatic
+	) {
+		DrawPrismaticBalls(balls, ctx);
+		return;
+	}
 	const kPrismaticSaturationOuter = 0.8;
 	const kPrismaticSaturationInner = 0.25;
 	const kPrismaticCycleDuration = 2000.0;
@@ -138,27 +229,21 @@ function DrawBalls(balls, inner_color, outer_color, ctx) {
 	for (let i = 0; i < balls.length; ++i) {
 		let inner_color_rgb = inner_color;
 		if (inner_color == kPrismatic) {
-			inner_color_rgb =
-				"rgb(" +
-				GetPrismaticColor(
-					balls[i].start_time,
-					time + kPrismaticCycleShift,
-					kPrismaticCycleDuration,
-					/*saturation=*/ kPrismaticSaturationInner
-				) +
-				")";
+			inner_color_rgb = GetPrismaticColor(
+				time + kPrismaticCycleShift - balls[i].start_time,
+				kPrismaticCycleDuration,
+				/*saturation=*/ kPrismaticSaturationInner,
+				/*alpha=*/1.0
+			);
 		}
 		let outer_color_rgb = outer_color;
 		if (outer_color == kPrismatic) {
-			outer_color_rgb =
-				"rgb(" +
-				GetPrismaticColor(
-					balls[i].start_time,
-					time,
-					kPrismaticCycleDuration,
-					/*saturation=*/ kPrismaticSaturationOuter
-				) +
-				")";
+			outer_color_rgb = GetPrismaticColor(
+				time - balls[i].start_time,
+				kPrismaticCycleDuration,
+				/*saturation=*/ kPrismaticSaturationOuter,
+				/*alpha=*/1.0
+			);
 		}
 		DrawGradientCircle(
 			ctx,
@@ -178,14 +263,12 @@ function DrawBallsNoGradient(balls, color, ctx) {
 		let color_rgb = color;
 		if (color == kPrismatic) {
 			color_rgb =
-				"rgb(" +
 				GetPrismaticColor(
-					balls[i].start_time,
-					time,
+					time - balls[i].start_time,
 					kPrismaticCycleDuration,
-					/*saturation=*/ kPrismaticSaturation
-				) +
-				")";
+					/*saturation=*/ kPrismaticSaturation,
+					/*alpha=*/1.0
+				);
 		}
 		DrawCircle(ctx, balls[i].pos, kBallRadius, color_rgb);
 	}
@@ -226,18 +309,20 @@ function DrawScoreText(score_text, font_size, duration, rise, ctx) {
 			continue;
 		}
 		let fraction = elapsed / duration;
-		let color_rgb = curr_text.color_rgb;
-		if (color_rgb == kPrismatic) {
-			color_rgb = GetPrismaticColor(
-				curr_text.start_time,
-				time,
+		let color_rgba = "";
+		if (curr_text.color_rgb == kPrismatic) {
+			color_rgba = GetPrismaticColor(
+				elapsed,
 				duration / 2,
-				/*saturation=*/ kPrismaticSaturation
+				/*saturation=*/ kPrismaticSaturation,
+				/*alpha=*/ 1 - fraction
 			);
+		} else {
+			color_rgba = "rgba(" + curr_text.color_rgb + ", " + (1 - fraction) + ")";
 		}
 		ctx.textAlign = "center";
 		ctx.font = "bold " + font_size + "px sans-serif";
-		ctx.fillStyle = "rgba(" + color_rgb + ", " + (1 - fraction) + ")";
+		ctx.fillStyle = color_rgba;
 		ctx.fillText(
 			curr_text.text,
 			curr_text.pos.x,
@@ -264,17 +349,19 @@ function DrawRipples(ripples, duration, expand, ctx) {
 			continue;
 		}
 		let fraction = elapsed / duration;
-		let color_rgb = curr_ripples.color_rgb;
-		if (color_rgb == kPrismatic) {
-			color_rgb = GetPrismaticColor(
-				curr_ripples.start_time,
-				time,
+		let color_rgba = "";
+		if (curr_ripples.color_rgb == kPrismatic) {
+			color_rgba = GetPrismaticColor(
+				elapsed,
 				duration / 2,
-				/*saturation=*/ kPrismaticSaturation
+				/*saturation=*/ kPrismaticSaturation,
+				/*alpha=*/ 1 - fraction
 			);
+		} else {
+			color_rgba = "rgba(" + curr_ripples.color_rgb + ", " + (1 - fraction) + ")";
 		}
 		let radius = curr_ripples.start_radius + expand * fraction;
-		ctx.strokeStyle = "rgba(" + color_rgb + ", " + (1 - fraction) + ")";
+		ctx.strokeStyle = color_rgba;
 		ctx.beginPath();
 		ctx.arc(curr_ripples.pos.x, curr_ripples.pos.y, radius, 0, 2 * Math.PI);
 		ctx.stroke();

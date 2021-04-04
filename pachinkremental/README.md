@@ -31,7 +31,11 @@ A: This is intentional, both to make sure the game won't softlock with too many 
 
 ## Changelog
 
-### v0.7.0 beta (2021-04-03)
+### v0.7.2 beta (2021-04-04)
+* Fix pegs being too dark to see in dark mode + low quality mode...except when April Fools is active.
+* New effect for Opal balls to make them easier to distinguish from other gemstone balls. You can still use the old style in the options, if you like.
+
+### v0.7.1 beta (2021-04-03)
 * New QoL feature: Dark mode! It can be toggled in the options.
 
 ### v0.7.0 beta (2021-04-03)

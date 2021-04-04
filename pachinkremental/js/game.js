@@ -1,4 +1,4 @@
-const kVersion = "v0.7.1 beta";
+const kVersion = "v0.7.2 beta";
 const kTitleAndVersion = "Pachinkremental " + kVersion;
 
 var max_drop_y = 20;
@@ -235,6 +235,7 @@ function InitState() {
 				auto_spin_enabled: false,
 				multi_spin_enabled: false,
 				dark_mode: false,
+				classic_opal_balls: false,
 				april_fools_enabled: 0,
 				quality: 0,
 				display_popup_text: 0,
@@ -374,7 +375,6 @@ function ToggleVisibility(panel_name) {
 function IsCollapsed(panel_name) {
 	let contents = document.getElementById(panel_name + "_contents");
 	if (!contents) {
-		console.log(panel_name);
 		return undefined;
 	}
 	return contents.style.height == "0px";
@@ -499,22 +499,16 @@ function UpdateDarkMode() {
 		document.body.style.backgroundColor = "#FFF";
 		color_scheme = "light";
 	}
-	console.log(color_scheme);
 	
 	for (let i = 0; i < kColorSchemeClasses.length; ++i) {
 		let class_mapping = kColorSchemeClasses[i];
-		console.log(class_mapping);
 		let elems = document.getElementsByClassName(class_mapping.base);
 		for (let j = elems.length - 1; j >= 0; --j) {
 			let elem = elems[j];
-			console.log("elem: " + elem.id);
 			for (let k = 0; k < kColorSchemes.length; ++k) {
-				console.log("kColorSchemes[k]: " + kColorSchemes[k]);
 				if (kColorSchemes[k] == color_scheme) {
-					console.log("add: " + class_mapping[kColorSchemes[k]]);
 					elem.classList.add(class_mapping[kColorSchemes[k]]);
 				} else {
-					console.log("remove: " + class_mapping[kColorSchemes[k]]);
 					elem.classList.remove(class_mapping[kColorSchemes[k]]);
 				}
 			}

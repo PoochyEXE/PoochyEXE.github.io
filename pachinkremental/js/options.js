@@ -70,6 +70,9 @@ function InitOptions(state) {
 		html += 'value="' + state.save_file.options[id] + '" ';
 		html += 'id="' + id + '" name="' + id + '">';
 		html += '<label for="' + id + '">' + display_name + '</label>';
+		if (kBallTypes[i].name == "opal") {
+			html += '&nbsp;<button type="button" class="optionButton" id="button_classic_opal_balls" onclick="ToggleBooleanOption(\'classic_opal_balls\')">Opal Balls</button>'
+		}
 		html += '</div>';
 	}
 	opacity_div.innerHTML = html;
@@ -225,6 +228,8 @@ function UpdateOptionsButtons() {
 		"Pop-up text: " + kPopupTextOptions[state.save_file.options.display_popup_text];
 	document.getElementById("button_april_fools").innerHTML =
 		"April Fools: " + kAprilFoolsOptions[state.save_file.options.april_fools_enabled];
+	document.getElementById("button_classic_opal_balls").innerHTML =
+		"Style: " + (state.save_file.options.classic_opal_balls ? "Classic" : "Default");
 }
 
 function UpdateAutoSaveInterval() {
@@ -281,6 +286,11 @@ function ToggleDarkMode() {
 	state.save_file.options.dark_mode = !state.save_file.options.dark_mode;
 	state.redraw_all = true;
 	UpdateDarkMode();
+	UpdateOptionsButtons();
+}
+
+function ToggleBooleanOption(id) {
+	state.save_file.options[id] = !state.save_file.options[id];
 	UpdateOptionsButtons();
 }
 
