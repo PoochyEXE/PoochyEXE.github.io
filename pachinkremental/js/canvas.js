@@ -81,7 +81,7 @@ function DrawPrismaticBalls(balls, ctx) {
 			time_elapsed, kCycleDuration, kSaturationOuter, /*alpha=*/1.0
 		);
 		let glow_color = GetPrismaticColorRGB(
-			time_elapsed, kCycleDuration, kSaturationOuter
+			time_elapsed + kCycleDuration / 2.0, kCycleDuration, kSaturationOuter
 		);
 		DrawGlow(
 			pos, glow_color, kGlowAlpha, kBallRadius, kBallRadius + kGlowSize, ctx
