@@ -27,11 +27,7 @@ function GetPegColor() {
 	}
 }
 
-function ToRGBAString(r, g, b, a) {
-	return "rgba(" + r + ", " + g + ", " + b + ", " + a + ")";
-}
-
-function GetPrismaticColor(time_elapsed, cycle_duration, saturation, alpha) {
+function GetPrismaticColorRGB(time_elapsed, cycle_duration, saturation) {
 	const kCycleLength = kPrismaticCycleColors.length;
 	let point_in_cycle = (time_elapsed * kCycleLength) / cycle_duration;
 	let index_before = Math.floor(point_in_cycle);
@@ -45,28 +41,50 @@ function GetPrismaticColor(time_elapsed, cycle_duration, saturation, alpha) {
 			color_before[i] * (1 - fraction) + color_after[i] * fraction;
 		color_rgb[i] = Math.round(lo + (255 - lo) * channel_fraction);
 	}
-	return ToRGBAString(color_rgb[0], color_rgb[1], color_rgb[2], alpha);
+	return color_rgb[0] + ", " + color_rgb[1] + ", " + color_rgb[2];
+}
+
+function GetPrismaticColor(time_elapsed, cycle_duration, saturation, alpha) {
+	let color_rgb = GetPrismaticColorRGB(time_elapsed, cycle_duration, saturation);
+	return "rgba(" + color_rgb + ", " + alpha + ")";
+}
+
+function DrawGlow(pos, color_rgb, alpha, inner_radius, outer_radius, ctx) {
+	let inner_color = "rgba(" + color_rgb + ", " + alpha + ")";
+	let outer_color = "rgba(" + color_rgb + ", 0)";
+	let gradient = ctx.createRadialGradient(
+		pos.x, pos.y, inner_radius, pos.x, pos.y, outer_radius
+	);
+	gradient.addColorStop(0, outer_color);
+	gradient.addColorStop(1e-7, inner_color);
+	gradient.addColorStop(1, outer_color);
+	ctx.fillStyle = gradient;
+	ctx.beginPath();
+	ctx.arc(pos.x, pos.y, outer_radius, 0, 2 * Math.PI);
+	ctx.fill();
 }
 
 function DrawPrismaticBalls(balls, ctx) {
-	const kPrismaticSaturationOuter = 0.8;
-	const kPrismaticSaturationInner = 0.25;
-	const kPrismaticCycleDuration = 1000.0;
+	const kSaturationOuter = 0.8;
+	const kSaturationInner = 0.25;
+	const kCycleDuration = 1000.0;
+	const kGlowSize = 3;
+	const kGlowAlpha = 0.5;
 	const time = Date.now();
 	for (let i = 0; i < balls.length; ++i) {
 		let time_elapsed = time - balls[i].start_time;
 		let pos = balls[i].pos;
 		let inner_color = GetPrismaticColor(
-			time_elapsed,
-			kPrismaticCycleDuration,
-			kPrismaticSaturationInner,
-			/*alpha=*/1.0
+			time_elapsed, kCycleDuration, kSaturationInner, /*alpha=*/1.0
 		);
 		let outer_color = GetPrismaticColor(
-			time_elapsed,
-			kPrismaticCycleDuration,
-			kPrismaticSaturationOuter,
-			/*alpha=*/1.0
+			time_elapsed, kCycleDuration, kSaturationOuter, /*alpha=*/1.0
+		);
+		let glow_color = GetPrismaticColorRGB(
+			time_elapsed, kCycleDuration, kSaturationOuter
+		);
+		DrawGlow(
+			pos, glow_color, kGlowAlpha, kBallRadius, kBallRadius + kGlowSize, ctx
 		);
 		
 		let inner_x = pos.x - kBallRadius / 3;
@@ -85,18 +103,17 @@ function DrawPrismaticBalls(balls, ctx) {
 		);
 		gradient.addColorStop(0, inner_color);
 		const kCycleLength = kPrismaticCycleColors.length;
-		let point_in_cycle =
-			(time_elapsed * kCycleLength) / kPrismaticCycleDuration;
+		let point_in_cycle = (time_elapsed * kCycleLength) / kCycleDuration;
 		let color_stop =
 			(1.0 - point_in_cycle + Math.floor(point_in_cycle)) / kCycleLength;
 		let color_stop_interval = 1.0 / kCycleLength;
 		while (color_stop < 1.0) {
 			let saturation =
-				kPrismaticSaturationOuter * color_stop +
-				kPrismaticSaturationInner * (1.0 - color_stop);
+				kSaturationOuter * color_stop +
+				kSaturationInner * (1.0 - color_stop);
 			let color_rgba = GetPrismaticColor(
-				time_elapsed + (1.0 - color_stop) * kPrismaticCycleDuration,
-				kPrismaticCycleDuration,
+				time_elapsed + (1.0 - color_stop) * kCycleDuration,
+				kCycleDuration,
 				saturation,
 				/*alpha=*/1.0
 			);
