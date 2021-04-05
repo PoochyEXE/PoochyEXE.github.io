@@ -61,7 +61,7 @@ function InitOptions(state) {
 	html = "<b>Opacity:</b>";
 	for (let i = 0; i < kBallTypes.length; ++i) {
 		let id = kBallTypes[i].name + "_ball_opacity";
-		let display_name = kBallTypes[i].display_name + " Balls"
+		let display_name = kBallTypes[i].display_name + "Balls"
 		let default_display = (i > 0) ? "none" : "block";
 		html += '<div id="' + id + '_wrapper" class="opacitySlider" ';
 		html += 'style="display: ' + default_display + ';">';
@@ -160,6 +160,7 @@ function LoadGame(save_file_str) {
 		UpdateUpgradeButtons(state);
 		UpdateOptionsButtons();
 		UpdateAutoSaveInterval();
+		UpdateDarkMode();
 		UpdateOpacitySlidersFromSaveFile(state.save_file);
 		state.notifications.push(new Notification("Game loaded", "#8F8"));
 	} else {

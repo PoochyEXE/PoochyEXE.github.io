@@ -314,11 +314,11 @@ class BallTypeUnlockUpgrade extends FeatureUnlockUpgrade {
 	constructor({ ball_type, ball_description, collapsible_header, cost_func, visible_func }) {
 		super({
 			id: `unlock_${ball_type.name}_balls`,
-			name: "Unlock " + ball_type.display_name + " Balls",
+			name: "Unlock " + ball_type.display_name + "Balls",
 			category: ball_type.name + "_balls",
 			collapsible_header: collapsible_header,
 			description:
-				"Unlock " + ball_type.name + " balls. " + ball_description,
+				"Unlock " + ball_type.display_name + "balls. " + ball_description,
 			cost_func,
 			visible_func,
 			on_update: () => {
@@ -334,13 +334,12 @@ class BallTypeRateUpgrade extends Upgrade {
 	constructor({ ball_type, collapsible_header, cost_func, value_func, max_level }) {
 		super({
 			id: ball_type.name + "_ball_rate",
-			name: ball_type.display_name + " Ball Rate",
+			name: ball_type.display_name + "Ball Rate",
 			category: ball_type.name + "_balls",
 			collapsible_header: collapsible_header,
 			description:
-				"Increases the probability of a ball being " +
-				ball_type.name +
-				".",
+				"Increases the probability of dropping " +
+				ball_type.display_name + "balls.",
 			cost_func: cost_func,
 			value_func: value_func,
 			max_level: max_level,
@@ -355,14 +354,14 @@ class BallTypeRateUpgrade extends Upgrade {
 	}
 }
 
-function ActivateOrExtendDoubleScoreBuff() {
+function ActivateOrExtendScoreBuff(multiplier) {
 	const kBuffDuration = 60000.0;
 	if (!IsUnlocked("ruby_ball_buff_stackable") || state.save_file.score_buff_duration <= 0.0 || state.save_file.score_buff_multiplier <= 1.0) {
-		state.save_file.score_buff_multiplier = 2.0;
+		state.save_file.score_buff_multiplier = multiplier;
 		state.save_file.score_buff_duration = kBuffDuration;
 	} else {
 		let stacks = state.save_file.score_buff_multiplier - 1.0;
-		state.save_file.score_buff_duration += (kBuffDuration / stacks);
+		state.save_file.score_buff_duration += (kBuffDuration / stacks) * (multiplier - 1.0);
 		if (state.save_file.score_buff_duration > kBuffDuration) {
 			state.save_file.score_buff_multiplier *= (state.save_file.score_buff_duration / kBuffDuration);
 			state.save_file.score_buff_duration = kBuffDuration;
@@ -384,7 +383,16 @@ function OnCenterSlotHit(ball) {
 			pos: text_pos,
 			color_rgb: "255,0,0"
 		});
-		ActivateOrExtendDoubleScoreBuff();
+		ActivateOrExtendScoreBuff(2.0);
+	} else if (ball.ball_type_index == kBallTypeIDs.EIGHT_BALL) {
+		let text_pos = new Point(ball.pos.x, ball.pos.y - 10);
+		MaybeAddScoreText({
+			level: 2,
+			text: "8\u00D7 scoring!",
+			pos: text_pos,
+			color_rgb: k8BallHighlightColor
+		});
+		ActivateOrExtendScoreBuff(8.0);
 	}
 }
 
@@ -932,6 +940,27 @@ function InitUpgrades() {
 			max_level: 49
 		})
 	);
+	upgrades_list.push(
+		new BallTypeUnlockUpgrade({
+			ball_type: kBallTypes[kBallTypeIDs.EIGHT_BALL],
+			ball_description:
+				'8-Balls are like Opal balls, but worth 8&times; points and 8&times; spins, and awards an 8&times; scoring buff instead of 2&times;. (Score buff stacks additively with the Ruby ball buff.)<br><i>"Veemo!"</i>',
+			collapsible_header: "eight_balls",
+			cost_func: () => 888e33,
+			visible_func: () =>
+				IsUnlocked("unlock_opal_balls") &&
+				IsUnlocked("ruby_ball_buff_stackable")
+		})
+	);
+	upgrades_list.push(
+		new BallTypeRateUpgrade({
+			ball_type: kBallTypes[kBallTypeIDs.EIGHT_BALL],
+			collapsible_header: "eight_balls",
+			cost_func: level => 888e33 * Math.pow(10, level),
+			value_func: GemstoneBallRateValueFunc,
+			max_level: 49
+		})
+	);
 
 	let upgrades_map = {};
 	for (let i = 0; i < upgrades_list.length; ++i) {
@@ -957,6 +986,8 @@ function ButtonClassForUpgradeCategory(category) {
 		return "amethystUpgradeButton";
 	} else if (category == "opal_balls") {
 		return "opalUpgradeButton";
+	} else if (category == "eight_balls") {
+		return "eightBallUpgradeButton";
 	} else {
 		return "upgradeButton";
 	}
@@ -1055,6 +1086,10 @@ function UpdateUpgradeButtons(state) {
 	UpdateUpgradeSubHeader(
 		"gemstone_balls_upgrades_container",
 		ShouldDisplayGemstoneBallUpgrades()
+	);
+	UpdateUpgradeSubHeader(
+		"eight_balls_upgrades_container",
+		state.upgrades["unlock_eight_balls"].visible_func()
 	);
 }
 

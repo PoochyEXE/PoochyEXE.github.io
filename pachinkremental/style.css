@@ -151,7 +151,7 @@ div.upgradeButtonWrapper {
 	margin: 2.5px;
 }
 
-button.upgradeButton, button.rubyUpgradeButton, button.sapphireUpgradeButton, button.emeraldUpgradeButton, button.topazUpgradeButton, button.turquoiseUpgradeButton, button.amethystUpgradeButton, button.opalUpgradeButton {
+button.upgradeButton, button.rubyUpgradeButton, button.sapphireUpgradeButton, button.emeraldUpgradeButton, button.topazUpgradeButton, button.turquoiseUpgradeButton, button.amethystUpgradeButton, button.opalUpgradeButton, button.eightBallUpgradeButton {
 	border: 1px solid #000;
 	border-radius: 10px;
 	font-family: sans-serif;
@@ -236,7 +236,7 @@ button.emeraldUpgradeButtonLight:disabled {
 }
 
 button.emeraldUpgradeButtonDark:disabled {
-	background: #303;
+	background: #030;
 	color: #FFF;
 }
 
@@ -297,6 +297,16 @@ button.amethystUpgradeButtonLight:disabled {
 
 button.amethystUpgradeButtonDark:disabled {
 	background: #303;
+	color: #FFF;
+}
+
+button.eightBallUpgradeButton {
+	background: #000;
+	color: #FFF;
+}
+
+button.eightBallUpgradeButton:disabled {
+	background: #333;
 	color: #FFF;
 }
 

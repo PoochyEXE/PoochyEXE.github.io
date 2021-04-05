@@ -9,6 +9,8 @@ const kPegColorDarkMode = {
 };
 
 const kPrismatic = "PRISMATIC";
+const k8Ball = "8-BALL";
+const k8BallHighlightColor = "246, 31,183";
 
 const kPrismaticCycleColors = [
 	[0, 1, 0],
@@ -62,6 +64,18 @@ function DrawGlow(pos, color_rgb, alpha, inner_radius, outer_radius, ctx) {
 	ctx.beginPath();
 	ctx.arc(pos.x, pos.y, outer_radius, 0, 2 * Math.PI);
 	ctx.fill();
+}
+
+function DrawTextOnBall(ball, text, font_size, ctx) {
+	const kTextWidth = kBallRadius * 1.5;
+	ctx.save();
+	ctx.translate(ball.pos.x, ball.pos.y);
+	ctx.rotate(-ball.rotation);
+	ctx.textAlign = "center";
+	ctx.fillStyle = "#000";
+	ctx.font = font_size + "px sans-serif";
+	ctx.fillText(text, 0, font_size / 3, kTextWidth);
+	ctx.restore();
 }
 
 function DrawPrismaticBalls(balls, ctx) {
@@ -125,6 +139,61 @@ function DrawPrismaticBalls(balls, ctx) {
 		ctx.beginPath();
 		ctx.arc(pos.x, pos.y, kBallRadius, 0, 2 * Math.PI);
 		ctx.fill();
+	}
+}
+
+function DrawEightBalls(balls, ctx) {
+	const kInnerRadiusFraction = 0.5;
+	const kEpsilon = 1e-7;
+	const kGlowSize = 3;
+	const kGlowAlpha = 0.5;
+	const time = Date.now();
+	for (let i = 0; i < balls.length; ++i) {
+		let pos = balls[i].pos;
+		DrawGlow(
+			pos, k8BallHighlightColor, kGlowAlpha, kBallRadius, kBallRadius + kGlowSize, ctx
+		);
+		
+		let inner_r = kBallRadius * kInnerRadiusFraction;
+		let outer_r = kBallRadius;
+		let gradient = ctx.createRadialGradient(
+			pos.x, pos.y, inner_r, pos.x, pos.y, outer_r
+		);
+		gradient.addColorStop(0, "#FFF");
+		gradient.addColorStop(kEpsilon, "#333");
+		gradient.addColorStop(1, "#000");
+		ctx.fillStyle = gradient;
+		ctx.beginPath();
+		ctx.arc(pos.x, pos.y, kBallRadius, 0, 2 * Math.PI);
+		ctx.fill();
+		DrawTextOnBall(balls[i], /*text=*/"8", /*font_size=*/5, ctx);
+	}
+}
+
+function DrawEightBallsNoGradient(balls, ctx) {
+	const kInnerRadiusFraction = 0.5;
+	const kGlowSize = 3;
+	const kGlowAlpha = 0.5;
+	const time = Date.now();
+	for (let i = 0; i < balls.length; ++i) {
+		let pos = balls[i].pos;
+		
+		// Draw highlight
+		ctx.beginPath();
+		ctx.strokeStyle = "rgba(" + k8BallHighlightColor + ", " + kGlowAlpha + ")";
+		ctx.fillStyle = "rgba(0,0,0,0)";
+		ctx.arc(pos.x, pos.y, kBallRadius, 0, 2 * Math.PI);
+		ctx.lineWidth = 2;
+		ctx.stroke();
+		
+		// Draw the ball itself
+		ctx.beginPath();
+		ctx.strokeStyle = "#000";
+		ctx.arc(pos.x, pos.y, kBallRadius * 0.75, 0, 2 * Math.PI);
+		ctx.lineWidth = kBallRadius * 0.5;
+		ctx.stroke();
+		DrawCircle(ctx, pos, kBallRadius / 2.0, "#FFF");
+		DrawTextOnBall(balls[i], /*text=*/"8", /*font_size=*/5, ctx);
 	}
 }
 
@@ -230,6 +299,10 @@ function DrawPegsNoGradient(positions, ctx) {
 }
 
 function DrawBalls(balls, inner_color, outer_color, ctx) {
+	if (inner_color == k8Ball && outer_color == k8Ball) {
+		DrawEightBalls(balls, ctx);
+		return;
+	}
 	if (
 		!state.save_file.options.classic_opal_balls &&
 		inner_color == kPrismatic &&
@@ -273,6 +346,10 @@ function DrawBalls(balls, inner_color, outer_color, ctx) {
 }
 
 function DrawBallsNoGradient(balls, color, ctx) {
+	if (color == k8Ball) {
+		DrawEightBallsNoGradient(balls, ctx);
+		return;
+	}
 	const kPrismaticSaturation = 0.8;
 	const kPrismaticCycleDuration = 2000.0;
 	const time = Date.now();

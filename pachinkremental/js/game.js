@@ -1,4 +1,4 @@
-const kVersion = "v0.7.2 beta";
+const kVersion = "v0.8.0 beta";
 const kTitleAndVersion = "Pachinkremental " + kVersion;
 
 var max_drop_y = 20;
@@ -12,15 +12,16 @@ const kTopCanvasLayer = "canvas6";
 
 const kBallTypes = [
 	//          | id |    name    | display_name | inner_color | outer_color | ripple_color_rgb |
-	new BallType(0,   "normal",    "Normal",      "#CCC",       "#888",       null             ),
-	new BallType(1,   "gold",      "Gold",        "#FFD700",    "#AA8F00",    "170,143,0"      ),
-	new BallType(2,   "ruby",      "Ruby",        "#FBB",       "#F33",       "255, 48, 48"    ),
-	new BallType(3,   "sapphire",  "Sapphire",    "#BBF",       "#33F",       " 48, 48,255"    ),
-	new BallType(4,   "emerald",   "Emerald",     "#BFB",       "#3F3",       " 48,255, 48"    ),
-	new BallType(5,   "topaz",     "Topaz",       "#FFB",       "#FF3",       "255,255, 48"    ),
-	new BallType(6,   "turquoise", "Turquoise",   "#BFF",       "#3FF",       " 48,255,255"    ),
-	new BallType(7,   "amethyst",  "Amethyst",    "#FBF",       "#F3F",       "255, 48,255"    ),
-	new BallType(8,   "opal",      "Opal",        kPrismatic,   kPrismatic,   kPrismatic       ),
+	new BallType(0,   "normal",    "Normal ",     "#CCC",       "#888",       null             ),
+	new BallType(1,   "gold",      "Gold ",       "#FFD700",    "#AA8F00",    "170,143,  0"    ),
+	new BallType(2,   "ruby",      "Ruby ",       "#FBB",       "#F33",       "255, 48, 48"    ),
+	new BallType(3,   "sapphire",  "Sapphire ",   "#BBF",       "#33F",       " 48, 48,255"    ),
+	new BallType(4,   "emerald",   "Emerald ",    "#BFB",       "#3F3",       " 48,255, 48"    ),
+	new BallType(5,   "topaz",     "Topaz ",      "#FFB",       "#FF3",       "255,255, 48"    ),
+	new BallType(6,   "turquoise", "Turquoise ",  "#BFF",       "#3FF",       " 48,255,255"    ),
+	new BallType(7,   "amethyst",  "Amethyst ",   "#FBF",       "#F3F",       "255, 48,255"    ),
+	new BallType(8,   "opal",      "Opal ",       kPrismatic,   kPrismatic,   kPrismatic       ),
+	new BallType(9,   "eight",     "8-",          k8Ball,       k8Ball,       "246, 31,183"    ),
 ];
 
 const kBallTypeIDs = {
@@ -33,11 +34,13 @@ const kBallTypeIDs = {
 	TURQUOISE: 6,
 	AMETHYST: 7,
 	OPAL: 8,
+	EIGHT_BALL: 9,
 };
 
 function CreateBallWithNoise(x, y, dx, dy, ball_type_index) {
 	let dNoise = SampleGaussianNoise(0.0, 20.0);
-	return new Ball(x, y, dx + dNoise.x, dy + dNoise.y, ball_type_index);
+	let angleNoise = SampleGaussianNoise(0.0, 0.1);
+	return new Ball(x, y, dx + dNoise.x, dy + dNoise.y, ball_type_index, angleNoise.x, angleNoise.y);
 }
 
 function RollBallType() {
@@ -169,6 +172,7 @@ function InitState() {
 		ball_type_rates: [
 			1.0,
 			0.01,
+			0.001,
 			0.001,
 			0.001,
 			0.001,
@@ -355,16 +359,15 @@ function CanDrop(state) {
 	return true;
 }
 
-function ToggleVisibility(panel_name) {
-	let id = panel_name.toLowerCase().replaceAll(" ", "_");
-	let header = document.getElementById(id + "_header");
+function ToggleVisibility(id) {
+	let collapsed = document.getElementById(id + "_collapsed");
 	let contents = document.getElementById(id + "_contents");
 	if (contents.style.height == "0px") {
 		contents.style.height = "auto";
-		header.innerHTML = "[&ndash;] " + panel_name;
+		collapsed.innerHTML = "[&ndash;]";
 	} else {
 		contents.style.height = "0px";
-		header.innerHTML = "[+] " + panel_name;
+		collapsed.innerHTML = "[+]";
 	}
 	let header_new = document.getElementById(id + "_header_new");
 	if (header_new) {
@@ -543,4 +546,6 @@ function Load() {
 
 	state.intervals.update = setInterval(Update, kFrameInterval);
 	state.intervals.score_history = setInterval(UpdateScoreHistory, 5000.0);
+	
+	console.log("Hi there! I don't mind if people hack/cheat, but if you make any screenshots, save files, videos, etc. that way, I'd appreciate it if you clearly label them as hacked. Thanks! --Poochy.EXE");
 }
