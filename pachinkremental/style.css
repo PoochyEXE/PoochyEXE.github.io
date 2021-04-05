@@ -176,7 +176,7 @@ button.upgradeButtonLight:disabled {
 }
 
 button.upgradeButtonDark:disabled {
-	background: #333;
+	background: #555;
 	color: #FFF;
 }
 
@@ -311,7 +311,7 @@ button.eightBallUpgradeButtonLight:disabled {
 }
 
 button.eightBallUpgradeButtonDark:disabled {
-	background: #333;
+	background: #555;
 	color: #FFF;
 }
 
