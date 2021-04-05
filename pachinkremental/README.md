@@ -31,6 +31,10 @@ A: This is intentional, both to make sure the game won't softlock with too many 
 
 ## Changelog
 
+### v0.8.1 beta (2021-04-05)
+* Add a hint that says when the next upgrade is revealed.
+* Fix a bug where you could upgrade things past their max level by clicking really fast.
+
 ### v0.8.0 beta (2021-04-05)
 * Octo Expansion update! New ball type: 8-Ball!
 * Fix dark mode not updating when loading a save file with the opposite setting as your current setting.

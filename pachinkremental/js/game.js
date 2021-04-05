@@ -1,4 +1,4 @@
-const kVersion = "v0.8.0 beta";
+const kVersion = "v0.8.1 beta";
 const kTitleAndVersion = "Pachinkremental " + kVersion;
 
 var max_drop_y = 20;
@@ -106,6 +106,10 @@ function GetUpgradeLevel(upgrade_id) {
 
 function IsUnlocked(upgrade_id) {
 	return GetUpgradeLevel(upgrade_id) > 0;
+}
+
+function IsUpgradeVisible(upgrade_id) {
+	return state.upgrades[upgrade_id].visible_func();
 }
 
 function AutoDropOn() {
