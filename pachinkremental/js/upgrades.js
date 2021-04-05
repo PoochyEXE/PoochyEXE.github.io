@@ -944,7 +944,7 @@ function InitUpgrades() {
 		new BallTypeUnlockUpgrade({
 			ball_type: kBallTypes[kBallTypeIDs.EIGHT_BALL],
 			ball_description:
-				'8-Balls are like Opal balls, but worth 8&times; points and 8&times; spins, and awards an 8&times; scoring buff instead of 2&times;. (Score buff stacks additively with the Ruby ball buff.)<br><i>"Veemo!"</i>',
+				'8-Balls are like Opal balls, but are worth 8&times; the points and spins of Opal balls, and awards an 8&times; scoring buff instead of 2&times;. (Score buff stacks additively with the Ruby ball buff.)<br><i>"Veemo!"</i>',
 			collapsible_header: "eight_balls",
 			cost_func: () => 888e33,
 			visible_func: () =>
