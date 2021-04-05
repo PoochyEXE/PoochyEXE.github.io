@@ -69,6 +69,9 @@ class Upgrade {
 		if (state.save_file.points < cost) {
 			return false;
 		}
+		if (this.GetLevel() >= this.max_level) {
+			return false;
+		}
 		++state.save_file.upgrade_levels[this.id];
 		state.save_file.points -= cost;
 		this.Update();
@@ -404,7 +407,7 @@ function NthGemstoneBallUnlockCost(n) {
 	return 1e12 * Math.pow(2000, n - 1);
 }
 
-function GemstoneBallUnlockCost() {
+function NumGemstoneBallsUnlocked() {
 	let prev_unlocks = 0;
 	if (state) {
 		if (IsUnlocked("unlock_ruby_balls")) {
@@ -426,6 +429,11 @@ function GemstoneBallUnlockCost() {
 			++prev_unlocks;
 		}
 	}
+	return prev_unlocks;
+}
+
+function GemstoneBallUnlockCost() {
+	let prev_unlocks = NumGemstoneBallsUnlocked();
 	return NthGemstoneBallUnlockCost(prev_unlocks + 1);
 }
 
@@ -1038,11 +1046,35 @@ function UpdateUpgradeSubHeader(header_id, visible) {
 	UpdateDisplay(header_id, visible ? "inline-block" : "none");
 }
 
+function NextUpgradeHint(state) {
+	if (!IsUpgradeVisible("auto_drop")) {
+		return "1K Center Slot Value";
+	} else if (!IsUpgradeVisible("unlock_gold_balls")) {
+		return "2 Max Balls";
+	} else if (!IsUpgradeVisible("gold_ball_rate")) {
+		return "Unlock Gold Balls";
+	} else if (!ShouldDisplayGemstoneBallUpgrades()) {
+		return "20% Gold Ball Rate";
+	} else if (NumGemstoneBallsUnlocked() < 2) {
+		return "Unlock any 2 of Ruby, Sapphire, and Emerald Balls";
+	} else if (!AllTier1GemstoneBallsUnlocked()) {
+		return "Unlock all 3 of Ruby, Sapphire, and Emerald Balls";
+	} else if (!AllTier2GemstoneBallsUnlocked()) {
+		return "Unlock all 3 of Topaz, Turquoise, and Amethyst Balls";
+	} else if (!IsUpgradeVisible("unlock_eight_balls")) {
+		return "Unlock Opal Balls";
+	} else {
+		return "None! Congratulations, you've reached the current endgame!"
+	}
+}
+
 function UpdateUpgradeButtons(state) {
 	if (!state.update_upgrade_buttons) {
 		return;
 	}
 	state.update_upgrade_buttons = false;
+	
+	UpdateInnerHTML("next_upgrade_hint", NextUpgradeHint(state));
 
 	for (let id in state.upgrades) {
 		let upgrade = state.upgrades[id];
