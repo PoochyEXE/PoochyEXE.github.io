@@ -4,11 +4,13 @@ var kCollisionElasticity = 0.3;
 
 function UpdateBalls(balls, board, target_sets) {
 	const kEpsilon = 1e-3 / kFPS;
+	const k2Pi = Math.PI * 2;
 	const kPegSearchRadius = kPegRadius + kBallRadius;
 	for (let b = 0; b < balls.length; ++b) {
 		let time_to_sim = 1.0 / kFPS;
 		let pos = balls[b].pos;
 		let vel = balls[b].vel;
+		let omega = balls[b].omega;
 
 		for (let iter = 0; iter < 10 && time_to_sim > kEpsilon; ++iter) {
 			let new_pos = pos.Add(vel.Multiply(time_to_sim));
@@ -37,17 +39,21 @@ function UpdateBalls(balls, board, target_sets) {
 				pos = new_pos;
 			} else {
 				let delta = pos.DeltaToPoint(collide_peg);
-				let perp_vel = vel.ProjectionOnto(
-					delta.Perpendicular().Normalize()
-				);
+				let perp_delta = delta.Perpendicular().Normalize();
+				let perp_vel = vel.ProjectionOnto(perp_delta);
 				let parallel_vel = vel.Subtract(perp_vel);
 				vel = vel.Add(parallel_vel.Multiply(-1 - kCollisionElasticity));
+				omega *= kCollisionElasticity;
+				omega += perp_vel.DotProduct(perp_delta) / kBallRadius;
 			}
 		}
 
 		balls[b].pos = pos;
 		balls[b].vel = vel;
+		balls[b].omega = omega;
 		balls[b].vel.y += kAccel / kFPS;
+		balls[b].rotation += omega / kFPS;
+		balls[b].rotation %= k2Pi;
 
 		for (let s = 0; s < target_sets.length; ++s) {
 			let t_set = target_sets[s];

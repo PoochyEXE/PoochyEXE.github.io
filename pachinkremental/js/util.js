@@ -66,13 +66,15 @@ class Vector {
 }
 
 class Ball {
-	constructor(x, y, dx, dy, ball_type_index) {
+	constructor(x, y, dx, dy, ball_type_index, rotation, omega) {
 		this.pos = new Point(x, y);
 		this.vel = new Vector(dx, dy);
 		this.ball_type_index = ball_type_index;
 		this.active = true;
 		this.last_hit = null;
 		this.start_time = Date.now();
+		this.rotation = rotation;  // Counterclockwise in radians
+		this.omega = omega;  // Angular velocity in radians/second
 	}
 }
 
