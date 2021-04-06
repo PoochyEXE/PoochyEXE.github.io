@@ -31,6 +31,10 @@ A: This is intentional, both to make sure the game won't softlock with too many 
 
 ## Changelog
 
+### v0.8.2 beta (2021-04-06)
+* Fix score multiplier buff not being applied to points won from spinning the bonus wheel.
+* Tweak brightness of grayed-out buttons so they're easier to tell apart from a buyable 8-ball upgrade.
+
 ### v0.8.1 beta (2021-04-05)
 * Add a hint that says when the next upgrade is revealed.
 * Fix a bug where you could upgrade things past their max level by clicking really fast.

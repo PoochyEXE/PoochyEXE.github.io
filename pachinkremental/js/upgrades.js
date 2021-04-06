@@ -357,9 +357,14 @@ class BallTypeRateUpgrade extends Upgrade {
 	}
 }
 
+function IsScoreBuffActive() {
+	return state.save_file.score_buff_multiplier > 1 &&
+		state.save_file.score_buff_duration > 0;
+}
+
 function ActivateOrExtendScoreBuff(multiplier) {
 	const kBuffDuration = 60000.0;
-	if (!IsUnlocked("ruby_ball_buff_stackable") || state.save_file.score_buff_duration <= 0.0 || state.save_file.score_buff_multiplier <= 1.0) {
+	if (!IsUnlocked("ruby_ball_buff_stackable") || !IsScoreBuffActive()) {
 		state.save_file.score_buff_multiplier = multiplier;
 		state.save_file.score_buff_duration = kBuffDuration;
 	} else {
@@ -966,7 +971,7 @@ function InitUpgrades() {
 			collapsible_header: "eight_balls",
 			cost_func: level => 888e33 * Math.pow(10, level),
 			value_func: GemstoneBallRateValueFunc,
-			max_level: 49
+			max_level: 79
 		})
 	);
 
