@@ -103,6 +103,9 @@ class BonusWheelPointSpace extends BonusWheelSpace {
 
 	OnHit(multi_spin) {
 		let value = this.value_func() * multi_spin;
+		if (IsScoreBuffActive()) {
+			value *= state.save_file.score_buff_multiplier;
+		}
 		AddScore(value);
 		MaybeAddBonusWheelText({
 			text: `+${FormatNumberShort(value)} points`,

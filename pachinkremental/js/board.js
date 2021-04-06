@@ -57,10 +57,7 @@ class ScoreTarget extends Target {
 		ball.active = false;
 		var total_value = this.value;
 		var color_rgb = "0,128,0";
-		if (
-			state.save_file.score_buff_multiplier > 1 &&
-			state.save_file.score_buff_duration > 0
-		) {
+		if (IsScoreBuffActive()) {
 			total_value *= state.save_file.score_buff_multiplier;
 		}
 		let popup_text_level = 0;
