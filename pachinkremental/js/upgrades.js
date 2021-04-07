@@ -111,7 +111,9 @@ class Upgrade {
 				this.value_suffix;
 			result += "<br>Cost: " + FormatNumberShort(this.cost_func(level));
 		}
-		result += "<br>Bought: " + level;
+		if (state.save_file.options.show_upgrade_levels) {
+			result += "<br>Bought: " + level;
+		}
 		return result;
 	}
 }
@@ -174,7 +176,9 @@ class DelayReductionUpgrade extends Upgrade {
 			result += " " + this.item_suffix + "/min)";
 			result += "<br>Cost: " + FormatNumberShort(this.cost_func(level));
 		}
-		result += "<br>Bought: " + level;
+		if (state.save_file.options.show_upgrade_levels) {
+			result += "<br>Bought: " + level;
+		}
 		return result;
 	}
 }
@@ -640,7 +644,7 @@ function InitUpgrades() {
 		new FixedCostFeatureUnlockUpgrade({
 			id: "unlock_bonus_wheel",
 			name: "Unlock Bonus Wheel",
-			category: "bonus_wheel_basic",
+			category: "bonus_wheel",
 			collapsible_header: "bonus_wheel",
 			description:
 				"Unlocks the Bonus Wheel. Also adds 2 targets, which award a spin for each ball that passes through them. Point values on the wheel scale based on your upgrades.",
@@ -663,7 +667,7 @@ function InitUpgrades() {
 		new FixedCostFeatureUnlockUpgrade({
 			id: "add_spin_target",
 			name: "Extra Spin Target",
-			category: "bonus_wheel_basic",
+			category: "bonus_wheel",
 			collapsible_header: "bonus_wheel",
 			description: "Adds an extra target that awards Bonus Wheel spins.",
 			cost: 10000000,
@@ -685,7 +689,7 @@ function InitUpgrades() {
 		new ToggleUnlockUpgrade({
 			id: "auto_spin",
 			name: "Auto-Spin",
-			category: "bonus_wheel_basic",
+			category: "bonus_wheel",
 			collapsible_header: "bonus_wheel",
 			description: "Automatically spin the Bonus Wheel.",
 			cost: 50000000,
@@ -697,7 +701,7 @@ function InitUpgrades() {
 		new ToggleUnlockUpgrade({
 			id: "multi_spin",
 			name: "Multi-Spin",
-			category: "bonus_wheel_basic",
+			category: "bonus_wheel",
 			collapsible_header: "bonus_wheel",
 			description:
 				"Uses 10% of your available spins at a time, multiplying any points you win from that spin. NOTE: Bonus gold ball drops are not multiplied.",
@@ -710,7 +714,7 @@ function InitUpgrades() {
 		new FixedCostFeatureUnlockUpgrade({
 			id: "better_drops_1",
 			name: "Better Ball Drops",
-			category: "bonus_wheel_gemstone_balls",
+			category: "bonus_wheel",
 			collapsible_header: "bonus_wheel",
 			description:
 				'Change the "Drop 7 gold balls" space to "Drop 7 special balls". One gemstone ball of each type you have unlocked replaces one of the gold balls. This automatically updates as you unlock more gemstone balls.',
@@ -723,7 +727,7 @@ function InitUpgrades() {
 		new FixedCostFeatureUnlockUpgrade({
 			id: "better_drops_2",
 			name: "Better Ball Drops 2",
-			category: "bonus_wheel_gemstone_balls",
+			category: "bonus_wheel",
 			collapsible_header: "bonus_wheel",
 			description:
 				'Change the "Drop 3 gold balls" space to "Drop 3 gemstone balls", which drops 1 Ruby, 1 Emerald, and 1 Sapphire ball.',
@@ -736,7 +740,7 @@ function InitUpgrades() {
 		new FixedCostFeatureUnlockUpgrade({
 			id: "better_drops_3",
 			name: "Better Ball Drops 3",
-			category: "bonus_wheel_gemstone_balls",
+			category: "bonus_wheel",
 			collapsible_header: "bonus_wheel",
 			description:
 				'Change the "Drop 3 gemstone balls" space to drop 1 Topaz, 1 Turquoise, and 1 Amethyst ball.',
@@ -749,7 +753,7 @@ function InitUpgrades() {
 		new Upgrade({
 			id: "bonus_wheel_speed",
 			name: "Wheel Speed",
-			category: "bonus_wheel_row3",
+			category: "bonus_wheel",
 			collapsible_header: "bonus_wheel",
 			description: "Makes bonus wheel spins play out faster.",
 			cost_func: level => 1e12 * Math.pow(10, level),
