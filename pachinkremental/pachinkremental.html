@@ -221,12 +221,12 @@
 	<div id="notifications" class="notifications"> </div>
 	<div id="tooltip" class="tooltip" style="display: none;"> </div>
 	<div id="export_save_modal" class="modal">
-		<div class="modalContent">
+		<div id="export_save_modal_content" class="modalContent">
 			<span class="modalCloseButton" onmousedown="CloseModal('export_save_modal')">&#xD7</span>
 			Your save file is below. Copy the text and keep it someplace safe.
 			<br>
 			<br>
-			<div id="exported_save" class="exportedSave"></div>
+			<textarea id="exported_save" class="exportedSave" onclick="this.select()" readonly></textarea>
 		</div>
 	</div>
 </body>

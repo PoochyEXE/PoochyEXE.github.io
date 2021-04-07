@@ -462,24 +462,20 @@ button.dropZone:disabled {
 }
 
 .modal {
-  display: none;
-  position: fixed;
-  z-index: 255;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-  background-color: rgba(0,0,0,0.3);
+	display: none;
+	position: fixed;
+	z-index: 255;
+	left: 0px;
+	top: 0px;
+	overflow: auto;
+	background-color: rgba(0,0,0,0.3);
 }
 
 .modalContent {
 	font-family: sans-serif;
 	background-color: #fff;
-	margin: 15% auto;
-	padding: 20px;
+	border-radius: 20px;
 	border: 1px solid #888;
-	width: 80%;
 }
 
 .modalCloseButton {
@@ -496,9 +492,10 @@ button.dropZone:disabled {
 	cursor: pointer;
 }
 
-div.exportedSave {
+textarea.exportedSave {
 	padding: 5px;
 	background-color: #fff;
+	color: #000;
 	border: 1px solid #000;
 	font-family: monospace;
 	overflow-wrap: break-word;

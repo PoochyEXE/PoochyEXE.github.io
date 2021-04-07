@@ -150,14 +150,19 @@ function LoadGame(save_file_str) {
 		state.display_score = state.save_file.stats.total_score;
 		state.display_points = state.save_file.points;
 		state.update_upgrade_buttons = true;
+		state.update_buff_display = true;
 		state.bonus_wheel = default_state.bonus_wheel;
 		state.redraw_wheel = true;
+		for (let i = 0; i < state.balls_by_type.length; ++i) {
+			state.balls_by_type[i].length = 0;
+		}
 		for (let id in state.upgrades) {
 			state.upgrades[id].Update();
 		}
 		if (state.save_file.stats.total_score > 0) {
 			UpdateScoreDisplay(state, /*forceUpdate=*/ true);
 		}
+		UpdateBuffDisplay();
 		UpdateUpgradeButtons(state);
 		UpdateOptionsButtons();
 		UpdateAutoSaveInterval();
@@ -196,10 +201,37 @@ function CloseModal(id) {
 	document.getElementById(id).style.display = "none";
 }
 
+function ResizeModals() {
+	const kInnerSizeRatio = 0.7;
+	const kInnerPadding = 20;
+	let modal_elem = document.getElementById("export_save_modal");
+	let horizontal_pad =
+		window.innerWidth * (1.0 - kInnerSizeRatio) / 2.0 - kInnerPadding;
+	let vertical_pad =
+		window.innerHeight * (1.0 - kInnerSizeRatio) / 2.0 - kInnerPadding;
+	modal_elem.style.width = window.innerWidth + "px";
+	modal_elem.style.height = window.innerHeight + "px";
+	modal_elem.style["padding-left"] = horizontal_pad + "px";
+	modal_elem.style["padding-right"] = horizontal_pad + "px";
+	modal_elem.style["padding-top"] = vertical_pad + "px";
+	modal_elem.style["padding-bottom"] = vertical_pad + "px";
+	let content_elem = document.getElementById("export_save_modal_content");
+	let content_width = kInnerSizeRatio * window.innerWidth;
+	let content_height = kInnerSizeRatio * window.innerHeight;
+	content_elem.style.padding = kInnerPadding + "px";
+	content_elem.style.width = content_width + "px";
+	content_elem.style.height = content_height + "px";
+	let exported_save_elem = document.getElementById("exported_save");
+	exported_save_elem.style.width = (content_width - kInnerPadding) + "px";
+	exported_save_elem.style.height =
+		(content_height - kInnerPadding - 30) + "px";
+}
+
 function ExportSave() {
-	document.getElementById("exported_save").innerHTML = SaveFileToString(
-		state
-	);
+	let export_textarea = document.getElementById("exported_save");
+	export_textarea.innerHTML = SaveFileToString(state);
+	export_textarea.focus();
+	export_textarea.select();
 	document.getElementById("export_save_modal").style.display = "block";
 }
 

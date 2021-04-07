@@ -1,4 +1,4 @@
-const kVersion = "v0.8.3 beta";
+const kVersion = "v0.8.4 beta";
 const kTitleAndVersion = "Pachinkremental " + kVersion;
 
 var max_drop_y = 20;
@@ -529,6 +529,7 @@ var state = InitState();
 function OnResize() {
 	state.redraw_all = true;
 	ResizeCanvas();
+	ResizeModals();
 }
 
 function Load() {
