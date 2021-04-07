@@ -82,11 +82,7 @@
 								<span id="bonus_wheel_collapsed">[&ndash;]</span> Bonus Wheel
 								<span id="bonus_wheel_header_new" class="upgradeHeaderNew" style="display: none;"><sup>New!</sup></span>
 							</button>
-							<div id="bonus_wheel_contents" class="upgradesContents" style="display: block;">
-								<div id="bonus_wheel_basic_contents" class="upgradesContents" style="display: block;"></div>
-								<div id="bonus_wheel_gemstone_balls_contents" class="upgradesContents" style="display: block;"></div>
-								<div id="bonus_wheel_row3_contents" class="upgradesContents" style="display: block;"></div>
-							</div>
+							<div id="bonus_wheel_contents" class="upgradesContents" style="display: block;"></div>
 						</div>
 						<div id="gold_balls_upgrades_container" class="upgradesContainer" style="display: none;">
 							<button type="button" class="upgradesSubHeader"
@@ -96,6 +92,14 @@
 							</button>
 							<div id="gold_balls_contents" class="upgradesContents" style="display: block;"></div>
 						</div>
+						<div id="eight_balls_upgrades_container" class="upgradesContainer" style="display: none;">
+							<button type="button" class="upgradesSubHeader"
+									id="button_eight_balls_header" onclick="ToggleVisibility('eight_balls')">
+								<span id="eight_balls_collapsed">[&ndash;]</span> 8-Balls
+								<span id="eight_balls_header_new" class="upgradeHeaderNew" style="display: none;"><sup>New!</sup></span>
+							</button>
+							<div id="eight_balls_contents" class="upgradesContents" style="display: block;"></div>
+						</div>
 						<div id="gemstone_balls_upgrades_container" class="upgradesContainer" style="display: none;">
 							<button type="button" class="upgradesSubHeader"
 									id="button_gemstone_balls_header" onclick="ToggleVisibility('gemstone_balls')">
@@ -104,22 +108,14 @@
 							</button>
 							<div id="gemstone_balls_contents" class="upgradesContents" style="display: block;">
 								<div id="gemstone_balls_note" class="messageBox" style="padding-top: 5px; padding-bottom: 5px;">Gemstone balls have the benefits of gold balls, plus additional bonuses.<br>NOTE: Unlocking one gemstone ball sharply increases the cost of unlocking the others!</div>
-								<div id="ruby_balls_contents" class="upgradesContents" style="display: block;"></div>
-								<div id="topaz_balls_contents" class="upgradesContents" style="display: block;"></div>
-								<div id="emerald_balls_contents" class="upgradesContents" style="display: block;"></div>
-								<div id="turquoise_balls_contents" class="upgradesContents" style="display: block;"></div>
-								<div id="sapphire_balls_contents" class="upgradesContents" style="display: block;"></div>
-								<div id="amethyst_balls_contents" class="upgradesContents" style="display: block;"></div>
-								<div id="opal_balls_contents" class="upgradesContents" style="display: block;"></div>
+								<div id="ruby_balls_contents" class="upgradesContents" style="display: inline-block;"></div>
+								<div id="topaz_balls_contents" class="upgradesContents" style="display: inline-block;"></div>
+								<div id="emerald_balls_contents" class="upgradesContents" style="display: inline-block;"></div>
+								<div id="turquoise_balls_contents" class="upgradesContents" style="display: inline-block;"></div>
+								<div id="sapphire_balls_contents" class="upgradesContents" style="display: inline-block;"></div>
+								<div id="amethyst_balls_contents" class="upgradesContents" style="display: inline-block;"></div>
+								<div id="opal_balls_contents" class="upgradesContents" style="display: inline-block;"></div>
 							</div>
-						</div>
-						<div id="eight_balls_upgrades_container" class="upgradesContainer" style="display: none;">
-							<button type="button" class="upgradesSubHeader"
-									id="button_eight_balls_header" onclick="ToggleVisibility('eight_balls')">
-								<span id="eight_balls_collapsed">[&ndash;]</span> 8-Balls
-								<span id="eight_balls_header_new" class="upgradeHeaderNew" style="display: none;"><sup>New!</sup></span>
-							</button>
-							<div id="eight_balls_contents" class="upgradesContents" style="display: block;"></div>
 						</div>
 					</div>
 				</div>
@@ -201,6 +197,8 @@
 								id="button_quality" onclick="ToggleQuality()">Quality</button>
 						<button type="button" class="optionButton"
 								id="button_popup_text" onclick="TogglePopupText()">Popup text</button>
+						<button type="button" class="optionButton"
+								id="button_upgrade_levels_bought" onclick="ToggleShowUpgradeLevels()">Upgrade levels bought</button>
 						<button type="button" class="optionButton"
 								id="button_april_fools" onclick="ToggleAprilFools()">April Fools</button>
 						<br>

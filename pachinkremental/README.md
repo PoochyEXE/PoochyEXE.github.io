@@ -31,6 +31,12 @@ A: This is intentional, both to make sure the game won't softlock with too many 
 
 ## Changelog
 
+### v0.8.3 beta (2021-04-07)
+* Fix color of pop-up text for spins earned by 8-Balls.
+* Made the upgrade panel UI more compact:
+	* Hide "Bought:" counter on upgrade buttons to reduce UI clutter. You can turn them back on in the options if you want.
+	* Stop forcing new rows between certain upgrade buttons.
+
 ### v0.8.2 beta (2021-04-06)
 * Fix score multiplier buff not being applied to points won from spinning the bonus wheel.
 * Tweak brightness of grayed-out buttons so they're easier to tell apart from a buyable 8-ball upgrade.

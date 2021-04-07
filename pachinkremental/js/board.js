@@ -125,8 +125,10 @@ class SpinTarget extends Target {
 			let value = Math.floor(Math.pow(
 				state.special_ball_multiplier, state.sapphire_ball_exponent
 			));
+			let color_rgb = "0,0,255"
 			if (ball.ball_type_index == kBallTypeIDs.EIGHT_BALL) {
 				value *= 8;
+				color_rgb = k8BallHighlightColor
 			}
 			state.save_file.spins += value;
 			UpdateSpinCounter();
@@ -134,7 +136,7 @@ class SpinTarget extends Target {
 				level: 2,
 				text: `+${FormatNumberShort(value)} Spins`,
 				pos: ball.pos,
-				color_rgb: "0,0,255"
+				color_rgb: color_rgb
 			});
 		} else {
 			++state.save_file.spins;

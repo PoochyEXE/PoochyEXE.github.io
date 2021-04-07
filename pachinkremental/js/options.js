@@ -220,18 +220,20 @@ function EraseSave() {
 }
 
 function UpdateOptionsButtons() {
-	document.getElementById("button_auto_save").innerHTML =
-		"Auto Save: " + (state.save_file.options.auto_save_enabled ? "ON" : "OFF");
-	document.getElementById("button_quality").innerHTML =
-		"Quality: " + kQualityOptions[state.save_file.options.quality];
-	document.getElementById("button_dark_mode").innerHTML =
-		"Dark Mode: " + (state.save_file.options.dark_mode ? "ON" : "OFF");
-	document.getElementById("button_popup_text").innerHTML =
-		"Pop-up text: " + kPopupTextOptions[state.save_file.options.display_popup_text];
-	document.getElementById("button_april_fools").innerHTML =
-		"April Fools: " + kAprilFoolsOptions[state.save_file.options.april_fools_enabled];
-	document.getElementById("button_classic_opal_balls").innerHTML =
-		"Style: " + (state.save_file.options.classic_opal_balls ? "Classic" : "Default");
+	UpdateInnerHTML("button_auto_save",
+		"Auto Save: " + (state.save_file.options.auto_save_enabled ? "ON" : "OFF"));
+	UpdateInnerHTML("button_quality",
+		"Quality: " + kQualityOptions[state.save_file.options.quality]);
+	UpdateInnerHTML("button_dark_mode",
+		"Dark Mode: " + (state.save_file.options.dark_mode ? "ON" : "OFF"));
+	UpdateInnerHTML("button_popup_text",
+		"Pop-up text: " + kPopupTextOptions[state.save_file.options.display_popup_text]);
+	UpdateInnerHTML("button_upgrade_levels_bought",
+		"Upgrade levels bought: " + (state.save_file.options.show_upgrade_levels ? "Show" : "Hide"));
+	UpdateInnerHTML("button_april_fools",
+		"April Fools: " + kAprilFoolsOptions[state.save_file.options.april_fools_enabled]);
+	UpdateInnerHTML("button_classic_opal_balls",
+		"Style: " + (state.save_file.options.classic_opal_balls ? "Classic" : "Default"));
 }
 
 function UpdateAutoSaveInterval() {
@@ -291,8 +293,11 @@ function ToggleDarkMode() {
 	UpdateOptionsButtons();
 }
 
-function ToggleBooleanOption(id) {
-	state.save_file.options[id] = !state.save_file.options[id];
+function ToggleShowUpgradeLevels(id) {
+	state.save_file.options.show_upgrade_levels =
+		!state.save_file.options.show_upgrade_levels;
+	state.update_upgrade_buttons = true;
+	UpdateUpgradeButtons(state);
 	UpdateOptionsButtons();
 }
 

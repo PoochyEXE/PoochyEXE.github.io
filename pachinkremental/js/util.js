@@ -181,10 +181,20 @@ const kShortSuffixes = [
 	"TDc",
 	"QaDc",
 	"QiDc",
-	"SxDc",
+	"SeDc",
 	"SpDc",
 	"OcDc",
 	"NoDc",
+	"V",
+	"UV",
+	"DV",
+	"TV",
+	"QaV",
+	"QiV",
+	"SeV",
+	"SpV",
+	"OcV",
+	"NoV",
 ];
 
 function FormatNumberShort(num) {
@@ -227,6 +237,15 @@ const kLongSuffixes = [
 	"octodecillion",
 	"novemdecillion",
 	"vigintillion",
+	"unvigintillion",
+	"duovigintillion",
+	"tresvigintillion",
+	"quattuorvigintillion",
+	"quinvigintillion",
+	"sesvigintillion",
+	"septemvigintillion",
+	"octovigintillion",
+	"novemvigintillion",
 ];
 
 function FormatNumberLong(num) {
