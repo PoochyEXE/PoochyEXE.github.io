@@ -187,6 +187,7 @@ class FeatureUnlockUpgrade extends Upgrade {
 	constructor({
 		id,
 		name,
+		unlocked_name,
 		category,
 		collapsible_header,
 		description,
@@ -209,14 +210,19 @@ class FeatureUnlockUpgrade extends Upgrade {
 			on_update,
 			on_buy
 		});
+		if (unlocked_name) {
+			this.unlocked_name = unlocked_name;
+		} else {
+			this.unlocked_name = name;
+		}
 	}
 
 	GetText() {
 		let result = "<b>" + this.name + "</b><br>";
 		if (this.GetLevel() == 0) {
-			result += "Cost: " + FormatNumberShort(this.cost_func());
+			return "<b>" + this.name + "</b><br>Cost: " + FormatNumberShort(this.cost_func());
 		} else {
-			result += "Unlocked!";
+			return "<b>" + this.unlocked_name + "</b><br>Unlocked!";
 		}
 		return result;
 	}
@@ -226,6 +232,7 @@ class FixedCostFeatureUnlockUpgrade extends FeatureUnlockUpgrade {
 	constructor({
 		id,
 		name,
+		unlocked_name,
 		category,
 		collapsible_header,
 		description,
@@ -237,6 +244,7 @@ class FixedCostFeatureUnlockUpgrade extends FeatureUnlockUpgrade {
 		super({
 			id,
 			name,
+			unlocked_name,
 			category,
 			collapsible_header,
 			description,
@@ -252,6 +260,7 @@ class ToggleUnlockUpgrade extends FixedCostFeatureUnlockUpgrade {
 	constructor({
 		id,
 		name,
+		unlocked_name,
 		category,
 		collapsible_header,
 		description,
@@ -263,6 +272,7 @@ class ToggleUnlockUpgrade extends FixedCostFeatureUnlockUpgrade {
 		super({
 			id,
 			name,
+			unlocked_name,
 			category,
 			collapsible_header,
 			description,
@@ -322,6 +332,7 @@ class BallTypeUnlockUpgrade extends FeatureUnlockUpgrade {
 		super({
 			id: `unlock_${ball_type.name}_balls`,
 			name: "Unlock " + ball_type.display_name + "Balls",
+			unlocked_name: ball_type.display_name + "Balls",
 			category: ball_type.name + "_balls",
 			collapsible_header: collapsible_header,
 			description:
@@ -644,6 +655,7 @@ function InitUpgrades() {
 		new FixedCostFeatureUnlockUpgrade({
 			id: "unlock_bonus_wheel",
 			name: "Unlock Bonus Wheel",
+			unlocked_name: "Bonus Wheel",
 			category: "bonus_wheel",
 			collapsible_header: "bonus_wheel",
 			description:

@@ -31,6 +31,12 @@ A: This is intentional, both to make sure the game won't softlock with too many 
 
 ## Changelog
 
+### v0.8.4 beta (2021-04-07)
+* More UI decluttering, by changing "Unlock X" buttons to remove the "Unlock" once bought. (The grayed-out button remains so that you can still see the tooltip text.)
+* Make the save export modal automatically highlight the full save file when you click on the text box. Also tweaked it to look better.
+* Bugfix: Clear balls on the board when importing a save file.
+* Bugfix: Update buff display when importing a save file that doesn't have a buff active.
+
 ### v0.8.3 beta (2021-04-07)
 * Fix color of pop-up text for spins earned by 8-Balls.
 * Made the upgrade panel UI more compact:
