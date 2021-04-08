@@ -396,6 +396,8 @@ function DrawScoreText(score_text, font_size, duration, rise, ctx) {
 	const kPrismaticSaturation = 0.8;
 	let next_index = 0;
 	const time = Date.now();
+	ctx.textAlign = "center";
+	ctx.font = "bold " + font_size + "px sans-serif";
 	for (let i = 0; i < score_text.length; ++i) {
 		let curr_text = score_text[i];
 		let elapsed = time - curr_text.start_time;
@@ -414,8 +416,6 @@ function DrawScoreText(score_text, font_size, duration, rise, ctx) {
 		} else {
 			color_rgba = "rgba(" + curr_text.color_rgb + ", " + (1 - fraction) + ")";
 		}
-		ctx.textAlign = "center";
-		ctx.font = "bold " + font_size + "px sans-serif";
 		ctx.fillStyle = color_rgba;
 		ctx.fillText(
 			curr_text.text,

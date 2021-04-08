@@ -1,4 +1,4 @@
-const kVersion = "v0.8.4 beta";
+const kVersion = "v0.8.5 beta";
 const kTitleAndVersion = "Pachinkremental " + kVersion;
 
 var max_drop_y = 20;
@@ -245,6 +245,7 @@ function InitState() {
 				dark_mode: false,
 				classic_opal_balls: false,
 				show_upgrade_levels: false,
+				favicon: -1,
 				april_fools_enabled: 0,
 				quality: 0,
 				display_popup_text: 0,

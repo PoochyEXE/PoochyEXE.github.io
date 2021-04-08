@@ -45,6 +45,26 @@ const kColorSchemeClasses = [
 	new ColorSchemeClassMapping("optionButtonRed", "optionButtonRedLight", "optionButtonRedDark"),
 ];
 
+function AutoPickFavicon() {
+	for (let i = kBallTypes.length - 1; i > 0; --i) {
+		if (IsUnlocked("unlock_" + kBallTypes[i].name + "_balls")) {
+			return kBallTypes[i].name;
+		}
+	}
+	return kBallTypes[0].name;
+}
+
+function UpdateFavicon() {
+	let id = state.save_file.options.favicon;
+	let name = (id < 0) ? AutoPickFavicon() : kBallTypes[id].name;
+	document.getElementById("favicon").href = "favicon/" + name + ".png";
+}
+
+function UpdateFaviconChoice(elem) {
+	state.save_file.options.favicon = parseInt(elem.value);
+	UpdateFavicon();
+}
+
 function UpdateBallOpacity(elem) {
 	state.save_file.options[elem.id] = elem.value;
 }
@@ -57,9 +77,19 @@ function UpdateOpacitySlidersFromSaveFile(save_file) {
 	}
 }
 
+function UpdateFaviconChoiceFromSaveFile(save_file) {
+	let index = parseInt(save_file.options.favicon);
+	let id = "auto_favicon";
+	if (index >= 0) {
+		id = kBallTypes[index].name + "_favicon";
+	}
+	let elem = document.getElementById(id);
+	elem.checked = true;
+}
+
 function InitOptions(state) {
 	let opacity_div = document.getElementById("options_opacity");
-	html = "<b>Opacity:</b>";
+	let html = "<b>Opacity:</b>";
 	for (let i = 0; i < kBallTypes.length; ++i) {
 		let id = kBallTypes[i].name + "_ball_opacity";
 		let display_name = kBallTypes[i].display_name + "Balls"
@@ -77,6 +107,24 @@ function InitOptions(state) {
 		html += '</div>';
 	}
 	opacity_div.innerHTML = html;
+	
+	let icon_div = document.getElementById("options_favicon");
+	html = "<b>Favicon:</b>";
+	for (let i = -1; i < kBallTypes.length; ++i) {
+		let id = (i < 0) ? "auto_favicon" : kBallTypes[i].name + "_favicon";
+		let display_name =
+			(i < 0) ? "Auto" : kBallTypes[i].display_name + "Ball";
+		let default_display = (i > 0) ? "none" : "block";
+		html += '<div id="' + id + '_wrapper" class="iconOption" ';
+		html += 'style="display: ' + default_display + ';">';
+		html += '<input type="radio" name="favicon_option" ';
+		html += 'onchange="UpdateFaviconChoice(this)" ';
+		html += 'value=' + i + ' ';
+		html += 'id="' + id + '">';
+		html += '<label for="' + id + '">' + display_name + '</label>';
+		html += '</div>';
+	}
+	icon_div.innerHTML = html;
 }
 
 function SaveFileToString(state) {
@@ -167,7 +215,9 @@ function LoadGame(save_file_str) {
 		UpdateOptionsButtons();
 		UpdateAutoSaveInterval();
 		UpdateDarkMode();
+		UpdateFavicon();
 		UpdateOpacitySlidersFromSaveFile(state.save_file);
+		UpdateFaviconChoiceFromSaveFile(state.save_file);
 		state.notifications.push(new Notification("Game loaded", "#8F8"));
 	} else {
 		state.notifications.push(
@@ -322,6 +372,11 @@ function ToggleDarkMode() {
 	state.save_file.options.dark_mode = !state.save_file.options.dark_mode;
 	state.redraw_all = true;
 	UpdateDarkMode();
+	UpdateOptionsButtons();
+}
+
+function ToggleBooleanOption(id) {
+	state.save_file.options[id] = !state.save_file.options[id];
 	UpdateOptionsButtons();
 }
 

@@ -340,9 +340,9 @@ class BallTypeUnlockUpgrade extends FeatureUnlockUpgrade {
 			cost_func,
 			visible_func,
 			on_update: () => {
-				let div_id = ball_type.name + "_ball_opacity_wrapper";
 				let display = (this.GetValue() > 0) ? "block" : "none";
-				UpdateDisplay(div_id, display);
+				UpdateDisplay(ball_type.name + "_ball_opacity_wrapper", display);
+				UpdateDisplay(ball_type.name + "_favicon_wrapper", display);
 			},
 		});
 	}
@@ -1083,7 +1083,7 @@ function NextUpgradeHint(state) {
 	} else if (!AllTier2GemstoneBallsUnlocked()) {
 		return "Unlock all 3 of Topaz, Turquoise, and Amethyst Balls";
 	} else if (!IsUpgradeVisible("unlock_eight_balls")) {
-		return "Unlock Opal Balls";
+		return "Unlock Opal Balls and Stackable Buff";
 	} else {
 		return "None! Congratulations, you've reached the current endgame!"
 	}
