@@ -31,6 +31,9 @@ A: This is intentional, both to make sure the game won't softlock with too many 
 
 ## Changelog
 
+### v0.9.0 beta (2021-04-08)
+* Add 3 new Bonus Wheel upgrades.
+
 ### v0.8.5 beta (2021-04-08)
 * Add favicon. By default it's automatically set to the highest ball type you have unlocked, but you can manually go into the options and pick any of the balls you have unlocked.
 * Fix classic opal balls option button, which I accidentally broke in v0.8.3. Oops!
@@ -110,7 +113,7 @@ A: This is intentional, both to make sure the game won't softlock with too many 
 * Buff: Reduced cost scaling for gemstone ball unlocks.
 
 ### v0.4.0 beta (2021-03-29)
-* New feature: 6 types of gemstone balls, which have the value multipiler of gold balls plus additional bonuses.
+* New feature: 6 types of gemstone balls, which have the value multiplier of gold balls plus additional bonuses.
 * Suppress pop-up text when the game is running in the background, to avoid the bug where all the pop-up text accumulates while the tab is inactive and then they all appear at once when you switch back to the tab.
 * Various UI tweaks
 

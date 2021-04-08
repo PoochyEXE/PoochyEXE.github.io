@@ -97,33 +97,6 @@ function TotalBalls(state) {
 	return total;
 }
 
-function GetUpgradeLevel(upgrade_id) {
-	if (!state) {
-		return undefined;
-	}
-	return state.save_file.upgrade_levels[upgrade_id];
-}
-
-function IsUnlocked(upgrade_id) {
-	return GetUpgradeLevel(upgrade_id) > 0;
-}
-
-function IsUpgradeVisible(upgrade_id) {
-	return state.upgrades[upgrade_id].visible_func();
-}
-
-function AutoDropOn() {
-	return IsUnlocked("auto_drop") && state.save_file.options.auto_drop_enabled;
-}
-
-function AutoSpinOn() {
-	return IsUnlocked("auto_spin") && state.save_file.options.auto_spin_enabled;
-}
-
-function MultiSpinOn() {
-	return IsUnlocked("multi_spin") && state.save_file.options.multi_spin_enabled;
-}
-
 function UpdateScoreHistory() {
 	let total = 0;
 	for (let i = 0; i < state.score_history.length; ++i) {
@@ -220,6 +193,7 @@ function InitState() {
 				score_last60s: 0,
 				balls_dropped: 0,
 				balls_dropped_manual: 0,
+				max_buff_multiplier: 0,
 				target_hits: {}
 			},
 			upgrade_levels: {
