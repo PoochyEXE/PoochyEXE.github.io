@@ -1094,6 +1094,19 @@ function InitUpgrades() {
 			max_level: 79
 		})
 	);
+	upgrades_list.push(
+		new FixedCostFeatureUnlockUpgrade({
+			id: "eight_ball_exponent",
+			name: "8-Ball Exponent",
+			category: "eight_balls",
+			description:
+				"8-Balls are scored with an exponent of 8 instead of the Emerald exponent.",
+			cost: 888e57,
+			visible_func: () =>
+				IsUnlocked("unlock_eight_balls") &&
+				IsMaxed("emerald_ball_exponent")
+		})
+	);
 
 	let upgrades_map = {};
 	for (let i = 0; i < upgrades_list.length; ++i) {
