@@ -31,6 +31,10 @@ A: This is intentional, both to make sure the game won't softlock with too many 
 
 ## Changelog
 
+### v0.8.5 beta (2021-04-08)
+* Add favicon. By default it's automatically set to the highest ball type you have unlocked, but you can manually go into the options and pick any of the balls you have unlocked.
+* Fix classic opal balls option button, which I accidentally broke in v0.8.3. Oops!
+
 ### v0.8.4 beta (2021-04-07)
 * More UI decluttering, by changing "Unlock X" buttons to remove the "Unlock" once bought. (The grayed-out button remains so that you can still see the tooltip text.)
 * Make the save export modal automatically highlight the full save file when you click on the text box. Also tweaked it to look better.
