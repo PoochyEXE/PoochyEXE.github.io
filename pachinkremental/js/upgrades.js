@@ -343,6 +343,7 @@ class BallTypeUnlockUpgrade extends FeatureUnlockUpgrade {
 				let display = (this.GetValue() > 0) ? "block" : "none";
 				UpdateDisplay(ball_type.name + "_ball_opacity_wrapper", display);
 				UpdateDisplay(ball_type.name + "_favicon_wrapper", display);
+				UpdateFavicon();
 			},
 		});
 	}
