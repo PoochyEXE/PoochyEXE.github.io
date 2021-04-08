@@ -294,11 +294,11 @@ function SpinBonusWheel() {
 
 function UpdateSpinCounter() {
 	UpdateDisplay("bonus_wheel", IsUnlocked("unlock_bonus_wheel") ? "inline" : "none");
-	UpdateInnerHTML("spin_count", state.save_file.spins);
+	UpdateInnerHTML("spin_count", FormatNumberLong(state.save_file.spins));
 	document.getElementById("button_spin").disabled =
 		state.bonus_wheel.IsSpinning() || state.save_file.spins <= 0;
 	UpdateDisplay("multi_spin", IsUnlocked("multi_spin") ? "inline" : "none");
-	UpdateInnerHTML("multi_spin_count", state.bonus_wheel.multi_spin);
+	UpdateInnerHTML("multi_spin_count", FormatNumberLong(state.bonus_wheel.multi_spin));
 }
 
 function UpdateStatsPanel(state) {

@@ -33,6 +33,8 @@ A: This is intentional, both to make sure the game won't softlock with too many 
 
 ### v0.9.0 beta (2021-04-08)
 * Add 3 new Bonus Wheel upgrades.
+* Add a new 8-Ball upgrade.
+* Format the spin counter.
 
 ### v0.8.5 beta (2021-04-08)
 * Add favicon. By default it's automatically set to the highest ball type you have unlocked, but you can manually go into the options and pick any of the balls you have unlocked.

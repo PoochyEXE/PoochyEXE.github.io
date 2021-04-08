@@ -62,22 +62,23 @@ class ScoreTarget extends Target {
 		}
 		let popup_text_level = 0;
 		if (ball.ball_type_index != kBallTypeIDs.NORMAL) {
-			if (
+			if (ball.ball_type_index == kBallTypeIDs.EIGHT_BALL) {
+				popup_text_level = 2;
+				color_rgb = k8BallHighlightColor;
+				let exponent = IsUnlocked("eight_ball_exponent") ? 8 : state.emerald_ball_exponent;
+				total_value *= Math.pow(state.special_ball_multiplier, exponent);
+				total_value *= 8;
+			} else if (
 				ball.ball_type_index == kBallTypeIDs.EMERALD ||
 				ball.ball_type_index == kBallTypeIDs.TOPAZ ||
 				ball.ball_type_index == kBallTypeIDs.TURQUOISE ||
-				ball.ball_type_index == kBallTypeIDs.OPAL || 
-				ball.ball_type_index == kBallTypeIDs.EIGHT_BALL
+				ball.ball_type_index == kBallTypeIDs.OPAL
 			) {
 				total_value *= Math.pow(
 					state.special_ball_multiplier, state.emerald_ball_exponent
 				);
 				popup_text_level = 2;
 				color_rgb = "0,192,0";
-				if (ball.ball_type_index == kBallTypeIDs.EIGHT_BALL) {
-					total_value *= 8;
-					color_rgb = k8BallHighlightColor;
-				}
 			} else {
 				popup_text_level = 1;
 				total_value *= state.special_ball_multiplier;
