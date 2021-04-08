@@ -251,7 +251,7 @@ const kLongSuffixes = [
 function FormatNumberLong(num) {
 	const kPrecision = 3;
 	if (num < 1000) {
-		return num.toString();
+		return FormatSmallNumberShort(num);
 	}
 	let suffix_index = Math.floor(Math.log10(num) / 3);
 	if (suffix_index >= kLongSuffixes.length) {

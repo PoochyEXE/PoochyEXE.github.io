@@ -61,8 +61,8 @@ class BonusWheel {
 			this.Rotate(this.spin_distance);
 			this.spin_distance = 0;
 			state.save_file.spins -= this.multi_spin;
-			UpdateSpinCounter();
 			this.PositionToSpace(this.pos).on_hit_func(this.multi_spin);
+			UpdateSpinCounter();
 		} else {
 			this.Rotate(delta);
 			this.spin_distance -= delta;
@@ -103,7 +103,9 @@ class BonusWheelPointSpace extends BonusWheelSpace {
 
 	OnHit(multi_spin) {
 		let value = this.value_func() * multi_spin;
-		if (IsScoreBuffActive()) {
+		if (IsUnlocked("better_buff_multiplier")) {
+			value *= state.save_file.stats.max_buff_multiplier;
+		} else if (IsScoreBuffActive()) {
 			value *= state.save_file.score_buff_multiplier;
 		}
 		AddScore(value);
@@ -124,7 +126,13 @@ function DefaultWheel() {
 	spaces.push(
 		new BonusWheelPointSpace({
 			active_color: "#8F8",
-			value_func: () => GetSlotValue(4) * state.special_ball_multiplier
+			value_func: () => {
+				let multiplier = state.special_ball_multiplier;
+				if (IsUnlocked("better_point_values")) {
+					multiplier = Math.pow(multiplier, state.emerald_ball_exponent)
+				}
+				return GetSlotValue(4) * multiplier;
+			}
 		})
 	);
 	spaces.push(
@@ -147,7 +155,10 @@ function DefaultWheel() {
 					? "Drop 3 gemstone balls"
 					: "Drop 3 gold balls",
 
-			on_hit_func: () => {
+			on_hit_func: (multi_spin) => {
+				if (IsUnlocked("better_multi_spin")) {
+					state.save_file.spins += multi_spin - 1;
+				}
 				if (IsUnlocked("better_drops_3")) {
 					DropBonusBalls(
 						ShuffleArray([
@@ -214,7 +225,10 @@ function DefaultWheel() {
 					return "Drop 7 special balls";
 				}
 			},
-			on_hit_func: () => {
+			on_hit_func: (multi_spin) => {
+				if (IsUnlocked("better_multi_spin")) {
+					state.save_file.spins += multi_spin - 1;
+				}
 				if (IsUnlocked("better_drops_1")) {
 					let bonus_balls = [];
 					bonus_balls.push(

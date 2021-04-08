@@ -210,6 +210,9 @@ function LoadGame(save_file_str) {
 		if (state.save_file.stats.total_score > 0) {
 			UpdateScoreDisplay(state, /*forceUpdate=*/ true);
 		}
+		if (state.save_file.stats.max_buff_multiplier < state.save_file.score_buff_multiplier) {
+			state.save_file.stats.max_buff_multiplier = state.save_file.score_buff_multiplier;
+		}
 		UpdateBuffDisplay();
 		UpdateUpgradeButtons(state);
 		UpdateOptionsButtons();

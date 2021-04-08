@@ -4,6 +4,7 @@ class Upgrade {
 		name,
 		category,
 		collapsible_header,
+		button_class,
 		description,
 		cost_func,
 		value_func,
@@ -20,6 +21,11 @@ class Upgrade {
 			this.collapsible_header = collapsible_header;
 		} else {
 			this.collapsible_header = category;
+		}
+		if (button_class) {
+			this.button_class = button_class;
+		} else {
+			this.button_class = ButtonClassForUpgradeCategory(category);
 		}
 		this.description = description;
 		this.cost_func = cost_func;
@@ -124,6 +130,7 @@ class DelayReductionUpgrade extends Upgrade {
 		name,
 		category,
 		collapsible_header,
+		button_class,
 		description,
 		cost_func,
 		value_func,
@@ -138,6 +145,7 @@ class DelayReductionUpgrade extends Upgrade {
 			name,
 			category,
 			collapsible_header,
+			button_class,
 			description,
 			cost_func,
 			value_func,
@@ -190,6 +198,7 @@ class FeatureUnlockUpgrade extends Upgrade {
 		unlocked_name,
 		category,
 		collapsible_header,
+		button_class,
 		description,
 		cost_func,
 		visible_func,
@@ -201,6 +210,7 @@ class FeatureUnlockUpgrade extends Upgrade {
 			name,
 			category,
 			collapsible_header,
+			button_class,
 			description,
 			cost_func,
 			value_func: null,
@@ -235,6 +245,7 @@ class FixedCostFeatureUnlockUpgrade extends FeatureUnlockUpgrade {
 		unlocked_name,
 		category,
 		collapsible_header,
+		button_class,
 		description,
 		cost,
 		visible_func,
@@ -247,6 +258,7 @@ class FixedCostFeatureUnlockUpgrade extends FeatureUnlockUpgrade {
 			unlocked_name,
 			category,
 			collapsible_header,
+			button_class,
 			description,
 			cost_func: () => cost,
 			visible_func,
@@ -263,6 +275,7 @@ class ToggleUnlockUpgrade extends FixedCostFeatureUnlockUpgrade {
 		unlocked_name,
 		category,
 		collapsible_header,
+		button_class,
 		description,
 		cost,
 		visible_func,
@@ -275,6 +288,7 @@ class ToggleUnlockUpgrade extends FixedCostFeatureUnlockUpgrade {
 			unlocked_name,
 			category,
 			collapsible_header,
+			button_class,
 			description,
 			cost,
 			visible_func,
@@ -373,6 +387,40 @@ class BallTypeRateUpgrade extends Upgrade {
 	}
 }
 
+function GetUpgradeLevel(upgrade_id) {
+	if (!state) {
+		return undefined;
+	}
+	return state.save_file.upgrade_levels[upgrade_id];
+}
+
+function IsUnlocked(upgrade_id) {
+	return GetUpgradeLevel(upgrade_id) > 0;
+}
+
+function IsMaxed(upgrade_id) {
+	if (!state) {
+		return undefined;
+	}
+	return GetUpgradeLevel(upgrade_id) >= state.upgrades[upgrade_id].max_level;
+}
+
+function IsUpgradeVisible(upgrade_id) {
+	return state.upgrades[upgrade_id].visible_func();
+}
+
+function AutoDropOn() {
+	return IsUnlocked("auto_drop") && state.save_file.options.auto_drop_enabled;
+}
+
+function AutoSpinOn() {
+	return IsUnlocked("auto_spin") && state.save_file.options.auto_spin_enabled;
+}
+
+function MultiSpinOn() {
+	return IsUnlocked("multi_spin") && state.save_file.options.multi_spin_enabled;
+}
+
 function IsScoreBuffActive() {
 	return state.save_file.score_buff_multiplier > 1 &&
 		state.save_file.score_buff_duration > 0;
@@ -385,10 +433,15 @@ function ActivateOrExtendScoreBuff(multiplier) {
 		state.save_file.score_buff_duration = kBuffDuration;
 	} else {
 		let stacks = state.save_file.score_buff_multiplier - 1.0;
-		state.save_file.score_buff_duration += (kBuffDuration / stacks) * (multiplier - 1.0);
+		state.save_file.score_buff_duration +=
+			(kBuffDuration / stacks) * (multiplier - 1.0);
 		if (state.save_file.score_buff_duration > kBuffDuration) {
-			state.save_file.score_buff_multiplier *= (state.save_file.score_buff_duration / kBuffDuration);
+			state.save_file.score_buff_multiplier *=
+				(state.save_file.score_buff_duration / kBuffDuration);
 			state.save_file.score_buff_duration = kBuffDuration;
+		}
+		if (state.save_file.stats.max_buff_multiplier < state.save_file.score_buff_multiplier) {
+			state.save_file.stats.max_buff_multiplier = state.save_file.score_buff_multiplier;
 		}
 	}
 }
@@ -763,6 +816,56 @@ function InitUpgrades() {
 		})
 	);
 	upgrades_list.push(
+		new FixedCostFeatureUnlockUpgrade({
+			id: "better_buff_multiplier",
+			name: "Better Buff Multiplier",
+			category: "bonus_wheel",
+			collapsible_header: "bonus_wheel",
+			button_class: "rubyUpgradeButton",
+			description:
+				'Instead of applying the <i>current</i> score multiplier buff to points won from wheel spins, the <i>highest</i> multiplier you have ever achieved is applied.',
+			cost: 1e48,
+			visible_func: () =>
+				IsMaxed("ruby_ball_rate") &&
+				IsUnlocked("ruby_ball_buff_stackable"),
+			on_update: () => {
+				state.bonus_wheel.UpdateAllSpaces();
+			}
+		})
+	);
+	upgrades_list.push(
+		new FixedCostFeatureUnlockUpgrade({
+			id: "better_point_values",
+			name: "Better Point Values",
+			category: "bonus_wheel",
+			collapsible_header: "bonus_wheel",
+			button_class: "emeraldUpgradeButton",
+			description:
+				'Makes the highest point value on the wheel scale to the value of emerald balls instead of gold balls.',
+			cost: 1e48,
+			visible_func: () => IsMaxed("emerald_ball_rate"),
+			on_update: () => {
+				state.bonus_wheel.UpdateAllSpaces();
+			}
+		})
+	);
+	upgrades_list.push(
+		new FixedCostFeatureUnlockUpgrade({
+			id: "better_multi_spin",
+			name: "Better Multi-Spin",
+			category: "bonus_wheel",
+			collapsible_header: "bonus_wheel",
+			button_class: "sapphireUpgradeButton",
+			description:
+				'Refunds additional spins consumed by Multi-Spin when landing on a ball drop space. (Note: ZONK still wastes all spins consumed.)',
+			cost: 1e48,
+			visible_func: () => IsMaxed("sapphire_ball_rate"),
+			on_update: () => {
+				state.bonus_wheel.UpdateAllSpaces();
+			}
+		})
+	);
+	upgrades_list.push(
 		new Upgrade({
 			id: "bonus_wheel_speed",
 			name: "Wheel Speed",
@@ -1028,13 +1131,12 @@ function InitUpgradeButtons(upgrades) {
 		let upgrade = upgrades[upgrade_id];
 		let category_div_id = upgrade.category + "_contents";
 		let category_div = document.getElementById(category_div_id);
-		let button_class = ButtonClassForUpgradeCategory(upgrade.category);
 		category_div.innerHTML +=
 			'<div class="upgradeButtonWrapper" id="' +
 			upgrade_id +
 			'" onmouseenter="ShowUpgradeTooltip(this)" onmouseleave="HideUpgradeTooltip(this)">' +
 			'<button type="button" class="' +
-			button_class +
+			upgrade.button_class +
 			'" id="button_upgrade_' +
 			upgrade.id +
 			'" onclick="UpgradeButtonHandler(this)"></button></div>';
@@ -1085,6 +1187,12 @@ function NextUpgradeHint(state) {
 		return "Unlock all 3 of Topaz, Turquoise, and Amethyst Balls";
 	} else if (!IsUpgradeVisible("unlock_eight_balls")) {
 		return "Unlock Opal Balls and Stackable Buff";
+	} else if (
+		!IsUpgradeVisible("better_point_values") ||
+		!IsUpgradeVisible("better_multi_spin") ||
+		!IsUpgradeVisible("better_buff_multiplier")
+	) {
+		return "Max Ruby, Sapphire, and Emerald Ball Rates (5%). Each one reveals a different upgrade when maxed.";
 	} else {
 		return "None! Congratulations, you've reached the current endgame!"
 	}
