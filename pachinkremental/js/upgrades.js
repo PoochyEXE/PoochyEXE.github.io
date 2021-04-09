@@ -470,6 +470,15 @@ function OnCenterSlotHit(ball) {
 			color_rgb: k8BallHighlightColor
 		});
 		ActivateOrExtendScoreBuff(8.0);
+	} else if (ball.ball_type_index == kBallTypeIDs.BEACH_BALL) {
+		let text_pos = new Point(ball.pos.x, ball.pos.y - 10);
+		MaybeAddScoreText({
+			level: 2,
+			text: "16\u00D7 scoring!",
+			pos: text_pos,
+			color_rgb: k8BallHighlightColor
+		});
+		ActivateOrExtendScoreBuff(16.0);
 	}
 }
 
@@ -817,6 +826,19 @@ function InitUpgrades() {
 	);
 	upgrades_list.push(
 		new FixedCostFeatureUnlockUpgrade({
+			id: "better_drops_4",
+			name: "Better Ball Drops 4",
+			category: "bonus_wheel",
+			collapsible_header: "bonus_wheel",
+			description:
+				'Change the "Drop 3 gemstone balls" space to "Drop 3 special balls", which drops 1 Opal ball, 1 8-Ball, and 1 Beach ball.',
+			cost: 1e67,
+			visible_func: () => IsUnlocked("unlock_beach_balls"),
+			on_update: null
+		})
+	);
+	upgrades_list.push(
+		new FixedCostFeatureUnlockUpgrade({
 			id: "better_buff_multiplier",
 			name: "Better Buff Multiplier",
 			category: "bonus_wheel",
@@ -1107,6 +1129,26 @@ function InitUpgrades() {
 				IsMaxed("emerald_ball_exponent")
 		})
 	);
+	upgrades_list.push(
+		new BallTypeUnlockUpgrade({
+			ball_type: kBallTypes[kBallTypeIDs.BEACH_BALL],
+			ball_description:
+				"Beach balls are bouncier and floatier than other balls. They're worth double the points and spins of 8-balls, and award a 16&times; scoring buff.",
+			collapsible_header: "beach_balls",
+			cost_func: () => 1e56,
+			visible_func: () =>
+				IsUnlocked("unlock_eight_balls")
+		})
+	);
+	upgrades_list.push(
+		new BallTypeRateUpgrade({
+			ball_type: kBallTypes[kBallTypeIDs.BEACH_BALL],
+			collapsible_header: "beach_balls",
+			cost_func: level => 1e57 * Math.pow(10, level),
+			value_func: GemstoneBallRateValueFunc,
+			max_level: 49
+		})
+	);
 
 	let upgrades_map = {};
 	for (let i = 0; i < upgrades_list.length; ++i) {
@@ -1134,6 +1176,8 @@ function ButtonClassForUpgradeCategory(category) {
 		return "opalUpgradeButton";
 	} else if (category == "eight_balls") {
 		return "eightBallUpgradeButton";
+	} else if (category == "beach_balls") {
+		return "beachBallUpgradeButton";
 	} else {
 		return "upgradeButton";
 	}
@@ -1206,6 +1250,8 @@ function NextUpgradeHint(state) {
 		!IsUpgradeVisible("better_buff_multiplier")
 	) {
 		return "Max Ruby, Sapphire, and Emerald Ball Rates (5%). Each one reveals a different upgrade when maxed.";
+	} else if (!IsUpgradeVisible("better_drops_4")) {
+		return "Unlock Beach Balls.";
 	} else {
 		return "None! Congratulations, you've reached the current endgame!"
 	}
@@ -1265,6 +1311,10 @@ function UpdateUpgradeButtons(state) {
 	UpdateUpgradeSubHeader(
 		"eight_balls_upgrades_container",
 		state.upgrades["unlock_eight_balls"].visible_func()
+	);
+	UpdateUpgradeSubHeader(
+		"beach_balls_upgrades_container",
+		state.upgrades["unlock_beach_balls"].visible_func()
 	);
 }
 

@@ -150,16 +150,33 @@ function DefaultWheel() {
 	spaces.push(
 		new BonusWheelSpace({
 			active_color: "#F8F",
-			text_func: () =>
-				IsUnlocked("better_drops_2")
-					? "Drop 3 gemstone balls"
-					: "Drop 3 gold balls",
-
+			text_func: () => {
+				if (IsUnlocked("better_drops_4")) {
+					return "Drop 3 special balls";
+				} else if (IsUnlocked("better_drops_2")) {
+					return "Drop 3 gemstone balls";
+				} else {
+					return "Drop 3 gold balls";
+				}
+			},
 			on_hit_func: (multi_spin) => {
 				if (IsUnlocked("better_multi_spin")) {
 					state.save_file.spins += multi_spin - 1;
 				}
-				if (IsUnlocked("better_drops_3")) {
+				if (IsUnlocked("better_drops_4")) {
+					DropBonusBalls(
+						ShuffleArray([
+							kBallTypeIDs.OPAL,
+							kBallTypeIDs.EIGHT_BALL,
+							kBallTypeIDs.BEACH_BALL
+						])
+					);
+					MaybeAddBonusWheelText({
+						text: "3 special balls!",
+						pos: kWheelPopupTextPos,
+						color_rgb: kWheelPopupTextColor
+					});
+				} else if (IsUnlocked("better_drops_3")) {
 					DropBonusBalls(
 						ShuffleArray([
 							kBallTypeIDs.TOPAZ,

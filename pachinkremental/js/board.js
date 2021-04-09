@@ -62,12 +62,18 @@ class ScoreTarget extends Target {
 		}
 		let popup_text_level = 0;
 		if (ball.ball_type_index != kBallTypeIDs.NORMAL) {
-			if (ball.ball_type_index == kBallTypeIDs.EIGHT_BALL) {
+			if (
+				ball.ball_type_index == kBallTypeIDs.EIGHT_BALL ||
+				ball.ball_type_index == kBallTypeIDs.BEACH_BALL
+			) {
 				popup_text_level = 2;
 				color_rgb = k8BallHighlightColor;
 				let exponent = IsUnlocked("eight_ball_exponent") ? 8 : state.emerald_ball_exponent;
 				total_value *= Math.pow(state.special_ball_multiplier, exponent);
 				total_value *= 8;
+				if (ball.ball_type_index == kBallTypeIDs.BEACH_BALL) {
+					total_value *= 2;
+				}
 			} else if (
 				ball.ball_type_index == kBallTypeIDs.EMERALD ||
 				ball.ball_type_index == kBallTypeIDs.TOPAZ ||
@@ -121,7 +127,8 @@ class SpinTarget extends Target {
 			ball.ball_type_index == kBallTypeIDs.TURQUOISE ||
 			ball.ball_type_index == kBallTypeIDs.AMETHYST ||
 			ball.ball_type_index == kBallTypeIDs.OPAL ||
-			ball.ball_type_index == kBallTypeIDs.EIGHT_BALL
+			ball.ball_type_index == kBallTypeIDs.EIGHT_BALL ||
+			ball.ball_type_index == kBallTypeIDs.BEACH_BALL
 		) {
 			let value = Math.floor(Math.pow(
 				state.special_ball_multiplier, state.sapphire_ball_exponent
@@ -129,7 +136,10 @@ class SpinTarget extends Target {
 			let color_rgb = "0,0,255"
 			if (ball.ball_type_index == kBallTypeIDs.EIGHT_BALL) {
 				value *= 8;
-				color_rgb = k8BallHighlightColor
+				color_rgb = k8BallHighlightColor;
+			} else if (ball.ball_type_index == kBallTypeIDs.BEACH_BALL) {
+				value *= 16;
+				color_rgb = k8BallHighlightColor;
 			}
 			state.save_file.spins += value;
 			UpdateSpinCounter();
