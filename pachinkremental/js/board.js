@@ -66,13 +66,14 @@ class ScoreTarget extends Target {
 				ball.ball_type_index == kBallTypeIDs.EIGHT_BALL ||
 				ball.ball_type_index == kBallTypeIDs.BEACH_BALL
 			) {
-				popup_text_level = 2;
+				popup_text_level = 3;
 				color_rgb = k8BallHighlightColor;
 				let exponent = IsUnlocked("eight_ball_exponent") ? 8 : state.emerald_ball_exponent;
 				total_value *= Math.pow(state.special_ball_multiplier, exponent);
 				total_value *= 8;
 				if (ball.ball_type_index == kBallTypeIDs.BEACH_BALL) {
 					total_value *= 2;
+					color_rgb = kPrismatic;
 				}
 			} else if (
 				ball.ball_type_index == kBallTypeIDs.EMERALD ||
@@ -134,17 +135,20 @@ class SpinTarget extends Target {
 				state.special_ball_multiplier, state.sapphire_ball_exponent
 			));
 			let color_rgb = "0,0,255"
+			let score_text_level = 2;
 			if (ball.ball_type_index == kBallTypeIDs.EIGHT_BALL) {
+				score_text_level = 3;
 				value *= 8;
 				color_rgb = k8BallHighlightColor;
 			} else if (ball.ball_type_index == kBallTypeIDs.BEACH_BALL) {
+				score_text_level = 3;
 				value *= 16;
-				color_rgb = k8BallHighlightColor;
+				color_rgb = kPrismatic;
 			}
 			state.save_file.spins += value;
 			UpdateSpinCounter();
 			MaybeAddScoreText({
-				level: 2,
+				level: score_text_level,
 				text: `+${FormatNumberShort(value)} Spins`,
 				pos: ball.pos,
 				color_rgb: color_rgb

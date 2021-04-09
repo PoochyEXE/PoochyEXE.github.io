@@ -34,6 +34,7 @@ A: This is intentional, both to make sure the game won't softlock with too many 
 ### v0.10.0 beta (2021-04-08)
 * New ball type: Beach balls! They're bouncier and floatier than other ball types.
 * Add another Bonus Wheel upgrade.
+* Add "8-Ball+" choice for pop-up text display option.
 
 ### v0.9.0 beta (2021-04-08)
 * Add 3 new Bonus Wheel upgrades.
