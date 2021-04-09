@@ -1,4 +1,4 @@
-const kVersion = "v0.9.0 beta";
+const kVersion = "v0.10.0 beta";
 const kTitleAndVersion = "Pachinkremental " + kVersion;
 
 var max_drop_y = 20;
@@ -22,6 +22,7 @@ const kBallTypes = [
 	new BallType(7,   "amethyst",  "Amethyst ",   "#FBF",       "#F3F",       "255, 48,255"    ),
 	new BallType(8,   "opal",      "Opal ",       kPrismatic,   kPrismatic,   kPrismatic       ),
 	new BallType(9,   "eight",     "8-",          k8Ball,       k8Ball,       "246, 31,183"    ),
+	new BallType(10,  "beach",     "Beach ",      kBeachBall,   kBeachBall,   kBeachBall       ),
 ];
 
 const kBallTypeIDs = {
@@ -35,6 +36,7 @@ const kBallTypeIDs = {
 	AMETHYST: 7,
 	OPAL: 8,
 	EIGHT_BALL: 9,
+	BEACH_BALL: 10,
 };
 
 function CreateBallWithNoise(x, y, dx, dy, ball_type_index) {
@@ -366,7 +368,12 @@ function IsCollapsed(panel_name) {
 function UpdateOneFrame(state, draw) {
 	for (let i = 0; i < state.balls_by_type.length; ++i) {
 		if (state.balls_by_type[i].length > 0) {
-			UpdateBalls(state.balls_by_type[i], state.board, state.target_sets);
+			UpdateBalls(
+				state.balls_by_type[i],
+				state.board,
+				state.target_sets,
+				i == kBallTypeIDs.BEACH_BALL
+			);
 		}
 	}
 

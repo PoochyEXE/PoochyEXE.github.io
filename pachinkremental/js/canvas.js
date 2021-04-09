@@ -11,6 +11,7 @@ const kPegColorDarkMode = {
 const kPrismatic = "PRISMATIC";
 const k8Ball = "8-BALL";
 const k8BallHighlightColor = "246, 31,183";
+const kBeachBall = "BEACH";
 
 const kPrismaticCycleColors = [
 	[0, 1, 0],
@@ -20,6 +21,9 @@ const kPrismaticCycleColors = [
 	[1, 0, 0],
 	[1, 1, 0]
 ];
+const kPrismaticSaturationOuter = 0.8;
+const kPrismaticSaturationInner = 0.25;
+const kPrismaticCycleDuration = 2000.0;
 
 function GetPegColor() {
 	if (state.save_file.options.dark_mode && !state.april_fools) {
@@ -197,7 +201,62 @@ function DrawEightBallsNoGradient(balls, ctx) {
 	}
 }
 
-function DrawGradientCircle(ctx, pos, radius, inner_color, outer_color) {
+function DrawBeachBalls(balls, ctx) {
+	for (let i = 0; i < balls.length; ++i) {
+		let pos = balls[i].pos;
+		let rotation = balls[i].rotation;
+		for (let i = 0; i < kPrismaticCycleColors.length; ++i) {
+			let segment_rotation =
+				Math.PI * 2.0 * i / kPrismaticCycleColors.length - rotation;
+			outer_color = GetPrismaticColor(
+				i, 6.0, kPrismaticSaturationOuter, 1.0
+			);
+			inner_color = GetPrismaticColor(
+				i, 6.0, kPrismaticSaturationInner, 1.0
+			);
+			ctx.fillStyle =
+				CreateBallGradient(ctx, pos, kBallRadius, inner_color, outer_color);
+			ctx.beginPath();
+			ctx.moveTo(pos.x, pos.y);
+			ctx.arc(
+				pos.x,
+				pos.y,
+				kBallRadius,
+				segment_rotation,
+				segment_rotation + Math.PI / 3.0
+			);
+			ctx.lineTo(pos.x, pos.y);
+			ctx.fill();
+		}
+	}
+}
+
+function DrawBeachBallsNoGradient(balls, ctx) {
+	for (let i = 0; i < balls.length; ++i) {
+		let pos = balls[i].pos;
+		let rotation = balls[i].rotation;
+		for (let i = 0; i < kPrismaticCycleColors.length; ++i) {
+			let segment_rotation =
+				Math.PI * 2.0 * i / kPrismaticCycleColors.length - rotation;
+			ctx.fillStyle = GetPrismaticColor(
+				i, 6.0, kPrismaticSaturationOuter, 1.0
+			);
+			ctx.beginPath();
+			ctx.moveTo(pos.x, pos.y);
+			ctx.arc(
+				pos.x,
+				pos.y,
+				kBallRadius,
+				segment_rotation,
+				segment_rotation + Math.PI / 3.0
+			);
+			ctx.lineTo(pos.x, pos.y);
+			ctx.fill();
+		}
+	}
+}
+
+function CreateBallGradient(ctx, pos, radius, inner_color, outer_color) {
 	let inner_x = pos.x - radius / 3;
 	let inner_y = pos.y - radius / 3;
 	let inner_r = radius / 10;
@@ -214,7 +273,12 @@ function DrawGradientCircle(ctx, pos, radius, inner_color, outer_color) {
 	);
 	gradient.addColorStop(0, inner_color);
 	gradient.addColorStop(1, outer_color);
-	ctx.fillStyle = gradient;
+	return gradient;
+}
+
+function DrawGradientCircle(ctx, pos, radius, inner_color, outer_color) {
+	ctx.fillStyle =
+		CreateBallGradient(ctx, pos, radius, inner_color, outer_color);
 	ctx.beginPath();
 	ctx.arc(pos.x, pos.y, radius, 0, 2 * Math.PI);
 	ctx.fill();
@@ -303,6 +367,10 @@ function DrawBalls(balls, inner_color, outer_color, ctx) {
 		DrawEightBalls(balls, ctx);
 		return;
 	}
+	if (inner_color == kBeachBall && outer_color == kBeachBall) {
+		DrawBeachBalls(balls, ctx);
+		return;
+	}
 	if (
 		!state.save_file.options.classic_opal_balls &&
 		inner_color == kPrismatic &&
@@ -311,9 +379,6 @@ function DrawBalls(balls, inner_color, outer_color, ctx) {
 		DrawPrismaticBalls(balls, ctx);
 		return;
 	}
-	const kPrismaticSaturationOuter = 0.8;
-	const kPrismaticSaturationInner = 0.25;
-	const kPrismaticCycleDuration = 2000.0;
 	const kPrismaticCycleShift = kPrismaticCycleDuration / 6.0;
 	const time = Date.now();
 	for (let i = 0; i < balls.length; ++i) {
@@ -348,6 +413,9 @@ function DrawBalls(balls, inner_color, outer_color, ctx) {
 function DrawBallsNoGradient(balls, color, ctx) {
 	if (color == k8Ball) {
 		DrawEightBallsNoGradient(balls, ctx);
+		return;
+	} else if (color == kBeachBall) {
+		DrawBeachBallsNoGradient(balls, ctx);
 		return;
 	}
 	const kPrismaticSaturation = 0.8;
@@ -443,22 +511,47 @@ function DrawRipples(ripples, duration, expand, ctx) {
 			continue;
 		}
 		let fraction = elapsed / duration;
-		let color_rgba = "";
-		if (curr_ripples.color_rgb == kPrismatic) {
-			color_rgba = GetPrismaticColor(
-				elapsed,
-				duration / 2,
-				/*saturation=*/ kPrismaticSaturation,
-				/*alpha=*/ 1 - fraction
-			);
-		} else {
-			color_rgba = "rgba(" + curr_ripples.color_rgb + ", " + (1 - fraction) + ")";
-		}
 		let radius = curr_ripples.start_radius + expand * fraction;
-		ctx.strokeStyle = color_rgba;
-		ctx.beginPath();
-		ctx.arc(curr_ripples.pos.x, curr_ripples.pos.y, radius, 0, 2 * Math.PI);
-		ctx.stroke();
+		
+		if (curr_ripples.color_rgb == kBeachBall) {
+			let rotation = 4.0 * Math.PI * elapsed / duration;
+			for (let i = 0; i < kPrismaticCycleColors.length; ++i) {
+				let segment_rotation =
+					rotation + Math.PI * 2.0 * i / kPrismaticCycleColors.length;
+				color_rgba = GetPrismaticColor(
+					i,
+					6.0,
+					/*saturation=*/ kPrismaticSaturation,
+					/*alpha=*/ 1 - fraction
+				);
+				ctx.strokeStyle = color_rgba;
+				ctx.beginPath();
+				ctx.arc(
+					curr_ripples.pos.x,
+					curr_ripples.pos.y,
+					radius,
+					segment_rotation,
+					segment_rotation + Math.PI / 3.0
+				);
+				ctx.stroke();
+			}
+		} else {
+			let color_rgba = "";
+			if (curr_ripples.color_rgb == kPrismatic) {
+				color_rgba = GetPrismaticColor(
+					elapsed,
+					duration / 2,
+					/*saturation=*/ kPrismaticSaturation,
+					/*alpha=*/ 1 - fraction
+				);
+			} else {
+				color_rgba = "rgba(" + curr_ripples.color_rgb + ", " + (1 - fraction) + ")";
+			}
+			ctx.strokeStyle = color_rgba;
+			ctx.beginPath();
+			ctx.arc(curr_ripples.pos.x, curr_ripples.pos.y, radius, 0, 2 * Math.PI);
+			ctx.stroke();
+		}
 		if (next_index != i) {
 			ripples[next_index] = ripples[i];
 		}

@@ -151,7 +151,7 @@ div.upgradeButtonWrapper {
 	margin: 2.5px;
 }
 
-button.upgradeButton, button.rubyUpgradeButton, button.sapphireUpgradeButton, button.emeraldUpgradeButton, button.topazUpgradeButton, button.turquoiseUpgradeButton, button.amethystUpgradeButton, button.opalUpgradeButton, button.eightBallUpgradeButton {
+button.upgradeButton, button.rubyUpgradeButton, button.sapphireUpgradeButton, button.emeraldUpgradeButton, button.topazUpgradeButton, button.turquoiseUpgradeButton, button.amethystUpgradeButton, button.opalUpgradeButton, button.eightBallUpgradeButton, button.beachBallUpgradeButton {
 	border: 1px solid #000;
 	border-radius: 10px;
 	font-family: sans-serif;
@@ -385,6 +385,82 @@ button.opalUpgradeButtonDark:disabled {
     -webkit-animation-name: opalUpgradeButtonDarkDisabledColor;  
     -webkit-animation-iteration-count: infinite;  
     -webkit-animation-duration: 2s; 
+}
+
+button.beachBallUpgradeButtonLight {
+	background: repeating-linear-gradient(
+	  45deg,
+	  #F88,
+	  #F88 10px,
+	  #FF8 10px,
+	  #FF8 20px,
+	  #8F8 20px,
+	  #8F8 30px,
+	  #8FF 30px,
+	  #8FF 40px,
+	  #88F 40px,
+	  #88F 50px,
+	  #F8F 50px,
+	  #F8F 60px
+	);
+	color: #000;
+}
+
+button.beachBallUpgradeButtonLight:disabled {
+	background: repeating-linear-gradient(
+	  45deg,
+	  #A77,
+	  #A77 10px,
+	  #AA7 10px,
+	  #AA7 20px,
+	  #7A7 20px,
+	  #7A7 30px,
+	  #7AA 30px,
+	  #7AA 40px,
+	  #77A 40px,
+	  #77A 50px,
+	  #A7A 50px,
+	  #A7A 60px
+	);
+	color: #000;
+}
+
+button.beachBallUpgradeButtonDark {
+	background: repeating-linear-gradient(
+	  45deg,
+	  #A33,
+	  #A33 10px,
+	  #AA3 10px,
+	  #AA3 20px,
+	  #3A3 20px,
+	  #3A3 30px,
+	  #3AA 30px,
+	  #3AA 40px,
+	  #33A 40px,
+	  #33A 50px,
+	  #A3A 50px,
+	  #A3A 60px
+	);
+	color: #FFF;
+}
+
+button.beachBallUpgradeButtonDark:disabled {
+	background: repeating-linear-gradient(
+	  45deg,
+	  #300,
+	  #300 10px,
+	  #330 10px,
+	  #330 20px,
+	  #030 20px,
+	  #030 30px,
+	  #033 30px,
+	  #033 40px,
+	  #003 40px,
+	  #003 50px,
+	  #303 50px,
+	  #303 60px
+	);
+	color: #FFF;
 }
 
 button.optionButton, button.optionButtonRed {
