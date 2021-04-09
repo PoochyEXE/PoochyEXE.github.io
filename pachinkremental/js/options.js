@@ -3,6 +3,7 @@ const kPopupTextOptions = [
 	"Enable All",
 	"Gold+ only",
 	"Gemstone+ only",
+	"8-Ball+ only",
 	"Disable All",
 ];
 const kAprilFoolsOptions = [

@@ -464,7 +464,7 @@ function OnCenterSlotHit(ball) {
 	} else if (ball.ball_type_index == kBallTypeIDs.EIGHT_BALL) {
 		let text_pos = new Point(ball.pos.x, ball.pos.y - 10);
 		MaybeAddScoreText({
-			level: 2,
+			level: 3,
 			text: "8\u00D7 scoring!",
 			pos: text_pos,
 			color_rgb: k8BallHighlightColor
@@ -473,10 +473,10 @@ function OnCenterSlotHit(ball) {
 	} else if (ball.ball_type_index == kBallTypeIDs.BEACH_BALL) {
 		let text_pos = new Point(ball.pos.x, ball.pos.y - 10);
 		MaybeAddScoreText({
-			level: 2,
+			level: 3,
 			text: "16\u00D7 scoring!",
 			pos: text_pos,
-			color_rgb: k8BallHighlightColor
+			color_rgb: kPrismatic
 		});
 		ActivateOrExtendScoreBuff(16.0);
 	}
@@ -588,7 +588,7 @@ function InitUpgrades() {
 				let popup_text = kTimesSymbol + "5";
 				for (let i = 0; i < bottom_targets.length; ++i) {
 					MaybeAddScoreText({
-						level: 2,
+						level: 3,
 						text: popup_text,
 						pos: bottom_targets[i].pos,
 						color_rgb: "0,0,255"
@@ -614,7 +614,7 @@ function InitUpgrades() {
 				let target = state.target_sets[0].targets[4];
 				let popup_text = kTimesSymbol + "2";
 				MaybeAddScoreText({
-					level: 2,
+					level: 3,
 					text: popup_text,
 					pos: target.pos,
 					color_rgb: "0,0,255"
