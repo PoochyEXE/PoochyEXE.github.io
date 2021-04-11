@@ -118,9 +118,7 @@ function AwardSpins(ball, text_pos) {
 		) {
 			exponent = state.eight_ball_spin_exponent;
 		}
-		let value = Math.pow(
-			state.special_ball_multiplier, state.sapphire_ball_exponent
-		);
+		let value = Math.pow(state.special_ball_multiplier, exponent);
 		let color_rgb = "0,0,255"
 		let score_text_level = 2;
 		if (
@@ -138,7 +136,7 @@ function AwardSpins(ball, text_pos) {
 		}
 		if (ball.ball_type_index == kBallTypeIDs.BEACH_BALL) {
 			score_text_level = 3;
-			value *= 2;
+			value *= 16;
 			color_rgb = kPrismatic;
 		}
 		value = Math.floor(value);

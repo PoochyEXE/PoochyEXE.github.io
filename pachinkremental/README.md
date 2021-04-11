@@ -31,6 +31,12 @@ A: This is intentional, both to make sure the game won't softlock with too many 
 
 ## Changelog
 
+### v0.11.1 beta (2021-04-11)
+* Several bugfixes. Thanks to Leidwesen for the bug reports!
+	* Fix both 8-Ball exponent upgrades not working properly.
+	* Fix Beach Ball not applying the 8-Ball's 8x spins.
+	* Fix 8-Ball and Beach Ball scoring text not displaying when pop-up text is set to "8-Ball+ only".
+
 ### v0.11.0 beta (2021-04-11)
 * Change 8-Ball Exponent to be a gradual upgrade, instead of jumping from 3 straight to 8, and rename it to "8-Ball Score Exponent". Note: Importing a save file from a previous version will reset this upgrade's level.
 * New upgrades!

@@ -612,7 +612,7 @@ function OnCenterSlotHit(ball) {
 		}
 		let mult_display = FormatNumberShort(multiplier);
 		MaybeAddScoreText({
-			level: 2,
+			level: text_level,
 			text: mult_display + "\u00D7 scoring!",
 			pos: text_pos,
 			color_rgb: color_rgb
@@ -1273,7 +1273,7 @@ function InitUpgrades() {
 				IsUnlocked("unlock_eight_balls") &&
 				IsMaxed("emerald_ball_exponent"),
 			on_update: function() {
-				state.eight_ball_spin_exponent = this.GetValue();
+				state.eight_ball_score_exponent = this.GetValue();
 			},
 		})
 	);
