@@ -31,6 +31,14 @@ A: This is intentional, both to make sure the game won't softlock with too many 
 
 ## Changelog
 
+### v0.11.0 beta (2021-04-11)
+* Change 8-Ball Exponent to be a gradual upgrade, instead of jumping from 3 straight to 8, and rename it to "8-Ball Score Exponent". Note: Importing a save file from a previous version will reset this upgrade's level.
+* New upgrades!
+	* Synergy upgrades for Topaz, Turquoise, and Amethyst balls.
+	* Add 8-Ball Spin Exponent upgrade.
+* Refactor a bunch of code to reduce the amount of boilerplate I have to write when adding a new ball type or collapsible section in the upgrades menu.
+* Tweak physics engine to detect if a ball is (or about to be) stuck by being perfectly balanced on top of a peg, and give the ball a tiny random nudge. (This was theoretically possible but so incredibly unlikely that I doubt anyone's actually encountered it in normal play. Still, I was able to get a ball stuck by hacking the RNG to return specific values, so better safe than sorry.)
+
 ### v0.10.0 beta (2021-04-08)
 * New ball type: Beach balls! They're bouncier and floatier than other ball types.
 * Add another Bonus Wheel upgrade.

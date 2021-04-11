@@ -3,7 +3,6 @@ class Upgrade {
 		id,
 		name,
 		category,
-		collapsible_header,
 		button_class,
 		description,
 		cost_func,
@@ -17,11 +16,6 @@ class Upgrade {
 		this.id = id;
 		this.name = name;
 		this.category = category;
-		if (collapsible_header) {
-			this.collapsible_header = collapsible_header;
-		} else {
-			this.collapsible_header = category;
-		}
 		if (button_class) {
 			this.button_class = button_class;
 		} else {
@@ -129,7 +123,6 @@ class DelayReductionUpgrade extends Upgrade {
 		id,
 		name,
 		category,
-		collapsible_header,
 		button_class,
 		description,
 		cost_func,
@@ -144,7 +137,6 @@ class DelayReductionUpgrade extends Upgrade {
 			id,
 			name,
 			category,
-			collapsible_header,
 			button_class,
 			description,
 			cost_func,
@@ -197,7 +189,6 @@ class FeatureUnlockUpgrade extends Upgrade {
 		name,
 		unlocked_name,
 		category,
-		collapsible_header,
 		button_class,
 		description,
 		cost_func,
@@ -209,7 +200,6 @@ class FeatureUnlockUpgrade extends Upgrade {
 			id,
 			name,
 			category,
-			collapsible_header,
 			button_class,
 			description,
 			cost_func,
@@ -244,7 +234,6 @@ class FixedCostFeatureUnlockUpgrade extends FeatureUnlockUpgrade {
 		name,
 		unlocked_name,
 		category,
-		collapsible_header,
 		button_class,
 		description,
 		cost,
@@ -257,7 +246,6 @@ class FixedCostFeatureUnlockUpgrade extends FeatureUnlockUpgrade {
 			name,
 			unlocked_name,
 			category,
-			collapsible_header,
 			button_class,
 			description,
 			cost_func: () => cost,
@@ -274,7 +262,6 @@ class ToggleUnlockUpgrade extends FixedCostFeatureUnlockUpgrade {
 		name,
 		unlocked_name,
 		category,
-		collapsible_header,
 		button_class,
 		description,
 		cost,
@@ -287,7 +274,6 @@ class ToggleUnlockUpgrade extends FixedCostFeatureUnlockUpgrade {
 			name,
 			unlocked_name,
 			category,
-			collapsible_header,
 			button_class,
 			description,
 			cost,
@@ -342,13 +328,12 @@ class ToggleUnlockUpgrade extends FixedCostFeatureUnlockUpgrade {
 }
 
 class BallTypeUnlockUpgrade extends FeatureUnlockUpgrade {
-	constructor({ ball_type, ball_description, collapsible_header, cost_func, visible_func }) {
+	constructor({ ball_type, ball_description, cost_func, visible_func }) {
 		super({
 			id: `unlock_${ball_type.name}_balls`,
 			name: "Unlock " + ball_type.display_name + "Balls",
 			unlocked_name: ball_type.display_name + "Balls",
 			category: ball_type.name + "_balls",
-			collapsible_header: collapsible_header,
 			description:
 				"Unlock " + ball_type.display_name + "balls. " + ball_description,
 			cost_func,
@@ -364,12 +349,11 @@ class BallTypeUnlockUpgrade extends FeatureUnlockUpgrade {
 }
 
 class BallTypeRateUpgrade extends Upgrade {
-	constructor({ ball_type, collapsible_header, cost_func, value_func, max_level }) {
+	constructor({ ball_type, cost_func, value_func, max_level }) {
 		super({
 			id: ball_type.name + "_ball_rate",
 			name: ball_type.display_name + "Ball Rate",
 			category: ball_type.name + "_balls",
-			collapsible_header: collapsible_header,
 			description:
 				"Increases the probability of dropping " +
 				ball_type.display_name + "balls.",
@@ -385,6 +369,95 @@ class BallTypeRateUpgrade extends Upgrade {
 			on_buy: null
 		});
 	}
+}
+
+class UpgradeHeader {
+	constructor(id, display_name, visible_func, categories, explanation_html) {
+		this.id = id;
+		this.display_name = display_name;
+		if (visible_func) {
+			this.visible_func = visible_func;
+		} else {
+			this.visible_func = () => true;
+		}
+		if (categories) {
+			this.categories = categories;
+		} else {
+			this.categories = [id];
+		}
+		this.explanation_html = explanation_html;
+	}
+	
+	ToHTML() {
+		let html =
+			'<div id="' + this.id + '_upgrades_container" class="upgradesContainer">' +
+			'<button type="button" class="upgradesSubHeader" id="button_' +
+			this.id + '_header" onclick="ToggleVisibility(\''+ this.id + '\')">' +
+			'<span id="' + this.id + '_collapsed">[&ndash;]</span> ' +
+			this.display_name +
+			'<span id="' + this.id + '_header_new" class="upgradeHeaderNew" style="display: none;"><sup>New!</sup></span>' +
+			'</button>' +
+			'<div id="' + this.id + '_contents" class="upgradesContents" style="display: block;">';
+		if (this.explanation_html) {
+			html +=
+				'<div id="' + this.id +
+				'_explantion" class="messageBox" style="padding-top: 5px; padding-bottom: 5px;">' +
+				this.explanation_html + '</div>'
+		}
+		for (let i = 0; i < this.categories.length; ++i) {
+			html +=
+				'<div id="' + this.categories[i] +
+				'_contents" class="upgradesContents" style="display: inline-block;"></div>';
+		}
+		html += '</div></div>'
+		return html;
+	}
+}
+
+class SingleBallTypeUpgradeHeader extends UpgradeHeader {
+	constructor(ball_type, explanation_html) {
+		super(
+			/*id=*/ball_type.name + "_balls",
+			/*display_name=*/ball_type.display_name + "Balls",
+			/*visible_func=*/() => IsUpgradeVisible("unlock_" + ball_type.name + "_balls"),
+			null,
+			explanation_html
+		);
+	}
+}
+
+function InitUpgradeHeaders(state) {
+	return [
+		new UpgradeHeader("board", "Board"),
+		new UpgradeHeader("auto_drop", "Auto-Drop", state.upgrades["auto_drop"].visible_func),
+		new UpgradeHeader("bonus_wheel", "Bonus Wheel", state.upgrades["unlock_bonus_wheel"].visible_func),
+		new SingleBallTypeUpgradeHeader(kBallTypes[kBallTypeIDs.GOLD]),
+		new SingleBallTypeUpgradeHeader(kBallTypes[kBallTypeIDs.EIGHT_BALL]),
+		new SingleBallTypeUpgradeHeader(kBallTypes[kBallTypeIDs.BEACH_BALL]),
+		new UpgradeHeader(
+			"gemstone_balls",
+			"Gemstone Balls",
+			ShouldDisplayGemstoneBallUpgrades,
+			[
+				"ruby_balls",
+				"topaz_balls",
+				"emerald_balls",
+				"turquoise_balls",
+				"sapphire_balls",
+				"amethyst_balls",
+				"opal_balls"
+			],
+			"Gemstone balls have the benefits of gold balls, plus additional bonuses.<br>NOTE: Unlocking one gemstone ball sharply increases the cost of unlocking the others!"
+		),
+	];
+}
+
+function InitUpgradeHeaderCollapsibles(upgrade_headers) {
+	let html = '';
+	for (let i = 0; i < upgrade_headers.length; ++i) {
+		html += upgrade_headers[i].ToHTML();
+	}
+	document.getElementById("upgrade_headers").innerHTML = html;
 }
 
 function GetUpgradeLevel(upgrade_id) {
@@ -421,6 +494,69 @@ function MultiSpinOn() {
 	return IsUnlocked("multi_spin") && state.save_file.options.multi_spin_enabled;
 }
 
+function HasEightBallSpecial(ball_type_index) {
+	return (
+		ball_type_index == kBallTypeIDs.EIGHT_BALL ||
+		ball_type_index == kBallTypeIDs.BEACH_BALL
+	);
+}
+
+
+function HasOpalSpecial(ball_type_index) {
+	return (
+		ball_type_index == kBallTypeIDs.OPAL ||
+		HasEightBallSpecial(ball_type_index)
+	);
+}
+
+function HasRubySpecial(ball_type_index) {
+	return (
+		ball_type_index == kBallTypeIDs.RUBY ||
+		ball_type_index == kBallTypeIDs.TOPAZ ||
+		ball_type_index == kBallTypeIDs.AMETHYST ||
+		HasOpalSpecial(ball_type_index)
+	);
+}
+
+function HasSapphireSpecial(ball_type_index) {
+	return (
+		ball_type_index == kBallTypeIDs.SAPPHIRE ||
+		ball_type_index == kBallTypeIDs.TURQUOISE ||
+		ball_type_index == kBallTypeIDs.AMETHYST ||
+		HasOpalSpecial(ball_type_index)
+	);
+}
+
+function HasEmeraldSpecial(ball_type_index) {
+	return (
+		ball_type_index == kBallTypeIDs.EMERALD ||
+		ball_type_index == kBallTypeIDs.TOPAZ ||
+		ball_type_index == kBallTypeIDs.TURQUOISE ||
+		HasOpalSpecial(ball_type_index)
+	);
+}
+
+function HasTopazSpecial(ball_type_index) {
+	return (
+		ball_type_index == kBallTypeIDs.TOPAZ ||
+		HasOpalSpecial(ball_type_index)
+	);
+}
+
+function HasTurquoiseSpecial(ball_type_index) {
+	return (
+		ball_type_index == kBallTypeIDs.TURQUOISE ||
+		HasOpalSpecial(ball_type_index)
+	);
+}
+
+function HasAmethystSpecial(ball_type_index) {
+	return (
+		ball_type_index == kBallTypeIDs.AMETHYST ||
+		HasOpalSpecial(ball_type_index)
+	);
+}
+
 function IsScoreBuffActive() {
 	return state.save_file.score_buff_multiplier > 1 &&
 		state.save_file.score_buff_duration > 0;
@@ -447,38 +583,41 @@ function ActivateOrExtendScoreBuff(multiplier) {
 }
 
 function OnCenterSlotHit(ball) {
+	let text_pos = new Point(ball.pos.x, ball.pos.y - 10);
 	if (
-		ball.ball_type_index == kBallTypeIDs.RUBY ||
-		ball.ball_type_index == kBallTypeIDs.TOPAZ ||
-		ball.ball_type_index == kBallTypeIDs.AMETHYST ||
-		ball.ball_type_index == kBallTypeIDs.OPAL
+		HasTurquoiseSpecial(ball.ball_type_index) &&
+		IsUnlocked("turquoise_synergy")
 	) {
-		let text_pos = new Point(ball.pos.x, ball.pos.y - 10);
+		AwardSpins(ball, text_pos);
+		text_pos.y -= 10;
+	}
+	if (HasRubySpecial(ball.ball_type_index)) {
+		let multiplier = 2.0;
+		let color_rgb = "255,0,0"
+		let text_level = 2;
+		if (ball.ball_type_index == kBallTypeIDs.BEACH_BALL) {
+			multiplier = 16;
+			color_rgb = kPrismatic;
+			text_level = 3;
+		} else if (ball.ball_type_index == kBallTypeIDs.EIGHT_BALL) {
+			multiplier = 8;
+			color_rgb = k8BallHighlightColor;
+			text_level = 3;
+		} else if (
+			HasTopazSpecial(ball.ball_type_index) &&
+			IsUnlocked("topaz_synergy")
+		) {
+			multiplier = state.emerald_ball_exponent;
+			color_rgb = "255,255,0"
+		}
+		let mult_display = FormatNumberShort(multiplier);
 		MaybeAddScoreText({
 			level: 2,
-			text: "2\u00D7 scoring!",
+			text: mult_display + "\u00D7 scoring!",
 			pos: text_pos,
-			color_rgb: "255,0,0"
+			color_rgb: color_rgb
 		});
-		ActivateOrExtendScoreBuff(2.0);
-	} else if (ball.ball_type_index == kBallTypeIDs.EIGHT_BALL) {
-		let text_pos = new Point(ball.pos.x, ball.pos.y - 10);
-		MaybeAddScoreText({
-			level: 3,
-			text: "8\u00D7 scoring!",
-			pos: text_pos,
-			color_rgb: k8BallHighlightColor
-		});
-		ActivateOrExtendScoreBuff(8.0);
-	} else if (ball.ball_type_index == kBallTypeIDs.BEACH_BALL) {
-		let text_pos = new Point(ball.pos.x, ball.pos.y - 10);
-		MaybeAddScoreText({
-			level: 3,
-			text: "16\u00D7 scoring!",
-			pos: text_pos,
-			color_rgb: kPrismatic
-		});
-		ActivateOrExtendScoreBuff(16.0);
+		ActivateOrExtendScoreBuff(multiplier);
 	}
 }
 
@@ -627,7 +766,7 @@ function InitUpgrades() {
 		new ToggleUnlockUpgrade({
 			id: "auto_drop",
 			name: "Auto-Drop",
-			category: "auto-drop",
+			category: "auto_drop",
 			description:
 				"Automatically drops a ball when allowed. Click in the drop zone to move the drop position.",
 			cost: 100000,
@@ -642,7 +781,7 @@ function InitUpgrades() {
 		new DelayReductionUpgrade({
 			id: "auto_drop_delay",
 			name: "Auto-Drop Delay",
-			category: "auto-drop",
+			category: "auto_drop",
 			description: "Decreases the auto drop delay.",
 			cost_func: level => 200000 * Math.pow(2, level),
 			value_func: level =>
@@ -683,7 +822,6 @@ function InitUpgrades() {
 			ball_type: kBallTypes[kBallTypeIDs.GOLD],
 			ball_description:
 				"Gold balls are worth double points and don't count towards the max balls limit.",
-			collapsible_header: "gold_balls",
 			cost_func: () => 500000,
 			visible_func: () => GetUpgradeLevel("max_balls") > 0
 		})
@@ -720,7 +858,6 @@ function InitUpgrades() {
 			name: "Unlock Bonus Wheel",
 			unlocked_name: "Bonus Wheel",
 			category: "bonus_wheel",
-			collapsible_header: "bonus_wheel",
 			description:
 				"Unlocks the Bonus Wheel. Also adds 2 targets, which award a spin for each ball that passes through them. Point values on the wheel scale based on your upgrades.",
 			cost: 2000000,
@@ -743,7 +880,6 @@ function InitUpgrades() {
 			id: "add_spin_target",
 			name: "Extra Spin Target",
 			category: "bonus_wheel",
-			collapsible_header: "bonus_wheel",
 			description: "Adds an extra target that awards Bonus Wheel spins.",
 			cost: 10000000,
 			visible_func: () => IsUnlocked("unlock_bonus_wheel"),
@@ -765,7 +901,6 @@ function InitUpgrades() {
 			id: "auto_spin",
 			name: "Auto-Spin",
 			category: "bonus_wheel",
-			collapsible_header: "bonus_wheel",
 			description: "Automatically spin the Bonus Wheel.",
 			cost: 50000000,
 			visible_func: () => IsUnlocked("unlock_bonus_wheel"),
@@ -777,7 +912,6 @@ function InitUpgrades() {
 			id: "multi_spin",
 			name: "Multi-Spin",
 			category: "bonus_wheel",
-			collapsible_header: "bonus_wheel",
 			description:
 				"Uses 10% of your available spins at a time, multiplying any points you win from that spin. NOTE: Bonus gold ball drops are not multiplied.",
 			cost: 50000000,
@@ -790,7 +924,6 @@ function InitUpgrades() {
 			id: "better_drops_1",
 			name: "Better Ball Drops",
 			category: "bonus_wheel",
-			collapsible_header: "bonus_wheel",
 			description:
 				'Change the "Drop 7 gold balls" space to "Drop 7 special balls". One gemstone ball of each type you have unlocked replaces one of the gold balls. This automatically updates as you unlock more gemstone balls.',
 			cost: NthGemstoneBallUnlockCost(1),
@@ -803,7 +936,6 @@ function InitUpgrades() {
 			id: "better_drops_2",
 			name: "Better Ball Drops 2",
 			category: "bonus_wheel",
-			collapsible_header: "bonus_wheel",
 			description:
 				'Change the "Drop 3 gold balls" space to "Drop 3 gemstone balls", which drops 1 Ruby, 1 Emerald, and 1 Sapphire ball.',
 			cost: NthGemstoneBallUnlockCost(3),
@@ -816,7 +948,6 @@ function InitUpgrades() {
 			id: "better_drops_3",
 			name: "Better Ball Drops 3",
 			category: "bonus_wheel",
-			collapsible_header: "bonus_wheel",
 			description:
 				'Change the "Drop 3 gemstone balls" space to drop 1 Topaz, 1 Turquoise, and 1 Amethyst ball.',
 			cost: NthGemstoneBallUnlockCost(6),
@@ -829,7 +960,6 @@ function InitUpgrades() {
 			id: "better_drops_4",
 			name: "Better Ball Drops 4",
 			category: "bonus_wheel",
-			collapsible_header: "bonus_wheel",
 			description:
 				'Change the "Drop 3 gemstone balls" space to "Drop 3 special balls", which drops 1 Opal ball, 1 8-Ball, and 1 Beach ball.',
 			cost: 1e67,
@@ -842,7 +972,6 @@ function InitUpgrades() {
 			id: "better_buff_multiplier",
 			name: "Better Buff Multiplier",
 			category: "bonus_wheel",
-			collapsible_header: "bonus_wheel",
 			button_class: "rubyUpgradeButton",
 			description:
 				'Instead of applying the <i>current</i> score multiplier buff to points won from wheel spins, the <i>highest</i> multiplier you have ever achieved is applied.',
@@ -860,7 +989,6 @@ function InitUpgrades() {
 			id: "better_point_values",
 			name: "Better Point Values",
 			category: "bonus_wheel",
-			collapsible_header: "bonus_wheel",
 			button_class: "emeraldUpgradeButton",
 			description:
 				'Makes the highest point value on the wheel scale to the value of emerald balls instead of gold balls.',
@@ -876,7 +1004,6 @@ function InitUpgrades() {
 			id: "better_multi_spin",
 			name: "Better Multi-Spin",
 			category: "bonus_wheel",
-			collapsible_header: "bonus_wheel",
 			button_class: "sapphireUpgradeButton",
 			description:
 				'Refunds additional spins consumed by Multi-Spin when landing on a ball drop space. (Note: ZONK still wastes all spins consumed.)',
@@ -892,7 +1019,6 @@ function InitUpgrades() {
 			id: "bonus_wheel_speed",
 			name: "Wheel Speed",
 			category: "bonus_wheel",
-			collapsible_header: "bonus_wheel",
 			description: "Makes bonus wheel spins play out faster.",
 			cost_func: level => 1e12 * Math.pow(10, level),
 			value_func: level => level * 0.1 + 1.0,
@@ -913,7 +1039,6 @@ function InitUpgrades() {
 			ball_type: kBallTypes[kBallTypeIDs.RUBY],
 			ball_description:
 				"Ruby balls are worth the same as a gold ball, plus if a ruby ball falls in the center slot, it activates a buff that doubles all points scored for 60 seconds.",
-			collapsible_header: "gemstone_balls",
 			cost_func: GemstoneBallUnlockCost,
 			visible_func: ShouldDisplayGemstoneBallUpgrades
 		})
@@ -921,7 +1046,6 @@ function InitUpgrades() {
 	upgrades_list.push(
 		new BallTypeRateUpgrade({
 			ball_type: kBallTypes[kBallTypeIDs.RUBY],
-			collapsible_header: "gemstone_balls",
 			cost_func: Tier1GemstoneBallRateCostFunc,
 			value_func: GemstoneBallRateValueFunc,
 			max_level: 49
@@ -932,7 +1056,6 @@ function InitUpgrades() {
 			id: "ruby_ball_buff_stackable",
 			name: "Stackable Buff",
 			category: "ruby_balls",
-			collapsible_header: "gemstone_balls",
 			description:
 				"Makes the ruby ball buff stackable. If a ruby ball falls in the center slot while the buff is already active, it extends the duration. Any time over 60 seconds is converted to a multiplier increase. The time extension is inversely proportional to the existing multiplier.",
 			cost: 1e18,
@@ -944,7 +1067,6 @@ function InitUpgrades() {
 			ball_type: kBallTypes[kBallTypeIDs.SAPPHIRE],
 			ball_description:
 				"Sapphire balls are worth the same as a gold ball, plus the gold ball multiplier is also applied to the number of bonus wheel spins earned by sapphire balls.",
-			collapsible_header: "gemstone_balls",
 			cost_func: GemstoneBallUnlockCost,
 			visible_func: ShouldDisplayGemstoneBallUpgrades
 		})
@@ -952,7 +1074,6 @@ function InitUpgrades() {
 	upgrades_list.push(
 		new BallTypeRateUpgrade({
 			ball_type: kBallTypes[kBallTypeIDs.SAPPHIRE],
-			collapsible_header: "gemstone_balls",
 			cost_func: Tier1GemstoneBallRateCostFunc,
 			value_func: GemstoneBallRateValueFunc,
 			max_level: 49
@@ -963,7 +1084,6 @@ function InitUpgrades() {
 			id: "sapphire_ball_exponent",
 			name: "Sapphire Exponent",
 			category: "sapphire_balls",
-			collapsible_header: "gemstone_balls",
 			description: "Increases the exponent on the gold ball value multiplier for sapphire balls. Note: The number of spins earned per sapphire ball is rounded down to the nearest whole number.",
 			cost_func: level => 1e15 * Math.pow(5, level),
 			value_func: level => (level / 10.0) + 1,
@@ -981,7 +1101,6 @@ function InitUpgrades() {
 			ball_type: kBallTypes[kBallTypeIDs.EMERALD],
 			ball_description:
 				"Points scored by emerald balls are multiplied by the square of the gold ball multiplier.",
-			collapsible_header: "gemstone_balls",
 			cost_func: GemstoneBallUnlockCost,
 			visible_func: ShouldDisplayGemstoneBallUpgrades
 		})
@@ -989,7 +1108,6 @@ function InitUpgrades() {
 	upgrades_list.push(
 		new BallTypeRateUpgrade({
 			ball_type: kBallTypes[kBallTypeIDs.EMERALD],
-			collapsible_header: "gemstone_balls",
 			cost_func: Tier1GemstoneBallRateCostFunc,
 			value_func: GemstoneBallRateValueFunc,
 			max_level: 49
@@ -1000,7 +1118,6 @@ function InitUpgrades() {
 			id: "emerald_ball_exponent",
 			name: "Emerald Exponent",
 			category: "emerald_balls",
-			collapsible_header: "gemstone_balls",
 			description: "Increases the exponent on the gold ball value multiplier for emerald balls.",
 			cost_func: level => 1e15 * Math.pow(25, level),
 			value_func: level => (level / 10.0) + 2,
@@ -1018,7 +1135,6 @@ function InitUpgrades() {
 			ball_type: kBallTypes[kBallTypeIDs.TOPAZ],
 			ball_description:
 				"Topaz balls have the bonuses of both ruby and emerald balls.",
-			collapsible_header: "gemstone_balls",
 			cost_func: GemstoneBallUnlockCost,
 			visible_func: () =>
 				IsUnlocked("unlock_ruby_balls") &&
@@ -1028,10 +1144,23 @@ function InitUpgrades() {
 	upgrades_list.push(
 		new BallTypeRateUpgrade({
 			ball_type: kBallTypes[kBallTypeIDs.TOPAZ],
-			collapsible_header: "gemstone_balls",
 			cost_func: Tier2GemstoneBallRateCostFunc,
 			value_func: GemstoneBallRateValueFunc,
 			max_level: 49
+		})
+	);
+	upgrades_list.push(
+		new FixedCostFeatureUnlockUpgrade({
+			id: "topaz_synergy",
+			name: "Topaz Synergy",
+			category: "topaz_balls",
+			description:
+				'Makes the score buff multiplier awarded by Topaz balls equal to the Emerald exponent, e.g. an Emerald exponent of 3 means a Topaz ball in the center slot awards a 3&times; scoring buff instead of just 2&times; scoring.',
+			cost: 1e36,
+			visible_func: () =>
+				IsUnlocked("unlock_topaz_balls") &&
+				IsUnlocked("ruby_ball_buff_stackable") &&
+				GetUpgradeLevel("emerald_ball_exponent") >= 1
 		})
 	);
 	upgrades_list.push(
@@ -1039,7 +1168,6 @@ function InitUpgrades() {
 			ball_type: kBallTypes[kBallTypeIDs.TURQUOISE],
 			ball_description:
 				"Turquoise balls have the bonuses of both emerald and sapphire balls.",
-			collapsible_header: "gemstone_balls",
 			cost_func: GemstoneBallUnlockCost,
 			visible_func: () =>
 				IsUnlocked("unlock_emerald_balls") &&
@@ -1049,10 +1177,20 @@ function InitUpgrades() {
 	upgrades_list.push(
 		new BallTypeRateUpgrade({
 			ball_type: kBallTypes[kBallTypeIDs.TURQUOISE],
-			collapsible_header: "gemstone_balls",
 			cost_func: Tier2GemstoneBallRateCostFunc,
 			value_func: GemstoneBallRateValueFunc,
 			max_level: 49
+		})
+	);
+	upgrades_list.push(
+		new FixedCostFeatureUnlockUpgrade({
+			id: "turquoise_synergy",
+			name: "Turquoise Synergy",
+			category: "turquoise_balls",
+			description:
+				'If a Turquoise ball hits a spin target, it also awards the value of the center slot, and if it lands in the center slot, it also awards the spins for a hitting a spin target.',
+			cost: 1e36,
+			visible_func: () => IsUnlocked("unlock_turquoise_balls")
 		})
 	);
 	upgrades_list.push(
@@ -1060,7 +1198,6 @@ function InitUpgrades() {
 			ball_type: kBallTypes[kBallTypeIDs.AMETHYST],
 			ball_description:
 				"Amethyst balls have the bonuses of both ruby and sapphire balls.",
-			collapsible_header: "gemstone_balls",
 			cost_func: GemstoneBallUnlockCost,
 			visible_func: () =>
 				IsUnlocked("unlock_ruby_balls") &&
@@ -1070,18 +1207,27 @@ function InitUpgrades() {
 	upgrades_list.push(
 		new BallTypeRateUpgrade({
 			ball_type: kBallTypes[kBallTypeIDs.AMETHYST],
-			collapsible_header: "gemstone_balls",
 			cost_func: Tier2GemstoneBallRateCostFunc,
 			value_func: GemstoneBallRateValueFunc,
 			max_level: 49
 		})
 	);
 	upgrades_list.push(
+		new FixedCostFeatureUnlockUpgrade({
+			id: "amethyst_synergy",
+			name: "Amethyst Synergy",
+			category: "amethyst_balls",
+			description:
+				'Applies the score buff multiplier to spins earned by Amethyst balls. (Spins awarded are rounded down to the nearest whole number.)',
+			cost: 1e36,
+			visible_func: () => IsUnlocked("unlock_amethyst_balls"),
+		})
+	);
+	upgrades_list.push(
 		new BallTypeUnlockUpgrade({
 			ball_type: kBallTypes[kBallTypeIDs.OPAL],
 			ball_description:
-				"Opal balls have the combined bonuses of ruby, sapphire, and emerald balls.",
-			collapsible_header: "gemstone_balls",
+				"Opal balls have the combined bonuses of all the other gemstone balls.",
 			cost_func: GemstoneBallUnlockCost,
 			visible_func: AllTier2GemstoneBallsUnlocked
 		})
@@ -1089,7 +1235,6 @@ function InitUpgrades() {
 	upgrades_list.push(
 		new BallTypeRateUpgrade({
 			ball_type: kBallTypes[kBallTypeIDs.OPAL],
-			collapsible_header: "gemstone_balls",
 			cost_func: level => 5e24 * Math.pow(5, level),
 			value_func: GemstoneBallRateValueFunc,
 			max_level: 49
@@ -1100,7 +1245,6 @@ function InitUpgrades() {
 			ball_type: kBallTypes[kBallTypeIDs.EIGHT_BALL],
 			ball_description:
 				'8-Balls are like Opal balls, but are worth 8&times; the points and spins of Opal balls, and awards an 8&times; scoring buff instead of 2&times;. (Score buff stacks additively with the Ruby ball buff.)<br><i>"Veemo!"</i>',
-			collapsible_header: "eight_balls",
 			cost_func: () => 888e33,
 			visible_func: () =>
 				IsUnlocked("unlock_opal_balls") &&
@@ -1110,23 +1254,45 @@ function InitUpgrades() {
 	upgrades_list.push(
 		new BallTypeRateUpgrade({
 			ball_type: kBallTypes[kBallTypeIDs.EIGHT_BALL],
-			collapsible_header: "eight_balls",
 			cost_func: level => 888e33 * Math.pow(10, level),
 			value_func: GemstoneBallRateValueFunc,
 			max_level: 79
 		})
 	);
 	upgrades_list.push(
-		new FixedCostFeatureUnlockUpgrade({
-			id: "eight_ball_exponent",
-			name: "8-Ball Exponent",
+		new Upgrade({
+			id: "eight_ball_score_exponent",
+			name: "8-Ball Score Exponent",
 			category: "eight_balls",
-			description:
-				"8-Balls are scored with an exponent of 8 instead of the Emerald exponent.",
-			cost: 888e57,
+			description: "Increases the exponent on the gold ball value multiplier for points scored by 8-Balls.",
+			cost_func: level => 888e33 * Math.pow(10, level),
+			value_func: level => (level / 10.0) + 3,
+			max_level: 50,
+			value_suffix: "",
 			visible_func: () =>
 				IsUnlocked("unlock_eight_balls") &&
-				IsMaxed("emerald_ball_exponent")
+				IsMaxed("emerald_ball_exponent"),
+			on_update: function() {
+				state.eight_ball_spin_exponent = this.GetValue();
+			},
+		})
+	);
+	upgrades_list.push(
+		new Upgrade({
+			id: "eight_ball_spin_exponent",
+			name: "8-Ball Spin Exponent",
+			category: "eight_balls",
+			description: "Increases the exponent on the gold ball value multiplier for spins earned by 8-Balls. Note: The number of spins earned per ball is rounded down to the nearest whole number.",
+			cost_func: level => 888e33 * Math.pow(10, level),
+			value_func: level => (level / 10.0) + 3,
+			max_level: 50,
+			value_suffix: "",
+			visible_func: () =>
+				IsUnlocked("unlock_eight_balls") &&
+				IsMaxed("sapphire_ball_exponent"),
+			on_update: function() {
+				state.eight_ball_spin_exponent = this.GetValue();
+			},
 		})
 	);
 	upgrades_list.push(
@@ -1134,16 +1300,13 @@ function InitUpgrades() {
 			ball_type: kBallTypes[kBallTypeIDs.BEACH_BALL],
 			ball_description:
 				"Beach balls are bouncier and floatier than other balls. They're worth double the points and spins of 8-balls, and award a 16&times; scoring buff.",
-			collapsible_header: "beach_balls",
 			cost_func: () => 1e56,
-			visible_func: () =>
-				IsUnlocked("unlock_eight_balls")
+			visible_func: () => IsUnlocked("unlock_eight_balls")
 		})
 	);
 	upgrades_list.push(
 		new BallTypeRateUpgrade({
 			ball_type: kBallTypes[kBallTypeIDs.BEACH_BALL],
-			collapsible_header: "beach_balls",
 			cost_func: level => 1e57 * Math.pow(10, level),
 			value_func: GemstoneBallRateValueFunc,
 			max_level: 49
@@ -1223,10 +1386,6 @@ function UpgradeButtonHandler(elem) {
 	state.upgrades[upgrade_id].OnClick();
 }
 
-function UpdateUpgradeSubHeader(header_id, visible) {
-	UpdateDisplay(header_id, visible ? "inline-block" : "none");
-}
-
 function NextUpgradeHint(state) {
 	if (!IsUpgradeVisible("auto_drop")) {
 		return "1K Center Slot Value";
@@ -1281,7 +1440,8 @@ function UpdateUpgradeButtons(state) {
 		if (elem.style.display != display) {
 			elem.style.display = display;
 			if (visible) {
-				let header = upgrade.collapsible_header;
+				let header =
+					state.upgrade_category_to_header_map[upgrade.category];
 				if (IsCollapsed(header)) {
 					UpdateDisplay(header + "_header_new", "inline");
 				}
@@ -1291,31 +1451,12 @@ function UpdateUpgradeButtons(state) {
 			}
 		}
 	}
-	UpdateUpgradeSubHeader("basic_upgrades_container", true);
-	UpdateUpgradeSubHeader(
-		"auto-drop_upgrades_container",
-		state.upgrades["auto_drop"].visible_func()
-	);
-	UpdateUpgradeSubHeader(
-		"bonus_wheel_upgrades_container",
-		state.upgrades["unlock_bonus_wheel"].visible_func()
-	);
-	UpdateUpgradeSubHeader(
-		"gold_balls_upgrades_container",
-		state.upgrades["unlock_gold_balls"].visible_func()
-	);
-	UpdateUpgradeSubHeader(
-		"gemstone_balls_upgrades_container",
-		ShouldDisplayGemstoneBallUpgrades()
-	);
-	UpdateUpgradeSubHeader(
-		"eight_balls_upgrades_container",
-		state.upgrades["unlock_eight_balls"].visible_func()
-	);
-	UpdateUpgradeSubHeader(
-		"beach_balls_upgrades_container",
-		state.upgrades["unlock_beach_balls"].visible_func()
-	);
+	
+	for (let i = 0; i < state.upgrade_headers.length; ++i) {
+		let header = state.upgrade_headers[i];
+		let display = header.visible_func() ? "inline-block" : "none";
+		UpdateDisplay(header.id + "_upgrades_container", display);
+	}
 }
 
 function ShowUpgradeTooltip(elem) {

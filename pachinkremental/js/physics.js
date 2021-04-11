@@ -50,6 +50,19 @@ function UpdateBalls(balls, board, target_sets, is_beach_ball) {
 				vel = vel.Add(parallel_vel.Multiply(-1 - collision_elasticity));
 				omega *= collision_elasticity;
 				omega += perp_vel.DotProduct(perp_delta) / kBallRadius;
+				
+				// In the extremely unlikely event a ball is balanced perfectly
+				// on top of a peg, give it a tiny nudge.
+				if (Math.abs(delta.x) < 1e-10 && Math.abs(vel.x) < 1e-10) {
+					console.log(
+						"Ball at " + pos.DebugStr() +
+						" stuck perfectly balanced on peg at " +
+						collide_peg.DebugStr() + " -- giving it a tiny nudge."
+					);
+					let noise = SampleGaussianNoise(0, 1e-5);
+					vel.x += noise.x;
+					vel.y += noise.y;
+				}
 			}
 		}
 
