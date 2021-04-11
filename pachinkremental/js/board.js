@@ -39,6 +39,48 @@ class Target {
 	}
 }
 
+function AwardPoints(base_value, ball) {
+	var total_value = base_value;
+	var color_rgb = "0,128,0";
+	if (IsScoreBuffActive()) {
+		total_value *= state.save_file.score_buff_multiplier;
+	}
+	let popup_text_level = 0;
+	if (ball.ball_type_index != kBallTypeIDs.NORMAL) {
+		if (HasEightBallSpecial(ball.ball_type_index)) {
+			popup_text_level = 3;
+			color_rgb = k8BallHighlightColor;
+			let exponent =
+				(GetUpgradeLevel("eight_ball_score_exponent") > 0) ?
+				state.eight_ball_score_exponent :
+				state.emerald_ball_exponent;
+			total_value *= Math.pow(state.special_ball_multiplier, exponent);
+			total_value *= 8;
+			if (ball.ball_type_index == kBallTypeIDs.BEACH_BALL) {
+				total_value *= 2;
+				color_rgb = kPrismatic;
+			}
+		} else if (HasEmeraldSpecial(ball.ball_type_index)) {
+			total_value *= Math.pow(
+				state.special_ball_multiplier, state.emerald_ball_exponent
+			);
+			popup_text_level = 2;
+			color_rgb = "0,192,0";
+		} else {
+			popup_text_level = 1;
+			total_value *= state.special_ball_multiplier;
+			color_rgb = "170,143,0";
+		}
+	}
+	AddScore(total_value);
+	MaybeAddScoreText({
+		level: popup_text_level,
+		text: `+${FormatNumberShort(total_value)}`,
+		pos: ball.pos,
+		color_rgb
+	});
+}
+
 class ScoreTarget extends Target {
 	constructor({ pos, draw_radius, hitbox_radius, color, id, active, value }) {
 		super({
@@ -55,58 +97,68 @@ class ScoreTarget extends Target {
 
 	OnHit(ball) {
 		ball.active = false;
-		var total_value = this.value;
-		var color_rgb = "0,128,0";
-		if (IsScoreBuffActive()) {
-			total_value *= state.save_file.score_buff_multiplier;
+		AwardPoints(this.value, ball);
+		if (this.id == 4) {
+			OnCenterSlotHit(ball);
 		}
-		let popup_text_level = 0;
-		if (ball.ball_type_index != kBallTypeIDs.NORMAL) {
-			if (
-				ball.ball_type_index == kBallTypeIDs.EIGHT_BALL ||
-				ball.ball_type_index == kBallTypeIDs.BEACH_BALL
-			) {
-				popup_text_level = 3;
-				color_rgb = k8BallHighlightColor;
-				let exponent = IsUnlocked("eight_ball_exponent") ? 8 : state.emerald_ball_exponent;
-				total_value *= Math.pow(state.special_ball_multiplier, exponent);
-				total_value *= 8;
-				if (ball.ball_type_index == kBallTypeIDs.BEACH_BALL) {
-					total_value *= 2;
-					color_rgb = kPrismatic;
-				}
-			} else if (
-				ball.ball_type_index == kBallTypeIDs.EMERALD ||
-				ball.ball_type_index == kBallTypeIDs.TOPAZ ||
-				ball.ball_type_index == kBallTypeIDs.TURQUOISE ||
-				ball.ball_type_index == kBallTypeIDs.OPAL
-			) {
-				total_value *= Math.pow(
-					state.special_ball_multiplier, state.emerald_ball_exponent
-				);
-				popup_text_level = 2;
-				color_rgb = "0,192,0";
-			} else {
-				popup_text_level = 1;
-				total_value *= state.special_ball_multiplier;
-				color_rgb = "170,143,0";
-			}
-			if (this.id == 4) {
-				OnCenterSlotHit(ball);
-			}
-		}
-		AddScore(total_value);
-		MaybeAddScoreText({
-			level: popup_text_level,
-			text: `+${FormatNumberShort(total_value)}`,
-			pos: ball.pos,
-			color_rgb
-		});
 	}
 
 	SetValue(new_value) {
 		this.value = new_value;
 		this.text = FormatNumberShort(new_value);
+	}
+}
+
+function AwardSpins(ball, text_pos) {
+	if (HasSapphireSpecial(ball.ball_type_index)) {
+		let exponent = state.sapphire_ball_exponent;
+		if (
+			HasEightBallSpecial(ball.ball_type_index) &&
+			GetUpgradeLevel("eight_ball_spin_exponent") > 0
+		) {
+			exponent = state.eight_ball_spin_exponent;
+		}
+		let value = Math.pow(
+			state.special_ball_multiplier, state.sapphire_ball_exponent
+		);
+		let color_rgb = "0,0,255"
+		let score_text_level = 2;
+		if (
+			HasAmethystSpecial(ball.ball_type_index) &&
+			IsUnlocked("amethyst_synergy") &&
+			IsScoreBuffActive()
+		) {
+			value *= state.save_file.score_buff_multiplier;
+			color_rgb = "255,0,255"
+		}
+		if (ball.ball_type_index == kBallTypeIDs.EIGHT_BALL) {
+			score_text_level = 3;
+			value *= 8;
+			color_rgb = k8BallHighlightColor;
+		}
+		if (ball.ball_type_index == kBallTypeIDs.BEACH_BALL) {
+			score_text_level = 3;
+			value *= 2;
+			color_rgb = kPrismatic;
+		}
+		value = Math.floor(value);
+		state.save_file.spins += value;
+		UpdateSpinCounter();
+		MaybeAddScoreText({
+			level: score_text_level,
+			text: `+${FormatNumberShort(value)} Spins`,
+			pos: text_pos,
+			color_rgb: color_rgb
+		});
+	} else {
+		++state.save_file.spins;
+		UpdateSpinCounter();
+		MaybeAddScoreText({
+			level: 0,
+			text: "+1 Spin",
+			pos: text_pos,
+			color_rgb: "0,170,0"
+		});
 	}
 }
 
@@ -123,46 +175,15 @@ class SpinTarget extends Target {
 	}
 
 	OnHit(ball) {
+		let text_pos = new Point(ball.pos.x, ball.pos.y);
 		if (
-			ball.ball_type_index == kBallTypeIDs.SAPPHIRE ||
-			ball.ball_type_index == kBallTypeIDs.TURQUOISE ||
-			ball.ball_type_index == kBallTypeIDs.AMETHYST ||
-			ball.ball_type_index == kBallTypeIDs.OPAL ||
-			ball.ball_type_index == kBallTypeIDs.EIGHT_BALL ||
-			ball.ball_type_index == kBallTypeIDs.BEACH_BALL
+			HasTurquoiseSpecial(ball.ball_type_index) &&
+			IsUnlocked("turquoise_synergy")
 		) {
-			let value = Math.floor(Math.pow(
-				state.special_ball_multiplier, state.sapphire_ball_exponent
-			));
-			let color_rgb = "0,0,255"
-			let score_text_level = 2;
-			if (ball.ball_type_index == kBallTypeIDs.EIGHT_BALL) {
-				score_text_level = 3;
-				value *= 8;
-				color_rgb = k8BallHighlightColor;
-			} else if (ball.ball_type_index == kBallTypeIDs.BEACH_BALL) {
-				score_text_level = 3;
-				value *= 16;
-				color_rgb = kPrismatic;
-			}
-			state.save_file.spins += value;
-			UpdateSpinCounter();
-			MaybeAddScoreText({
-				level: score_text_level,
-				text: `+${FormatNumberShort(value)} Spins`,
-				pos: ball.pos,
-				color_rgb: color_rgb
-			});
-		} else {
-			++state.save_file.spins;
-			UpdateSpinCounter();
-			MaybeAddScoreText({
-				level: 0,
-				text: "+1 Spin",
-				pos: ball.pos,
-				color_rgb: "0,170,0"
-			});
+			AwardPoints(GetSlotValue(4), ball);
+			text_pos.y -= 10;
 		}
+		AwardSpins(ball, text_pos);
 	}
 }
 
@@ -198,7 +219,7 @@ class PegBoard {
 			const peg = pegs[i];
 			if (peg.x < 0 || peg.x > width || peg.y < 0 || peg.y > height) {
 				console.log(
-					`Skipping out-of-bounds peg at (${peg.x}, ${peg.y})`
+					`Skipping out-of-bounds peg at ${peg.DebugStr()}`
 				);
 				continue;
 			}

@@ -17,6 +17,10 @@ class Point {
 	Add(vec) {
 		return new Point(this.x + vec.x, this.y + vec.y);
 	}
+	
+	DebugStr() {
+		return `(${this.x}, ${this.y})`
+	}
 }
 
 class Vector {
@@ -63,6 +67,10 @@ class Vector {
 	Perpendicular() {
 		return new Vector(-this.y, this.x);
 	}
+	
+	DebugStr() {
+		return `<${this.x}, ${this.y}>`
+	}
 }
 
 class Ball {
@@ -81,7 +89,7 @@ class Ball {
 class RisingText {
 	constructor(text, pos, color_rgb) {
 		this.text = text;
-		this.pos = pos;
+		this.pos = new Point(pos.x, pos.y);
 		this.color_rgb = color_rgb;
 		this.start_time = Date.now();
 	}
@@ -135,6 +143,7 @@ class RippleEffect {
 	}
 }
 
+// Based on https://en.wikipedia.org/wiki/Box%E2%80%93Muller_transform
 function SampleGaussianNoise(mu, sigma) {
 	const two_pi = 2.0 * Math.PI;
 

@@ -1,4 +1,4 @@
-const kVersion = "v0.10.0 beta";
+const kVersion = "v0.10.1 beta";
 const kTitleAndVersion = "Pachinkremental " + kVersion;
 
 var max_drop_y = 20;
@@ -135,6 +135,8 @@ function InitState() {
 		score_history: [...Array(12)].map(_ => 0),
 		notifications: new Array(0),
 		upgrades: InitUpgrades(),
+		upgrade_headers: null,
+		upgrade_category_to_header_map: {},
 		display_points: 0,
 		canvas_scale: 2.0,
 		redraw_all: true,
@@ -148,21 +150,12 @@ function InitState() {
 		auto_drop_cooldown: 1000.0,
 		auto_drop_cooldown_left: 1000.0,
 		max_balls: 1,
-		ball_type_rates: [
-			1.0,
-			0.01,
-			0.001,
-			0.001,
-			0.001,
-			0.001,
-			0.001,
-			0.001,
-			0.001,
-			0.001
-		],
+		ball_type_rates: [1.0],
 		special_ball_multiplier: 2,
 		sapphire_ball_exponent: 1.0,
 		emerald_ball_exponent: 2.0,
+		eight_ball_score_exponent: 3.0,
+		eight_ball_spin_exponent: 3.0,
 		bonus_wheel: null,
 		bonus_wheel_speed: 1.0,
 		active_tooltip: null,
@@ -228,12 +221,25 @@ function InitState() {
 			},
 		}
 	};
+	state.upgrade_headers = InitUpgradeHeaders(state);
+	for (let i = 0; i < state.upgrade_headers.length; ++i) {
+		let header = state.upgrade_headers[i];
+		for (let j = 0; j < header.categories.length; ++j) {
+			state.upgrade_category_to_header_map[header.categories[j]] =
+				header.id;
+		}
+	}
 	for (upgrade in state.upgrades) {
 		state.save_file.upgrade_levels[upgrade] = 0;
 	}
 	for (let i = 0; i < kBallTypes.length; ++i) {
-		state.save_file.stats[kBallTypes[i].name + "_balls"] = 0;
-		state.save_file.options[kBallTypes[i].name + "_ball_opacity"] = 100;
+		let name = kBallTypes[i].name;
+		state.save_file.stats[name + "_balls"] = 0;
+		state.save_file.options[name + "_ball_opacity"] = 100;
+		if (i > 0) {
+			let rate_upgrade = state.upgrades[name + "_ball_rate"];
+			state.ball_type_rates.push(rate_upgrade.value_func(0) / 100.0);
+		}
 	}
 	state.bonus_wheel = DefaultWheel(state);
 	return state;
@@ -301,6 +307,22 @@ function UpdateSpinCounter() {
 		state.bonus_wheel.IsSpinning() || state.save_file.spins <= 0;
 	UpdateDisplay("multi_spin", IsUnlocked("multi_spin") ? "inline" : "none");
 	UpdateInnerHTML("multi_spin_count", FormatNumberLong(state.bonus_wheel.multi_spin));
+}
+
+function InitStatsPanel(state) {
+	let balls_by_type_container =
+		document.getElementById("stats_balls_dropped_by_type");
+	let html = '';
+	for (let id = 1; id < kBallTypes.length; ++id) {
+		let type_name = kBallTypes[id].name + "_balls";
+		html +=
+			'<div id="stats_container_' + type_name +
+			'" class="statsRow" style="display: none;"><b>' +
+			kBallTypes[id].display_name +
+			'balls: </b><span id="stats_' + type_name +
+			'" class="statsEntry"></span></div>';
+	}
+	balls_by_type_container.innerHTML = html;
 }
 
 function UpdateStatsPanel(state) {
@@ -515,7 +537,9 @@ function OnResize() {
 }
 
 function Load() {
+	InitUpgradeHeaderCollapsibles(state.upgrade_headers);
 	InitUpgradeButtons(state.upgrades);
+	InitStatsPanel(state);
 	InitOptions(state);
 	document.getElementById(kTopCanvasLayer).addEventListener("click", OnClick);
 	document.title = kTitleAndVersion;
