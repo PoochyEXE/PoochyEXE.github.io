@@ -204,6 +204,16 @@ const kShortSuffixes = [
 	"SpV",
 	"OcV",
 	"NoV",
+	"Tr",
+	"UTr",
+	"DTr",
+	"TTr",
+	"QaTr",
+	"QiTr",
+	"SeTr",
+	"SpTr",
+	"OcTr",
+	"NoTr",
 ];
 
 function FormatNumberShort(num) {
@@ -255,6 +265,16 @@ const kLongSuffixes = [
 	"septemvigintillion",
 	"octovigintillion",
 	"novemvigintillion",
+	"trigintillion",
+	"untrigintillion",
+	"duotrigintillion",
+	"trestrigintillion",
+	"quattuortrigintillion",
+	"quintrigintillion",
+	"sestrigintillion",
+	"septentrigintillion",
+	"octotrigintillion",
+	"noventrigintillion",
 ];
 
 function FormatNumberLong(num) {

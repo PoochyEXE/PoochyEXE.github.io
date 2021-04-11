@@ -36,6 +36,7 @@ A: This is intentional, both to make sure the game won't softlock with too many 
 	* Fix both 8-Ball exponent upgrades not working properly.
 	* Fix Beach Ball not applying the 8-Ball's 8x spins.
 	* Fix 8-Ball and Beach Ball scoring text not displaying when pop-up text is set to "8-Ball+ only".
+* Add more names for numbers up to 10^120.
 
 ### v0.11.0 beta (2021-04-11)
 * Change 8-Ball Exponent to be a gradual upgrade, instead of jumping from 3 straight to 8, and rename it to "8-Ball Score Exponent". Note: Importing a save file from a previous version will reset this upgrade's level.

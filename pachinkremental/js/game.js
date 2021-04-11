@@ -1,4 +1,4 @@
-const kVersion = "v0.11.0 beta";
+const kVersion = "v0.11.2 beta";
 const kTitleAndVersion = "Pachinkremental " + kVersion;
 
 var max_drop_y = 20;
