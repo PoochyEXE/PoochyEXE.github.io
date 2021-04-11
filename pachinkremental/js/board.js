@@ -57,7 +57,14 @@ function AwardPoints(base_value, ball) {
 			total_value *= Math.pow(state.special_ball_multiplier, exponent);
 			total_value *= 8;
 			if (ball.ball_type_index == kBallTypeIDs.BEACH_BALL) {
-				total_value *= 2;
+				let multiplier = 2;
+				if (IsUnlocked("beach_ball_time_based_multiplier")) {
+					let sec_elapsed = (Date.now() - ball.start_time) / 1000.0;
+					multiplier =
+						Math.pow(sec_elapsed, state.beach_ball_score_exponent);
+					multiplier = Math.max(multiplier, 2.0);
+				}
+				total_value *= multiplier;
 				color_rgb = kPrismatic;
 			}
 		} else if (HasEmeraldSpecial(ball.ball_type_index)) {
@@ -129,15 +136,21 @@ function AwardSpins(ball, text_pos) {
 			value *= state.save_file.score_buff_multiplier;
 			color_rgb = "255,0,255"
 		}
-		if (ball.ball_type_index == kBallTypeIDs.EIGHT_BALL) {
+		if (HasEightBallSpecial(ball.ball_type_index)) {
 			score_text_level = 3;
 			value *= 8;
 			color_rgb = k8BallHighlightColor;
-		}
-		if (ball.ball_type_index == kBallTypeIDs.BEACH_BALL) {
-			score_text_level = 3;
-			value *= 16;
-			color_rgb = kPrismatic;
+			if (ball.ball_type_index == kBallTypeIDs.BEACH_BALL) {
+				let multiplier = 2;
+				if (IsUnlocked("beach_ball_time_based_multiplier")) {
+					let sec_elapsed = (Date.now() - ball.start_time) / 1000.0;
+					multiplier =
+						Math.pow(sec_elapsed, state.beach_ball_spin_exponent);
+					multiplier = Math.max(multiplier, 2.0);
+				}
+				value *= multiplier;
+				color_rgb = kPrismatic;
+			}
 		}
 		value = Math.floor(value);
 		state.save_file.spins += value;

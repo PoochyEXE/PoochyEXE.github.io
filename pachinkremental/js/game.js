@@ -1,4 +1,4 @@
-const kVersion = "v0.11.2 beta";
+const kVersion = "v0.12.0 beta";
 const kTitleAndVersion = "Pachinkremental " + kVersion;
 
 var max_drop_y = 20;
@@ -156,6 +156,8 @@ function InitState() {
 		emerald_ball_exponent: 2.0,
 		eight_ball_score_exponent: 3.0,
 		eight_ball_spin_exponent: 3.0,
+		beach_ball_score_exponent: 1.0,
+		beach_ball_spin_exponent: 0.5,
 		bonus_wheel: null,
 		bonus_wheel_speed: 1.0,
 		active_tooltip: null,

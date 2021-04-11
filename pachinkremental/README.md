@@ -31,6 +31,9 @@ A: This is intentional, both to make sure the game won't softlock with too many 
 
 ## Changelog
 
+### v0.12.0 beta (2021-04-11)
+* Add a couple more upgrades for Beach Balls, aimed at balancing points from the center slot with points from the bonus wheel in the late game.
+
 ### v0.11.2 beta (2021-04-11)
 * Add more names for numbers up to 10^120.
 

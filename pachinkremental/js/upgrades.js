@@ -1312,6 +1312,51 @@ function InitUpgrades() {
 			max_level: 49
 		})
 	);
+	upgrades_list.push(
+		new FixedCostFeatureUnlockUpgrade({
+			id: "beach_ball_time_based_multiplier",
+			name: "Time-Based Multiplier",
+			category: "beach_balls",
+			description:
+				"The more time a beach ball spends bouncing around, the more points and spins it's worth.",
+			cost: 1e80,
+			visible_func: () => IsUnlocked("unlock_beach_balls")
+		})
+	);
+	upgrades_list.push(
+		new Upgrade({
+			id: "beach_ball_score_exponent",
+			name: "Beach Ball Score Exponent",
+			category: "beach_balls",
+			description: "Increases the exponent on the time-based multiplier for points scored by Beach Balls.",
+			cost_func: level => 1e81 * Math.pow(10, level),
+			value_func: level => (level / 5.0) + 1,
+			max_level: 45,
+			value_suffix: "",
+			visible_func: () =>
+				IsUnlocked("beach_ball_time_based_multiplier"),
+			on_update: function() {
+				state.beach_ball_score_exponent = this.GetValue();
+			},
+		})
+	);
+	upgrades_list.push(
+		new Upgrade({
+			id: "beach_ball_spin_exponent",
+			name: "Beach Ball Spin Exponent",
+			category: "beach_balls",
+			description: "Increases the exponent on the time-based multiplier for spins earned by Beach Balls. Note: The number of spins earned per ball is rounded down to the nearest whole number.",
+			cost_func: level => 1e85 * Math.pow(1e5, level),
+			value_func: level => (level / 10.0) + 0.5,
+			max_level: 5,
+			value_suffix: "",
+			visible_func: () =>
+				IsUnlocked("beach_ball_time_based_multiplier"),
+			on_update: function() {
+				state.beach_ball_spin_exponent = this.GetValue();
+			},
+		})
+	);
 
 	let upgrades_map = {};
 	for (let i = 0; i < upgrades_list.length; ++i) {
