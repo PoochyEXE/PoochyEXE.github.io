@@ -1,4 +1,4 @@
-const kVersion = "v0.12.0 beta";
+const kVersion = "v0.12.1 beta";
 const kTitleAndVersion = "Pachinkremental " + kVersion;
 
 var max_drop_y = 20;
@@ -79,7 +79,7 @@ function DropBall(x, y, ball_type_index) {
 			)
 		);
 	}
-	state.stats_updated = true;
+	state.update_stats_panel = true;
 }
 
 function DropBonusBalls(ball_types) {
@@ -121,13 +121,13 @@ function AddScore(points) {
 	state.save_file.stats.total_score += points;
 	state.save_file.points += points;
 	state.score_history[0] += points;
-	state.stats_updated = true;
+	state.update_stats_panel = true;
 	state.update_upgrade_buttons = true;
 }
 
 function InitState() {
 	let state = {
-		last_update: Date.now(),
+		current_time: Date.now(),
 		board: DefaultBoard(),
 		target_sets: DefaultTargets(),
 		balls_by_type: [...Array(kBallTypes.length)].map(_ => new Array(0)),
@@ -143,7 +143,7 @@ function InitState() {
 		redraw_targets: false,
 		redraw_auto_drop: false,
 		redraw_wheel: false,
-		stats_updated: true,
+		update_stats_panel: true,
 		update_upgrade_buttons: true,
 		enable_score_text: true,
 		update_buff_display: true,
@@ -328,10 +328,10 @@ function InitStatsPanel(state) {
 }
 
 function UpdateStatsPanel(state) {
-	if (!state.stats_updated) {
+	if (!state.update_stats_panel) {
 		return;
 	}
-	state.stats_updated = false;
+	state.update_stats_panel = false;
 	for (key in state.save_file.stats) {
 		let elem = document.getElementById("stats_" + key);
 		if (!elem) {
@@ -390,6 +390,7 @@ function IsCollapsed(panel_name) {
 }
 
 function UpdateOneFrame(state, draw) {
+	state.current_time += kFrameInterval;
 	for (let i = 0; i < state.balls_by_type.length; ++i) {
 		if (state.balls_by_type[i].length > 0) {
 			UpdateBalls(
@@ -444,7 +445,6 @@ function IsAprilFoolsActive() {
 }
 
 function Update() {
-	const this_update = Date.now();
 	let now_april_fools = IsAprilFoolsActive();
 	if (now_april_fools != state.april_fools) {
 		state.redraw_all = true;
@@ -454,7 +454,7 @@ function Update() {
 		}
 	}
 	const num_frames = Math.floor(
-		(this_update - state.last_update) / kFrameInterval
+		(Date.now() - state.current_time) / kFrameInterval
 	);
 	const elapsed = num_frames * kFrameInterval;
 	if (num_frames <= 0) {

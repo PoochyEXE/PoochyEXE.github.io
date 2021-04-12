@@ -321,6 +321,8 @@ function UpdateOptionsButtons() {
 		"April Fools: " + kAprilFoolsOptions[state.save_file.options.april_fools_enabled]);
 	UpdateInnerHTML("button_classic_opal_balls",
 		"Style: " + (state.save_file.options.classic_opal_balls ? "Classic" : "Default"));
+	UpdateInnerHTML("button_scientific_notation",
+		"Scientific Notation: " + (state.save_file.options.scientific_notation ? "ON" : "OFF"));
 }
 
 function UpdateAutoSaveInterval() {
@@ -377,6 +379,19 @@ function ToggleDarkMode() {
 	state.save_file.options.dark_mode = !state.save_file.options.dark_mode;
 	state.redraw_all = true;
 	UpdateDarkMode();
+	UpdateOptionsButtons();
+}
+
+function ToggleScientificNotation(id) {
+	state.save_file.options.scientific_notation =
+		!state.save_file.options.scientific_notation;
+	state.update_upgrade_buttons = true;
+	state.redraw_wheel = true;
+	state.redraw_targets = true;
+	state.update_stats_panel = true;
+	UpdateUpgradeButtons(state);
+	UpdateSpinCounter();
+	UpdateBuffDisplay();
 	UpdateOptionsButtons();
 }
 

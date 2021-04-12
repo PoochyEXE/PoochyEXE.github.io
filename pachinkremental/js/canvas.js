@@ -88,9 +88,8 @@ function DrawPrismaticBalls(balls, ctx) {
 	const kCycleDuration = 1000.0;
 	const kGlowSize = 3;
 	const kGlowAlpha = 0.5;
-	const time = Date.now();
 	for (let i = 0; i < balls.length; ++i) {
-		let time_elapsed = time - balls[i].start_time;
+		let time_elapsed = state.current_time - balls[i].start_time;
 		let pos = balls[i].pos;
 		let inner_color = GetPrismaticColor(
 			time_elapsed, kCycleDuration, kSaturationInner, /*alpha=*/1.0
@@ -151,7 +150,6 @@ function DrawEightBalls(balls, ctx) {
 	const kEpsilon = 1e-7;
 	const kGlowSize = 3;
 	const kGlowAlpha = 0.5;
-	const time = Date.now();
 	for (let i = 0; i < balls.length; ++i) {
 		let pos = balls[i].pos;
 		DrawGlow(
@@ -178,7 +176,6 @@ function DrawEightBallsNoGradient(balls, ctx) {
 	const kInnerRadiusFraction = 0.5;
 	const kGlowSize = 3;
 	const kGlowAlpha = 0.5;
-	const time = Date.now();
 	for (let i = 0; i < balls.length; ++i) {
 		let pos = balls[i].pos;
 		
@@ -380,7 +377,7 @@ function DrawBalls(balls, inner_color, outer_color, ctx) {
 		return;
 	}
 	const kPrismaticCycleShift = kPrismaticCycleDuration / 6.0;
-	const time = Date.now();
+	const time = state.current_time;
 	for (let i = 0; i < balls.length; ++i) {
 		let inner_color_rgb = inner_color;
 		if (inner_color == kPrismatic) {
@@ -420,13 +417,12 @@ function DrawBallsNoGradient(balls, color, ctx) {
 	}
 	const kPrismaticSaturation = 0.8;
 	const kPrismaticCycleDuration = 2000.0;
-	const time = Date.now();
 	for (let i = 0; i < balls.length; ++i) {
 		let color_rgb = color;
 		if (color == kPrismatic) {
 			color_rgb =
 				GetPrismaticColor(
-					time - balls[i].start_time,
+					state.current_time - balls[i].start_time,
 					kPrismaticCycleDuration,
 					/*saturation=*/ kPrismaticSaturation,
 					/*alpha=*/1.0
@@ -463,12 +459,11 @@ function DrawTargets(target_sets, ctx) {
 function DrawScoreText(score_text, font_size, duration, rise, ctx) {
 	const kPrismaticSaturation = 0.8;
 	let next_index = 0;
-	const time = Date.now();
 	ctx.textAlign = "center";
 	ctx.font = "bold " + font_size + "px sans-serif";
 	for (let i = 0; i < score_text.length; ++i) {
 		let curr_text = score_text[i];
-		let elapsed = time - curr_text.start_time;
+		let elapsed = state.current_time - curr_text.start_time;
 		if (elapsed > duration) {
 			continue;
 		}
@@ -502,11 +497,10 @@ function DrawScoreText(score_text, font_size, duration, rise, ctx) {
 function DrawRipples(ripples, duration, expand, ctx) {
 	const kPrismaticSaturation = 0.8;
 	let next_index = 0;
-	const time = Date.now();
 	ctx.lineWidth = "1px";
 	for (let i = 0; i < ripples.length; ++i) {
 		let curr_ripples = ripples[i];
-		let elapsed = time - curr_ripples.start_time;
+		let elapsed = state.current_time - curr_ripples.start_time;
 		if (elapsed > duration) {
 			continue;
 		}
@@ -741,6 +735,10 @@ function Draw(state) {
 	// Layer 3: Targets
 	if (state.redraw_all || state.redraw_targets) {
 		let ctx = ClearLayerAndReturnContext(3);
+		let bottom_targets = state.target_sets[0].targets;
+		for (let i = 0; i < bottom_targets.length; ++i) {
+			bottom_targets[i].ResetText();
+		}
 		DrawTargets(state.target_sets, ctx);
 		state.redraw_targets = false;
 	}

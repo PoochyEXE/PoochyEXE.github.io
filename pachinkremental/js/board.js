@@ -59,7 +59,8 @@ function AwardPoints(base_value, ball) {
 			if (ball.ball_type_index == kBallTypeIDs.BEACH_BALL) {
 				let multiplier = 2;
 				if (IsUnlocked("beach_ball_time_based_multiplier")) {
-					let sec_elapsed = (Date.now() - ball.start_time) / 1000.0;
+					let sec_elapsed =
+						(state.current_time - ball.start_time) / 1000.0;
 					multiplier =
 						Math.pow(sec_elapsed, state.beach_ball_score_exponent);
 					multiplier = Math.max(multiplier, 2.0);
@@ -110,9 +111,14 @@ class ScoreTarget extends Target {
 		}
 	}
 
+	ResetText() {
+		this.text = FormatNumberShort(this.value);
+	}
+
 	SetValue(new_value) {
 		this.value = new_value;
 		this.text = FormatNumberShort(new_value);
+		this.ResetText();
 	}
 }
 
@@ -143,7 +149,8 @@ function AwardSpins(ball, text_pos) {
 			if (ball.ball_type_index == kBallTypeIDs.BEACH_BALL) {
 				let multiplier = 2;
 				if (IsUnlocked("beach_ball_time_based_multiplier")) {
-					let sec_elapsed = (Date.now() - ball.start_time) / 1000.0;
+					let sec_elapsed =
+						(state.current_time - ball.start_time) / 1000.0;
 					multiplier =
 						Math.pow(sec_elapsed, state.beach_ball_spin_exponent);
 					multiplier = Math.max(multiplier, 2.0);

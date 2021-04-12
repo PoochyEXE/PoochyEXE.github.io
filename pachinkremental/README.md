@@ -31,6 +31,11 @@ A: This is intentional, both to make sure the game won't softlock with too many 
 
 ## Changelog
 
+### v0.12.1 beta (2021-04-12)
+* Fix exploit where Beach Ball timer could be extended by pausing script execution (e.g. minimizing the window or switching away from the tab). Thanks to Leidwesen for the bug report!
+* Add scientific notation.
+* Fix "Highest buff multiplier" stat showing 1x instead of 2x if the buff hasn't stacked before.
+
 ### v0.12.0 beta (2021-04-11)
 * Add a couple more upgrades for Beach Balls, aimed at balancing points from the center slot with points from the bonus wheel in the late game.
 
