@@ -80,7 +80,7 @@ class Ball {
 		this.ball_type_index = ball_type_index;
 		this.active = true;
 		this.last_hit = null;
-		this.start_time = Date.now();
+		this.start_time = state.current_time;
 		this.rotation = rotation;  // Counterclockwise in radians
 		this.omega = omega;  // Angular velocity in radians/second
 	}
@@ -161,15 +161,20 @@ function SampleGaussianNoise(mu, sigma) {
 	return new Point(z0, z1);
 }
 
+const kNumericPrecision = 3;
+
 function FormatSmallNumberShort(num) {
-	const kPrecision = 3;
 	if (Number.isInteger(num)) {
 		return num.toString();
 	} else if (num < 100 && Number.isInteger(num * 10)) {
 		return num.toFixed(1);
 	} else {
-		return num.toPrecision(kPrecision);
+		return num.toPrecision(kNumericPrecision);
 	}
+}
+
+function FormatNumberScientificNotation(num) {
+	return num.toPrecision(kNumericPrecision).replace("+", "");
 }
 
 const kShortSuffixes = [
@@ -217,16 +222,18 @@ const kShortSuffixes = [
 ];
 
 function FormatNumberShort(num) {
-	const kPrecision = 3;
 	if (num < 1000) {
 		return FormatSmallNumberShort(num);
 	}
 	let suffix_index = Math.floor(Math.log10(num) / 3);
-	if (suffix_index >= kShortSuffixes.length) {
-		return num.toPrecision(kPrecision).replace("+", "");
-	}
 	if (suffix_index == 0) {
 		return FormatSmallNumberShort(num);
+	}
+	if (
+		state.save_file.options.scientific_notation ||
+		suffix_index >= kShortSuffixes.length
+	) {
+		return FormatNumberScientificNotation(num);
 	}
 	let prefix = num / Math.pow(1000, suffix_index);
 	let prefix_str = FormatSmallNumberShort(prefix);
@@ -278,19 +285,25 @@ const kLongSuffixes = [
 ];
 
 function FormatNumberLong(num) {
-	const kPrecision = 3;
 	if (num < 1000) {
 		return FormatSmallNumberShort(num);
 	}
 	let suffix_index = Math.floor(Math.log10(num) / 3);
-	if (suffix_index >= kLongSuffixes.length) {
-		return num.toPrecision(kPrecision).replace("+", "");
+	if (suffix_index >= kShortSuffixes.length) {
+		return FormatNumberScientificNotation(num);
 	}
 	if (kLongSuffixes[suffix_index] == "") {
 		return num.toLocaleString();
 	}
+	if (state.save_file.options.scientific_notation) {
+		return FormatNumberScientificNotation(num);
+	}
 	let prefix = num / Math.pow(1000, suffix_index);
-	return prefix.toFixed(kPrecision) + " " + kLongSuffixes[suffix_index];
+	console.log(prefix);
+	console.log(prefix.toFixed(kNumericPrecision));
+	console.log(kLongSuffixes[suffix_index]);
+	return prefix.toFixed(kNumericPrecision) + " " +
+		kLongSuffixes[suffix_index];
 }
 
 class BallType {

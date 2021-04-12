@@ -576,9 +576,9 @@ function ActivateOrExtendScoreBuff(multiplier) {
 				(state.save_file.score_buff_duration / kBuffDuration);
 			state.save_file.score_buff_duration = kBuffDuration;
 		}
-		if (state.save_file.stats.max_buff_multiplier < state.save_file.score_buff_multiplier) {
-			state.save_file.stats.max_buff_multiplier = state.save_file.score_buff_multiplier;
-		}
+	}
+	if (state.save_file.stats.max_buff_multiplier < state.save_file.score_buff_multiplier) {
+		state.save_file.stats.max_buff_multiplier = state.save_file.score_buff_multiplier;
 	}
 }
 
