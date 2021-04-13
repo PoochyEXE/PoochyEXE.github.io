@@ -1,4 +1,4 @@
-const kVersion = "v1.0.0-RC1";
+const kVersion = "v0.12.2 beta";
 const kTitleAndVersion = "Pachinkremental " + kVersion;
 
 var max_drop_y = 20;
@@ -154,8 +154,8 @@ function InitState() {
 		special_ball_multiplier: 2,
 		sapphire_ball_exponent: 1.0,
 		emerald_ball_exponent: 2.0,
-		eight_ball_score_exponent: 1.0,
-		eight_ball_spin_exponent: 1.0,
+		eight_ball_score_exponent: 3.0,
+		eight_ball_spin_exponent: 3.0,
 		beach_ball_score_exponent: 1.0,
 		beach_ball_spin_exponent: 0.5,
 		bonus_wheel: null,
@@ -177,7 +177,7 @@ function InitState() {
 			score_history: null
 		},
 		save_file: {
-			game_version: kSaveFileVersion,
+			game_version: 2,
 			points: 0,
 			spins: 0,
 			auto_drop_pos: null,
@@ -191,7 +191,6 @@ function InitState() {
 				balls_dropped: 0,
 				balls_dropped_manual: 0,
 				max_buff_multiplier: 0,
-				start_time: Date.now(),
 				target_hits: {}
 			},
 			upgrade_levels: {
@@ -217,7 +216,6 @@ function InitState() {
 				dark_mode: false,
 				classic_opal_balls: false,
 				show_upgrade_levels: false,
-				scientific_notation: false,
 				favicon: -1,
 				april_fools_enabled: 0,
 				quality: 0,
@@ -473,6 +471,7 @@ function Update() {
 	Draw(state);
 	UpdateStatsPanel(state);
 	UpdateUpgradeButtons(state);
+	state.last_update += elapsed;
 }
 
 function OnClick(event) {
@@ -547,12 +546,10 @@ function Load() {
 	document.getElementById(kTopCanvasLayer).addEventListener("click", OnClick);
 	document.title = kTitleAndVersion;
 	document.getElementById("title_version").innerHTML = kTitleAndVersion;
-	document.getElementById("version_ending").innerHTML = kVersion;
 	document.getElementById("message_box").innerHTML =
 		"<h1>Welcome to Pachinkremental!</h1>" +
 		"<h1>Click anywhere in the green box to drop a ball.</h1>";
 	LoadFromLocalStorage();
-	DisplayArchivedSaveFileButtons();
 	UpdateDarkMode();
 
 	OnResize();
