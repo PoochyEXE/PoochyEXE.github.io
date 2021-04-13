@@ -377,12 +377,12 @@ function DrawBalls(balls, inner_color, outer_color, ctx) {
 		return;
 	}
 	const kPrismaticCycleShift = kPrismaticCycleDuration / 6.0;
-	const current_time = state.current_time;
+	const time = state.current_time;
 	for (let i = 0; i < balls.length; ++i) {
 		let inner_color_rgb = inner_color;
 		if (inner_color == kPrismatic) {
 			inner_color_rgb = GetPrismaticColor(
-				current_time + kPrismaticCycleShift - balls[i].start_time,
+				time + kPrismaticCycleShift - balls[i].start_time,
 				kPrismaticCycleDuration,
 				/*saturation=*/ kPrismaticSaturationInner,
 				/*alpha=*/1.0
@@ -391,7 +391,7 @@ function DrawBalls(balls, inner_color, outer_color, ctx) {
 		let outer_color_rgb = outer_color;
 		if (outer_color == kPrismatic) {
 			outer_color_rgb = GetPrismaticColor(
-				current_time - balls[i].start_time,
+				time - balls[i].start_time,
 				kPrismaticCycleDuration,
 				/*saturation=*/ kPrismaticSaturationOuter,
 				/*alpha=*/1.0
@@ -459,7 +459,6 @@ function DrawTargets(target_sets, ctx) {
 function DrawScoreText(score_text, font_size, duration, rise, ctx) {
 	const kPrismaticSaturation = 0.8;
 	let next_index = 0;
-	const time = Date.now();
 	ctx.textAlign = "center";
 	ctx.font = "bold " + font_size + "px sans-serif";
 	for (let i = 0; i < score_text.length; ++i) {
@@ -478,8 +477,7 @@ function DrawScoreText(score_text, font_size, duration, rise, ctx) {
 				/*alpha=*/ 1 - fraction
 			);
 		} else {
-			color_rgba =
-				"rgba(" + curr_text.color_rgb + ", " + (1 - fraction) + ")";
+			color_rgba = "rgba(" + curr_text.color_rgb + ", " + (1 - fraction) + ")";
 		}
 		ctx.fillStyle = color_rgba;
 		ctx.fillText(

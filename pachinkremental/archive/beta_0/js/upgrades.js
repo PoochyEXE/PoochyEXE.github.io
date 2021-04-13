@@ -76,9 +76,6 @@ class Upgrade {
 		state.save_file.points -= cost;
 		this.Update();
 		this.on_buy();
-		if (this.GetLevel() == this.max_level) {
-			ShowEndingIfAllUpgradesMaxed();
-		}
 		return true;
 	}
 
@@ -625,7 +622,7 @@ function OnCenterSlotHit(ball) {
 }
 
 function ShouldDisplayGemstoneBallUpgrades() {
-	return IsMaxed("gold_ball_rate") && IsUnlocked("unlock_bonus_wheel");
+	return GetUpgradeLevel("gold_ball_rate") >= 19;
 }
 
 function NthGemstoneBallUnlockCost(n) {
@@ -671,7 +668,7 @@ function Tier2GemstoneBallRateCostFunc(level) {
 }
 
 function GemstoneBallRateValueFunc(level) {
-	return (level + 1) / 5.0;
+	return (level + 1) / 10.0;
 }
 
 function AllTier1GemstoneBallsUnlocked() {
@@ -834,7 +831,7 @@ function InitUpgrades() {
 			ball_type: kBallTypes[kBallTypeIDs.GOLD],
 			cost_func: level => 1000000 * Math.pow(2, level),
 			value_func: level => level + 1,
-			max_level: 14
+			max_level: 49
 		})
 	);
 	upgrades_list.push(
@@ -905,7 +902,7 @@ function InitUpgrades() {
 			name: "Auto-Spin",
 			category: "bonus_wheel",
 			description: "Automatically spin the Bonus Wheel.",
-			cost: 100000000,
+			cost: 50000000,
 			visible_func: () => IsUnlocked("unlock_bonus_wheel"),
 			on_update: null
 		})
@@ -917,7 +914,7 @@ function InitUpgrades() {
 			category: "bonus_wheel",
 			description:
 				"Uses 10% of your available spins at a time, multiplying any points you win from that spin. NOTE: Bonus gold ball drops are not multiplied.",
-			cost: 100000000,
+			cost: 50000000,
 			visible_func: () => IsUnlocked("unlock_bonus_wheel"),
 			on_update: null
 		})
@@ -965,7 +962,7 @@ function InitUpgrades() {
 			category: "bonus_wheel",
 			description:
 				'Change the "Drop 3 gemstone balls" space to "Drop 3 special balls", which drops 1 Opal ball, 1 8-Ball, and 1 Beach ball.',
-			cost: 2e55,
+			cost: 1e67,
 			visible_func: () => IsUnlocked("unlock_beach_balls"),
 			on_update: null
 		})
@@ -995,7 +992,7 @@ function InitUpgrades() {
 			button_class: "emeraldUpgradeButton",
 			description:
 				'Makes the highest point value on the wheel scale to the value of emerald balls instead of gold balls.',
-			cost: 1e68,
+			cost: 1e48,
 			visible_func: () => IsMaxed("emerald_ball_rate"),
 			on_update: () => {
 				state.bonus_wheel.UpdateAllSpaces();
@@ -1010,7 +1007,7 @@ function InitUpgrades() {
 			button_class: "sapphireUpgradeButton",
 			description:
 				'Refunds additional spins consumed by Multi-Spin when landing on a ball drop space. (Note: ZONK still wastes all spins consumed.)',
-			cost: 1e51,
+			cost: 1e48,
 			visible_func: () => IsMaxed("sapphire_ball_rate"),
 			on_update: () => {
 				state.bonus_wheel.UpdateAllSpaces();
@@ -1159,7 +1156,7 @@ function InitUpgrades() {
 			category: "topaz_balls",
 			description:
 				'Makes the score buff multiplier awarded by Topaz balls equal to the Emerald exponent, e.g. an Emerald exponent of 3 means a Topaz ball in the center slot awards a 3&times; scoring buff instead of just 2&times; scoring.',
-			cost: 1e24,
+			cost: 1e36,
 			visible_func: () =>
 				IsUnlocked("unlock_topaz_balls") &&
 				IsUnlocked("ruby_ball_buff_stackable") &&
@@ -1192,7 +1189,7 @@ function InitUpgrades() {
 			category: "turquoise_balls",
 			description:
 				'If a Turquoise ball hits a spin target, it also awards the value of the center slot, and if it lands in the center slot, it also awards the spins for a hitting a spin target.',
-			cost: 1e24,
+			cost: 1e36,
 			visible_func: () => IsUnlocked("unlock_turquoise_balls")
 		})
 	);
@@ -1222,7 +1219,7 @@ function InitUpgrades() {
 			category: "amethyst_balls",
 			description:
 				'Applies the score buff multiplier to spins earned by Amethyst balls. (Spins awarded are rounded down to the nearest whole number.)',
-			cost: 1e24,
+			cost: 1e36,
 			visible_func: () => IsUnlocked("unlock_amethyst_balls"),
 		})
 	);
@@ -1238,7 +1235,7 @@ function InitUpgrades() {
 	upgrades_list.push(
 		new BallTypeRateUpgrade({
 			ball_type: kBallTypes[kBallTypeIDs.OPAL],
-			cost_func: level => 1e32 * Math.pow(5, level),
+			cost_func: level => 5e24 * Math.pow(5, level),
 			value_func: GemstoneBallRateValueFunc,
 			max_level: 49
 		})
@@ -1258,14 +1255,8 @@ function InitUpgrades() {
 		new BallTypeRateUpgrade({
 			ball_type: kBallTypes[kBallTypeIDs.EIGHT_BALL],
 			cost_func: level => 888e33 * Math.pow(10, level),
-			value_func: function(level) {
-				if (level >= 43) {
-					return 8.88;
-				} else {
-					return (level + 1) / 5.0;
-				}
-			},
-			max_level: 43
+			value_func: GemstoneBallRateValueFunc,
+			max_level: 79
 		})
 	);
 	upgrades_list.push(
@@ -1273,10 +1264,10 @@ function InitUpgrades() {
 			id: "eight_ball_score_exponent",
 			name: "8-Ball Score Exponent",
 			category: "eight_balls",
-			description: "Increases the exponent on the 8&times; multiplier for points scored by 8-Balls.",
+			description: "Increases the exponent on the gold ball value multiplier for points scored by 8-Balls.",
 			cost_func: level => 888e33 * Math.pow(10, level),
-			value_func: level => (level / 5.0) + 1,
-			max_level: 35,
+			value_func: level => (level / 10.0) + 3,
+			max_level: 50,
 			value_suffix: "",
 			visible_func: () =>
 				IsUnlocked("unlock_eight_balls") &&
@@ -1286,16 +1277,15 @@ function InitUpgrades() {
 			},
 		})
 	);
-	/*
 	upgrades_list.push(
 		new Upgrade({
 			id: "eight_ball_spin_exponent",
 			name: "8-Ball Spin Exponent",
 			category: "eight_balls",
-			description: "Increases the exponent on the 8&times; multiplier for spins earned by 8-Balls. Note: The number of spins earned per ball is rounded down to the nearest whole number.",
+			description: "Increases the exponent on the gold ball value multiplier for spins earned by 8-Balls. Note: The number of spins earned per ball is rounded down to the nearest whole number.",
 			cost_func: level => 888e33 * Math.pow(10, level),
-			value_func: level => (level / 10.0) + 1,
-			max_level: 70,
+			value_func: level => (level / 10.0) + 3,
+			max_level: 50,
 			value_suffix: "",
 			visible_func: () =>
 				IsUnlocked("unlock_eight_balls") &&
@@ -1305,22 +1295,21 @@ function InitUpgrades() {
 			},
 		})
 	);
-	*/
 	upgrades_list.push(
 		new BallTypeUnlockUpgrade({
 			ball_type: kBallTypes[kBallTypeIDs.BEACH_BALL],
 			ball_description:
 				"Beach balls are bouncier and floatier than other balls. They're worth double the points and spins of 8-balls, and award a 16&times; scoring buff.",
-			cost_func: () => 1e50,
+			cost_func: () => 1e56,
 			visible_func: () => IsUnlocked("unlock_eight_balls")
 		})
 	);
 	upgrades_list.push(
 		new BallTypeRateUpgrade({
 			ball_type: kBallTypes[kBallTypeIDs.BEACH_BALL],
-			cost_func: level => 1e51 * Math.pow(10, level),
+			cost_func: level => 1e57 * Math.pow(10, level),
 			value_func: GemstoneBallRateValueFunc,
-			max_level: 24
+			max_level: 49
 		})
 	);
 	upgrades_list.push(
@@ -1330,7 +1319,7 @@ function InitUpgrades() {
 			category: "beach_balls",
 			description:
 				"The more time a beach ball spends bouncing around, the more points and spins it's worth.",
-			cost: 1e52,
+			cost: 1e80,
 			visible_func: () => IsUnlocked("unlock_beach_balls")
 		})
 	);
@@ -1340,9 +1329,9 @@ function InitUpgrades() {
 			name: "Beach Ball Score Exponent",
 			category: "beach_balls",
 			description: "Increases the exponent on the time-based multiplier for points scored by Beach Balls.",
-			cost_func: level => 1e53 * Math.pow(10, level),
+			cost_func: level => 1e81 * Math.pow(10, level),
 			value_func: level => (level / 5.0) + 1,
-			max_level: 5,
+			max_level: 45,
 			value_suffix: "",
 			visible_func: () =>
 				IsUnlocked("beach_ball_time_based_multiplier"),
@@ -1357,7 +1346,7 @@ function InitUpgrades() {
 			name: "Beach Ball Spin Exponent",
 			category: "beach_balls",
 			description: "Increases the exponent on the time-based multiplier for spins earned by Beach Balls. Note: The number of spins earned per ball is rounded down to the nearest whole number.",
-			cost_func: level => 1e53 * Math.pow(1e4, level),
+			cost_func: level => 1e85 * Math.pow(1e5, level),
 			value_func: level => (level / 10.0) + 0.5,
 			max_level: 5,
 			value_suffix: "",
@@ -1450,7 +1439,7 @@ function NextUpgradeHint(state) {
 	} else if (!IsUpgradeVisible("gold_ball_rate")) {
 		return "Unlock Gold Balls";
 	} else if (!ShouldDisplayGemstoneBallUpgrades()) {
-		return "15% Gold Ball Rate and unlock Bonus Wheel";
+		return "20% Gold Ball Rate";
 	} else if (NumGemstoneBallsUnlocked() < 2) {
 		return "Unlock any 2 of Ruby, Sapphire, and Emerald Balls";
 	} else if (!AllTier1GemstoneBallsUnlocked()) {
@@ -1464,11 +1453,9 @@ function NextUpgradeHint(state) {
 		!IsUpgradeVisible("better_multi_spin") ||
 		!IsUpgradeVisible("better_buff_multiplier")
 	) {
-		return "Max Ruby, Sapphire, and Emerald Ball Rates (10%). Each one reveals a different upgrade when maxed.";
+		return "Max Ruby, Sapphire, and Emerald Ball Rates (5%). Each one reveals a different upgrade when maxed.";
 	} else if (!IsUpgradeVisible("better_drops_4")) {
 		return "Unlock Beach Balls.";
-	} else if (!IsUnlocked("beach_ball_time_based_multiplier")) {
-		return "Unlock Time-Based Multipiler for Beach Balls.";
 	} else {
 		return "None! Congratulations, you've reached the current endgame!"
 	}
@@ -1537,25 +1524,4 @@ function HideUpgradeTooltip(button_elem) {
 		return;
 	}
 	document.getElementById("tooltip").style.display = "none";
-}
-
-function AreAllUpgradesMaxed() {
-	for (let id in state.upgrades) {
-		let upgrade = state.upgrades[id];
-		if (!isFinite(upgrade.max_level)) {
-			continue;
-		}
-		if (!IsMaxed(id)) {
-			return false;
-		}
-	}
-	return true;
-}
-
-function ShowEndingIfAllUpgradesMaxed() {
-	if (AreAllUpgradesMaxed()) {
-		let play_time = Date.now() - state.save_file.stats.start_time;
-		UpdateInnerHTML("ending_play_time", FormatDurationLong(play_time));
-		document.getElementById("ending_modal").style.display = "block";
-	}
 }
