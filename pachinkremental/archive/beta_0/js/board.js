@@ -50,10 +50,12 @@ function AwardPoints(base_value, ball) {
 		if (HasEightBallSpecial(ball.ball_type_index)) {
 			popup_text_level = 3;
 			color_rgb = k8BallHighlightColor;
-			total_value *= Math.pow(
-				state.special_ball_multiplier, state.emerald_ball_exponent
-			);
-			total_value *= Math.pow(8, state.eight_ball_score_exponent);
+			let exponent =
+				(GetUpgradeLevel("eight_ball_score_exponent") > 0) ?
+				state.eight_ball_score_exponent :
+				state.emerald_ball_exponent;
+			total_value *= Math.pow(state.special_ball_multiplier, exponent);
+			total_value *= 8;
 			if (ball.ball_type_index == kBallTypeIDs.BEACH_BALL) {
 				let multiplier = 2;
 				if (IsUnlocked("beach_ball_time_based_multiplier")) {
@@ -108,22 +110,28 @@ class ScoreTarget extends Target {
 			OnCenterSlotHit(ball);
 		}
 	}
-	
+
 	ResetText() {
 		this.text = FormatNumberShort(this.value);
 	}
 
 	SetValue(new_value) {
 		this.value = new_value;
+		this.text = FormatNumberShort(new_value);
 		this.ResetText();
 	}
 }
 
 function AwardSpins(ball, text_pos) {
 	if (HasSapphireSpecial(ball.ball_type_index)) {
-		let value = Math.pow(
-			state.special_ball_multiplier, state.sapphire_ball_exponent
-		);
+		let exponent = state.sapphire_ball_exponent;
+		if (
+			HasEightBallSpecial(ball.ball_type_index) &&
+			GetUpgradeLevel("eight_ball_spin_exponent") > 0
+		) {
+			exponent = state.eight_ball_spin_exponent;
+		}
+		let value = Math.pow(state.special_ball_multiplier, exponent);
 		let color_rgb = "0,0,255"
 		let score_text_level = 2;
 		if (
@@ -136,7 +144,7 @@ function AwardSpins(ball, text_pos) {
 		}
 		if (HasEightBallSpecial(ball.ball_type_index)) {
 			score_text_level = 3;
-			value *= Math.pow(8, state.eight_ball_spin_exponent);
+			value *= 8;
 			color_rgb = k8BallHighlightColor;
 			if (ball.ball_type_index == kBallTypeIDs.BEACH_BALL) {
 				let multiplier = 2;

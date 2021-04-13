@@ -303,37 +303,6 @@ function FormatNumberLong(num) {
 		kLongSuffixes[suffix_index];
 }
 
-function ZeroPad(num, len) {
-	return String(num).padStart(len, "0");
-}
-
-function FormatDurationLong(duration_ms) {
-	console.assert(duration_ms > 0);
-	let x = Math.round(duration_ms);
-	let ms = x % 1000;
-	x = Math.floor(x / 1000);
-	let secs = x % 60;
-	x = Math.floor(x / 60);
-	let result = ZeroPad(secs, 2) + "s " + ZeroPad(ms, 3) + "ms";
-	if (x <= 0) {
-		return result;
-	}
-	let mins = x % 60;
-	x = Math.floor(x / 60);
-	result = ZeroPad(mins, 2) + "m " + result;
-	if (x <= 0) {
-		return result;
-	}
-	let hours = x % 24;
-	x = Math.floor(x / 24);
-	result = ZeroPad(hours, 2) + "h " + result;
-	if (x <= 0) {
-		return result;
-	}
-	result = x + "d " + result;
-	return result;
-}
-
 class BallType {
 	constructor(
 		id,
@@ -352,9 +321,6 @@ class BallType {
 	}
 }
 
-// Fisher-Yates shuffle.
-// Implemented from psuedocode at
-// https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle#The_modern_algorithm
 function ShuffleArray(array) {
 	let result = array.slice(0);
 	for (let i = result.length - 1; i > 0; i--) {

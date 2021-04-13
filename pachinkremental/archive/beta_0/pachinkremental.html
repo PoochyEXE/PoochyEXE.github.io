@@ -95,7 +95,6 @@
 							<b>Balls dropped manually: </b><span id="stats_balls_dropped_manual" class="statsEntry"></span>
 						</div>
 						<div id="stats_balls_dropped_by_type"></div>
-						<div class="menuPadding"></div>
 					</div>
 				</div>
 				<div id="options_container" class="optionsContainer">
@@ -130,7 +129,7 @@
 						<br>
 						<div id="options_opacity" class="optionsContents messageBox" style="display: inline-block;"></div>
 						<div id="options_favicon" class="optionsContents messageBox" style="display: inline-block;"></div>
-						<div id="options_archived_save_files"></div>
+						<br>
 						<br>
 						<button type="button" class="optionButtonRed"
 								id="button_erase_save" onclick="EraseSave()">Erase save file</button>
@@ -150,26 +149,10 @@
 	<div id="export_save_modal" class="modal">
 		<div id="export_save_modal_content" class="modalContent">
 			<span class="modalCloseButton" onmousedown="CloseModal('export_save_modal')">&#xD7</span>
-			<div id="export_message">Your save file is below. Copy the text and keep it someplace safe.</div>
+			Your save file is below. Copy the text and keep it someplace safe.
+			<br>
 			<br>
 			<textarea id="exported_save" class="exportedSave" onclick="this.select()" readonly></textarea>
-		</div>
-	</div>
-	<div id="ending_modal" class="modal">
-		<div id="ending_modal_content" class="modalContent">
-			<span class="modalCloseButton" onmousedown="CloseModal('ending_modal')">&#xD7</span>
-			<span style="text-align: center; vertical-align: middle;">
-				<span class="prismaticText messageBoxLarge">Congratulations!</span>
-				<br><br>
-				You've maxed all the upgrades that can be maxed, as of <span id="version_ending"></span>!
-				<br><br>
-				It's been <span id="ending_play_time" class="speedrunTimerCompleted"></span> since you started playing on this save file.
-				<br><br>
-				Thanks for playing Pachinkremental! Please check back for more updates in the future.
-				<br><br>
-				You can keep going as far as you want, but for now there are no more upgrades to discover or max out.
-				<br>Perhaps just relax and watch the balls drop, if you like.
-			</span>
 		</div>
 	</div>
 </body>

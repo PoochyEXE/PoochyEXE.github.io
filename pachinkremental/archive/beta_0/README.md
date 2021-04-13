@@ -29,26 +29,10 @@ A: This is intentional, both to make sure the game won't softlock with too many 
 * Making the window too narrow can break some CSS and make the menu UI ugly.
 * Firefox seems to occasionally delete the save file upon closing the tab. If you're playing in Firefox, export your save frequently!
 
-## Archived versions
-
-I plan to archive the last version before any update that significantly nerfs previous content or renders previous save files incompatible, so that the old version is still easily accessible to people who want to keep playing it. Below is the list of archived versions.
-
-* [v0.12.2 beta](https://poochyexe.github.io/pachinkremental/archive/beta_0/pachinkremental.html)
-
 ## Changelog
 
-### v1.0.0-RC1 (2021-04-11)
-* Pachinkremental is out of beta!
-* Lots of rebalancing. In order by game progression:
-	* Nerf: Lower the max Gold ball rate to 15%.
-	* Buff: Raise the max Gemstone ball rates to 10%.
-	* Buff: Gemstone and higher ball rate upgrades now increase by 0.2% per upgrade level instead of 0.1%.
-	* Buff: Reduced cost of Synergy upgrades.
-	* Nerf: Raise the costs of Better Buff Multiplier, Better Point Values, and Better Multi-Spin based on how powerful they are.
-	* Nerf: 8-Ball Score Exponent is now an exponent on the 8-Ball's 8x multiplier instead of the gold ball value multiplier.
-	* Nerf: Disabled the 8-Ball Spin Exponent upgrade entirely. It was way too powerful when combined with Better Point Values.
-* New "Congratulations!" modal when you max every upgrade that can be maxed.
-* Make Dark Mode apply to modals as well.
+### v0.12.2 beta (2021-04-12)
+* Fix bug where prismatic effects (Opal Ball ripple, Beach Ball score text, etc.) failed to render on the first frame. Thanks again to Leidwesen for the bug report!
 
 ### v0.12.1 beta (2021-04-12)
 * Fix exploit where Beach Ball timer could be extended by pausing script execution (e.g. minimizing the window or switching away from the tab). Thanks to Leidwesen for the bug report!

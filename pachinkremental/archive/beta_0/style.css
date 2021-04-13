@@ -549,117 +549,30 @@ button.dropZone:disabled {
 
 .modalContent {
 	font-family: sans-serif;
-	border-radius: 20px;
-	border: 3px solid #888;
-}
-
-.modalContentLight {
 	background-color: #fff;
-	color: #000;
-}
-
-.modalContentDark {
-	background-color: #000;
-	color: #fff;
+	border-radius: 20px;
+	border: 1px solid #888;
 }
 
 .modalCloseButton {
+	color: #aaa;
 	float: right;
 	font-size: 28px;
 	font-weight: bold;
 }
 
-.modalCloseButtonLight {
-	color: #aaa;
-}
-
-.modalCloseButtonDark {
-	color: #888;
-}
-
 .modalCloseButton:hover,
 .modalCloseButton:focus {
+	color: black;
 	text-decoration: none;
 	cursor: pointer;
 }
 
-.modalCloseButtonLight:hover,
-.modalCloseButtonLight:focus {
-	color: #000;
-}
-
-.modalCloseButtonDark:hover,
-.modalCloseButtonDark:focus {
-	color: #FFF;
-}
-
 textarea.exportedSave {
 	padding: 5px;
-	font-family: monospace;
-	overflow-wrap: break-word;
-}
-
-textarea.exportedSaveLight {
 	background-color: #fff;
 	color: #000;
 	border: 1px solid #000;
-}
-
-textarea.exportedSaveDark {
-	background-color: #000;
-	color: #fff;
-	border: 1px solid #fff;
-}
-
-span.prismaticText {
-	background-clip: text;
-	color: transparent;
-}
-
-@-webkit-keyframes prismaticTextLightColor {  
-  0% { color: #C00; }
-  17% { color: #CC0; }
-  33% { color: #0C0; }
-  50% { color: #0CC; }
-  67% { color: #00C; }
-  83% { color: #C0C; }
-  100% { color: #C00; }
-}
-
-@-webkit-keyframes prismaticTextDarkColor {  
-  0% { color: #F88; }
-  17% { color: #FF8; }
-  33% { color: #8F8; }
-  50% { color: #8FF; }
-  67% { color: #88F; }
-  83% { color: #F8F; }
-  100% { color: #F88; }
-}
-
-span.prismaticTextLight {
-    background: #FFF;
-	color: #000;
-    -webkit-animation-name: prismaticTextLightColor;  
-    -webkit-animation-iteration-count: infinite;  
-    -webkit-animation-duration: 2s; 
-}
-
-span.prismaticTextDark {
-    background: #000;
-	color: #FFF;
-    -webkit-animation-name: prismaticTextDarkColor;  
-    -webkit-animation-iteration-count: infinite;  
-    -webkit-animation-duration: 2s; 
-}
-
-span.speedrunTimerCompleted {
-	font-weight: bold;
-}
-
-span.speedrunTimerCompletedLight {
-	color: #00F;
-}
-
-span.speedrunTimerCompletedDark {
-	color: #0FF;
+	font-family: monospace;
+	overflow-wrap: break-word;
 }
