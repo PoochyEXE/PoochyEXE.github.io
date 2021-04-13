@@ -299,9 +299,6 @@ function FormatNumberLong(num) {
 		return FormatNumberScientificNotation(num);
 	}
 	let prefix = num / Math.pow(1000, suffix_index);
-	console.log(prefix);
-	console.log(prefix.toFixed(kNumericPrecision));
-	console.log(kLongSuffixes[suffix_index]);
 	return prefix.toFixed(kNumericPrecision) + " " +
 		kLongSuffixes[suffix_index];
 }
