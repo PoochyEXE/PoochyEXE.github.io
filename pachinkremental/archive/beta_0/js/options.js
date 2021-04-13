@@ -12,6 +12,7 @@ const kAprilFoolsOptions = [
 	"Enabled",
 ];
 const kSaveFileVersion = 2;
+const kSaveFileName = "beta_0_archived_save_file";
 
 class ColorSchemeClassMapping {
 	constructor(base_class, light_class, dark_class) {
@@ -151,7 +152,7 @@ function SaveFileFromString(save_file_str) {
 }
 
 function SaveToLocalStorage() {
-	localStorage.setItem("save_file", SaveFileToString(state));
+	localStorage.setItem(kSaveFileName, SaveFileToString(state));
 	state.notifications.push(new Notification("Game saved", "#8F8"));
 }
 
@@ -235,7 +236,7 @@ function LoadGame(save_file_str) {
 }
 
 function LoadFromLocalStorage() {
-	let save_file_str = localStorage.getItem("save_file");
+	let save_file_str = localStorage.getItem(kSaveFileName);
 	if (save_file_str) {
 		LoadGame(save_file_str);
 	}
@@ -301,7 +302,7 @@ function EraseSave() {
 		""
 	);
 	if (answer == "DELETE") {
-		localStorage.removeItem("save_file");
+		localStorage.removeItem(kSaveFileName);
 		location.reload();
 	}
 }
