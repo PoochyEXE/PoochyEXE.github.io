@@ -1,4 +1,4 @@
-const kVersion = "v0.12.1 beta";
+const kVersion = "v0.12.2 beta";
 const kTitleAndVersion = "Pachinkremental " + kVersion;
 
 var max_drop_y = 20;
@@ -551,7 +551,6 @@ function Load() {
 		"<h1>Click anywhere in the green box to drop a ball.</h1>";
 	LoadFromLocalStorage();
 	UpdateDarkMode();
-	var last_update = Date.now();
 
 	OnResize();
 	window.onresize = OnResize;
