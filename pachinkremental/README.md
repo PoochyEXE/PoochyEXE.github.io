@@ -31,6 +31,9 @@ A: This is intentional, both to make sure the game won't softlock with too many 
 
 ## Changelog
 
+### v0.12.2 beta (2021-04-12)
+* Fix bug where prismatic effects (Opal Ball ripple, Beach Ball score text, etc.) failed to render on the first frame. Thanks again to Leidwesen for the bug report!
+
 ### v0.12.1 beta (2021-04-12)
 * Fix exploit where Beach Ball timer could be extended by pausing script execution (e.g. minimizing the window or switching away from the tab). Thanks to Leidwesen for the bug report!
 * Add scientific notation.

@@ -91,7 +91,7 @@ class RisingText {
 		this.text = text;
 		this.pos = new Point(pos.x, pos.y);
 		this.color_rgb = color_rgb;
-		this.start_time = Date.now();
+		this.start_time = state.current_time;
 	}
 }
 
@@ -139,7 +139,7 @@ class RippleEffect {
 		this.pos = pos;
 		this.color_rgb = color_rgb;
 		this.start_radius = start_radius;
-		this.start_time = Date.now();
+		this.start_time = state.current_time;
 	}
 }
 
