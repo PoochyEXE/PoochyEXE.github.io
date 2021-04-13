@@ -166,6 +166,7 @@ function LoadGame(save_file_str) {
 					"#F88"
 				)
 			);
+			return;
 		}
 		default_state = InitState();
 		state.save_file = { ...default_state.save_file, ...load_save };
