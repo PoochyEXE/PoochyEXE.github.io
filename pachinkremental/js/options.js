@@ -11,26 +11,7 @@ const kAprilFoolsOptions = [
 	"Always On",
 	"Enabled",
 ];
-const kSaveFileVersion = 3;
-
-const kPrevSaveFileVersions = [
-	// 0
-	// There was never a version 0, since 0 is falsey in JS and I want
-	// "!save_file.game_version" to imply a save file is corrupted.
-	null,
-
-	// 1
-	{
-		archive_id: null,
-		last_version: "v0.6.2 beta",
-	},
-
-	// 2
-	{
-		archive_id: "beta_0",
-		last_version: "v0.12.2 beta",
-	},
-];
+const kSaveFileVersion = 2;
 
 class ColorSchemeClassMapping {
 	constructor(base_class, light_class, dark_class) {
@@ -64,11 +45,6 @@ const kColorSchemeClasses = [
 	new ColorSchemeClassMapping("beachBallUpgradeButton", "beachBallUpgradeButtonLight", "beachBallUpgradeButtonDark"),
 	new ColorSchemeClassMapping("optionButton", "optionButtonLight", "optionButtonDark"),
 	new ColorSchemeClassMapping("optionButtonRed", "optionButtonRedLight", "optionButtonRedDark"),
-	new ColorSchemeClassMapping("modalContent", "modalContentLight", "modalContentDark"),
-	new ColorSchemeClassMapping("modalCloseButton", "modalCloseButtonLight", "modalCloseButtonDark"),
-	new ColorSchemeClassMapping("prismaticText", "prismaticTextLight", "prismaticTextDark"),
-	new ColorSchemeClassMapping("speedrunTimerCompleted", "speedrunTimerCompletedLight", "speedrunTimerCompletedDark"),
-	new ColorSchemeClassMapping("exportedSave", "exportedSaveLight", "exportedSaveDark"),
 ];
 
 function AutoPickFavicon() {
@@ -189,14 +165,6 @@ function LoadGame(save_file_str) {
 					"#F88"
 				)
 			);
-			return;
-		}
-		if (load_save.game_version < 3) {
-			ArchiveSaveFile(2, save_file_str);
-			const kVer3UpgradeMessage =
-				"<b>Pachinkremental is out of beta!</b><br><br>Unfortunately, save files from the beta are not compatible with the new version, but you can continue playing v0.12.2 beta using your previous save file if you want. (You can also retrieve this archived save file from the Options menu.)"
-			ExportArchivedSave(2, kVer3UpgradeMessage);
-			return;
 		}
 		default_state = InitState();
 		state.save_file = { ...default_state.save_file, ...load_save };
@@ -212,6 +180,22 @@ function LoadGame(save_file_str) {
 			...default_state.save_file.options,
 			...load_save.options
 		};
+		if (state.save_file.game_version < 2) {
+			state.save_file.options.auto_save_enabled = state.save_file.auto_save_enabled;
+			delete state.save_file.auto_save_enabled;
+			state.save_file.options.auto_drop_enabled = state.save_file.auto_drop_enabled;
+			delete state.save_file.auto_drop_enabled;
+			state.save_file.options.auto_spin_enabled = state.save_file.auto_spin_enabled;
+			delete state.save_file.auto_spin_enabled;
+			state.save_file.options.multi_spin_enabled = state.save_file.multi_spin_enabled;
+			delete state.save_file.multi_spin_enabled;
+			state.save_file.options.april_fools_enabled = state.save_file.april_fools_enabled ? 2 : 0;
+			delete state.save_file.april_fools_enabled;
+			state.save_file.options.quality = state.save_file.quality;
+			delete state.save_file.quality;
+			state.save_file.options.display_popup_text = state.save_file.display_popup_text;
+			delete state.save_file.display_popup_text;
+		}
 		state.save_file.game_version = kSaveFileVersion;
 		state.display_score = state.save_file.stats.total_score;
 		state.display_points = state.save_file.points;
@@ -273,98 +257,37 @@ function CloseModal(id) {
 }
 
 function ResizeModals() {
-	const kSizeRatio = 0.7;
-	const kPadding = 20;
-	let content_width = kSizeRatio * window.innerWidth;
-	let content_height = kSizeRatio * window.innerHeight;
-	let modal_elems = document.getElementsByClassName("modal");
-	for (let i = 0; i < modal_elems.length; ++i) {
-		let modal_elem = modal_elems[i];
-		let horizontal_pad =
-			window.innerWidth * (1.0 - kSizeRatio) / 2.0 - kPadding;
-		let vertical_pad =
-			window.innerHeight * (1.0 - kSizeRatio) / 2.0 - kPadding;
-		modal_elem.style.width = window.innerWidth + "px";
-		modal_elem.style.height = window.innerHeight + "px";
-		modal_elem.style["padding-left"] = horizontal_pad + "px";
-		modal_elem.style["padding-right"] = horizontal_pad + "px";
-		modal_elem.style["padding-top"] = vertical_pad + "px";
-		modal_elem.style["padding-bottom"] = vertical_pad + "px";
-		let content_elem = document.getElementById(modal_elem.id + "_content");
-		content_elem.style.padding = kPadding + "px";
-		content_elem.style.maxWidth = content_width + "px";
-		content_elem.style.maxHeight = content_height + "px";
-	}
-	
-	// Save file export modal
-	let header_height = document.getElementById("export_message").offsetHeight;
+	const kInnerSizeRatio = 0.7;
+	const kInnerPadding = 20;
+	let modal_elem = document.getElementById("export_save_modal");
+	let horizontal_pad =
+		window.innerWidth * (1.0 - kInnerSizeRatio) / 2.0 - kInnerPadding;
+	let vertical_pad =
+		window.innerHeight * (1.0 - kInnerSizeRatio) / 2.0 - kInnerPadding;
+	modal_elem.style.width = window.innerWidth + "px";
+	modal_elem.style.height = window.innerHeight + "px";
+	modal_elem.style["padding-left"] = horizontal_pad + "px";
+	modal_elem.style["padding-right"] = horizontal_pad + "px";
+	modal_elem.style["padding-top"] = vertical_pad + "px";
+	modal_elem.style["padding-bottom"] = vertical_pad + "px";
+	let content_elem = document.getElementById("export_save_modal_content");
+	let content_width = kInnerSizeRatio * window.innerWidth;
+	let content_height = kInnerSizeRatio * window.innerHeight;
+	content_elem.style.padding = kInnerPadding + "px";
+	content_elem.style.width = content_width + "px";
+	content_elem.style.height = content_height + "px";
 	let exported_save_elem = document.getElementById("exported_save");
-	exported_save_elem.style.width = (content_width - kPadding) + "px";
+	exported_save_elem.style.width = (content_width - kInnerPadding) + "px";
 	exported_save_elem.style.height =
-		(content_height - kPadding * 2 - header_height - 15) + "px";
-}
-
-function ArchiveSaveFile(save_file_ver, save_file_str) {
-	let save_file_id =
-		kPrevSaveFileVersions[save_file_ver] + "_archived_save_file";
-	localStorage.setItem(save_file_id, save_file_str);
-}
-
-function ExportArchivedSave(save_file_ver, message_prefix) {
-	let ver_info = kPrevSaveFileVersions[save_file_ver];
-	let export_message = "";
-	if (message_prefix) {
-		export_message = message_prefix + "<br><br>";
-	}
-	export_message +=
-		"Your archived save file for <b>" + ver_info.last_version +
-		"</b> is below. Copy the text and keep it someplace safe."
-	export_message +=
-		'<br>You can import this save file into the corresponding archived version of the game. See the <a href="https://github.com/PoochyEXE/PoochyEXE.github.io/tree/main/pachinkremental#archived-versions" target="_blank" rel="noopener noreferrer">manual</a> for a list of archived versions.'
-	UpdateInnerHTML("export_message", export_message);
-	let export_textarea = document.getElementById("exported_save");
-	let save_file_id = ver_info.archive_id + "_archived_save_file";
-	export_textarea.innerHTML = localStorage.getItem(save_file_id);
-	export_textarea.focus();
-	export_textarea.select();
-	document.getElementById("export_save_modal").style.display = "block";
-	ResizeModals();
-}
-
-function DisplayArchivedSaveFileButtons() {
-	let html = ""
-	for (let i = 1; i < kPrevSaveFileVersions.length; ++i) {
-		let ver_info = kPrevSaveFileVersions[i];
-		if (!ver_info) {
-			continue;
-		}
-		if (!ver_info.archive_id) {
-			continue;
-		}
-		let save_file_id = ver_info.archive_id + "_archived_save_file";
-		if (!localStorage.getItem(save_file_id)) {
-			continue;
-		}
-		html += '<button type="button" class="optionButton" ';
-		html += 'id="button_export_archived_save_file_' + i + '" ';
-		html += 'onclick="ExportArchivedSave(' + i + ')">';
-		html += 'Export archived save file (' + ver_info.last_version + ')';
-		html += '</button>';
-	}
-	UpdateInnerHTML("options_archived_save_files", html);
+		(content_height - kInnerPadding - 30) + "px";
 }
 
 function ExportSave() {
-	UpdateInnerHTML(
-		"export_message",
-		"Your save file is below. Copy the text and keep it someplace safe."
-	);
 	let export_textarea = document.getElementById("exported_save");
 	export_textarea.innerHTML = SaveFileToString(state);
 	export_textarea.focus();
 	export_textarea.select();
 	document.getElementById("export_save_modal").style.display = "block";
-	ResizeModals();
 }
 
 function EraseSave() {
