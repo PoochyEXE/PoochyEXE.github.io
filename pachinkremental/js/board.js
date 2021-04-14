@@ -71,7 +71,8 @@ function AwardPoints(base_value, ball) {
 				state.special_ball_multiplier, state.emerald_ball_exponent
 			);
 			popup_text_level = 2;
-			color_rgb = "0,192,0";
+			color_rgb =
+				state.save_file.options.dark_mode ? "0,255,0" : "0,192,0";
 		} else {
 			popup_text_level = 1;
 			total_value *= state.special_ball_multiplier;
@@ -124,7 +125,8 @@ function AwardSpins(ball, text_pos) {
 		let value = Math.pow(
 			state.special_ball_multiplier, state.sapphire_ball_exponent
 		);
-		let color_rgb = "0,0,255"
+		let color_rgb =
+			state.save_file.options.dark_mode ? "32,96,255" : "0,0,255";
 		let score_text_level = 2;
 		if (
 			HasAmethystSpecial(ball.ball_type_index) &&
