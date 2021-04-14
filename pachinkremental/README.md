@@ -47,6 +47,8 @@ I plan to archive the last version before any update that significantly nerfs pr
 	* Nerf: Raise the costs of Better Buff Multiplier, Better Point Values, and Better Multi-Spin based on how powerful they are.
 	* Nerf: 8-Ball Score Exponent is now an exponent on the 8-Ball's 8x multiplier instead of the gold ball value multiplier.
 	* Nerf: Disabled the 8-Ball Spin Exponent upgrade entirely. It was way too powerful when combined with Better Point Values.
+	* Buff: Reduced cost of Beach Ball unlock and upgrades.
+	* Nerf: Reduced max Beach Ball Score Exponent from 10 to 2.
 * New "Congratulations!" modal when you max every upgrade that can be maxed.
 * Make Dark Mode apply to modals as well.
 
