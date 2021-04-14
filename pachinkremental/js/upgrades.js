@@ -1024,7 +1024,7 @@ function InitUpgrades() {
 			category: "bonus_wheel",
 			description: "Makes bonus wheel spins play out faster.",
 			cost_func: level => 1e12 * Math.pow(10, level),
-			value_func: level => level * 0.1 + 1.0,
+			value_func: level => (level / 10.0) + 1.0,
 			max_level: 20,
 			value_suffix: kTimesSymbol,
 			visible_func: () =>
