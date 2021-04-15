@@ -1,6 +1,6 @@
 # Pachinkremental by Poochy.EXE
 
-This game is designed for Firefox or Chrome on desktop. It might work on Safari, but I haven't tested it there yet. It probably won't run very well on mobile.
+Pachinkremental is a pachinko-based incremental browser game. It's designed for Firefox or Chrome on desktop, although it seems to run noticeably smoother in Chrome than Firefox. The UI will probably be rather clunky on mobile, but otherwise the game appears to run fine on mobile devices in both Safari and Chrome.
 
 ## How to play
 
@@ -27,6 +27,7 @@ A: This is intentional, both to make sure the game won't softlock with too many 
 ## Known issues
 
 * Making the window too narrow can break some CSS and make the menu UI ugly.
+* The ball opacity options don't work in Firefox.
 * Firefox seems to occasionally delete the save file upon closing the tab. If you're playing in Firefox, export your save frequently!
 
 ## Archived versions
@@ -36,6 +37,8 @@ I plan to archive the last version before any update that significantly nerfs pr
 * [v0.12.2 beta](https://poochyexe.github.io/pachinkremental/archive/beta_0/pachinkremental.html)
 
 ## Changelog
+
+**Caution: Spoilers below!**
 
 ### v1.0.0-RC1 (2021-04-11)
 * Pachinkremental is out of beta!
