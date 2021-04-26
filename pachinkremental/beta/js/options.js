@@ -355,7 +355,7 @@ function DisplayBetaIntro() {
 		'Beta version save files are separate from the live version.<br><br>' +
 		'<span class="warning">CAUTION: Beta save files may occasionally be wiped or archived!</span><br><br>' +
 		'You can import a live version save into the beta, but <span class="warning">beta version saves cannot be imported back into the live version.</span><br><br>' +
-		'For your convenience, your save version from the live version is below.';
+		'For your convenience, your save file from the live version is below.';
 	UpdateInnerHTML("export_message", message);
 	let export_textarea = document.getElementById("exported_save");
 	export_textarea.innerHTML = localStorage.getItem(kLiveSaveFileName);
