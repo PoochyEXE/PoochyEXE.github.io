@@ -40,10 +40,8 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
-### v1.0.1-RC2 (2021-04-26)
-* Add a beta version, for testing future updates. Live version save files can be imported into the beta, but beta version saves cannot be imported back into the live version.
-* Tweaked a couple pop-up text colors in dark mode to make them easier to read.
-* Fixed 2.4x wheel speed being displayed as "2.40x".
+### v1.1.0-beta (2021-04-26)
+* Add a rotation-based multiplier for beach balls.
 
 ### v1.0.0-RC1 (2021-04-11)
 * Pachinkremental is out of beta!
