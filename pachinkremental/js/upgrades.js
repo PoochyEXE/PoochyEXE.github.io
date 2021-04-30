@@ -1368,6 +1368,18 @@ function InitUpgrades() {
 			},
 		})
 	);
+	upgrades_list.push(
+		new FixedCostFeatureUnlockUpgrade({
+			id: "beach_ball_rotation_multiplier",
+			name: "Rotation Multiplier",
+			category: "beach_balls",
+			description:
+				"The more a beach ball rotates, the more points it's worth. Stacks multiplicatively with Time-Based Multiplier.",
+			cost: 1e72,
+			visible_func: () =>
+				IsUnlocked("beach_ball_time_based_multiplier"),
+		})
+	);
 
 	let upgrades_map = {};
 	for (let i = 0; i < upgrades_list.length; ++i) {

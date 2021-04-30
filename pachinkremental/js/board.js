@@ -63,6 +63,13 @@ function AwardPoints(base_value, ball) {
 						Math.pow(sec_elapsed, state.beach_ball_score_exponent);
 					multiplier = Math.max(multiplier, 2.0);
 				}
+				const k2Pi = Math.PI * 2;
+				if (
+					IsUnlocked("beach_ball_rotation_multiplier") &&
+					ball.total_rotations > k2Pi
+				) {
+					multiplier *= ball.total_rotations / k2Pi;
+				}
 				total_value *= multiplier;
 				color_rgb = kPrismatic;
 			}

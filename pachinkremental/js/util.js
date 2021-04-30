@@ -83,6 +83,7 @@ class Ball {
 		this.start_time = state.current_time;
 		this.rotation = rotation;  // Counterclockwise in radians
 		this.omega = omega;  // Angular velocity in radians/second
+		this.total_rotations = 0.0;  // Total radians rotated.
 	}
 }
 

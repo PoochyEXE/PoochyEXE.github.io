@@ -14,7 +14,7 @@ const kAprilFoolsOptions = [
 const kIsLiveVersion = true;
 const kLiveSaveFileName = "save_file";
 const kBetaSaveFileName = "beta_save_file";
-const kSaveFileVersion = 3;
+const kSaveFileVersion = 4;
 const kSaveFileName = kIsLiveVersion ? kLiveSaveFileName : kBetaSaveFileName;
 
 const kPrevSaveFileVersions = [
