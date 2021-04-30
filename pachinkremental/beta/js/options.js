@@ -186,19 +186,19 @@ function SaveToLocalStorage() {
 function LoadGame(save_file_str) {
 	let load_save = SaveFileFromString(save_file_str);
 	if (load_save && load_save.game_version) {
-		if (load_save.game_version > kSaveFileVersion) {
+		if (kIsLiveVersion && load_save.is_beta) {
 			state.notifications.push(
 				new Notification(
-					"Error: Save file appears to be from an incompatible future version.",
+					"Error: Beta version save files are incompatible with the live version.",
 					"#F88"
 				)
 			);
 			return;
 		}
-		if (kIsLiveVersion && load_save.is_beta) {
+		if (load_save.game_version > kSaveFileVersion) {
 			state.notifications.push(
 				new Notification(
-					"Error: Beta version save files are incompatible with the live version.",
+					"Error: Save file appears to be from an incompatible future version.",
 					"#F88"
 				)
 			);

@@ -72,6 +72,7 @@ function UpdateBalls(balls, board, target_sets, is_beach_ball) {
 		balls[b].vel.y += accel / kFPS;
 		balls[b].rotation += omega / kFPS;
 		balls[b].rotation %= k2Pi;
+		balls[b].total_rotations += Math.abs(omega) / kFPS;
 
 		for (let s = 0; s < target_sets.length; ++s) {
 			let t_set = target_sets[s];
