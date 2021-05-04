@@ -249,32 +249,37 @@ function InitStatsPanel(state) {
 	UpdateInnerHTML("stats_balls_dropped_by_type", html);
 }
 
+function UpdateStatsEntry(state, key, val) {
+	let elem = document.getElementById("stats_" + key);
+	if (!elem || val == null || val == undefined) {
+		return;
+	}
+	let visible = (val != 0);
+	if (key == "balls_dropped_manual") {
+		visible = ActiveMachine(state).IsUnlocked("auto_drop");
+	}
+	if (visible) {
+		let container = document.getElementById("stats_container_" + key);
+		if (container && container.style.display != "block") {
+			container.style.display = "block";
+		}
+	}
+	let html = Number.isFinite(val) ? FormatNumberLong(val) : val;
+	if (elem.innerHTML != html) {
+		elem.innerHTML = html;
+	}
+}
+
 function UpdateStatsPanel(state) {
 	state.update_stats_panel = false;
-	const stats = ActiveMachine(state).GetSaveData().stats;
-	for (key in stats) {
-		let elem = document.getElementById("stats_" + key);
-		if (!elem) {
-			continue;
-		}
-		let val = stats[key];
-		if (val == null || val == undefined) {
-			continue;
-		}
-		let visible = (val != 0);
-		if (key == "balls_dropped_manual") {
-			visible = ActiveMachine(state).IsUnlocked("auto_drop");
-		}
-		if (visible) {
-			let container = document.getElementById("stats_container_" + key);
-			if (container && container.style.display != "block") {
-				container.style.display = "block";
-			}
-		}
-		let html = Number.isFinite(val) ? FormatNumberLong(val) : val;
-		if (elem.innerHTML != html) {
-			elem.innerHTML = html;
-		}
+	for (key in state.save_file.stats) {
+		let val = state.save_file.stats[key];
+		UpdateStatsEntry(state, key, val);
+	}
+	const machine_stats = ActiveMachine(state).GetSaveData().stats;
+	for (key in machine_stats) {
+		let val = machine_stats[key];
+		UpdateStatsEntry(state, key, val);
 	}
 }
 

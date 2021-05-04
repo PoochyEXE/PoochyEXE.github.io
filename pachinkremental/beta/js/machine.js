@@ -57,6 +57,9 @@ class PachinkoMachine {
 			points: 0,
 			auto_drop_pos: null,
 			stats: {
+				total_score: 0,
+				balls_dropped: 0,
+				balls_dropped_manual: 0,
 				target_hits: {}
 			},
 			upgrade_levels: {},
