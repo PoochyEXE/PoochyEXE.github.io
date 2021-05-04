@@ -685,7 +685,7 @@ function Draw(state) {
 			drop_zone_elem.style.width = width_px + "px";
 			drop_zone_elem.style.height = height_px + "px";
 			if (state.april_fools) {
-				let top_px = state.board.height * state.canvas_scale - height_px
+				let top_px = kTopOffset + state.board.height * state.canvas_scale - height_px
 				let left_px = kLeftOffset + (state.board.width - max_drop_x) * state.canvas_scale;
 				drop_zone_elem.style.top = top_px + "px";
 				drop_zone_elem.style.left = left_px + "px";
