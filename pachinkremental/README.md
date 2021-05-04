@@ -40,6 +40,9 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
+### v1.1.1 (2021-05-03)
+* Fix drop zone being drawn 5 pixels too high in April Fools mode.
+
 ### v1.1.0 (2021-04-30)
 * Add a rotation-based multiplier for beach balls.
 
