@@ -1,5 +1,6 @@
 class BonusWheel {
-	constructor(spaces) {
+	constructor(machine, spaces) {
+		this.machine = machine;
 		this.spaces = spaces;
 		this.pos = 0.5 / spaces.length;
 		this.spin_distance = 0.0; // Revolutions left to turn on current spin
@@ -17,11 +18,12 @@ class BonusWheel {
 	}
 
 	Spin() {
-		if (this.IsSpinning() || state.save_file.spins <= 0) {
+		let spins = this.machine.GetSaveData().spins;
+		if (this.IsSpinning() || spins <= 0) {
 			return false;
 		}
-		if (MultiSpinOn()) {
-			this.multi_spin = Math.ceil(state.save_file.spins * 0.1);
+		if (this.machine.MultiSpinOn()) {
+			this.multi_spin = Math.ceil(spins * 0.1);
 		} else {
 			this.multi_spin = 1;
 		}
@@ -55,13 +57,13 @@ class BonusWheel {
 			return;
 		}
 		const kBaseDecel = 0.001; // 0.002 revs/frame/frame
-		let decel = kBaseDecel * state.bonus_wheel_speed;
+		let decel = kBaseDecel * this.machine.bonus_wheel_speed;
 		let delta = Math.sqrt(decel * this.spin_distance);
 		if (this.spin_distance <= delta) {
 			this.Rotate(this.spin_distance);
 			this.spin_distance = 0;
-			state.save_file.spins -= this.multi_spin;
-			this.PositionToSpace(this.pos).on_hit_func(this.multi_spin);
+			this.machine.GetSaveData().spins -= this.multi_spin;
+			this.PositionToSpace(this.pos).on_hit_func(this.machine, this.multi_spin);
 			UpdateSpinCounter();
 		} else {
 			this.Rotate(delta);
@@ -101,14 +103,15 @@ class BonusWheelPointSpace extends BonusWheelSpace {
 		return FormatNumberShort(this.value_func()) + " points";
 	}
 
-	OnHit(multi_spin) {
+	OnHit(machine, multi_spin) {
+		let save_file = machine.GetSaveData();
 		let value = this.value_func() * multi_spin;
-		if (IsUnlocked("better_buff_multiplier")) {
-			value *= state.save_file.stats.max_buff_multiplier;
-		} else if (IsScoreBuffActive()) {
-			value *= state.save_file.score_buff_multiplier;
+		if (machine.IsUnlocked("better_buff_multiplier")) {
+			value *= save_file.stats.max_buff_multiplier;
+		} else if (machine.IsScoreBuffActive()) {
+			value *= save_file.score_buff_multiplier;
 		}
-		AddScore(value);
+		machine.AddScore(value);
 		MaybeAddBonusWheelText({
 			text: `+${FormatNumberShort(value)} points`,
 			pos: kWheelPopupTextPos,
@@ -121,188 +124,3 @@ class BonusWheelPointSpace extends BonusWheelSpace {
 	}
 }
 
-function DefaultWheel() {
-	let spaces = Array(0);
-	spaces.push(
-		new BonusWheelPointSpace({
-			active_color: "#8F8",
-			value_func: () => {
-				let multiplier = state.special_ball_multiplier;
-				if (IsUnlocked("better_point_values")) {
-					multiplier = Math.pow(multiplier, state.emerald_ball_exponent)
-				}
-				return GetSlotValue(4) * multiplier;
-			}
-		})
-	);
-	spaces.push(
-		new BonusWheelPointSpace({
-			active_color: "#8FF",
-			value_func: () => GetSlotValue(3)
-		})
-	);
-	spaces.push(
-		new BonusWheelPointSpace({
-			active_color: "#88F",
-			value_func: () => GetSlotValue(4)
-		})
-	);
-	spaces.push(
-		new BonusWheelSpace({
-			active_color: "#F8F",
-			text_func: () => {
-				if (IsUnlocked("better_drops_4")) {
-					return "Drop 3 special balls";
-				} else if (IsUnlocked("better_drops_2")) {
-					return "Drop 3 gemstone balls";
-				} else {
-					return "Drop 3 gold balls";
-				}
-			},
-			on_hit_func: (multi_spin) => {
-				if (IsUnlocked("better_multi_spin")) {
-					state.save_file.spins += multi_spin - 1;
-				}
-				if (IsUnlocked("better_drops_4")) {
-					DropBonusBalls(
-						ShuffleArray([
-							kBallTypeIDs.OPAL,
-							kBallTypeIDs.EIGHT_BALL,
-							kBallTypeIDs.BEACH_BALL
-						])
-					);
-					MaybeAddBonusWheelText({
-						text: "3 special balls!",
-						pos: kWheelPopupTextPos,
-						color_rgb: kWheelPopupTextColor
-					});
-				} else if (IsUnlocked("better_drops_3")) {
-					DropBonusBalls(
-						ShuffleArray([
-							kBallTypeIDs.TOPAZ,
-							kBallTypeIDs.TURQUOISE,
-							kBallTypeIDs.AMETHYST
-						])
-					);
-					MaybeAddBonusWheelText({
-						text: "3 gemstone balls!",
-						pos: kWheelPopupTextPos,
-						color_rgb: kWheelPopupTextColor
-					});
-				} else if (IsUnlocked("better_drops_2")) {
-					DropBonusBalls(
-						ShuffleArray([
-							kBallTypeIDs.RUBY,
-							kBallTypeIDs.SAPPHIRE,
-							kBallTypeIDs.EMERALD
-						])
-					);
-					MaybeAddBonusWheelText({
-						text: "3 gemstone balls!",
-						pos: kWheelPopupTextPos,
-						color_rgb: kWheelPopupTextColor
-					});
-				} else {
-					DropBonusBalls([
-						kBallTypeIDs.GOLD,
-						kBallTypeIDs.GOLD,
-						kBallTypeIDs.GOLD
-					]);
-					MaybeAddBonusWheelText({
-						text: "3 gold balls!",
-						pos: kWheelPopupTextPos,
-						color_rgb: kWheelPopupTextColor
-					});
-				}
-			}
-		})
-	);
-	spaces.push(
-		new BonusWheelSpace({
-			active_color: "#F88",
-			text_func: () => "ZONK",
-			on_hit_func: () => {
-				MaybeAddBonusWheelText({
-					text: "*sad trombone*",
-					pos: kWheelPopupTextPos,
-					color_rgb: kWheelPopupTextColor
-				});
-			}
-		})
-	);
-	spaces.push(
-		new BonusWheelSpace({
-			active_color: "#FF8",
-			text_func: () => {
-				if (!IsUnlocked("better_drops_1")) {
-					return "Drop 7 gold balls";
-				} else if (IsUnlocked("unlock_opal_balls")) {
-					return "Drop 7 gemstone balls";
-				} else {
-					return "Drop 7 special balls";
-				}
-			},
-			on_hit_func: (multi_spin) => {
-				if (IsUnlocked("better_multi_spin")) {
-					state.save_file.spins += multi_spin - 1;
-				}
-				if (IsUnlocked("better_drops_1")) {
-					let bonus_balls = [];
-					bonus_balls.push(
-						IsUnlocked("unlock_ruby_balls")
-							? kBallTypeIDs.RUBY
-							: kBallTypeIDs.GOLD
-					);
-					bonus_balls.push(
-						IsUnlocked("unlock_sapphire_balls")
-							? kBallTypeIDs.SAPPHIRE
-							: kBallTypeIDs.GOLD
-					);
-					bonus_balls.push(
-						IsUnlocked("unlock_emerald_balls")
-							? kBallTypeIDs.EMERALD
-							: kBallTypeIDs.GOLD
-					);
-					bonus_balls.push(
-						IsUnlocked("unlock_topaz_balls")
-							? kBallTypeIDs.TOPAZ
-							: kBallTypeIDs.GOLD
-					);
-					bonus_balls.push(
-						IsUnlocked("unlock_turquoise_balls")
-							? kBallTypeIDs.TURQUOISE
-							: kBallTypeIDs.GOLD
-					);
-					bonus_balls.push(
-						IsUnlocked("unlock_amethyst_balls")
-							? kBallTypeIDs.AMETHYST
-							: kBallTypeIDs.GOLD
-					);
-					bonus_balls.push(
-						IsUnlocked("unlock_opal_balls")
-							? kBallTypeIDs.OPAL
-							: kBallTypeIDs.GOLD
-					);
-					bonus_balls = ShuffleArray(bonus_balls);
-					DropBonusBalls(bonus_balls);
-					let popup_text = IsUnlocked("unlock_opal_balls")
-						? "7 gemstone balls!"
-						: "7 special balls!";
-					MaybeAddBonusWheelText({
-						text: popup_text,
-						pos: kWheelPopupTextPos,
-						color_rgb: kWheelPopupTextColor
-					});
-				} else {
-					DropBonusBalls([...Array(7)].map(_ => kBallTypeIDs.GOLD));
-					MaybeAddBonusWheelText({
-						text: "7 gold balls!",
-						pos: kWheelPopupTextPos,
-						color_rgb: kWheelPopupTextColor
-					});
-				}
-			}
-		})
-	);
-	return new BonusWheel(spaces);
-}

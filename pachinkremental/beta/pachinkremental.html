@@ -11,9 +11,13 @@
 	<script type="text/javascript" src="js/notifications.js"></script>
 	<script type="text/javascript" src="js/options.js"></script>
 	<script type="text/javascript" src="js/physics.js"></script>
+	<script type="text/javascript" src="js/text_format.js"></script>
 	<script type="text/javascript" src="js/upgrades.js"></script>
 	<script type="text/javascript" src="js/util.js"></script>
 	<script type="text/javascript" src="js/wheel.js"></script>
+
+	<script type="text/javascript" src="js/machine.js"></script>
+	<script type="text/javascript" src="js/machine01.js"></script>
 
 	<script type="text/javascript" src="js/game.js"></script>
 
@@ -22,8 +26,10 @@
 	<table id="outer_table">
 		<tr>
 			<td id="board-td" rowspan="2">
-				<button type="button" class="dropZone" id="drop_zone"
-						style="z-index: 0; left: 15px; top: 5px; width: 140px; height: 30px;"></button>
+				<span id="drop_zones">
+					<button type="button" class="dropZone" id="drop_zone"
+							style="z-index: 0; left: 15px; top: 5px; width: 140px; height: 30px;"></button>
+				</span>
 				<canvas id="canvas1" class="board" style="z-index: 1;"></canvas>
 				<canvas id="canvas2" class="board" style="z-index: 2;"></canvas>
 				<canvas id="canvas3" class="board" style="z-index: 3;"></canvas>

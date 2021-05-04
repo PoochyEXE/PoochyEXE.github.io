@@ -1,16 +1,19 @@
-var kFPS = 30;
-var kAccel = 500;
-var kCollisionElasticity = 0.3;
-var kBeachBallAccel = 100;
-var kBeachBallCollisionElasticity = 0.7;
+const kFPS = 30;
+const kPhysicsParams = {
+	normal: {
+		accel: 500,
+		collision_elasticity: 0.3
+	},
+	beach_ball: {
+		accel: 100,
+		collision_elasticity: 0.7
+	}
+};
 
-function UpdateBalls(balls, board, target_sets, is_beach_ball) {
+function UpdateBalls(balls, board, target_sets, params) {
 	const kEpsilon = 1e-3 / kFPS;
 	const k2Pi = Math.PI * 2;
 	const kPegSearchRadius = kPegRadius + kBallRadius;
-	let accel = is_beach_ball ? kBeachBallAccel : kAccel;
-	let collision_elasticity =
-		is_beach_ball ? kBeachBallCollisionElasticity : kCollisionElasticity;
 	for (let b = 0; b < balls.length; ++b) {
 		let time_to_sim = 1.0 / kFPS;
 		let pos = balls[b].pos;
@@ -47,8 +50,8 @@ function UpdateBalls(balls, board, target_sets, is_beach_ball) {
 				let perp_delta = delta.Perpendicular().Normalize();
 				let perp_vel = vel.ProjectionOnto(perp_delta);
 				let parallel_vel = vel.Subtract(perp_vel);
-				vel = vel.Add(parallel_vel.Multiply(-1 - collision_elasticity));
-				omega *= collision_elasticity;
+				vel = vel.Add(parallel_vel.Multiply(-1 - params.collision_elasticity));
+				omega *= params.collision_elasticity;
 				omega += perp_vel.DotProduct(perp_delta) / kBallRadius;
 				
 				// In the extremely unlikely event a ball is balanced perfectly
@@ -69,19 +72,14 @@ function UpdateBalls(balls, board, target_sets, is_beach_ball) {
 		balls[b].pos = pos;
 		balls[b].vel = vel;
 		balls[b].omega = omega;
-		balls[b].vel.y += accel / kFPS;
+		balls[b].vel.y += params.accel / kFPS;
 		balls[b].rotation += omega / kFPS;
 		balls[b].rotation %= k2Pi;
 		balls[b].total_rotations += Math.abs(omega) / kFPS;
 
 		for (let s = 0; s < target_sets.length; ++s) {
 			let t_set = target_sets[s];
-			if (
-				pos.x < t_set.min_x ||
-				pos.x > t_set.max_x ||
-				pos.y < t_set.min_y ||
-				pos.y > t_set.max_y
-			) {
+			if (!t_set.bounding_box.Contains(pos)) {
 				continue;
 			}
 			for (let t = 0; t < t_set.targets.length; ++t) {

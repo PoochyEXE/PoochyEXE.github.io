@@ -1,11 +1,4 @@
 const kQualityOptions = ["High", "Medium", "Low"];
-const kPopupTextOptions = [
-	"Enable All",
-	"Gold+ only",
-	"Gemstone+ only",
-	"8-Ball+ only",
-	"Disable All",
-];
 const kAprilFoolsOptions = [
 	"Disabled",
 	"Always On",
@@ -14,7 +7,7 @@ const kAprilFoolsOptions = [
 const kIsLiveVersion = false;
 const kLiveSaveFileName = "save_file";
 const kBetaSaveFileName = "beta_save_file";
-const kSaveFileVersion = 4;
+const kSaveFileVersion = 5;
 const kSaveFileName = kIsLiveVersion ? kLiveSaveFileName : kBetaSaveFileName;
 
 const kPrevSaveFileVersions = [
@@ -75,75 +68,86 @@ const kColorSchemeClasses = [
 	new ColorSchemeClassMapping("exportedSave", "exportedSaveLight", "exportedSaveDark"),
 ];
 
-function AutoPickFavicon() {
-	for (let i = kBallTypes.length - 1; i > 0; --i) {
-		if (IsUnlocked("unlock_" + kBallTypes[i].name + "_balls")) {
-			return kBallTypes[i].name;
-		}
-	}
-	return kBallTypes[0].name;
+function GetSetting(id) {
+	return state.save_file.options[id];
 }
 
-function UpdateFavicon() {
-	let id = state.save_file.options.favicon;
-	let name = (id < 0) ? AutoPickFavicon() : kBallTypes[id].name;
+function AutoPickFavicon(state) {
+	const machine = ActiveMachine(state);
+	const ball_types = machine.BallTypes();
+	for (let i = ball_types.length - 1; i > 0; --i) {
+		if (machine.IsBallTypeUnlocked(ball_types[i])) {
+			return ball_types[i].name;
+		}
+	}
+	return ball_types[0].name;
+}
+
+function UpdateFavicon(state) {
+	const machine = ActiveMachine(state);
+	const id = machine.GetSetting("favicon");
+	const ball_types = machine.BallTypes();
+	const name = (id >= 0 && id < ball_types.length) ? ball_types[id].name : AutoPickFavicon(state);
 	document.getElementById("favicon").href = "favicon/" + name + ".png";
 }
 
 function UpdateFaviconChoice(elem) {
-	state.save_file.options.favicon = parseInt(elem.value);
-	UpdateFavicon();
+	ActiveMachine(state).GetSaveData().options.favicon = parseInt(elem.value);
+	UpdateFavicon(state);
 }
 
 function UpdateBallOpacity(elem) {
-	state.save_file.options[elem.id] = elem.value;
+	ActiveMachine(state).GetSaveData().options[elem.id] = elem.value;
 }
 
-function UpdateOpacitySlidersFromSaveFile(save_file) {
-	for (let i = 0; i < kBallTypes.length; ++i) {
-		let id = kBallTypes[i].name + "_ball_opacity";
+function UpdateOpacitySlidersFromSaveFile(state) {
+	const machine = ActiveMachine(state);
+	const ball_types = machine.BallTypes();
+	for (let i = 0; i < ball_types.length; ++i) {
+		let id = ball_types[i].name + "_ball_opacity";
 		let elem = document.getElementById(id);
-		elem.value = save_file.options[id];
+		elem.value = machine.GetSetting(id);
 	}
 }
 
-function UpdateFaviconChoiceFromSaveFile(save_file) {
-	let index = parseInt(save_file.options.favicon);
+function UpdateFaviconChoiceFromSaveFile(state) {
+	const machine = ActiveMachine(state);
+	const ball_types = machine.BallTypes();
+	let index = parseInt(machine.GetSetting("favicon"));
 	let id = "auto_favicon";
 	if (index >= 0) {
-		id = kBallTypes[index].name + "_favicon";
+		id = ball_types[index].name + "_favicon";
 	}
 	let elem = document.getElementById(id);
 	elem.checked = true;
 }
 
 function InitOptions(state) {
-	let opacity_div = document.getElementById("options_opacity");
+	const machine = ActiveMachine(state);
+	const ball_types = ActiveMachine(state).BallTypes();
 	let html = "<b>Opacity:</b>";
-	for (let i = 0; i < kBallTypes.length; ++i) {
-		let id = kBallTypes[i].name + "_ball_opacity";
-		let display_name = kBallTypes[i].display_name + "Balls"
+	for (let i = 0; i < ball_types.length; ++i) {
+		let id = ball_types[i].name + "_ball_opacity";
+		let display_name = ball_types[i].display_name + "Balls"
 		let default_display = (i > 0) ? "none" : "block";
 		html += '<div id="' + id + '_wrapper" class="opacitySlider" ';
 		html += 'style="display: ' + default_display + ';">';
 		html += '<input type="range" min="0" max="100" step="5" ';
-		html += 'onchange="UpdateBallOpacity(this)" ';
-		html += 'value="' + state.save_file.options[id] + '" ';
+		html += 'onchange="UpdateBallOpacity(this)" value="100" ';
 		html += 'id="' + id + '" name="' + id + '">';
 		html += '<label for="' + id + '">' + display_name + '</label>';
-		if (kBallTypes[i].name == "opal") {
+		if (ball_types[i].name == "opal") {
 			html += '&nbsp;<button type="button" class="optionButton" id="button_classic_opal_balls" onclick="ToggleBooleanOption(\'classic_opal_balls\')">Opal Balls</button>'
 		}
 		html += '</div>';
 	}
-	opacity_div.innerHTML = html;
-	
-	let icon_div = document.getElementById("options_favicon");
+	UpdateInnerHTML("options_opacity", html);
+
 	html = "<b>Favicon:</b>";
-	for (let i = -1; i < kBallTypes.length; ++i) {
-		let id = (i < 0) ? "auto_favicon" : kBallTypes[i].name + "_favicon";
+	for (let i = -1; i < ball_types.length; ++i) {
+		let id = (i < 0) ? "auto_favicon" : ball_types[i].name + "_favicon";
 		let display_name =
-			(i < 0) ? "Auto" : kBallTypes[i].display_name + "Ball";
+			(i < 0) ? "Auto" : ball_types[i].display_name + "Ball";
 		let default_display = (i > 0) ? "none" : "block";
 		html += '<div id="' + id + '_wrapper" class="iconOption" ';
 		html += 'style="display: ' + default_display + ';">';
@@ -154,7 +158,7 @@ function InitOptions(state) {
 		html += '<label for="' + id + '">' + display_name + '</label>';
 		html += '</div>';
 	}
-	icon_div.innerHTML = html;
+	UpdateInnerHTML("options_favicon", html);
 }
 
 function SaveFileToString(state) {
@@ -193,7 +197,7 @@ function LoadGame(save_file_str) {
 					"#F88"
 				)
 			);
-			return;
+			return false;
 		}
 		if (load_save.game_version > kSaveFileVersion) {
 			state.notifications.push(
@@ -202,14 +206,14 @@ function LoadGame(save_file_str) {
 					"#F88"
 				)
 			);
-			return;
+			return false;
 		}
 		if (load_save.game_version < 3) {
 			ArchiveSaveFile(2, save_file_str);
 			const kVer3UpgradeMessage =
 				"<b>Pachinkremental is out of beta!</b><br><br>Unfortunately, save files from the beta are not compatible with the new version, but you can continue playing v0.12.2 beta using your previous save file if you want. (You can also retrieve this archived save file from the Options menu.)"
 			ExportArchivedSave(2, kVer3UpgradeMessage);
-			return;
+			return false;
 		}
 		default_state = InitState();
 		state.save_file = { ...default_state.save_file, ...load_save };
@@ -217,45 +221,67 @@ function LoadGame(save_file_str) {
 			...default_state.save_file.stats,
 			...load_save.stats
 		};
-		state.save_file.upgrade_levels = {
-			...default_state.save_file.upgrade_levels,
-			...load_save.upgrade_levels
-		};
 		state.save_file.options = {
 			...default_state.save_file.options,
 			...load_save.options
 		};
+		if (load_save.game_version < 5) {
+			let first_machine_save = state.save_file.machines["first"];
+			for (let key in first_machine_save) {
+				if (key == "options" || key == "stats") {
+					continue;
+				}
+				first_machine_save[key] = state.save_file[key];
+				delete state.save_file[key];
+			}
+			for (let key in first_machine_save.stats) {
+				first_machine_save.stats[key] = state.save_file.stats[key];
+				delete state.save_file.stats[key];
+			}
+			for (let key in first_machine_save.options) {
+				first_machine_save.options[key] = state.save_file.options[key];
+				delete state.save_file.options[key];
+			}
+		} else {
+			for (let machine_id in default_state.save_file.machines) {
+				state.save_file.machines[machine_id] = {
+					...default_state.save_file.machines[machine_id],
+					...load_save.machines[machine_id]
+				};
+				state.save_file.machines[machine_id].stats = {
+					...default_state.save_file.machines[machine_id].stats,
+					...load_save.machines[machine_id].stats
+				};
+				state.save_file.machines[machine_id].upgrade_levels = {
+					...default_state.save_file.machines[machine_id].upgrade_levels,
+					...load_save.machines[machine_id].upgrade_levels
+				};
+				state.save_file.machines[machine_id].options = {
+					...default_state.save_file.machines[machine_id].options,
+					...load_save.machines[machine_id].options
+				};
+			}
+		}
 		state.save_file.game_version = kSaveFileVersion;
-		state.display_score = state.save_file.stats.total_score;
-		state.display_points = state.save_file.points;
 		state.update_upgrade_buttons = true;
 		state.update_buff_display = true;
 		state.bonus_wheel = default_state.bonus_wheel;
 		state.redraw_wheel = true;
-		for (let i = 0; i < state.balls_by_type.length; ++i) {
-			state.balls_by_type[i].length = 0;
-		}
-		for (let id in state.upgrades) {
-			state.upgrades[id].Update();
-		}
 		if (state.save_file.stats.total_score > 0) {
 			UpdateScoreDisplay(state, /*forceUpdate=*/ true);
-		}
-		if (state.save_file.stats.max_buff_multiplier < state.save_file.score_buff_multiplier) {
-			state.save_file.stats.max_buff_multiplier = state.save_file.score_buff_multiplier;
 		}
 		if (!kIsLiveVersion) {
 			state.save_file.is_beta = true;
 		}
-		UpdateBuffDisplay();
-		UpdateUpgradeButtons(state);
+		LoadActiveMachine(state);
 		UpdateOptionsButtons();
 		UpdateAutoSaveInterval();
 		UpdateDarkMode();
-		UpdateFavicon();
-		UpdateOpacitySlidersFromSaveFile(state.save_file);
-		UpdateFaviconChoiceFromSaveFile(state.save_file);
+		UpdateFavicon(state);
+		UpdateOpacitySlidersFromSaveFile(state);
+		UpdateFaviconChoiceFromSaveFile(state);
 		state.notifications.push(new Notification("Game loaded", "#8F8"));
+		return true;
 	} else {
 		state.notifications.push(
 			new Notification(
@@ -263,16 +289,18 @@ function LoadGame(save_file_str) {
 				"#F88"
 			)
 		);
+		return false;
 	}
 }
 
 function LoadFromLocalStorage() {
 	let save_file_str = localStorage.getItem(kSaveFileName);
 	if (save_file_str) {
-		LoadGame(save_file_str);
+		return LoadGame(save_file_str);
 	} else if (!kIsLiveVersion) {
 		DisplayBetaIntro();
 	}
+	return false;
 }
 
 function ImportSave() {
@@ -313,7 +341,7 @@ function ResizeModals() {
 		content_elem.style.maxWidth = content_width + "px";
 		content_elem.style.maxHeight = content_height + "px";
 	}
-	
+
 	// Save file export modal
 	let header_height = document.getElementById("export_message").offsetHeight;
 	let exported_save_elem = document.getElementById("exported_save");
@@ -418,6 +446,7 @@ function EraseSave() {
 }
 
 function UpdateOptionsButtons() {
+	const machine = ActiveMachine(state);
 	UpdateInnerHTML("button_auto_save",
 		"Auto Save: " + (state.save_file.options.auto_save_enabled ? "ON" : "OFF"));
 	UpdateInnerHTML("button_quality",
@@ -425,11 +454,11 @@ function UpdateOptionsButtons() {
 	UpdateInnerHTML("button_dark_mode",
 		"Dark Mode: " + (state.save_file.options.dark_mode ? "ON" : "OFF"));
 	UpdateInnerHTML("button_popup_text",
-		"Pop-up text: " + kPopupTextOptions[state.save_file.options.display_popup_text]);
+		"Pop-up text: " + machine.CurrentPopupTextOptionName());
 	UpdateInnerHTML("button_upgrade_levels_bought",
 		"Upgrade levels bought: " + (state.save_file.options.show_upgrade_levels ? "Show" : "Hide"));
 	UpdateInnerHTML("button_april_fools",
-		"April Fools: " + kAprilFoolsOptions[state.save_file.options.april_fools_enabled]);
+		"April Fools: " + kAprilFoolsOptions[GetSetting("april_fools_enabled")]);
 	UpdateInnerHTML("button_classic_opal_balls",
 		"Style: " + (state.save_file.options.classic_opal_balls ? "Classic" : "Default"));
 	UpdateInnerHTML("button_scientific_notation",
@@ -459,21 +488,7 @@ function ToggleAutoSave() {
 }
 
 function TogglePopupText() {
-	++state.save_file.options.display_popup_text;
-	if (
-		state.save_file.options.display_popup_text == 1 &&
-		!IsUnlocked("unlock_gold_balls")
-	) {
-		state.save_file.options.display_popup_text = kPopupTextOptions.length - 1;
-	} else if (
-		state.save_file.options.display_popup_text == 2 &&
-		!AnyTier1GemstoneBallsUnlocked()
-	) {
-		state.save_file.options.display_popup_text = kPopupTextOptions.length - 1;
-	}
-	if (state.save_file.options.display_popup_text >= kPopupTextOptions.length) {
-		state.save_file.options.display_popup_text = 0;
-	}
+	ActiveMachine(state).TogglePopupText();
 	UpdateOptionsButtons();
 }
 
@@ -497,12 +512,11 @@ function ToggleScientificNotation(id) {
 	state.save_file.options.scientific_notation =
 		!state.save_file.options.scientific_notation;
 	state.update_upgrade_buttons = true;
+	state.update_buff_display = true;
 	state.redraw_wheel = true;
 	state.redraw_targets = true;
 	state.update_stats_panel = true;
-	UpdateUpgradeButtons(state);
 	UpdateSpinCounter();
-	UpdateBuffDisplay();
 	UpdateOptionsButtons();
 }
 
@@ -515,7 +529,6 @@ function ToggleShowUpgradeLevels(id) {
 	state.save_file.options.show_upgrade_levels =
 		!state.save_file.options.show_upgrade_levels;
 	state.update_upgrade_buttons = true;
-	UpdateUpgradeButtons(state);
 	UpdateOptionsButtons();
 }
 

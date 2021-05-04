@@ -315,7 +315,7 @@ button.eightBallUpgradeButtonDark:disabled {
 	color: #FFF;
 }
 
-@-webkit-keyframes opalUpgradeButtonLightColor {  
+@-webkit-keyframes opalUpgradeButtonLightColor {
   0% { background: #F88; }
   17% { background: #FF8; }
   33% { background: #8F8; }
@@ -325,7 +325,7 @@ button.eightBallUpgradeButtonDark:disabled {
   100% { background: #F88; }
 }
 
-@-webkit-keyframes opalUpgradeButtonDarkColor {  
+@-webkit-keyframes opalUpgradeButtonDarkColor {
   0% { background: #833; }
   17% { background: #883; }
   33% { background: #383; }
@@ -335,7 +335,7 @@ button.eightBallUpgradeButtonDark:disabled {
   100% { background: #833; }
 }
 
-@-webkit-keyframes opalUpgradeButtonLightDisabledColor {  
+@-webkit-keyframes opalUpgradeButtonLightDisabledColor {
   0% { background: #A77; }
   17% { background: #AA7; }
   33% { background: #7A7; }
@@ -345,7 +345,7 @@ button.eightBallUpgradeButtonDark:disabled {
   100% { background: #A77; }
 }
 
-@-webkit-keyframes opalUpgradeButtonDarkDisabledColor {  
+@-webkit-keyframes opalUpgradeButtonDarkDisabledColor {
   0% { background: #300; }
   17% { background: #330; }
   33% { background: #030; }
@@ -358,33 +358,33 @@ button.eightBallUpgradeButtonDark:disabled {
 button.opalUpgradeButtonLight {
     background: white;
 	color: #000;
-    -webkit-animation-name: opalUpgradeButtonLightColor;  
-    -webkit-animation-iteration-count: infinite;  
-    -webkit-animation-duration: 2s; 
+    -webkit-animation-name: opalUpgradeButtonLightColor;
+    -webkit-animation-iteration-count: infinite;
+    -webkit-animation-duration: 2s;
 }
 
 button.opalUpgradeButtonDark {
     background: black;
 	color: #FFF;
-    -webkit-animation-name: opalUpgradeButtonDarkColor;  
-    -webkit-animation-iteration-count: infinite;  
-    -webkit-animation-duration: 2s; 
+    -webkit-animation-name: opalUpgradeButtonDarkColor;
+    -webkit-animation-iteration-count: infinite;
+    -webkit-animation-duration: 2s;
 }
 
 button.opalUpgradeButtonLight:disabled {
     background: #AAA;
 	color: #000;
-    -webkit-animation-name: opalUpgradeButtonLightDisabledColor;  
-    -webkit-animation-iteration-count: infinite;  
-    -webkit-animation-duration: 2s; 
+    -webkit-animation-name: opalUpgradeButtonLightDisabledColor;
+    -webkit-animation-iteration-count: infinite;
+    -webkit-animation-duration: 2s;
 }
 
 button.opalUpgradeButtonDark:disabled {
     background: #333;
 	color: #FFF;
-    -webkit-animation-name: opalUpgradeButtonDarkDisabledColor;  
-    -webkit-animation-iteration-count: infinite;  
-    -webkit-animation-duration: 2s; 
+    -webkit-animation-name: opalUpgradeButtonDarkDisabledColor;
+    -webkit-animation-iteration-count: infinite;
+    -webkit-animation-duration: 2s;
 }
 
 button.beachBallUpgradeButtonLight {
@@ -616,7 +616,7 @@ span.prismaticText {
 	color: transparent;
 }
 
-@-webkit-keyframes prismaticTextLightColor {  
+@-webkit-keyframes prismaticTextLightColor {
   0% { color: #C00; }
   17% { color: #CC0; }
   33% { color: #0C0; }
@@ -626,7 +626,7 @@ span.prismaticText {
   100% { color: #C00; }
 }
 
-@-webkit-keyframes prismaticTextDarkColor {  
+@-webkit-keyframes prismaticTextDarkColor {
   0% { color: #F88; }
   17% { color: #FF8; }
   33% { color: #8F8; }
@@ -639,17 +639,17 @@ span.prismaticText {
 span.prismaticTextLight {
     background: #FFF;
 	color: #000;
-    -webkit-animation-name: prismaticTextLightColor;  
-    -webkit-animation-iteration-count: infinite;  
-    -webkit-animation-duration: 2s; 
+    -webkit-animation-name: prismaticTextLightColor;
+    -webkit-animation-iteration-count: infinite;
+    -webkit-animation-duration: 2s;
 }
 
 span.prismaticTextDark {
     background: #000;
 	color: #FFF;
-    -webkit-animation-name: prismaticTextDarkColor;  
-    -webkit-animation-iteration-count: infinite;  
-    -webkit-animation-duration: 2s; 
+    -webkit-animation-name: prismaticTextDarkColor;
+    -webkit-animation-iteration-count: infinite;
+    -webkit-animation-duration: 2s;
 }
 
 span.speedrunTimerCompleted {

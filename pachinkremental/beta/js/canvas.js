@@ -26,7 +26,7 @@ const kPrismaticSaturationInner = 0.25;
 const kPrismaticCycleDuration = 2000.0;
 
 function GetPegColor() {
-	if (state.save_file.options.dark_mode && !state.april_fools) {
+	if (GetSetting("dark_mode") && !state.april_fools) {
 		return kPegColorDarkMode;
 	} else {
 		return kPegColor;
@@ -311,22 +311,23 @@ function ClearLayerAndReturnContext(layer_id) {
 }
 
 function ResizeCanvas() {
-	const aspect_ratio = state.board.width / state.board.height;
+	let board = ActiveMachine(state).board;
+	const aspect_ratio = board.width / board.height;
 	const max_height = window.innerHeight - 25;
 	const max_width = window.innerWidth - 300;
 	state.canvas_scale = Math.min(
-		max_height / state.board.height,
-		max_width / state.board.width
+		max_height / board.height,
+		max_width / board.width
 	);
-	const height = state.board.height * state.canvas_scale;
-	const width = state.board.width * state.canvas_scale;
+	const height = board.height * state.canvas_scale;
+	const width = board.width * state.canvas_scale;
 	let board_td = document.getElementById("board-td");
 	board_td.width = width;
 	board_td.height = height;
 	let canvasLayers = document.getElementsByClassName("board");
 	for (let i = 0; i < canvasLayers.length; ++i) {
 		let canvas = canvasLayers[i];
-		let aspect_ratio = state.board.width / state.board.height;
+		let aspect_ratio = board.width / board.height;
 		canvas.height = height;
 		canvas.width = width;
 	}
@@ -369,7 +370,7 @@ function DrawBalls(balls, inner_color, outer_color, ctx) {
 		return;
 	}
 	if (
-		!state.save_file.options.classic_opal_balls &&
+		!GetSetting("classic_opal_balls") &&
 		inner_color == kPrismatic &&
 		outer_color == kPrismatic
 	) {
@@ -668,31 +669,41 @@ function DrawWheel(wheel) {
 }
 
 function Draw(state) {
+	const machine = ActiveMachine(state);
+	const board = machine.board;
 	// Layer 0: Drop Zone
 	const can_drop =
 		CanDrop(state) ||
-		(AutoDropOn() && state.auto_drop_cooldown < kMinCooldownToDraw);
+		(machine.AutoDropOn() && state.auto_drop_cooldown < kMinCooldownToDraw);
 	if (state.redraw_all || state.last_drawn.can_drop != can_drop) {
-		let drop_zone_elem = document.getElementById("drop_zone");
-		if (drop_zone_elem.disabled == can_drop) {
-			drop_zone_elem.disabled = !can_drop;
+		const drop_zones = machine.board.drop_zones;
+		for (let i = 0; i < drop_zones.length; ++i) {
+			let drop_zone_elem = document.getElementById("drop_zone" + i);
+			if (drop_zone_elem.disabled == can_drop) {
+				drop_zone_elem.disabled = !can_drop;
+			}
 		}
 		if (state.redraw_all) {
-			const kLeftOffset = 5;
-			const kTopOffset = 5;
-			let width_px = (max_drop_x - min_drop_x) * state.canvas_scale;
-			let height_px = max_drop_y * state.canvas_scale;
-			drop_zone_elem.style.width = width_px + "px";
-			drop_zone_elem.style.height = height_px + "px";
-			if (state.april_fools) {
-				let top_px = kTopOffset + state.board.height * state.canvas_scale - height_px
-				let left_px = kLeftOffset + (state.board.width - max_drop_x) * state.canvas_scale;
-				drop_zone_elem.style.top = top_px + "px";
-				drop_zone_elem.style.left = left_px + "px";
-			} else {
-				let left_px = kLeftOffset + min_drop_x * state.canvas_scale;
-				drop_zone_elem.style.top = kTopOffset + "px";
-				drop_zone_elem.style.left = left_px + "px";
+			for (let i = 0; i < drop_zones.length; ++i) {
+				let drop_zone_elem = document.getElementById("drop_zone" + i);
+				let rect = drop_zones[i];
+				const kLeftOffset = 5;
+				const kTopOffset = 5;
+				let width_px = (rect.max_x - rect.min_x) * state.canvas_scale;
+				let height_px = (rect.max_y - rect.min_y) * state.canvas_scale;
+				drop_zone_elem.style.width = width_px + "px";
+				drop_zone_elem.style.height = height_px + "px";
+				if (state.april_fools) {
+					let top_px = kTopOffset + (board.height - rect.min_y) * state.canvas_scale - height_px;
+					let left_px = kLeftOffset + (board.width - rect.max_x) * state.canvas_scale;
+					drop_zone_elem.style.top = top_px + "px";
+					drop_zone_elem.style.left = left_px + "px";
+				} else {
+					let top_px = kTopOffset + rect.min_y * state.canvas_scale;
+					let left_px = kLeftOffset + rect.min_x * state.canvas_scale;
+					drop_zone_elem.style.top = kTopOffset + "px";
+					drop_zone_elem.style.left = left_px + "px";
+				}
 			}
 		}
 		state.last_drawn.can_drop = can_drop;
@@ -700,34 +711,35 @@ function Draw(state) {
 	// Layer 1: Board
 	if (state.redraw_all) {
 		let ctx = ClearLayerAndReturnContext(1);
-		if (state.save_file.options.quality <= 1) {
-			DrawPegs(state.board.pegs, ctx);
+		if (GetSetting("quality") <= 1) {
+			DrawPegs(board.pegs, ctx);
 		} else {
-			DrawPegsNoGradient(state.board.pegs, ctx);
+			DrawPegsNoGradient(board.pegs, ctx);
 		}
 	}
 	// Layer 2: Balls
 	let total_balls = TotalBalls(state);
 	if (state.redraw_all || total_balls > 0 || state.last_drawn.num_balls > 0) {
+		const ball_types = machine.BallTypes();
 		let ctx = ClearLayerAndReturnContext(2);
 		for (let i = 0; i < state.balls_by_type.length; ++i) {
-			let opacity_id = kBallTypes[i].name + "_ball_opacity";
-			let opacity_pct = state.save_file.options[opacity_id];
+			let opacity_id = ball_types[i].name + "_ball_opacity";
+			let opacity_pct = machine.GetSetting(opacity_id);
 			if (opacity_pct <= 0) {
 				continue;
 			}
 			ctx.globalAlpha = opacity_pct / 100.0;
-			if (state.save_file.options.quality == 0) {
+			if (GetSetting("quality") == 0) {
 				DrawBalls(
 					state.balls_by_type[i],
-					kBallTypes[i].inner_color,
-					kBallTypes[i].outer_color,
+					ball_types[i].inner_color,
+					ball_types[i].outer_color,
 					ctx
 				);
 			} else {
 				DrawBallsNoGradient(
 					state.balls_by_type[i],
-					kBallTypes[i].outer_color,
+					ball_types[i].outer_color,
 					ctx
 				);
 			}
@@ -737,23 +749,25 @@ function Draw(state) {
 	// Layer 3: Targets
 	if (state.redraw_all || state.redraw_targets) {
 		let ctx = ClearLayerAndReturnContext(3);
-		let bottom_targets = state.target_sets[0].targets;
-		for (let i = 0; i < bottom_targets.length; ++i) {
-			bottom_targets[i].ResetText();
+		for (let i = 0; i < machine.target_sets.length; ++i) {
+			let targets = machine.target_sets[0].targets;
+			for (let j = 0; j < targets.length; ++j) {
+				targets[j].ResetText();
+			}
 		}
-		DrawTargets(state.target_sets, ctx);
+		DrawTargets(machine.target_sets, ctx);
 		state.redraw_targets = false;
 	}
 	// Layer 4: Auto-Drop position
 	if (state.redraw_all || state.redraw_auto_drop) {
 		let ctx = ClearLayerAndReturnContext(4);
-		if (AutoDropOn()) {
+		if (machine.AutoDropOn()) {
 			let cooldown = 0;
 			if (state.auto_drop_cooldown >= kMinCooldownToDraw) {
 				cooldown =
 					state.auto_drop_cooldown_left / state.auto_drop_cooldown;
 			}
-			DrawAutoDropPosition(state.save_file.auto_drop_pos, cooldown, ctx);
+			DrawAutoDropPosition(machine.GetSaveData().auto_drop_pos, cooldown, ctx);
 		}
 		state.redraw_auto_drop = false;
 	}
@@ -786,13 +800,16 @@ function Draw(state) {
 
 	// Bonus wheel
 	if (
-		state.redraw_all ||
-		state.redraw_wheel ||
-		state.wheel_popup_text.length > 0 ||
-		state.last_drawn.num_wheel_popup_texts > 0
+		machine.bonus_wheel && 
+		(
+			state.redraw_all ||
+			state.redraw_wheel ||
+			state.wheel_popup_text.length > 0 ||
+			state.last_drawn.num_wheel_popup_texts > 0
+		)
 	) {
 		state.redraw_wheel = false;
-		DrawWheel(state.bonus_wheel);
+		DrawWheel(machine.bonus_wheel);
 		state.last_drawn.num_wheel_popup_texts = state.wheel_popup_text.length;
 	}
 

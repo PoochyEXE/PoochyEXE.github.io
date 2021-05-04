@@ -73,6 +73,20 @@ class Vector {
 	}
 }
 
+class Rectangle {
+	constructor(min_x, max_x, min_y, max_y) {
+		this.min_x = min_x;
+		this.max_x = max_x;
+		this.min_y = min_y;
+		this.max_y = max_y;
+	}
+	
+	Contains(point) {
+		return this.min_x <= point.x && this.max_x >= point.x &&
+			this.min_y <= point.y && this.max_y >= point.y;
+	}
+}
+
 class Ball {
 	constructor(x, y, dx, dy, ball_type_index, rotation, omega) {
 		this.pos = new Point(x, y);
@@ -94,6 +108,35 @@ class RisingText {
 		this.color_rgb = color_rgb;
 		this.start_time = state.current_time;
 	}
+}
+
+// Appends a linear series of points from start to end, equally spaced and at
+// least min_spacing apart. Does not append the start or end points themselves.
+function AppendInterpolatedLine(points_array, start, end, min_spacing) {
+	let delta = start.DeltaToPoint(end);
+	let dist = delta.Magnitude();
+	let num_intervals = Math.floor(dist / min_spacing);
+	let step_dist = dist / num_intervals;
+	let step = delta.Normalize().Multiply(step_dist);
+	for (let i = 1; i < num_intervals; ++i) {
+		points_array.push(start.Add(step.Multiply(i)));
+	}
+}
+
+// Appends a linear series of points between each consecutive pair of points in
+// `vertices`, equally spaced and at least min_spacing apart, including all
+// points in `vertices`.
+function AppendInterpolatedPolyline(points_array, vertices, min_spacing) {
+	points_array.push(new Point(vertices[0].x, vertices[0].y));
+	for (let i = 1; i < vertices.length; ++i) {
+		AppendInterpolatedLine(
+			points_array, vertices[i - 1], vertices[i], min_spacing
+		);
+	}
+}
+
+function ActiveMachine(state) {
+	return state.machines[state.active_machine_index];
 }
 
 function UpdateInnerHTML(elem_id, html) {
@@ -123,7 +166,7 @@ function UpdateDisplay(elem_id, display) {
 function MaybeAddScoreText({ level, text, pos, color_rgb }) {
 	if (
 		state.enable_score_text &&
-		level >= state.save_file.options.display_popup_text
+		level >= ActiveMachine(state).GetSetting("display_popup_text")
 	) {
 		state.score_text.push(new RisingText(text, pos, color_rgb));
 	}
@@ -162,184 +205,12 @@ function SampleGaussianNoise(mu, sigma) {
 	return new Point(z0, z1);
 }
 
-const kNumericPrecision = 3;
-
-function FormatSmallNumberShort(num) {
-	if (Number.isInteger(num)) {
-		return num.toString();
-	} else if (num < 100 && Number.isInteger(num * 10)) {
-		return num.toFixed(1);
-	} else {
-		return num.toPrecision(kNumericPrecision);
-	}
-}
-
-function FormatNumberScientificNotation(num) {
-	return num.toPrecision(kNumericPrecision).replace("+", "");
-}
-
-const kShortSuffixes = [
-	"",
-	"K",
-	"M",
-	"B",
-	"T",
-	"Qa",
-	"Qi",
-	"Sx",
-	"Sp",
-	"Oc",
-	"No",
-	"Dc",
-	"UDc",
-	"DDc",
-	"TDc",
-	"QaDc",
-	"QiDc",
-	"SeDc",
-	"SpDc",
-	"OcDc",
-	"NoDc",
-	"V",
-	"UV",
-	"DV",
-	"TV",
-	"QaV",
-	"QiV",
-	"SeV",
-	"SpV",
-	"OcV",
-	"NoV",
-	"Tr",
-	"UTr",
-	"DTr",
-	"TTr",
-	"QaTr",
-	"QiTr",
-	"SeTr",
-	"SpTr",
-	"OcTr",
-	"NoTr",
-];
-
-function FormatNumberShort(num) {
-	if (num < 1000) {
-		return FormatSmallNumberShort(num);
-	}
-	let suffix_index = Math.floor(Math.log10(num) / 3);
-	if (suffix_index == 0) {
-		return FormatSmallNumberShort(num);
-	}
-	if (
-		state.save_file.options.scientific_notation ||
-		suffix_index >= kShortSuffixes.length
-	) {
-		return FormatNumberScientificNotation(num);
-	}
-	let prefix = num / Math.pow(1000, suffix_index);
-	let prefix_str = FormatSmallNumberShort(prefix);
-	return prefix_str + kShortSuffixes[suffix_index];
-}
-
-const kLongSuffixes = [
-	"",
-	"",
-	"",
-	"billion",
-	"trillion",
-	"quadrillion",
-	"quintillion",
-	"sextillion",
-	"septillion",
-	"octillion",
-	"nonillion",
-	"decillion",
-	"undecillion",
-	"duodecillion",
-	"tredecillion",
-	"quattuordecillion",
-	"quindecillion",
-	"sedecillion",
-	"septedecillion",
-	"octodecillion",
-	"novendecillion",
-	"vigintillion",
-	"unvigintillion",
-	"duovigintillion",
-	"tresvigintillion",
-	"quattuorvigintillion",
-	"quinvigintillion",
-	"sesvigintillion",
-	"septemvigintillion",
-	"octovigintillion",
-	"novemvigintillion",
-	"trigintillion",
-	"untrigintillion",
-	"duotrigintillion",
-	"trestrigintillion",
-	"quattuortrigintillion",
-	"quintrigintillion",
-	"sestrigintillion",
-	"septentrigintillion",
-	"octotrigintillion",
-	"noventrigintillion",
-];
-
-function FormatNumberLong(num) {
-	if (num < 1000) {
-		return FormatSmallNumberShort(num);
-	}
-	let suffix_index = Math.floor(Math.log10(num) / 3);
-	if (suffix_index >= kShortSuffixes.length) {
-		return FormatNumberScientificNotation(num);
-	}
-	if (kLongSuffixes[suffix_index] == "") {
-		return num.toLocaleString();
-	}
-	if (state.save_file.options.scientific_notation) {
-		return FormatNumberScientificNotation(num);
-	}
-	let prefix = num / Math.pow(1000, suffix_index);
-	return prefix.toFixed(kNumericPrecision) + " " +
-		kLongSuffixes[suffix_index];
-}
-
-function ZeroPad(num, len) {
-	return String(num).padStart(len, "0");
-}
-
-function FormatDurationLong(duration_ms) {
-	console.assert(duration_ms > 0);
-	let x = Math.round(duration_ms);
-	let ms = x % 1000;
-	x = Math.floor(x / 1000);
-	let secs = x % 60;
-	x = Math.floor(x / 60);
-	let result = ZeroPad(secs, 2) + "s " + ZeroPad(ms, 3) + "ms";
-	if (x <= 0) {
-		return result;
-	}
-	let mins = x % 60;
-	x = Math.floor(x / 60);
-	result = ZeroPad(mins, 2) + "m " + result;
-	if (x <= 0) {
-		return result;
-	}
-	let hours = x % 24;
-	x = Math.floor(x / 24);
-	result = ZeroPad(hours, 2) + "h " + result;
-	if (x <= 0) {
-		return result;
-	}
-	result = x + "d " + result;
-	return result;
-}
-
 class BallType {
 	constructor(
 		id,
 		name,
 		display_name,
+		physics_params,
 		inner_color,
 		outer_color,
 		ripple_color_rgb
@@ -347,6 +218,7 @@ class BallType {
 		this.id = id;
 		this.name = name;
 		this.display_name = display_name;
+		this.physics_params = physics_params;
 		this.inner_color = inner_color;
 		this.outer_color = outer_color;
 		this.ripple_color_rgb = ripple_color_rgb;
