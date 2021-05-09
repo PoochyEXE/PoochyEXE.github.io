@@ -40,6 +40,10 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
+### v1.3.1-beta (2021-05-09)
+* Fix pop-up text not appearing when buying Point Multiplier upgrade.
+* Fix score display being momentarily frozen on the old save file's value when importing a save file.
+
 ### v1.3.0-beta (2021-05-09)
 * **Major new feature: Multiple machines!**
 	* This update includes a 2nd machine, but it's incomplete and not balanced yet.

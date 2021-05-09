@@ -436,8 +436,8 @@ class FirstMachine extends PachinkoMachine {
 				value_suffix: kTimesSymbol,
 				visible_func: null,
 				on_update: () => this.UpdateBottomTargets(),
-				on_buy: () => {
-					let bottom_targets = this.target_sets[0].targets;
+				on_buy: (level) => {
+					let bottom_targets = this.board.target_sets[0].targets;
 					let popup_text = kTimesSymbol + "5";
 					for (let i = 0; i < bottom_targets.length; ++i) {
 						MaybeAddScoreText({
@@ -464,7 +464,7 @@ class FirstMachine extends PachinkoMachine {
 				value_suffix: "",
 				visible_func: null,
 				on_update: () => this.UpdateBottomTargets(),
-				on_buy: () => {
+				on_buy: (level) => {
 					let target = this.target_sets[0].targets[4];
 					let popup_text = kTimesSymbol + "2";
 					MaybeAddScoreText({

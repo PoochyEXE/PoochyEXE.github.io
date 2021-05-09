@@ -74,11 +74,11 @@ class Upgrade {
 		if (this.GetLevel() >= this.max_level) {
 			return false;
 		}
-		++save_data.upgrade_levels[this.id];
+		let new_level = ++save_data.upgrade_levels[this.id];
 		save_data.points -= cost;
 		this.Update();
-		this.on_buy();
-		if (this.GetLevel() == this.max_level) {
+		this.on_buy(new_level);
+		if (new_level == this.max_level) {
 			UpdateMachinesHeader(state);
 			ShowEndingIfAllUpgradesMaxed();
 		}

@@ -612,16 +612,23 @@ class BumperMachine extends PachinkoMachine {
 				value_suffix: kTimesSymbol,
 				visible_func: null,
 				on_update: () => this.UpdateScoreTargets(),
-				on_buy: () => {
-					let bottom_targets = this.target_sets[0].targets;
-					let popup_text = kTimesSymbol + "5";
-					for (let i = 0; i < bottom_targets.length; ++i) {
-						MaybeAddScoreText({
-							level: 3,
-							text: popup_text,
-							pos: bottom_targets[i].pos,
-							color_rgb: "0,0,255"
-						});
+				on_buy: (new_level) => {
+					// Set #4 is the bumpers, so skip it.
+					const kScoreTargetSets = [0, 1, 2, 3, 5];
+					let bottom_targets = this.board.target_sets[0].targets;
+					let multiple = ((new_level % 3) == 2) ? "2.5" : "2"
+					let popup_text = kTimesSymbol + multiple;
+					for (let i = 0; i < kScoreTargetSets.length; ++i) {
+						let set_number = kScoreTargetSets[i];
+						let targets = this.board.target_sets[set_number].targets;
+						for (let j = 0; j < targets.length; ++j) {
+							MaybeAddScoreText({
+								level: 3,
+								text: popup_text,
+								pos: targets[j].pos,
+								color_rgb: "0,0,255"
+							});
+						}
 					}
 					/* TODO: Add bonus wheel.
 					this.bonus_wheel.UpdateAllSpaces();
@@ -642,7 +649,7 @@ class BumperMachine extends PachinkoMachine {
 				value_suffix: "",
 				visible_func: null,
 				on_update: () => this.UpdateBumperValues(),
-				on_buy: () => null
+				on_buy: null
 			})
 		);
 		upgrades_list.push(

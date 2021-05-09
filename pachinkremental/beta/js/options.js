@@ -279,13 +279,13 @@ function LoadGame(save_file_str) {
 		state.update_buff_display = true;
 		state.bonus_wheel = default_state.bonus_wheel;
 		state.redraw_wheel = true;
-		if (state.save_file.stats.total_score > 0) {
-			UpdateScoreDisplay(state, /*forceUpdate=*/ true);
-		}
 		if (!kIsLiveVersion) {
 			state.save_file.is_beta = true;
 		}
 		LoadActiveMachine(state);
+		if (ActiveMachine(state).GetSaveData().stats.total_score > 0) {
+			UpdateScoreDisplay(state, /*forceUpdate=*/ true);
+		}
 		UpdateOptionsButtons();
 		UpdateAutoSaveInterval();
 		UpdateDarkMode();
