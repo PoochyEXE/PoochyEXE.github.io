@@ -79,6 +79,7 @@ class Upgrade {
 		this.Update();
 		this.on_buy();
 		if (this.GetLevel() == this.max_level) {
+			UpdateMachinesHeader(state);
 			ShowEndingIfAllUpgradesMaxed();
 		}
 		return true;

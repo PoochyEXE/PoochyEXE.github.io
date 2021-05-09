@@ -18,6 +18,7 @@
 
 	<script type="text/javascript" src="js/machine.js"></script>
 	<script type="text/javascript" src="js/machine01.js"></script>
+	<script type="text/javascript" src="js/machine02.js"></script>
 
 	<script type="text/javascript" src="js/game.js"></script>
 
@@ -68,6 +69,19 @@
 						<div class="messageBox">Next upgrade reveal at: <span id="next_upgrade_hint"></span></div>
 						<div class="menuPadding"></div>
 						<div id="upgrade_headers" class="upgradesContents"></div>
+					</div>
+				</div>
+				<div id="machines_container" class="machinesContainer" style="display: none;">
+					<button type="button" class="machinesHeader"
+							id="button_machines_header" onclick="ToggleVisibility('machines')">
+						<span id="machines_collapsed">[&ndash;]</span> Machines
+						<span id="machines_header_new" class="machineHeaderNew" style="display: none;"><sup>New!</sup></span>
+					</button>
+					<div id="machines_contents" class="machinesContents">
+						<div class="menuPadding"></div>
+						<div class="messageBox">You can switch machines here whenever you like. Each machine has its own separate points, upgrades, and stats. You can only play one machine at a time, but you can always return to a previous machine and pick up where you left off.</div>
+						<div class="menuPadding"></div>
+						<div id="machine_buttons" class="machinesContents"></div>
 					</div>
 				</div>
 				<div id="stats_container" class="statsContainer">

@@ -10,7 +10,7 @@ const kPhysicsParams = {
 	}
 };
 
-function UpdateBalls(balls, board, target_sets, params) {
+function UpdateBalls(balls, board, params) {
 	const kEpsilon = 1e-3 / kFPS;
 	const k2Pi = Math.PI * 2;
 	const kPegSearchRadius = kPegRadius + kBallRadius;
@@ -62,9 +62,7 @@ function UpdateBalls(balls, board, target_sets, params) {
 						" stuck perfectly balanced on peg at " +
 						collide_peg.DebugStr() + " -- giving it a tiny nudge."
 					);
-					let noise = SampleGaussianNoise(0, 1e-5);
-					vel.x += noise.x;
-					vel.y += noise.y;
+					vel = vel.Add(SampleGaussianNoise(0, 1e-5));
 				}
 			}
 		}
@@ -77,14 +75,8 @@ function UpdateBalls(balls, board, target_sets, params) {
 		balls[b].rotation %= k2Pi;
 		balls[b].total_rotations += Math.abs(omega) / kFPS;
 
-		for (let s = 0; s < target_sets.length; ++s) {
-			let t_set = target_sets[s];
-			if (!t_set.bounding_box.Contains(pos)) {
-				continue;
-			}
-			for (let t = 0; t < t_set.targets.length; ++t) {
-				t_set.targets[t].CheckForHit(balls[b]);
-			}
+		for (let s = 0; s < board.target_sets.length; ++s) {
+			board.target_sets[s].CheckForHit(balls[b]);
 		}
 	}
 

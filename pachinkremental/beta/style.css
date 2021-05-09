@@ -41,7 +41,7 @@ div.bonusWheel {
 	clear: both;
 }
 
-div.upgradesContainer, div.upgradesSubContainer, div.statsContainer, div.optionsContainer {
+div.upgradesContainer, div.upgradesSubContainer, div.machinesContainer, div.statsContainer, div.optionsContainer {
 	border-radius: 15px;
 	clear: both;
 	padding: 5px;
@@ -65,6 +65,16 @@ div.upgradesContainerDark, div.upgradesSubContainerDark {
 div.upgradesSubContainer {
 	clear: none;
 	display: inline-block;
+}
+
+div.machinesContainerLight {
+	border: 2px solid #088;
+	background: #CFF;
+}
+
+div.machinesContainerDark {
+	border: 2px solid #088;
+	background: #033;
 }
 
 div.statsContainerLight {
@@ -92,7 +102,7 @@ span.upgradeHeaderNew {
 	color: #F00;
 }
 
-button.upgradesHeader, button.upgradesSubHeader, button.statsHeader, button.optionsHeader {
+button.upgradesHeader, button.upgradesSubHeader, button.machinesHeader, button.statsHeader, button.optionsHeader {
 	width: 100%;
 	border: none;
 	text-align: center;
@@ -101,7 +111,7 @@ button.upgradesHeader, button.upgradesSubHeader, button.statsHeader, button.opti
 	font-family: sans-serif;
 }
 
-button.upgradesHeader, button.statsHeader, button.optionsHeader {
+button.upgradesHeader, button.machinesHeader, button.statsHeader, button.optionsHeader {
 	font-size: 20px;
 }
 
@@ -116,6 +126,16 @@ button.upgradesHeaderLight, button.upgradesSubHeaderLight {
 
 button.upgradesHeaderDark, button.upgradesSubHeaderDark {
 	background: #030;
+	color: #FFF;
+}
+
+button.machinesHeaderLight {
+	background: #CFF;
+	color: #000;
+}
+
+button.machinesHeaderDark {
+	background: #033;
 	color: #FFF;
 }
 
@@ -139,7 +159,7 @@ button.optionsHeaderDark {
 	color: #FFF;
 }
 
-div.upgradesContents, div.statsContents, div.optionsContents {
+div.upgradesContents, div.machinesContents, div.statsContents, div.optionsContents {
 	line-height: 16px;
 	font-family: sans-serif;
 	font-size: 14px;
@@ -307,7 +327,7 @@ button.eightBallUpgradeButton {
 
 button.eightBallUpgradeButtonLight:disabled {
 	background: #888;
-	color: #FFF;
+	color: #000;
 }
 
 button.eightBallUpgradeButtonDark:disabled {
@@ -460,6 +480,35 @@ button.beachBallUpgradeButtonDark:disabled {
 	  #303 50px,
 	  #303 60px
 	);
+	color: #FFF;
+}
+
+button.machineButton {
+	border: 1px solid #000;
+	border-radius: 10px;
+	font-family: sans-serif;
+	font-size: 14px;
+	padding: 5px;
+	transition-duration: 250ms;
+}
+
+button.machineButtonLight {
+	background: #8CC;
+	color: #000;
+}
+
+button.machineButtonDark {
+	background: #388;
+	color: #FFF;
+}
+
+button.machineButtonLight:disabled {
+	background: #888;
+	color: #000;
+}
+
+button.machineButtonDark:disabled {
+	background: #555;
 	color: #FFF;
 }
 

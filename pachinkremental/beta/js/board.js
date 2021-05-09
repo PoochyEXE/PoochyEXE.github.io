@@ -35,14 +35,14 @@ class Target {
 				save_file.stats.target_hits[this.id] = 1;
 			}
 
-			this.OnHit(ball);
 			ball.last_hit = this.id;
+			this.OnHit(ball);
 		}
 	}
 }
 
 class ScoreTarget extends Target {
-	constructor({ machine, pos, draw_radius, hitbox_radius, color, id, active, value }) {
+	constructor({ machine, pos, draw_radius, hitbox_radius, color, id, active, value, pass_through }) {
 		super({
 			machine,
 			pos,
@@ -54,10 +54,13 @@ class ScoreTarget extends Target {
 			active
 		});
 		this.value = value;
+		this.pass_through = pass_through;
 	}
 
 	OnHit(ball) {
-		ball.active = false;
+		if (!this.pass_through) {
+			ball.active = false;
+		}
 		this.machine.AwardPoints(this.value, ball);
 	}
 	
@@ -89,25 +92,84 @@ class TargetSet {
 		}
 		this.bounding_box = new Rectangle(min_x, max_x, min_y, max_y);
 	}
+	
+	CheckForHit(ball) {
+		if (this.bounding_box.Contains(ball.pos)) {
+			for (let t = 0; t < this.targets.length; ++t) {
+				this.targets[t].CheckForHit(ball);
+			}
+		}
+	}
+}
+
+class Bumper extends Target {
+	constructor({ machine, pos, radius, strength, color, value, id, active }) {
+		super({
+			machine,
+			pos,
+			draw_radius: radius,
+			hitbox_radius: radius + kBallRadius,
+			color: kBumperColor,
+			text: "",
+			id,
+			active
+		});
+		this.value = value;
+		this.strength = strength;
+		this.hit_animation = 0;
+		this.ResetText();
+	}
+
+	OnHit(ball) {
+		this.hit_animation = kBumperHitExpandSizes.length - 1;
+		if (this.value) {
+			this.machine.AwardPoints(this.value, ball);
+		}
+
+		const kNoiseSigma = 0.01;
+		let noise = SampleGaussianNoise(0, kNoiseSigma);
+		let delta = this.pos.DeltaToPoint(ball.pos);
+		let delta_norm = delta.Normalize();
+		let add_vel = delta_norm.Multiply(this.strength).Add(noise);
+		ball.vel = ball.vel.Add(add_vel);
+		ball.pos = this.pos.Add(delta_norm.Multiply(this.hitbox_radius + kBallRadius));
+		ball.last_hit = null;
+		state.redraw_targets = true;
+	}
+
+	ResetText() {
+		this.text = "";
+		/*
+		if (this.value) {
+			this.text = FormatNumberShort(this.value);
+		} else {
+			this.text = "";
+		}
+		*/
+	}
+
+	SetValue(new_value) {
+		this.value = new_value;
+		this.ResetText();
+	}
 }
 
 class PegBoard {
-	constructor(width, height, pegs, drop_zones) {
+	constructor(width, height, pegs, target_sets, drop_zones, bumper_sets) {
 		this.width = width;
 		this.height = height;
 		this.pegs = pegs;
+		this.target_sets = target_sets;
 		this.drop_zones = drop_zones;
+		this.bumper_sets = bumper_sets;
 		this.grid_cols = Math.ceil(width / kCellSize);
 		this.grid_rows = Math.ceil(height / kCellSize);
-		this.cache = [...Array(this.grid_rows * this.grid_cols)].map(_ =>
-			Array(0)
-		);
+		this.cache =
+			[...Array(this.grid_rows * this.grid_cols)].map(_ => Array(0));
 		for (let i = 0; i < pegs.length; ++i) {
 			const peg = pegs[i];
 			if (peg.x < 0 || peg.x > width || peg.y < 0 || peg.y > height) {
-				console.log(
-					`Skipping out-of-bounds peg at ${peg.DebugStr()}`
-				);
+				console.log(`Skipping out-of-bounds peg at ${peg.DebugStr()}`);
 				continue;
 			}
 			const row = Math.floor(peg.y / kCellSize);

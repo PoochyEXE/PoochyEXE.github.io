@@ -12,6 +12,9 @@ const kPrismatic = "PRISMATIC";
 const k8Ball = "8-BALL";
 const k8BallHighlightColor = "246, 31,183";
 const kBeachBall = "BEACH";
+const kBumperColor = "BUMPER";
+
+const kBumperHitExpandSizes = [0, 1, 2, 3, 2, 1];
 
 const kPrismaticCycleColors = [
 	[0, 1, 0],
@@ -273,6 +276,21 @@ function CreateBallGradient(ctx, pos, radius, inner_color, outer_color) {
 	return gradient;
 }
 
+function CreateBumperGradient(ctx, pos, radius) {
+	const kOuterColor = "#080";
+	const kInnerColor = "#8F8";
+	const kTransparent = "rgba(0, 0, 0, 0)";
+	const kEpsilon = 1e-7;
+	let inner_r = radius / 3.0;
+	let gradient =
+		ctx.createRadialGradient(pos.x, pos.y, inner_r, pos.x, pos.y, radius);
+	gradient.addColorStop(0, kTransparent);
+	gradient.addColorStop(kEpsilon, kOuterColor);
+	gradient.addColorStop(0.5, kInnerColor);
+	gradient.addColorStop(1.0, kOuterColor);
+	return gradient;
+}
+
 function DrawGradientCircle(ctx, pos, radius, inner_color, outer_color) {
 	ctx.fillStyle =
 		CreateBallGradient(ctx, pos, radius, inner_color, outer_color);
@@ -443,9 +461,19 @@ function DrawTargets(target_sets, ctx) {
 				continue;
 			}
 			const pos = target.pos;
-			ctx.fillStyle = target.color;
+			let radius = target.draw_radius;
+			if (target.color == kBumperColor) {
+				if (target.hit_animation > 0) {
+					radius += kBumperHitExpandSizes[target.hit_animation];
+					target.hit_animation -= 1;
+					state.redraw_targets = true;
+				}
+				ctx.fillStyle = CreateBumperGradient(ctx, pos, radius);
+			} else {
+				ctx.fillStyle = target.color;
+			}
 			ctx.beginPath();
-			ctx.arc(pos.x, pos.y, target.draw_radius, 0, 2 * Math.PI);
+			ctx.arc(pos.x, pos.y, radius, 0, 2 * Math.PI);
 			ctx.fill();
 
 			ctx.textAlign = "center";
@@ -749,14 +777,14 @@ function Draw(state) {
 	// Layer 3: Targets
 	if (state.redraw_all || state.redraw_targets) {
 		let ctx = ClearLayerAndReturnContext(3);
-		for (let i = 0; i < machine.target_sets.length; ++i) {
-			let targets = machine.target_sets[0].targets;
+		for (let i = 0; i < machine.board.target_sets.length; ++i) {
+			let targets = machine.board.target_sets[0].targets;
 			for (let j = 0; j < targets.length; ++j) {
 				targets[j].ResetText();
 			}
 		}
-		DrawTargets(machine.target_sets, ctx);
 		state.redraw_targets = false;
+		DrawTargets(machine.board.target_sets, ctx);
 	}
 	// Layer 4: Auto-Drop position
 	if (state.redraw_all || state.redraw_auto_drop) {

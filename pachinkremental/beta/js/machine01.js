@@ -1,3 +1,5 @@
+const kFirstMachineID = "first";
+
 const kFirstMachineBallTypes = [
 	//          | id |    name    | display_name |      physics_params       | inner_color | outer_color | ripple_color_rgb |
 	kNormalBallType,
@@ -34,17 +36,6 @@ const kFirstMachinePopupTextOptions = [
 	"8-Ball+ only",
 	"Disable All",
 ];
-
-const kHorizontalSpacing = 18;
-const kWallSpacing = 4;
-const kHalfWallSpace = kWallSpacing / 2;
-const kVerticalSpacing = (Math.sqrt(3) * kHorizontalSpacing) / 2;
-const kColumns = 9;
-const kRows = 13;
-const kBottomSlotRows = 5;
-const kWidth = kHorizontalSpacing * kColumns + kWallSpacing;
-const kHeight = 256;
-const kBaseSlotValues = [20, 100, 200, 1, 250, 1, 200, 100, 20];
 
 function HasEightBallSpecial(ball_type_index) {
 	return (
@@ -134,7 +125,8 @@ class CenterSlotTarget extends ScoreTarget {
 			color,
 			id,
 			active,
-			value
+			value,
+			pass_through: false
 		});
 	}
 	
@@ -171,8 +163,8 @@ class SpinTarget extends Target {
 }
 
 class FirstMachine extends PachinkoMachine {
-	constructor(id) {
-		super(id, kFirstMachineBallTypes);
+	constructor(id, display_name) {
+		super(id, display_name, kFirstMachineBallTypes);
 		
 		this.special_ball_multiplier = 2;
 		this.sapphire_ball_exponent = 1.0;
@@ -261,29 +253,39 @@ class FirstMachine extends PachinkoMachine {
 			),
 		];
 	}
+	
+	BaseSlotValues() {
+		return [20, 100, 200, 1, 250, 1, 200, 100, 20];
+	}
 
 	InitBoard() {
+		const kBaseSlotValues = this.BaseSlotValues();
+		const kHorizontalSpacing = 18;
+		const kWallSpacing = 4;
+		const kHalfWallSpace = kWallSpacing / 2;
+		const kVerticalSpacing = (Math.sqrt(3) * kHorizontalSpacing) / 2;
+		const kColumns = kBaseSlotValues.length;
+		const kRows = 13;
+		const kBottomSlotRows = 5;
+		const kWidth = kHorizontalSpacing * kColumns + kWallSpacing;
+		const kHeight = 256;
+		
 		let pegs = Array(0);
-		for (
-			let y = kHeight - kHalfWallSpace;
-			y >= kHalfWallSpace;
-			y -= kWallSpacing
-		) {
-			pegs.push(new Point(kHalfWallSpace, y));
-			pegs.push(new Point(kWidth - kHalfWallSpace, y));
-		}
+		let border_polyline = Array(0);
+		const left_wall_x = kHalfWallSpace;
+		const right_wall_x = kWidth - kHalfWallSpace;
+		const top_y = kHalfWallSpace;
+		const bottom_y = kHeight - kHalfWallSpace;
+		border_polyline.push(new Point(left_wall_x, top_y));
 		var y = kHeight - kHalfWallSpace;
-		for (let col = 0; col < kColumns; ++col) {
-			const prev_x = col * kHorizontalSpacing + kHalfWallSpace;
-			const next_x = (col + 1) * kHorizontalSpacing + kHalfWallSpace;
-			const delta_x = next_x - prev_x;
-			const mid_pegs = Math.floor(delta_x / kWallSpacing);
-			for (let subcol = 1; subcol <= mid_pegs; ++subcol) {
-				const x = prev_x + (subcol * delta_x) / mid_pegs;
-				pegs.push(new Point(x, y));
-			}
+		for (let col = 0; col <= kColumns; ++col) {
+			const x = col * kHorizontalSpacing + left_wall_x;
+			border_polyline.push(new Point(x, bottom_y));
 		}
-		y -= kWallSpacing;
+		border_polyline.push(new Point(right_wall_x, top_y));
+		AppendInterpolatedPolyline(pegs, border_polyline, kWallSpacing);
+		
+		var y = kHeight - kHalfWallSpace - kWallSpacing;
 		for (let row = 1; row < kBottomSlotRows; ++row) {
 			for (let col = 1; col < kColumns; ++col) {
 				const x = col * kHorizontalSpacing + kHalfWallSpace;
@@ -317,10 +319,7 @@ class FirstMachine extends PachinkoMachine {
 		let drop_zones = [
 			new Rectangle(min_drop_x, max_drop_x, min_drop_y, max_drop_y)
 		];
-		return new PegBoard(kWidth, kHeight, pegs, drop_zones);
-	}
 
-	InitTargets() {
 		const kDrawRadius = (kHorizontalSpacing - kWallSpacing) / 2;
 		const kTargetColor = "#8FF";
 		const kHitboxRadius = Math.min(kDrawRadius * 1.5 - kBallRadius);
@@ -356,7 +355,8 @@ class FirstMachine extends PachinkoMachine {
 						color: kTargetColor,
 						id: col,
 						active: true,
-						value
+						value,
+						pass_through: false
 					})
 				);
 			}
@@ -402,11 +402,12 @@ class FirstMachine extends PachinkoMachine {
 		);
 		target_sets.push(new TargetSet(spin_targets));
 
-		return target_sets;
+		return new PegBoard(kWidth, kHeight, pegs, target_sets, drop_zones);
 	}
 
 	UpdateBottomTargets() {
-		let bottom_targets = this.target_sets[0].targets;
+		const kBaseSlotValues = this.BaseSlotValues();
+		let bottom_targets = this.board.target_sets[0].targets;
 		console.assert(bottom_targets.length == 9);
 		let multiplier = this.GetUpgradeValue("multiplier");
 		for (let i = 0; i < kBaseSlotValues.length; ++i) {
@@ -586,7 +587,7 @@ class FirstMachine extends PachinkoMachine {
 				on_update: function() {
 					let unlocked = this.GetValue() > 0;
 					UpdateDisplay("bonus_wheel", unlocked ? "inline" : "none");
-					let spin_targets = this.machine.target_sets[1].targets;
+					let spin_targets = this.machine.board.target_sets[1].targets;
 					console.assert(spin_targets.length == 3);
 					spin_targets[0].active = unlocked;
 					spin_targets[2].active = unlocked;
@@ -607,7 +608,7 @@ class FirstMachine extends PachinkoMachine {
 				visible_func: () => this.IsUnlocked("unlock_bonus_wheel"),
 				on_update: function() {
 					let unlocked = this.GetValue() > 0;
-					let spin_targets = this.machine.target_sets[1].targets;
+					let spin_targets = this.machine.board.target_sets[1].targets;
 					console.assert(spin_targets.length == 3);
 					spin_targets[1].active = unlocked;
 					state.redraw_targets = true;
@@ -1190,8 +1191,10 @@ class FirstMachine extends PachinkoMachine {
 			return "Unlock Beach Balls.";
 		} else if (!this.IsUnlocked("beach_ball_time_based_multiplier")) {
 			return "Unlock Time-Based Multipiler for Beach Balls.";
+		} else if (!this.AreAllUpgradesMaxed()) {
+			return "Max all upgrades that can be maxed. (Costs about " + FormatNumberShort(9.87e77) + " points total. Point Multiplier, Center Slot Value, and Gold Ball Multiplier have no maximum.)";
 		} else {
-			return "None! Congratulations, you've maxed everything that can be maxed!"
+			return "None! Congratulations, you've maxed everything that can be maxed on this machine! Check the Machines section below for a new machine!"
 		}
 	}
 	
@@ -1396,8 +1399,8 @@ class FirstMachine extends PachinkoMachine {
 	}
 
 	AwardPoints(base_value, ball) {
-		var total_value = base_value;
-		var color_rgb = "0,128,0";
+		let total_value = base_value;
+		let color_rgb = "0,128,0";
 		if (this.IsScoreBuffActive()) {
 			total_value *= this.GetSaveData().score_buff_multiplier;
 		}

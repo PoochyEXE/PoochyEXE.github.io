@@ -40,8 +40,14 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
+### v1.3.0-beta (2021-05-09)
+* **Major new feature: Multiple machines!**
+	* This update includes a 2nd machine, but it's incomplete and not balanced yet.
+* Fix 8-ball upgrade buttons still having white text when disabled in light mode.
+
 ### v1.2.0-beta (2021-05-04)
 * Under-the-hood refactor of the game engine in preparation for a planned future update.
+* Bugfix: Require buying Better Ball Drops 2 before showing Better Ball Drops 3, and likewise buying 3 before showing 4.
 
 ### v1.1.1 (2021-05-03)
 * Fix drop zone being drawn 5 pixels too high in April Fools mode.

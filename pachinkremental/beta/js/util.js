@@ -132,6 +132,27 @@ function AppendInterpolatedPolyline(points_array, vertices, min_spacing) {
 		AppendInterpolatedLine(
 			points_array, vertices[i - 1], vertices[i], min_spacing
 		);
+		points_array.push(new Point(vertices[i].x, vertices[i].y));
+	}
+}
+
+// Appends an arc of points between start_radians and end_radians along the circle
+// wih the specified center with radius. Radians are counterclockwise starting from
+// the right (parallel with the positive x-axis). Output points are equally spaced
+// and at least min_spacing apart (straight line distance).
+function AppendInterpolatedArc(points_array, center, radius, start_radians, end_radians, min_spacing) {
+	console.assert(radius > 0);
+	console.assert(min_spacing <= radius);
+	const radius_sqr = radius * radius;
+	const min_spacing_sqr = min_spacing * min_spacing;
+	const min_spacing_radians = Math.acos(1 - min_spacing_sqr / radius_sqr);
+	const radian_delta = (end_radians - start_radians);
+	const num_intervals =
+		Math.floor(Math.abs(radian_delta) / min_spacing_radians) + 1;
+	for (let i = 0; i <= num_intervals; ++i) {
+		let radians = start_radians + radian_delta * i / num_intervals;
+		let vec = new Vector(radius * cos(radians), radius * sin(radians));
+		points_array.push(center.Add(vec));
 	}
 }
 
@@ -202,7 +223,7 @@ function SampleGaussianNoise(mu, sigma) {
 	const z0 = magnitude * Math.cos(two_pi * u2) + mu;
 	const z1 = magnitude * Math.sin(two_pi * u2) + mu;
 
-	return new Point(z0, z1);
+	return new Vector(z0, z1);
 }
 
 class BallType {

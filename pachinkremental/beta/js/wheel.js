@@ -123,4 +123,3 @@ class BonusWheelPointSpace extends BonusWheelSpace {
 		this.text = this.text_func();
 	}
 }
-

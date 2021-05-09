@@ -1,4 +1,4 @@
-const kVersion = "v1.2.0-beta";
+const kVersion = "v1.3.0-beta";
 const kTitleAndVersion = "Pachinkremental " + kVersion;
 
 const kFrameInterval = 1000.0 / kFPS;
@@ -101,12 +101,16 @@ function LoadActiveMachine(state) {
 	UpdateFavicon(state);
 	UpdateOpacitySlidersFromSaveFile(state);
 	UpdateFaviconChoiceFromSaveFile(state);
+	OnResize();
 }
 
 function InitState() {
 	let state = {
 		current_time: Date.now(),
-		machines: [new FirstMachine("first")],
+		machines: [
+			new FirstMachine(kFirstMachineID, "Basic"),
+			new BumperMachine(kBumperMachineID, "Bumpers"),
+		],
 		active_machine_index: 0,
 		balls_by_type: [],
 		score_text: new Array(0),
@@ -146,6 +150,7 @@ function InitState() {
 		save_file: {
 			game_version: kSaveFileVersion,
 			is_beta: !kIsLiveVersion,
+			active_machine: kFirstMachineID,
 			stats: {
 				total_score: 0,
 				score_last5s: 0,
@@ -314,6 +319,31 @@ function IsCollapsed(panel_name) {
 	return contents.style.height == "0px";
 }
 
+function SwitchMachine(index) {
+	state.active_machine_index = index;
+	const new_active_machine = state.machines[index];
+	state.save_file.active_machine = new_active_machine.id;
+	state.redraw_all = true;
+	state.update_stats_panel = true;
+	state.update_upgrades = true;
+	state.update_upgrade_buttons = true;
+	state.update_buff_display = true;
+	state.display_points = new_active_machine.GetSaveData().points;
+	state.wheel_popup_text.length = 0;
+	state.score_text.length = 0;
+	state.ripples.length = 0;
+	LoadActiveMachine(state);
+	UpdateScoreDisplay(state, /*force_update=*/true);
+	UpdateMachinesHeader(state);
+	UpdateDarkMode();
+	ResizeCanvas();
+	
+	for (let i = 0; i < state.score_history.length; ++i) {
+		state.score_history[i] = 0;
+	}
+
+}
+
 function UpdateOneFrame(state, draw) {
 	state.current_time += kFrameInterval;
 	let machine = ActiveMachine(state);
@@ -324,7 +354,6 @@ function UpdateOneFrame(state, draw) {
 			UpdateBalls(
 				state.balls_by_type[i],
 				machine.board,
-				machine.target_sets,
 				ball_types[i].physics_params
 			);
 		}
@@ -473,6 +502,7 @@ function OnResize() {
 }
 
 function Load() {
+	InitMachinesHeader(state);
 	let loaded_save = LoadFromLocalStorage();
 	LoadActiveMachine(state);
 	document.getElementById(kTopCanvasLayer).addEventListener("click", OnClick);
@@ -491,7 +521,6 @@ function Load() {
 	DisplayArchivedSaveFileButtons();
 	UpdateDarkMode();
 
-	OnResize();
 	window.onresize = OnResize;
 
 	Draw(state);

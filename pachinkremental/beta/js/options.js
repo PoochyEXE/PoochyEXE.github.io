@@ -43,10 +43,12 @@ const kColorSchemeClasses = [
 	new ColorSchemeClassMapping("messageBox", "messageBoxLight", "messageBoxDark"),
 	new ColorSchemeClassMapping("upgradesContainer", "upgradesContainerLight", "upgradesContainerDark"),
 	new ColorSchemeClassMapping("upgradesSubContainer", "upgradesSubContainerLight", "upgradesSubContainerDark"),
+	new ColorSchemeClassMapping("machinesContainer", "machinesContainerLight", "machinesContainerDark"),
 	new ColorSchemeClassMapping("statsContainer", "statsContainerLight", "statsContainerDark"),
 	new ColorSchemeClassMapping("optionsContainer", "optionsContainerLight", "optionsContainerDark"),
 	new ColorSchemeClassMapping("upgradesHeader", "upgradesHeaderLight", "upgradesHeaderDark"),
 	new ColorSchemeClassMapping("upgradesSubHeader", "upgradesSubHeaderLight", "upgradesSubHeaderDark"),
+	new ColorSchemeClassMapping("machinesHeader", "machinesHeaderLight", "machinesHeaderDark"),
 	new ColorSchemeClassMapping("statsHeader", "statsHeaderLight", "statsHeaderDark"),
 	new ColorSchemeClassMapping("optionsHeader", "optionsHeaderLight", "optionsHeaderDark"),
 	new ColorSchemeClassMapping("upgradeButton", "upgradeButtonLight", "upgradeButtonDark"),
@@ -59,6 +61,7 @@ const kColorSchemeClasses = [
 	new ColorSchemeClassMapping("opalUpgradeButton", "opalUpgradeButtonLight", "opalUpgradeButtonDark"),
 	new ColorSchemeClassMapping("eightBallUpgradeButton", "eightBallUpgradeButtonLight", "eightBallUpgradeButtonDark"),
 	new ColorSchemeClassMapping("beachBallUpgradeButton", "beachBallUpgradeButtonLight", "beachBallUpgradeButtonDark"),
+	new ColorSchemeClassMapping("machineButton", "machineButtonLight", "machineButtonDark"),
 	new ColorSchemeClassMapping("optionButton", "optionButtonLight", "optionButtonDark"),
 	new ColorSchemeClassMapping("optionButtonRed", "optionButtonRedLight", "optionButtonRedDark"),
 	new ColorSchemeClassMapping("modalContent", "modalContentLight", "modalContentDark"),
@@ -69,6 +72,9 @@ const kColorSchemeClasses = [
 ];
 
 function GetSetting(id) {
+	if (!state) {
+		return undefined;
+	}
 	return state.save_file.options[id];
 }
 
@@ -226,7 +232,7 @@ function LoadGame(save_file_str) {
 			...load_save.options
 		};
 		if (load_save.game_version < 5) {
-			let first_machine_save = state.save_file.machines["first"];
+			let first_machine_save = state.save_file.machines[kFirstMachineID];
 			for (let key in first_machine_save) {
 				if (key == "options" || key == "stats") {
 					continue;
@@ -262,6 +268,12 @@ function LoadGame(save_file_str) {
 				};
 			}
 		}
+		for (let i = 0; i < state.machines.length; ++i) {
+			if (state.machines[i].id == state.save_file.active_machine) {
+				state.active_machine_index = i;
+				break;
+			}
+		}
 		state.save_file.game_version = kSaveFileVersion;
 		state.update_upgrade_buttons = true;
 		state.update_buff_display = true;
@@ -277,6 +289,7 @@ function LoadGame(save_file_str) {
 		UpdateOptionsButtons();
 		UpdateAutoSaveInterval();
 		UpdateDarkMode();
+		UpdateMachinesHeader(state);
 		UpdateFavicon(state);
 		UpdateOpacitySlidersFromSaveFile(state);
 		UpdateFaviconChoiceFromSaveFile(state);

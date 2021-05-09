@@ -1,15 +1,15 @@
 const kNormalBallType = new BallType(0, "normal", "Normal ", kPhysicsParams.normal, "#CCC", "#888", null);
 
 class PachinkoMachine {
-	constructor(id, ball_types, ball_type_ids) {
+	constructor(id, display_name, ball_types) {
 		this.id = id;
+		this.display_name = display_name;
 		this.ball_types = ball_types;
 		this.board = this.InitBoard();
-		this.target_sets = this.InitTargets();
 		this.upgrades = this.InitUpgrades();
 		this.bonus_wheel = null;
 		this.max_balls = 1;
-		this.ball_type_rates = [0.0];
+		this.ball_type_rates = [1.0];
 		for (let i = 1; i < ball_types.length; ++i) {
 			let name = this.ball_types[i].name;
 			let rate_upgrade = this.upgrades[name + "_ball_rate"];
@@ -20,10 +20,6 @@ class PachinkoMachine {
 	OnActivate() {}
 
 	InitBoard() {
-		console.error("Not implemented!");
-	}
-
-	InitTargets() {
 		console.error("Not implemented!");
 	}
 
@@ -65,7 +61,7 @@ class PachinkoMachine {
 			upgrade_levels: {},
 			options: {
 				auto_drop_enabled: false,
-				display_popup_text: 1,
+				display_popup_text: 0,
 				favicon: -1
 			}
 		}
@@ -173,7 +169,13 @@ class PachinkoMachine {
 	}
 
 	AwardPoints(base_value, ball) {
-		this.GetSaveData().points += base_value;
+		this.AddScore(base_value);
+		MaybeAddScoreText({
+			level: 0,
+			text: `+${FormatNumberShort(base_value)}`,
+			pos: ball.pos,
+			color_rgb: "0,128,0"
+		});
 	}
 
 	RollBallType() {
@@ -190,5 +192,47 @@ class PachinkoMachine {
 			}
 		}
 		return 0;
+	}
+}
+
+function InitMachinesHeader(state) {
+	let html = '';
+	for (let i = 0; i < state.machines.length; ++i) {
+		html += '<button type="button" class="machineButton" id="button_machine_'
+			+ state.machines[i].id + '" onclick="SwitchMachine(\'' + i
+			+ '\')">' + state.machines[i].display_name + '</button> '
+	}
+	UpdateInnerHTML("machine_buttons", html);
+	UpdateMachinesHeader(state);
+}
+
+function UpdateMachinesHeader(state) {
+	let container_elem = document.getElementById("machines_container");
+	let is_maxed = [...Array(state.machines.length)].map((_, i) =>
+		state.machines[i].AreAllUpgradesMaxed()
+	);
+	if (!is_maxed[0]) {
+		UpdateDisplay("machines_container", "none");
+		return;
+	}
+	UpdateDisplay("machines_container", "block");
+
+	for (let i = 0; i < state.machines.length; ++i) {
+		const active = (state.active_machine_index == i);
+		const button_id = "button_machine_" + state.machines[i].id;
+		let visible = true;
+		if (i > 0) {
+			visible = is_maxed[i - 1];
+		}
+		UpdateDisplay(button_id, visible ? "inline" : "none");
+		document.getElementById(button_id).disabled = active || !visible;
+		let html = "<b>" + state.machines[i].display_name + "</b>";
+		if (is_maxed[i]) {
+			html += "<br>Maxed!";
+		}
+		if (active) {
+			html += "<br>(Active)";
+		}
+		UpdateInnerHTML(button_id, html);
 	}
 }
