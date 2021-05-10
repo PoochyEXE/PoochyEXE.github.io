@@ -434,15 +434,18 @@ class BumperMachine extends PachinkoMachine {
 		]
 		AppendInterpolatedPolyline(pegs, bumper_right_wall, kWallSpacing);
 		const bumper_center_left_wall = [
-			new Point(grid_cols[10], y - kVerticalSpacing * 5),
-			new Point(grid_cols[10], y - kVerticalSpacing * 6),
+			new Point(grid_cols[10], y - kVerticalSpacing * 5.125),
+			new Point(grid_cols[10], y - kVerticalSpacing * 5.75),
 		]
 		AppendInterpolatedPolyline(pegs, bumper_center_left_wall, kWallSpacing);
 		const bumper_center_right_wall = [
-			new Point(grid_cols[12], y - kVerticalSpacing * 5),
-			new Point(grid_cols[12], y - kVerticalSpacing * 6),
+			new Point(grid_cols[12], y - kVerticalSpacing * 5.125),
+			new Point(grid_cols[12], y - kVerticalSpacing * 5.75),
 		]
 		AppendInterpolatedPolyline(pegs, bumper_center_right_wall, kWallSpacing);
+		pegs.push(new Point((grid_cols[9] + grid_cols[10]) / 2.0, y - kVerticalSpacing * 6))
+		pegs.push(new Point((grid_cols[12] + grid_cols[13]) / 2.0, y - kVerticalSpacing * 6))
+		pegs.push(new Point(grid_cols[11], y - kVerticalSpacing * 7))
 		target_sets.push(new TargetSet([
 			new ScoreTarget({
 				machine: this,

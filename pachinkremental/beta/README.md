@@ -40,6 +40,9 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
+### v1.3.3-beta (2021-05-09)
+* Tweak Bumpers machine layout so that the top center target isn't so unreasonably hard to hit.
+
 ### v1.3.2-beta (2021-05-09)
 * Make bonus wheel pop-up text easier to read.
 
