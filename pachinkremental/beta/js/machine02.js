@@ -786,7 +786,7 @@ class BumperMachine extends PachinkoMachine {
 				name: "Ruby Ball Value",
 				category: "ruby_balls",
 				description: "Point value increase per second for Ruby balls.",
-				cost_func: level => 1e15 * Math.pow(5, level),
+				cost_func: level => 2e11 * Math.pow(5, level),
 				value_func: level => level + 5,
 				max_level: 45,
 				value_suffix: "%",
@@ -824,7 +824,7 @@ class BumperMachine extends PachinkoMachine {
 				name: "Sapphire Ball Value",
 				category: "sapphire_balls",
 				description: "Point value increase per blue target hit for Sapphire balls.",
-				cost_func: level => 1e15 * Math.pow(2, level),
+				cost_func: level => 2e11 * Math.pow(2, level),
 				value_func: level => (level + 10) * 5,
 				max_level: 90,
 				value_suffix: "%",
@@ -862,7 +862,7 @@ class BumperMachine extends PachinkoMachine {
 				name: "Emerald Ball Value",
 				category: "emerald_balls",
 				description: "Point value increase per green bumper hit for Emerald balls.",
-				cost_func: level => 1e15 * Math.pow(2, level),
+				cost_func: level => 2e11 * Math.pow(2, level),
 				value_func: level => level + 10,
 				max_level: 90,
 				value_suffix: "%",
@@ -1113,7 +1113,7 @@ class BumperMachine extends PachinkoMachine {
 	}
 	
 	NthGemstoneBallUnlockCost(n) {
-		return 2e9 * Math.pow(2000, n - 1);
+		return 25e8 * Math.pow(200, n - 1);
 	}
 
 	Tier1GemstoneBallRateCostFunc(level) {
@@ -1121,7 +1121,7 @@ class BumperMachine extends PachinkoMachine {
 	}
 
 	Tier2GemstoneBallRateCostFunc(level) {
-		return 1e16 * Math.pow(5, level);
+		return 1e14 * Math.pow(5, level);
 	}
 
 	GemstoneBallRateValueFunc(level) {
