@@ -20,7 +20,7 @@ function UpdateBalls(balls, board, params) {
 		let vel = balls[b].vel;
 		let omega = balls[b].omega;
 
-		for (let iter = 0; iter < 10 && time_to_sim > kEpsilon; ++iter) {
+		for (let iter = 0; iter < 10 && time_to_sim >= kEpsilon; ++iter) {
 			let new_pos = pos.Add(vel.Multiply(time_to_sim));
 			let collide_peg = board.FindNearestPeg(new_pos, kPegSearchRadius);
 			if (collide_peg == null) {
@@ -28,7 +28,11 @@ function UpdateBalls(balls, board, params) {
 				break;
 			}
 			let time_step = time_to_sim;
-			while (time_step > kEpsilon) {
+			let speed = vel.Magnitude();
+			if (time_step * speed > 2.0 * kBallRadius) {
+				time_step = Math.max(2.0 * kBallRadius / speed, kEpsilon);
+			}
+			while (time_step >= kEpsilon) {
 				time_step /= 2;
 				new_pos = pos.Add(vel.Multiply(time_step));
 				let collide_peg = board.FindNearestPeg(

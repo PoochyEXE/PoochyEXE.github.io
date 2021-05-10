@@ -40,6 +40,14 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
+### v1.4.0-beta (2021-05-10)
+* Bumpers machine updates:
+	* Add gemstone balls.
+	* Reduce costs for some upgrades.
+	* Bugfix: Points from bumpers are now multiplied by the Point Multiplier upgrade.
+* Adjust physics engine to make it much less likely for a ball to clip through a peg after being slingshotted at high velocity by a bumper.
+* Fix bug where balls would teleport a couple pixels away from a bumper immediately after hitting it.
+
 ### v1.3.3-beta (2021-05-09)
 * Tweak Bumpers machine layout so that the top center target isn't so unreasonably hard to hit.
 

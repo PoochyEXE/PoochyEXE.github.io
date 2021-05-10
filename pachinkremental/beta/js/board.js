@@ -62,6 +62,7 @@ class ScoreTarget extends Target {
 			ball.active = false;
 		}
 		this.machine.AwardPoints(this.value, ball);
+		++ball.score_targets_hit;
 	}
 	
 	ResetText() {
@@ -132,8 +133,9 @@ class Bumper extends Target {
 		let delta_norm = delta.Normalize();
 		let add_vel = delta_norm.Multiply(this.strength).Add(noise);
 		ball.vel = ball.vel.Add(add_vel);
-		ball.pos = this.pos.Add(delta_norm.Multiply(this.hitbox_radius + kBallRadius));
+		ball.pos = this.pos.Add(delta_norm.Multiply(this.hitbox_radius));
 		ball.last_hit = null;
+		++ball.bumpers_hit;
 		state.redraw_targets = true;
 	}
 

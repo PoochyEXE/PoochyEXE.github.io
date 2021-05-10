@@ -37,84 +37,6 @@ const kFirstMachinePopupTextOptions = [
 	"Disable All",
 ];
 
-function HasEightBallSpecial(ball_type_index) {
-	return (
-		ball_type_index == kFirstMachineBallTypeIDs.EIGHT_BALL ||
-		ball_type_index == kFirstMachineBallTypeIDs.BEACH_BALL
-	);
-}
-
-function HasOpalSpecial(ball_type_index) {
-	return (
-		ball_type_index == kFirstMachineBallTypeIDs.OPAL ||
-		HasEightBallSpecial(ball_type_index)
-	);
-}
-
-function HasRubySpecial(ball_type_index) {
-	return (
-		ball_type_index == kFirstMachineBallTypeIDs.RUBY ||
-		ball_type_index == kFirstMachineBallTypeIDs.TOPAZ ||
-		ball_type_index == kFirstMachineBallTypeIDs.AMETHYST ||
-		HasOpalSpecial(ball_type_index)
-	);
-}
-
-function HasSapphireSpecial(ball_type_index) {
-	return (
-		ball_type_index == kFirstMachineBallTypeIDs.SAPPHIRE ||
-		ball_type_index == kFirstMachineBallTypeIDs.TURQUOISE ||
-		ball_type_index == kFirstMachineBallTypeIDs.AMETHYST ||
-		HasOpalSpecial(ball_type_index)
-	);
-}
-
-function HasEmeraldSpecial(ball_type_index) {
-	return (
-		ball_type_index == kFirstMachineBallTypeIDs.EMERALD ||
-		ball_type_index == kFirstMachineBallTypeIDs.TOPAZ ||
-		ball_type_index == kFirstMachineBallTypeIDs.TURQUOISE ||
-		HasOpalSpecial(ball_type_index)
-	);
-}
-
-function HasTopazSpecial(ball_type_index) {
-	return (
-		ball_type_index == kFirstMachineBallTypeIDs.TOPAZ ||
-		HasOpalSpecial(ball_type_index)
-	);
-}
-
-function HasTurquoiseSpecial(ball_type_index) {
-	return (
-		ball_type_index == kFirstMachineBallTypeIDs.TURQUOISE ||
-		HasOpalSpecial(ball_type_index)
-	);
-}
-
-function HasAmethystSpecial(ball_type_index) {
-	return (
-		ball_type_index == kFirstMachineBallTypeIDs.AMETHYST ||
-		HasOpalSpecial(ball_type_index)
-	);
-}
-
-function NthGemstoneBallUnlockCost(n) {
-	return 1e12 * Math.pow(2000, n - 1);
-}
-
-function Tier1GemstoneBallRateCostFunc(level) {
-	return 5e12 * Math.pow(5, level);
-}
-
-function Tier2GemstoneBallRateCostFunc(level) {
-	return 5e18 * Math.pow(5, level);
-}
-
-function GemstoneBallRateValueFunc(level) {
-	return (level + 1) / 5.0;
-}
-
 class CenterSlotTarget extends ScoreTarget {
 	constructor({ machine, pos, draw_radius, hitbox_radius, color, id, active, value }) {
 		super({
@@ -152,7 +74,7 @@ class SpinTarget extends Target {
 	OnHit(ball) {
 		let text_pos = new Point(ball.pos.x, ball.pos.y);
 		if (
-			HasTurquoiseSpecial(ball.ball_type_index) &&
+			this.machine.HasTurquoiseSpecial(ball.ball_type_index) &&
 			this.machine.IsUnlocked("turquoise_synergy")
 		) {
 			this.machine.AwardPoints(this.machine.CenterSlotValue(), ball);
@@ -513,7 +435,6 @@ class FirstMachine extends PachinkoMachine {
 					}
 					state.redraw_auto_drop = true;
 				},
-				on_buy: null
 			})
 		);
 		upgrades_list.push(
@@ -532,7 +453,6 @@ class FirstMachine extends PachinkoMachine {
 				on_update: function() {
 					this.machine.max_balls = this.GetValue();
 				},
-				on_buy: null
 			})
 		);
 		upgrades_list.push(
@@ -570,7 +490,6 @@ class FirstMachine extends PachinkoMachine {
 					this.machine.special_ball_multiplier = this.GetValue();
 					this.machine.bonus_wheel.UpdateAllSpaces();
 				},
-				on_buy: null
 			})
 		);
 		upgrades_list.push(
@@ -648,7 +567,7 @@ class FirstMachine extends PachinkoMachine {
 				category: "bonus_wheel",
 				description:
 					'Change the "Drop 7 gold balls" space to "Drop 7 special balls". One gemstone ball of each type you have unlocked replaces one of the gold balls. This automatically updates as you unlock more gemstone balls.',
-				cost: NthGemstoneBallUnlockCost(1),
+				cost: this.NthGemstoneBallUnlockCost(1),
 				visible_func: () => {
 					return this.AnyTier1GemstoneBallsUnlocked();
 				},
@@ -663,7 +582,7 @@ class FirstMachine extends PachinkoMachine {
 				category: "bonus_wheel",
 				description:
 					'Change the "Drop 3 gold balls" space to "Drop 3 gemstone balls", which drops 1 Ruby, 1 Emerald, and 1 Sapphire ball.',
-				cost: NthGemstoneBallUnlockCost(3),
+				cost: this.NthGemstoneBallUnlockCost(3),
 				visible_func: () => {
 					return this.AllTier1GemstoneBallsUnlocked();
 				},
@@ -678,7 +597,7 @@ class FirstMachine extends PachinkoMachine {
 				category: "bonus_wheel",
 				description:
 					'Change the "Drop 3 gemstone balls" space to drop 1 Topaz, 1 Turquoise, and 1 Amethyst ball.',
-				cost: NthGemstoneBallUnlockCost(6),
+				cost: this.NthGemstoneBallUnlockCost(6),
 				visible_func: () => {
 					return this.AllTier2GemstoneBallsUnlocked() &&
 						this.IsUnlocked("better_drops_2");
@@ -770,7 +689,6 @@ class FirstMachine extends PachinkoMachine {
 				on_update: function() {
 					this.machine.bonus_wheel_speed = this.GetValue();
 				},
-				on_buy: null
 			})
 		);
 		upgrades_list.push(
@@ -789,8 +707,8 @@ class FirstMachine extends PachinkoMachine {
 			new BallTypeRateUpgrade({
 				machine: this,
 				ball_type: this.ball_types[kFirstMachineBallTypeIDs.RUBY],
-				cost_func: Tier1GemstoneBallRateCostFunc,
-				value_func: GemstoneBallRateValueFunc,
+				cost_func: this.Tier1GemstoneBallRateCostFunc,
+				value_func: this.GemstoneBallRateValueFunc,
 				max_level: 49
 			})
 		);
@@ -822,8 +740,8 @@ class FirstMachine extends PachinkoMachine {
 			new BallTypeRateUpgrade({
 				machine: this,
 				ball_type: this.ball_types[kFirstMachineBallTypeIDs.SAPPHIRE],
-				cost_func: Tier1GemstoneBallRateCostFunc,
-				value_func: GemstoneBallRateValueFunc,
+				cost_func: this.Tier1GemstoneBallRateCostFunc,
+				value_func: this.GemstoneBallRateValueFunc,
 				max_level: 49
 			})
 		);
@@ -842,7 +760,6 @@ class FirstMachine extends PachinkoMachine {
 				on_update: function() {
 					this.machine.sapphire_ball_exponent = this.GetValue();
 				},
-				on_buy: null
 			})
 		);
 		upgrades_list.push(
@@ -861,8 +778,8 @@ class FirstMachine extends PachinkoMachine {
 			new BallTypeRateUpgrade({
 				machine: this,
 				ball_type: this.ball_types[kFirstMachineBallTypeIDs.EMERALD],
-				cost_func: Tier1GemstoneBallRateCostFunc,
-				value_func: GemstoneBallRateValueFunc,
+				cost_func: this.Tier1GemstoneBallRateCostFunc,
+				value_func: this.GemstoneBallRateValueFunc,
 				max_level: 49
 			})
 		);
@@ -881,7 +798,6 @@ class FirstMachine extends PachinkoMachine {
 				on_update: function() {
 					this.machine.emerald_ball_exponent = this.GetValue();
 				},
-				on_buy: null
 			})
 		);
 		upgrades_list.push(
@@ -900,8 +816,8 @@ class FirstMachine extends PachinkoMachine {
 			new BallTypeRateUpgrade({
 				machine: this,
 				ball_type: this.ball_types[kFirstMachineBallTypeIDs.TOPAZ],
-				cost_func: Tier2GemstoneBallRateCostFunc,
-				value_func: GemstoneBallRateValueFunc,
+				cost_func: this.Tier2GemstoneBallRateCostFunc,
+				value_func: this.GemstoneBallRateValueFunc,
 				max_level: 49
 			})
 		);
@@ -936,8 +852,8 @@ class FirstMachine extends PachinkoMachine {
 			new BallTypeRateUpgrade({
 				machine: this,
 				ball_type: this.ball_types[kFirstMachineBallTypeIDs.TURQUOISE],
-				cost_func: Tier2GemstoneBallRateCostFunc,
-				value_func: GemstoneBallRateValueFunc,
+				cost_func: this.Tier2GemstoneBallRateCostFunc,
+				value_func: this.GemstoneBallRateValueFunc,
 				max_level: 49
 			})
 		);
@@ -969,8 +885,8 @@ class FirstMachine extends PachinkoMachine {
 			new BallTypeRateUpgrade({
 				machine: this,
 				ball_type: this.ball_types[kFirstMachineBallTypeIDs.AMETHYST],
-				cost_func: Tier2GemstoneBallRateCostFunc,
-				value_func: GemstoneBallRateValueFunc,
+				cost_func: this.Tier2GemstoneBallRateCostFunc,
+				value_func: this.GemstoneBallRateValueFunc,
 				max_level: 49
 			})
 		);
@@ -1003,7 +919,7 @@ class FirstMachine extends PachinkoMachine {
 				machine: this,
 				ball_type: this.ball_types[kFirstMachineBallTypeIDs.OPAL],
 				cost_func: level => 1e32 * Math.pow(5, level),
-				value_func: GemstoneBallRateValueFunc,
+				value_func: this.GemstoneBallRateValueFunc,
 				max_level: 49
 			})
 		);
@@ -1089,7 +1005,7 @@ class FirstMachine extends PachinkoMachine {
 				machine: this,
 				ball_type: this.ball_types[kFirstMachineBallTypeIDs.BEACH_BALL],
 				cost_func: level => 1e51 * Math.pow(10, level),
-				value_func: GemstoneBallRateValueFunc,
+				value_func: this.GemstoneBallRateValueFunc,
 				max_level: 24
 			})
 		);
@@ -1406,7 +1322,7 @@ class FirstMachine extends PachinkoMachine {
 		}
 		let popup_text_level = 0;
 		if (ball.ball_type_index != kFirstMachineBallTypeIDs.NORMAL) {
-			if (HasEightBallSpecial(ball.ball_type_index)) {
+			if (this.HasEightBallSpecial(ball.ball_type_index)) {
 				popup_text_level = 3;
 				color_rgb = k8BallHighlightColor;
 				total_value *= Math.pow(
@@ -1433,7 +1349,7 @@ class FirstMachine extends PachinkoMachine {
 					total_value *= multiplier;
 					color_rgb = kPrismatic;
 				}
-			} else if (HasEmeraldSpecial(ball.ball_type_index)) {
+			} else if (this.HasEmeraldSpecial(ball.ball_type_index)) {
 				total_value *= Math.pow(
 					this.special_ball_multiplier, this.emerald_ball_exponent
 				);
@@ -1455,21 +1371,21 @@ class FirstMachine extends PachinkoMachine {
 	}
 
 	AwardSpins(ball, text_pos) {
-		if (HasSapphireSpecial(ball.ball_type_index)) {
+		if (this.HasSapphireSpecial(ball.ball_type_index)) {
 			let value = Math.pow(
 				this.special_ball_multiplier, this.sapphire_ball_exponent
 			);
 			let color_rgb = GetSetting("dark_mode") ? "32,96,255" : "0,0,255";
 			let score_text_level = 2;
 			if (
-				HasAmethystSpecial(ball.ball_type_index) &&
+				this.HasAmethystSpecial(ball.ball_type_index) &&
 				this.IsUnlocked("amethyst_synergy") &&
 				this.IsScoreBuffActive()
 			) {
 				value *= this.GetSaveData().score_buff_multiplier;
 				color_rgb = "255,0,255"
 			}
-			if (HasEightBallSpecial(ball.ball_type_index)) {
+			if (this.HasEightBallSpecial(ball.ball_type_index)) {
 				score_text_level = 3;
 				value *= Math.pow(8, this.eight_ball_spin_exponent);
 				color_rgb = k8BallHighlightColor;
@@ -1510,13 +1426,13 @@ class FirstMachine extends PachinkoMachine {
 	OnCenterSlotHit(ball) {
 		let text_pos = new Point(ball.pos.x, ball.pos.y - 10);
 		if (
-			HasTurquoiseSpecial(ball.ball_type_index) &&
+			this.HasTurquoiseSpecial(ball.ball_type_index) &&
 			this.IsUnlocked("turquoise_synergy")
 		) {
 			this.AwardSpins(ball, text_pos);
 			text_pos.y -= 10;
 		}
-		if (HasRubySpecial(ball.ball_type_index)) {
+		if (this.HasRubySpecial(ball.ball_type_index)) {
 			let multiplier = 2.0;
 			let color_rgb = "255,0,0"
 			let text_level = 2;
@@ -1529,7 +1445,7 @@ class FirstMachine extends PachinkoMachine {
 				color_rgb = k8BallHighlightColor;
 				text_level = 3;
 			} else if (
-				HasTopazSpecial(ball.ball_type_index) &&
+				this.HasTopazSpecial(ball.ball_type_index) &&
 				this.IsUnlocked("topaz_synergy")
 			) {
 				multiplier = this.emerald_ball_exponent;
@@ -1572,7 +1488,7 @@ class FirstMachine extends PachinkoMachine {
 	
 	GemstoneBallUnlockCost() {
 		let prev_unlocks = this.machine.NumGemstoneBallsUnlocked();
-		return NthGemstoneBallUnlockCost(prev_unlocks + 1);
+		return this.machine.NthGemstoneBallUnlockCost(prev_unlocks + 1);
 	}
 	
 	AllTier1GemstoneBallsUnlocked() {
@@ -1607,6 +1523,84 @@ class FirstMachine extends PachinkoMachine {
 		);
 	}
 	
+	NthGemstoneBallUnlockCost(n) {
+		return 1e12 * Math.pow(2000, n - 1);
+	}
+
+	Tier1GemstoneBallRateCostFunc(level) {
+		return 5e12 * Math.pow(5, level);
+	}
+
+	Tier2GemstoneBallRateCostFunc(level) {
+		return 5e18 * Math.pow(5, level);
+	}
+
+	GemstoneBallRateValueFunc(level) {
+		return (level + 1) / 5.0;
+	}
+
+	HasEightBallSpecial(ball_type_index) {
+		return (
+			ball_type_index == kFirstMachineBallTypeIDs.EIGHT_BALL ||
+			ball_type_index == kFirstMachineBallTypeIDs.BEACH_BALL
+		);
+	}
+
+	HasOpalSpecial(ball_type_index) {
+		return (
+			ball_type_index == kFirstMachineBallTypeIDs.OPAL ||
+			this.HasEightBallSpecial(ball_type_index)
+		);
+	}
+
+	HasRubySpecial(ball_type_index) {
+		return (
+			ball_type_index == kFirstMachineBallTypeIDs.RUBY ||
+			ball_type_index == kFirstMachineBallTypeIDs.TOPAZ ||
+			ball_type_index == kFirstMachineBallTypeIDs.AMETHYST ||
+			this.HasOpalSpecial(ball_type_index)
+		);
+	}
+
+	HasSapphireSpecial(ball_type_index) {
+		return (
+			ball_type_index == kFirstMachineBallTypeIDs.SAPPHIRE ||
+			ball_type_index == kFirstMachineBallTypeIDs.TURQUOISE ||
+			ball_type_index == kFirstMachineBallTypeIDs.AMETHYST ||
+			this.HasOpalSpecial(ball_type_index)
+		);
+	}
+
+	HasEmeraldSpecial(ball_type_index) {
+		return (
+			ball_type_index == kFirstMachineBallTypeIDs.EMERALD ||
+			ball_type_index == kFirstMachineBallTypeIDs.TOPAZ ||
+			ball_type_index == kFirstMachineBallTypeIDs.TURQUOISE ||
+			this.HasOpalSpecial(ball_type_index)
+		);
+	}
+
+	HasTopazSpecial(ball_type_index) {
+		return (
+			ball_type_index == kFirstMachineBallTypeIDs.TOPAZ ||
+			this.HasOpalSpecial(ball_type_index)
+		);
+	}
+
+	HasTurquoiseSpecial(ball_type_index) {
+		return (
+			ball_type_index == kFirstMachineBallTypeIDs.TURQUOISE ||
+			this.HasOpalSpecial(ball_type_index)
+		);
+	}
+
+	HasAmethystSpecial(ball_type_index) {
+		return (
+			ball_type_index == kFirstMachineBallTypeIDs.AMETHYST ||
+			this.HasOpalSpecial(ball_type_index)
+		);
+	}
+
 	BuffDisplayText() {
 		let save_data = this.GetSaveData();
 		if (save_data.score_buff_duration > 0) {

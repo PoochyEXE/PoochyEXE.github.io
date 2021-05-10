@@ -98,6 +98,8 @@ class Ball {
 		this.rotation = rotation;  // Counterclockwise in radians
 		this.omega = omega;  // Angular velocity in radians/second
 		this.total_rotations = 0.0;  // Total radians rotated.
+		this.score_targets_hit = 0;
+		this.bumpers_hit = 0;
 	}
 }
 
