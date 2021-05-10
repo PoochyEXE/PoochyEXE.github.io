@@ -456,7 +456,7 @@ function DrawTargets(target_sets, ctx) {
 	}
 }
 
-function DrawScoreText(score_text, font_size, duration, rise, ctx) {
+function DrawScoreText(score_text, font_size, duration, rise, stroke_color_rgb, ctx) {
 	const kPrismaticSaturation = 0.8;
 	let next_index = 0;
 	const time = Date.now();
@@ -481,6 +481,18 @@ function DrawScoreText(score_text, font_size, duration, rise, ctx) {
 			color_rgba =
 				"rgba(" + curr_text.color_rgb + ", " + (1 - fraction) + ")";
 		}
+		
+		if (stroke_color_rgb) {
+			stroke_color_rgba = 
+				"rgba(" + stroke_color_rgb + ", " + (1 - fraction) + ")";
+			ctx.strokeStyle = stroke_color_rgba;
+			ctx.strokeText(
+				curr_text.text,
+				curr_text.pos.x,
+				curr_text.pos.y - fraction * rise
+			);
+		}
+		
 		ctx.fillStyle = color_rgba;
 		ctx.fillText(
 			curr_text.text,
@@ -662,6 +674,7 @@ function DrawWheel(wheel) {
 			/*font_size=*/ 18,
 			/*duration=*/ 2000.0,
 			/*rise=*/ 50.0,
+			/*stroke_color_rgb=*/ "0, 0, 0",
 			ctx
 		);
 	}
@@ -769,6 +782,7 @@ function Draw(state) {
 			/*font_size=*/ 8,
 			/*duration=*/ 1000.0,
 			/*rise=*/ 15.0,
+			/*stroke_color_rgb=*/ null,
 			ctx
 		);
 		state.last_drawn.num_score_texts = state.score_text.length;

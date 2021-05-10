@@ -40,6 +40,10 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
+### v1.1.2 (2021-05-09)
+* Make bonus wheel pop-up text easier to read.
+* Fix 8-ball upgrade buttons still having white text when disabled in light mode.
+
 ### v1.1.1 (2021-05-03)
 * Fix drop zone being drawn 5 pixels too high in April Fools mode.
 

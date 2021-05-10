@@ -307,7 +307,7 @@ button.eightBallUpgradeButton {
 
 button.eightBallUpgradeButtonLight:disabled {
 	background: #888;
-	color: #FFF;
+	color: #000;
 }
 
 button.eightBallUpgradeButtonDark:disabled {
