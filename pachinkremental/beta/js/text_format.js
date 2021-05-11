@@ -10,8 +10,12 @@ function FormatSmallNumberShort(num) {
 	}
 }
 
-function FormatNumberScientificNotation(num) {
-	return num.toPrecision(kNumericPrecision).replace("+", "");
+function FormatNumberScientificNotation(num, trim_zeros) {
+	let result = num.toPrecision(kNumericPrecision).replace("+", "");
+	if (trim_zeros) {
+		result = result.replace(/\.?0+e/, "e");
+	}
+	return result;
 }
 
 const kShortSuffixes = [
@@ -64,13 +68,13 @@ function FormatNumberShort(num) {
 	}
 	let suffix_index = Math.floor(Math.log10(num) / 3);
 	if (suffix_index == 0) {
-		return FormatSmallNumberShort(num);
+		return FormatSmallNumberShort(num, /*trim_zeros=*/true);
 	}
 	if (
 		GetSetting("scientific_notation") ||
 		suffix_index >= kShortSuffixes.length
 	) {
-		return FormatNumberScientificNotation(num);
+		return FormatNumberScientificNotation(num, /*trim_zeros=*/true);
 	}
 	let prefix = num / Math.pow(1000, suffix_index);
 	let prefix_str = FormatSmallNumberShort(prefix);
@@ -133,7 +137,7 @@ function FormatNumberLong(num) {
 		return num.toLocaleString();
 	}
 	if (GetSetting("scientific_notation")) {
-		return FormatNumberScientificNotation(num);
+		return FormatNumberScientificNotation(num, /*trim_zeros=*/false);
 	}
 	let prefix = num / Math.pow(1000, suffix_index);
 	return prefix.toFixed(kNumericPrecision) + " " +

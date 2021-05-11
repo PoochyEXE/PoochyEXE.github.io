@@ -20,6 +20,8 @@ class Target {
 		console.error("Not implemented!");
 	}
 
+	ResetText() {}
+
 	CheckForHit(ball) {
 		if (!this.active) {
 			return;

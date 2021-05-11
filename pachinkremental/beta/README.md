@@ -40,6 +40,10 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
+### v1.4.1-beta (2021-05-10)
+* Fix some targets not updating their text when toggling scientific notation.
+* Trim trailing zeros in significand in scientific notation.
+
 ### v1.4.0-beta (2021-05-10)
 * Bumpers machine updates:
 	* Add gemstone balls.

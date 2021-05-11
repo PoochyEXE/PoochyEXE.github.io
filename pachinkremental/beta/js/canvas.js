@@ -791,7 +791,7 @@ function Draw(state) {
 	if (state.redraw_all || state.redraw_targets) {
 		let ctx = ClearLayerAndReturnContext(3);
 		for (let i = 0; i < machine.board.target_sets.length; ++i) {
-			let targets = machine.board.target_sets[0].targets;
+			let targets = machine.board.target_sets[i].targets;
 			for (let j = 0; j < targets.length; ++j) {
 				targets[j].ResetText();
 			}

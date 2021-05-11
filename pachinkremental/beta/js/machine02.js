@@ -763,7 +763,7 @@ class BumperMachine extends PachinkoMachine {
 				machine: this,
 				ball_type: this.ball_types[kBumperMachineBallTypeIDs.RUBY],
 				ball_description:
-					"The more time a Ruby ball spends bouncing around, the more points it's worth.",
+					"A Ruby ball gets +5% value (upgradable) per second.",
 				cost_func: this.GemstoneBallUnlockCost,
 				visible_func: () => {
 					return this.ShouldDisplayGemstoneBallUpgrades();
@@ -801,7 +801,7 @@ class BumperMachine extends PachinkoMachine {
 				machine: this,
 				ball_type: this.ball_types[kBumperMachineBallTypeIDs.SAPPHIRE],
 				ball_description:
-					"A Sapphire ball increases in value each time it hits a blue score target.",
+					"A Sapphire ball gets +50% value (upgradable) each time it hits a blue score target.",
 				cost_func: this.GemstoneBallUnlockCost,
 				visible_func: () => {
 					return this.ShouldDisplayGemstoneBallUpgrades();
@@ -839,7 +839,7 @@ class BumperMachine extends PachinkoMachine {
 				machine: this,
 				ball_type: this.ball_types[kBumperMachineBallTypeIDs.EMERALD],
 				ball_description:
-					"An Emerald ball increases in value each time it hits a green bumper.",
+					"An Emerald ball gets +10% value (upgradable) each time it hits a green bumper.",
 				cost_func: this.GemstoneBallUnlockCost,
 				visible_func: () => {
 					return this.ShouldDisplayGemstoneBallUpgrades();
