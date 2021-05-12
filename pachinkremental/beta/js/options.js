@@ -1,9 +1,6 @@
 const kQualityOptions = ["High", "Medium", "Low"];
-const kAprilFoolsOptions = [
-	"Disabled",
-	"Always On",
-	"Enabled",
-];
+const kAprilFoolsOptions = ["Disabled", "Always On", "Enabled"];
+const kMaxedUpgradesOptions = ["Full Size", "Shrink"];
 const kIsLiveVersion = false;
 const kLiveSaveFileName = "save_file";
 const kBetaSaveFileName = "beta_save_file";
@@ -470,6 +467,8 @@ function UpdateOptionsButtons() {
 		"Pop-up text: " + machine.CurrentPopupTextOptionName());
 	UpdateInnerHTML("button_upgrade_levels_bought",
 		"Upgrade levels bought: " + (state.save_file.options.show_upgrade_levels ? "Show" : "Hide"));
+	UpdateInnerHTML("button_maxed_upgrades",
+		"Maxed upgrades: " + kMaxedUpgradesOptions[state.save_file.options.maxed_upgrades]);
 	UpdateInnerHTML("button_april_fools",
 		"April Fools: " + kAprilFoolsOptions[GetSetting("april_fools_enabled")]);
 	UpdateInnerHTML("button_classic_opal_balls",
@@ -538,9 +537,18 @@ function ToggleBooleanOption(id) {
 	UpdateOptionsButtons();
 }
 
-function ToggleShowUpgradeLevels(id) {
+function ToggleShowUpgradeLevels() {
 	state.save_file.options.show_upgrade_levels =
 		!state.save_file.options.show_upgrade_levels;
+	state.update_upgrade_buttons = true;
+	UpdateOptionsButtons();
+}
+
+function ToggleMaxedUpgrades() {
+	++state.save_file.options.maxed_upgrades;
+	if (state.save_file.options.maxed_upgrades >= kMaxedUpgradesOptions.length) {
+		state.save_file.options.maxed_upgrades = 0;
+	}
 	state.update_upgrade_buttons = true;
 	UpdateOptionsButtons();
 }

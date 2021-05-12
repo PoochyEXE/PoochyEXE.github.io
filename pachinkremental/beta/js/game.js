@@ -173,6 +173,7 @@ function InitState() {
 				april_fools_enabled: 2,
 				quality: 0,
 				display_popup_text: 0,
+				maxed_upgrades: 1,
 			},
 		}
 	};

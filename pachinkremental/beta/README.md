@@ -40,6 +40,10 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
+### v1.4.4-beta (2021-05-12)
+* Shrink buttons for maxed upgrades, with an option to revert to the old behavior and keep them at full size.
+* Move the Gold Balls upgrades above Bonus Wheel upgrades in the Basic machine, now that shrinking maxed upgrade buttons means Board, Auto-Drop and Gold Balls upgrades can fit neatly in one row on a standard HD display (1360x768 or 1366x768).
+
 ### v1.4.3-beta (2021-05-12)
 * Adjust bumper physics so that when a bumper sends a ball flying into another bumper, the ball doesn't ricochet as wildly off the second bumper.
 * Adjust pop-up text color when buying Point Multiplier upgrade in dark mode.

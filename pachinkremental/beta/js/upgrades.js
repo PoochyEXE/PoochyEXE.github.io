@@ -49,9 +49,13 @@ class Upgrade {
 			this.on_buy = kNoop;
 		}
 	}
+	
+	IsMaxed() {
+		return this.GetLevel() >= this.max_level;
+	}
 
 	ShouldEnableButton() {
-		if (this.GetLevel() >= this.max_level) {
+		if (this.IsMaxed()) {
 			return false;
 		}
 		if (this.GetCost() > this.machine.GetSaveData().points) {
@@ -71,7 +75,7 @@ class Upgrade {
 		if (save_data.points < cost) {
 			return false;
 		}
-		if (this.GetLevel() >= this.max_level) {
+		if (this.IsMaxed()) {
 			return false;
 		}
 		let new_level = ++save_data.upgrade_levels[this.id];
@@ -108,7 +112,7 @@ class Upgrade {
 			"<br>" +
 			FormatNumberShort(this.value_func(level)) +
 			this.value_suffix;
-		if (level >= this.max_level) {
+		if (this.IsMaxed()) {
 			result += " (MAX)";
 		} else {
 			result +=
@@ -163,7 +167,7 @@ class DelayReductionUpgrade extends Upgrade {
 		let level = this.GetLevel();
 		let delay_now = this.value_func(level);
 		let rate_now = 60000.0 / delay_now;
-		if (level >= this.max_level) {
+		if (this.IsMaxed()) {
 			result +=
 				"<br>" + FormatNumberShort(delay_now) + this.value_suffix;
 			result +=
@@ -545,6 +549,11 @@ function UpdateUpgradeButtons(state) {
 					UpdateDisplay("upgrades_header_new", "inline");
 				}
 			}
+		}
+		if (disabled && GetSetting("maxed_upgrades") == 1 && upgrade.IsMaxed()) {
+			elem.classList.add("upgradeButtonMaxedShrink");
+		} else {
+			elem.classList.remove("upgradeButtonMaxedShrink");
 		}
 	}
 

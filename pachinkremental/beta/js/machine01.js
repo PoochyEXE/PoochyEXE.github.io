@@ -145,10 +145,10 @@ class FirstMachine extends PachinkoMachine {
 		return [
 			new UpgradeHeader(this, "board", "Board"),
 			new UpgradeHeader(this, "auto_drop", "Auto-Drop", this.upgrades["auto_drop"].visible_func),
-			new UpgradeHeader(this, "bonus_wheel", "Bonus Wheel", this.upgrades["unlock_bonus_wheel"].visible_func),
 			new SingleBallTypeUpgradeHeader(
 				this, this.ball_types[kFirstMachineBallTypeIDs.GOLD]
 			),
+			new UpgradeHeader(this, "bonus_wheel", "Bonus Wheel", this.upgrades["unlock_bonus_wheel"].visible_func),
 			new SingleBallTypeUpgradeHeader(
 				this, this.ball_types[kFirstMachineBallTypeIDs.EIGHT_BALL]
 			),

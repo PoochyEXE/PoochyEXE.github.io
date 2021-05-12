@@ -180,6 +180,11 @@ button.upgradeButton, button.rubyUpgradeButton, button.sapphireUpgradeButton, bu
 	transition-duration: 250ms;
 }
 
+button.upgradeButtonMaxedShrink {
+	transition-delay: 250ms;
+	font-size: 8.5px;
+}
+
 button.upgradeButtonLight {
 	background: #8C8;
 	color: #000;
