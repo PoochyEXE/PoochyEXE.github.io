@@ -40,6 +40,10 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
+### v1.4.2-beta (2021-05-11)
+* Reduce a bunch of upgrade prices for the Bumpers machine.
+* Fix some wheel spaces appearing blank before the first spin after switching machines.
+
 ### v1.4.1-beta (2021-05-10)
 * Fix some targets not updating their text when toggling scientific notation.
 * Trim trailing zeros in significand in scientific notation.

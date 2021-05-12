@@ -776,7 +776,7 @@ class BumperMachine extends PachinkoMachine {
 				ball_type: this.ball_types[kBumperMachineBallTypeIDs.RUBY],
 				cost_func: this.Tier1GemstoneBallRateCostFunc,
 				value_func: this.GemstoneBallRateValueFunc,
-				max_level: 49
+				max_level: 18
 			})
 		);
 		upgrades_list.push(
@@ -786,7 +786,7 @@ class BumperMachine extends PachinkoMachine {
 				name: "Ruby Ball Value",
 				category: "ruby_balls",
 				description: "Point value increase per second for Ruby balls.",
-				cost_func: level => 2e11 * Math.pow(5, level),
+				cost_func: level => 2e10 * Math.pow(2, level),
 				value_func: level => level + 5,
 				max_level: 45,
 				value_suffix: "%",
@@ -814,7 +814,7 @@ class BumperMachine extends PachinkoMachine {
 				ball_type: this.ball_types[kBumperMachineBallTypeIDs.SAPPHIRE],
 				cost_func: this.Tier1GemstoneBallRateCostFunc,
 				value_func: this.GemstoneBallRateValueFunc,
-				max_level: 49
+				max_level: 18
 			})
 		);
 		upgrades_list.push(
@@ -824,9 +824,9 @@ class BumperMachine extends PachinkoMachine {
 				name: "Sapphire Ball Value",
 				category: "sapphire_balls",
 				description: "Point value increase per blue target hit for Sapphire balls.",
-				cost_func: level => 2e11 * Math.pow(2, level),
-				value_func: level => (level + 10) * 5,
-				max_level: 90,
+				cost_func: level => 2e10 * Math.pow(2, level),
+				value_func: level => (level + 5) * 10,
+				max_level: 45,
 				value_suffix: "%",
 				visible_func: () => this.IsUnlocked("unlock_sapphire_balls"),
 				on_update: function() {
@@ -852,7 +852,7 @@ class BumperMachine extends PachinkoMachine {
 				ball_type: this.ball_types[kBumperMachineBallTypeIDs.EMERALD],
 				cost_func: this.Tier1GemstoneBallRateCostFunc,
 				value_func: this.GemstoneBallRateValueFunc,
-				max_level: 49
+				max_level: 18
 			})
 		);
 		upgrades_list.push(
@@ -862,9 +862,9 @@ class BumperMachine extends PachinkoMachine {
 				name: "Emerald Ball Value",
 				category: "emerald_balls",
 				description: "Point value increase per green bumper hit for Emerald balls.",
-				cost_func: level => 2e11 * Math.pow(2, level),
-				value_func: level => level + 10,
-				max_level: 90,
+				cost_func: level => 2e10 * Math.pow(2, level),
+				value_func: level => 2 * level + 10,
+				max_level: 45,
 				value_suffix: "%",
 				visible_func: () => this.IsUnlocked("unlock_emerald_balls"),
 				on_update: function() {
@@ -890,7 +890,7 @@ class BumperMachine extends PachinkoMachine {
 				ball_type: this.ball_types[kBumperMachineBallTypeIDs.TOPAZ],
 				cost_func: this.Tier2GemstoneBallRateCostFunc,
 				value_func: this.GemstoneBallRateValueFunc,
-				max_level: 49
+				max_level: 18
 			})
 		);
 		upgrades_list.push(
@@ -911,7 +911,7 @@ class BumperMachine extends PachinkoMachine {
 				ball_type: this.ball_types[kBumperMachineBallTypeIDs.TURQUOISE],
 				cost_func: this.Tier2GemstoneBallRateCostFunc,
 				value_func: this.GemstoneBallRateValueFunc,
-				max_level: 49
+				max_level: 18
 			})
 		);
 		upgrades_list.push(
@@ -932,7 +932,7 @@ class BumperMachine extends PachinkoMachine {
 				ball_type: this.ball_types[kBumperMachineBallTypeIDs.AMETHYST],
 				cost_func: this.Tier2GemstoneBallRateCostFunc,
 				value_func: this.GemstoneBallRateValueFunc,
-				max_level: 49
+				max_level: 18
 			})
 		);
 		upgrades_list.push(
@@ -953,7 +953,7 @@ class BumperMachine extends PachinkoMachine {
 				ball_type: this.ball_types[kBumperMachineBallTypeIDs.OPAL],
 				cost_func: level => 1e32 * Math.pow(5, level),
 				value_func: this.GemstoneBallRateValueFunc,
-				max_level: 49
+				max_level: 18
 			})
 		);
 		/* TODO: Add bonus wheel.
@@ -1113,19 +1113,19 @@ class BumperMachine extends PachinkoMachine {
 	}
 	
 	NthGemstoneBallUnlockCost(n) {
-		return 25e8 * Math.pow(200, n - 1);
+		return 25e8 * Math.pow(20, n - 1);
 	}
 
 	Tier1GemstoneBallRateCostFunc(level) {
-		return 1e10 * Math.pow(5, level);
+		return 1e9 * Math.pow(5, level);
 	}
 
 	Tier2GemstoneBallRateCostFunc(level) {
-		return 1e14 * Math.pow(5, level);
+		return 1e12 * Math.pow(5, level);
 	}
 
 	GemstoneBallRateValueFunc(level) {
-		return (level + 1) / 5.0;
+		return 1 + level / 2.0;
 	}
 
 	HasOpalSpecial(ball_type_index) {

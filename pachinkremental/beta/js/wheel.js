@@ -15,6 +15,7 @@ class BonusWheel {
 		for (let i = 0; i < this.spaces.length; ++i) {
 			this.spaces[i].Update();
 		}
+		state.redraw_wheel = true;
 	}
 
 	Spin() {
