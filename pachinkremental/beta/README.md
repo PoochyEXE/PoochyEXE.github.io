@@ -40,6 +40,13 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
+### v1.4.3-beta (2021-05-12)
+* Adjust bumper physics so that when a bumper sends a ball flying into another bumper, the ball doesn't ricochet as wildly off the second bumper.
+* Adjust pop-up text color when buying Point Multiplier upgrade in dark mode.
+* Reduce gold ball value upgrade price for the Bumpers machine.
+* Tweak gemstone ball note to say that "each" gemstone ball unlocked increases the cost of the others.
+* Fix Better Multi-Spin not working (broken in v1.2.0-beta).
+
 ### v1.4.2-beta (2021-05-11)
 * Reduce a bunch of upgrade prices for the Bumpers machine.
 * Fix some wheel spaces appearing blank before the first spin after switching machines.

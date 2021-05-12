@@ -128,12 +128,15 @@ class Bumper extends Target {
 		if (this.value) {
 			this.machine.AwardPoints(this.value, ball);
 		}
+		const ball_physics_params =
+			this.machine.BallTypes()[ball.ball_type_index].physics_params;
 
 		const kNoiseSigma = 0.01;
 		let noise = SampleGaussianNoise(0, kNoiseSigma);
 		let delta = this.pos.DeltaToPoint(ball.pos);
 		let delta_norm = delta.Normalize();
 		let add_vel = delta_norm.Multiply(this.strength).Add(noise);
+		ball.vel = ball.vel.Multiply(ball_physics_params.collision_elasticity);
 		ball.vel = ball.vel.Add(add_vel);
 		ball.pos = this.pos.Add(delta_norm.Multiply(this.hitbox_radius));
 		ball.last_hit = null;

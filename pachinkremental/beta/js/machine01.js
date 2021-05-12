@@ -171,7 +171,7 @@ class FirstMachine extends PachinkoMachine {
 					"amethyst_balls",
 					"opal_balls"
 				],
-				"Gemstone balls have the benefits of gold balls, plus additional bonuses.<br>NOTE: Unlocking one gemstone ball sharply increases the cost of unlocking the others!"
+				"Gemstone balls have the benefits of gold balls, plus additional bonuses.<br>NOTE: Unlocking each gemstone ball sharply increases the cost of unlocking the others!"
 			),
 		];
 	}
@@ -1166,9 +1166,9 @@ class FirstMachine extends PachinkoMachine {
 						return "Drop 3 gold balls";
 					}
 				},
-				on_hit_func: (multi_spin) => {
+				on_hit_func: (machine, multi_spin) => {
 					if (this.IsUnlocked("better_multi_spin")) {
-						state.save_file.spins += multi_spin - 1;
+						machine.GetSaveData().spins += multi_spin - 1;
 					}
 					if (this.IsUnlocked("better_drops_4")) {
 						this.DropBonusBalls(
@@ -1249,9 +1249,9 @@ class FirstMachine extends PachinkoMachine {
 						return "Drop 7 special balls";
 					}
 				},
-				on_hit_func: (multi_spin) => {
+				on_hit_func: (machine, multi_spin) => {
 					if (this.IsUnlocked("better_multi_spin")) {
-						state.save_file.spins += multi_spin - 1;
+						machine.GetSaveData().spins += multi_spin - 1;
 					}
 					if (this.IsUnlocked("better_drops_1")) {
 						let bonus_balls = [];

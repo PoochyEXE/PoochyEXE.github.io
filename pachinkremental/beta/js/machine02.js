@@ -147,7 +147,7 @@ class BumperMachine extends PachinkoMachine {
 					"amethyst_balls",
 					"opal_balls"
 				],
-				"Gemstone balls have the benefits of gold balls, plus an additional point value multiplier. Each type of gemstone ball has its own way to increase its multiplier.<br>NOTE: Unlocking one gemstone ball sharply increases the cost of unlocking the others!"
+				"Gemstone balls have the benefits of gold balls, plus an additional point value multiplier. Each type of gemstone ball has its own way to increase its multiplier.<br>NOTE: Unlocking each gemstone ball sharply increases the cost of unlocking the others!"
 			),
 		];
 	}
@@ -627,6 +627,8 @@ class BumperMachine extends PachinkoMachine {
 				on_buy: (new_level) => {
 					// Set #4 is the bumpers, so skip it.
 					const kScoreTargetSets = [0, 1, 2, 3, 5];
+					let color_rgb =
+						GetSetting("dark_mode") ? "48,96,255" : "0,0,255"
 					let bottom_targets = this.board.target_sets[0].targets;
 					let multiple = ((new_level % 3) == 2) ? "2.5" : "2"
 					let popup_text = kTimesSymbol + multiple;
@@ -638,7 +640,7 @@ class BumperMachine extends PachinkoMachine {
 								level: 3,
 								text: popup_text,
 								pos: targets[j].pos,
-								color_rgb: "0,0,255"
+								color_rgb: color_rgb
 							});
 						}
 					}
@@ -745,7 +747,7 @@ class BumperMachine extends PachinkoMachine {
 				name: "Gold Ball Value",
 				category: "gold_balls",
 				description: "Increases point multiplier for gold balls.",
-				cost_func: level => 100000 * Math.pow(10, level),
+				cost_func: level => 100000 * Math.pow(5, level),
 				value_func: level => level + 2,
 				max_level: Infinity,
 				value_suffix: kTimesSymbol,
