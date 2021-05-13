@@ -953,7 +953,7 @@ class BumperMachine extends PachinkoMachine {
 			new BallTypeRateUpgrade({
 				machine: this,
 				ball_type: this.ball_types[kBumperMachineBallTypeIDs.OPAL],
-				cost_func: level => 1e32 * Math.pow(5, level),
+				cost_func: level => 2e17 * Math.pow(5, level),
 				value_func: this.GemstoneBallRateValueFunc,
 				max_level: 18
 			})
