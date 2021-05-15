@@ -40,6 +40,9 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
+### v1.4.6-beta (2021-05-15)
+* Add option to hide pop-up text for balls set to opacity 0.
+
 ### v1.4.5-beta (2021-05-13)
 * Reduce price of Opal Ball Rate upgrade in Bumper machine.
 

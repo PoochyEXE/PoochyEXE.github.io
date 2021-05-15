@@ -170,12 +170,14 @@ class PachinkoMachine {
 
 	AwardPoints(base_value, ball) {
 		this.AddScore(base_value);
-		MaybeAddScoreText({
-			level: 0,
-			text: `+${FormatNumberShort(base_value)}`,
-			pos: ball.pos,
-			color_rgb: "0,128,0"
-		});
+		if (ShouldShowPopupTextForBallType(ball.ball_type_index)) {
+			MaybeAddScoreText({
+				level: 0,
+				text: `+${FormatNumberShort(base_value)}`,
+				pos: ball.pos,
+				color_rgb: "0,128,0"
+			});
+		}
 	}
 
 	RollBallType() {

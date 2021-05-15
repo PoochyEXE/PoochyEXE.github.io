@@ -1362,12 +1362,14 @@ class FirstMachine extends PachinkoMachine {
 			}
 		}
 		this.AddScore(total_value);
-		MaybeAddScoreText({
-			level: popup_text_level,
-			text: `+${FormatNumberShort(total_value)}`,
-			pos: ball.pos,
-			color_rgb
-		});
+		if (ShouldShowPopupTextForBallType(ball.ball_type_index)) {
+			MaybeAddScoreText({
+				level: popup_text_level,
+				text: `+${FormatNumberShort(total_value)}`,
+				pos: ball.pos,
+				color_rgb
+			});
+		}
 	}
 
 	AwardSpins(ball, text_pos) {
@@ -1404,22 +1406,26 @@ class FirstMachine extends PachinkoMachine {
 			}
 			value = Math.floor(value);
 			this.GetSaveData().spins += value;
-			UpdateSpinCounter();
-			MaybeAddScoreText({
-				level: score_text_level,
-				text: `+${FormatNumberShort(value)} Spins`,
-				pos: text_pos,
-				color_rgb: color_rgb
-			});
+			UpdateSpinCounter();			
+			if (ShouldShowPopupTextForBallType(ball.ball_type_index)) {
+				MaybeAddScoreText({
+					level: score_text_level,
+					text: `+${FormatNumberShort(value)} Spins`,
+					pos: text_pos,
+					color_rgb: color_rgb
+				});
+			}
 		} else {
 			++this.GetSaveData().spins;
 			UpdateSpinCounter();
-			MaybeAddScoreText({
-				level: 0,
-				text: "+1 Spin",
-				pos: text_pos,
-				color_rgb: "0,170,0"
-			});
+			if (ShouldShowPopupTextForBallType(ball.ball_type_index)) {
+				MaybeAddScoreText({
+					level: 0,
+					text: "+1 Spin",
+					pos: text_pos,
+					color_rgb: "0,170,0"
+				});
+			}
 		}
 	}
 
@@ -1452,12 +1458,14 @@ class FirstMachine extends PachinkoMachine {
 				color_rgb = "255,255,0"
 			}
 			let mult_display = FormatNumberShort(multiplier);
-			MaybeAddScoreText({
-				level: text_level,
-				text: mult_display + "\u00D7 scoring!",
-				pos: text_pos,
-				color_rgb: color_rgb
-			});
+			if (ShouldShowPopupTextForBallType(ball.ball_type_index)) {
+				MaybeAddScoreText({
+					level: text_level,
+					text: mult_display + "\u00D7 scoring!",
+					pos: text_pos,
+					color_rgb: color_rgb
+				});
+			}
 			this.ActivateOrExtendScoreBuff(multiplier);
 		}
 	}

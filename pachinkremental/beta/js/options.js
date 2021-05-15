@@ -125,8 +125,16 @@ function UpdateFaviconChoiceFromSaveFile(state) {
 	elem.checked = true;
 }
 
-function InitOptions(state) {
+function ShouldShowPopupTextForBallType(ball_type_index) {
+	if (GetSetting("hidden_balls_popup_text")) {
+		return true;
+	}
 	const machine = ActiveMachine(state);
+	const ball_type_name = machine.BallTypes()[ball_type_index].name;
+	return machine.GetSetting(ball_type_name + "_ball_opacity") > 0;
+}
+
+function InitOptions(state) {
 	const ball_types = ActiveMachine(state).BallTypes();
 	let html = "<b>Opacity:</b>";
 	for (let i = 0; i < ball_types.length; ++i) {
@@ -475,6 +483,8 @@ function UpdateOptionsButtons() {
 		"Style: " + (state.save_file.options.classic_opal_balls ? "Classic" : "Default"));
 	UpdateInnerHTML("button_scientific_notation",
 		"Scientific Notation: " + (state.save_file.options.scientific_notation ? "ON" : "OFF"));
+	UpdateInnerHTML("button_hidden_balls_popup_text",
+		"Pop-up text for opacity 0 balls: " + (state.save_file.options.hidden_balls_popup_text ? "Show" : "Hide"));
 }
 
 function UpdateAutoSaveInterval() {

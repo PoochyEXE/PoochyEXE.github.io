@@ -1046,12 +1046,14 @@ class BumperMachine extends PachinkoMachine {
 			}
 		}
 		this.AddScore(total_value);
-		MaybeAddScoreText({
-			level: popup_text_level,
-			text: `+${FormatNumberShort(total_value)}`,
-			pos: ball.pos,
-			color_rgb
-		});
+		if (ShouldShowPopupTextForBallType(ball.ball_type_index)) {
+			MaybeAddScoreText({
+				level: popup_text_level,
+				text: `+${FormatNumberShort(total_value)}`,
+				pos: ball.pos,
+				color_rgb
+			});
+		}
 	}
 
 	ShouldDisplayGemstoneBallUpgrades() {
