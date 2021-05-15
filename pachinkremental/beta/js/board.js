@@ -66,7 +66,7 @@ class ScoreTarget extends Target {
 		this.machine.AwardPoints(this.value, ball);
 		++ball.score_targets_hit;
 	}
-	
+
 	ResetText() {
 		this.text = FormatNumberShort(this.value);
 	}
@@ -80,7 +80,7 @@ class ScoreTarget extends Target {
 class TargetSet {
 	constructor(targets) {
 		this.targets = targets;
-		
+
 		let radius = targets[0].hitbox_radius;
 		let min_x = targets[0].pos.x - radius;
 		let max_x = targets[0].pos.x + radius;
@@ -95,7 +95,7 @@ class TargetSet {
 		}
 		this.bounding_box = new Rectangle(min_x, max_x, min_y, max_y);
 	}
-	
+
 	CheckForHit(ball) {
 		if (this.bounding_box.Contains(ball.pos)) {
 			for (let t = 0; t < this.targets.length; ++t) {
@@ -238,7 +238,7 @@ class PegBoard {
 		}
 		return result;
 	}
-	
+
 	CanDropAt(pos) {
 		for (let i = 0; i < this.drop_zones.length; ++i) {
 			if (this.drop_zones[i].Contains(pos)) {

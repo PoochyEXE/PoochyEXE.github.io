@@ -57,7 +57,7 @@ function UpdateBalls(balls, board, params) {
 				vel = vel.Add(parallel_vel.Multiply(-1 - params.collision_elasticity));
 				omega *= params.collision_elasticity;
 				omega += perp_vel.DotProduct(perp_delta) / kBallRadius;
-				
+
 				// In the extremely unlikely event a ball is balanced perfectly
 				// on top of a peg, give it a tiny nudge.
 				if (Math.abs(delta.x) < 1e-10 && Math.abs(vel.x) < 1e-10) {

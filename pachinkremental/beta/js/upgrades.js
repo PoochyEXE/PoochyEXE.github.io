@@ -49,7 +49,7 @@ class Upgrade {
 			this.on_buy = kNoop;
 		}
 	}
-	
+
 	IsMaxed() {
 		return this.GetLevel() >= this.max_level;
 	}
@@ -502,7 +502,7 @@ function InitUpgradeButtons(upgrades) {
 	}
 }
 
-function UpdateUpgrades(state) {	
+function UpdateUpgrades(state) {
 	state.update_upgrades = false;
 	let upgrades = ActiveMachine(state).upgrades;
 	for (let id in upgrades) {
@@ -519,7 +519,7 @@ function UpgradeButtonHandler(elem) {
 
 function UpdateUpgradeButtons(state) {
 	state.update_upgrade_buttons = false;
-	
+
 	const machine = ActiveMachine(state);
 
 	UpdateInnerHTML("next_upgrade_hint", machine.NextUpgradeHint());

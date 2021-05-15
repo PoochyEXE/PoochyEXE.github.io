@@ -35,18 +35,18 @@ const kBumperMachinePopupTextOptions = [
 class BumperMachine extends PachinkoMachine {
 	constructor(id, display_name) {
 		super(id, display_name, kBumperMachineBallTypes);
-		
+
 		this.ruby_ball_value_percent = 5;
 		this.sapphire_ball_value_percent = 10;
 		this.emerald_ball_value_percent = 50;
-		
+
 		//this.bonus_wheel = this.InitWheel();
 	}
-	
+
 	OnActivate() {
 		//this.bonus_wheel = this.InitWheel();
 	}
-	
+
 	BallTypes() {
 		return kBumperMachineBallTypes;
 	}
@@ -76,7 +76,7 @@ class BumperMachine extends PachinkoMachine {
 			options.display_popup_text = 0;
 		}
 	}
-	
+
 	PopupTextColorForBallType(ball_type_index) {
 		if (GetSetting("dark_mode")) {
 			const kDarkModeColors = [
@@ -106,7 +106,7 @@ class BumperMachine extends PachinkoMachine {
 			return kLightModeColors[ball_type_index];
 		}
 	}
-	
+
 	PopupTextLevelForBallType(ball_type_index) {
 		if (ball_type_index == kBumperMachineBallTypeIDs.NORMAL) {
 			return 0;
@@ -151,7 +151,7 @@ class BumperMachine extends PachinkoMachine {
 			),
 		];
 	}
-	
+
 	BaseValues() {
 		return {
 			bottom: [10, 20, 30, 50, 100, 500, 100, 50, 30, 20, 10],
@@ -160,8 +160,8 @@ class BumperMachine extends PachinkoMachine {
 			top: [5000, 10000, 5000],
 		}
 	}
-	
-	
+
+
 	InitBoard() {
 		const kBaseValues = this.BaseValues();
 		const kHorizontalSpacing = 18;
@@ -187,17 +187,17 @@ class BumperMachine extends PachinkoMachine {
 		}
 		border_polyline.push(new Point(right_x, top_y));
 		AppendInterpolatedPolyline(pegs, border_polyline, kWallSpacing);
-		
+
 		const grid_cols = [...Array(kColumns * 2 + 1)].map((_, i) =>
 			i * kHorizontalSpacing / 2.0 + kHalfWallSpace
 		);
-		
+
 		function even_grid_row(y) {
 			for (let col = 2; col < grid_cols.length - 1; col += 2) {
 				pegs.push(new Point(grid_cols[col], y));
 			}
 		}
-		
+
 		function odd_grid_row_nudgers(y) {
 			const y_above = y - kVerticalSpacing / 4;
 			const x_left = 0.25 * kHorizontalSpacing + kHalfWallSpace;
@@ -205,14 +205,14 @@ class BumperMachine extends PachinkoMachine {
 			pegs.push(new Point(x_left, y_above));
 			pegs.push(new Point(x_right, y_above));
 		}
-		
+
 		function odd_grid_row(y) {
 			for (let col = 1; col < grid_cols.length; col += 2) {
 				pegs.push(new Point(grid_cols[col], y));
 			}
 			odd_grid_row_nudgers(y);
 		}
-		
+
 		function midfield_target_set({machine, points, set_id, target_ids, values}) {
 			console.assert(points.length == values.length);
 			console.assert(points.length == target_ids.length);
@@ -232,14 +232,14 @@ class BumperMachine extends PachinkoMachine {
 			}
 			return new TargetSet(targets);
 		}
-		
+
 		// Bottom target slots
 		let y = kHeight - kHalfWallSpace;
 		for (let row = 0; row < kBottomSlotRows; ++row) {
 			y -= kWallSpacing;
 			even_grid_row(y);
 		}
-		
+
 		let target_sets = Array(0);
 
 		const kTargetDrawRadius = (kHorizontalSpacing - kWallSpacing) / 2;
@@ -269,7 +269,7 @@ class BumperMachine extends PachinkoMachine {
 			);
 		}
 		target_sets.push(new TargetSet(bottom_targets));
-		
+
 		y -= kVerticalSpacing;
 		odd_grid_row(y);
 		y -= kVerticalSpacing;
@@ -374,9 +374,9 @@ class BumperMachine extends PachinkoMachine {
 			target_ids: ["left", "middle", "right"],
 			values: kBaseValues.funnel_center,
 		}));
-		
+
 		y -= kVerticalSpacing * 2;
-		
+
 		target_sets.push(midfield_target_set({
 			machine: this,
 			points: [
@@ -397,7 +397,7 @@ class BumperMachine extends PachinkoMachine {
 			target_ids: ["outer", "inner"],
 			values: kBaseValues.funnel_sides,
 		}));
-		
+
 		y -= kVerticalSpacing / 2;
 		even_grid_row(y);
 		y -= kVerticalSpacing;
@@ -456,7 +456,7 @@ class BumperMachine extends PachinkoMachine {
 			}),
 		];
 		target_sets.push(new TargetSet(bumpers));
-		
+
 		const bumper_left_ramp = [
 			new Point(grid_cols[3], y - kVerticalSpacing * 2),
 			new Point(grid_cols[0], y - kVerticalSpacing * 2.75),
@@ -503,7 +503,7 @@ class BumperMachine extends PachinkoMachine {
 			target_ids: ["left", "center", "right"],
 			values: kBaseValues.top,
 		}));
-		
+
 		y -= kVerticalSpacing * 7.5;
 		const top_left_ramp = [
 			new Point(grid_cols[4], y),
@@ -534,7 +534,7 @@ class BumperMachine extends PachinkoMachine {
 		y -= kVerticalSpacing;
 		odd_grid_row(y);
 		y -= kVerticalSpacing;
-		
+
 		let min_drop_x = 10;
 		let max_drop_x = kWidth - 10;
 		let min_drop_y = 0;
@@ -568,7 +568,7 @@ class BumperMachine extends PachinkoMachine {
 
 		return new PegBoard(kWidth, kHeight, pegs, target_sets, drop_zones);
 	}
-	
+
 	UpdateScoreTargetSet(target_set, base_values) {
 		console.assert(target_set.targets.length == base_values.length);
 		const multiplier = this.GetUpgradeValue("multiplier");
@@ -594,10 +594,10 @@ class BumperMachine extends PachinkoMachine {
 		for (let i = 0; i < bumpers.length; ++i) {
 			bumpers[i].SetValue(bumper_value);
 		}
-		
+
 		state.redraw_targets = true;
 	}
-	
+
 	UpdateBumperValues() {
 		const base_value = this.GetUpgradeValue("bumper_value");
 		const multiplier = this.GetUpgradeValue("multiplier");
@@ -1059,7 +1059,7 @@ class BumperMachine extends PachinkoMachine {
 	ShouldDisplayGemstoneBallUpgrades() {
 		return this.IsMaxed("gold_ball_rate");
 	}
-	
+
 	NumGemstoneBallsUnlocked() {
 		let prev_unlocks = 0;
 		const kGemstoneBalls = [
@@ -1078,12 +1078,12 @@ class BumperMachine extends PachinkoMachine {
 		}
 		return prev_unlocks;
 	}
-	
+
 	GemstoneBallUnlockCost() {
 		let prev_unlocks = this.machine.NumGemstoneBallsUnlocked();
 		return this.machine.NthGemstoneBallUnlockCost(prev_unlocks + 1);
 	}
-	
+
 	AllTier1GemstoneBallsUnlocked() {
 		return (
 			this.IsUnlocked("unlock_ruby_balls") &&
@@ -1091,7 +1091,7 @@ class BumperMachine extends PachinkoMachine {
 			this.IsUnlocked("unlock_emerald_balls")
 		);
 	}
-	
+
 	AnyTier1GemstoneBallsUnlocked() {
 		return (
 			this.IsUnlocked("unlock_ruby_balls") ||
@@ -1099,7 +1099,7 @@ class BumperMachine extends PachinkoMachine {
 			this.IsUnlocked("unlock_emerald_balls")
 		);
 	}
-	
+
 	AllTier2GemstoneBallsUnlocked() {
 		return (
 			this.IsUnlocked("unlock_topaz_balls") &&
@@ -1107,7 +1107,7 @@ class BumperMachine extends PachinkoMachine {
 			this.IsUnlocked("unlock_amethyst_balls")
 		);
 	}
-	
+
 	AnyTier2GemstoneBallsUnlocked() {
 		return (
 			this.IsUnlocked("unlock_topaz_balls") ||
@@ -1115,7 +1115,7 @@ class BumperMachine extends PachinkoMachine {
 			this.IsUnlocked("unlock_amethyst_balls")
 		);
 	}
-	
+
 	NthGemstoneBallUnlockCost(n) {
 		return 25e8 * Math.pow(20, n - 1);
 	}

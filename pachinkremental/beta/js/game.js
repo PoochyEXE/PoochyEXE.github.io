@@ -71,7 +71,7 @@ function LoadActiveMachine(state) {
 	for (let i = 0; i < state.score_history.length; ++i) {
 		state.score_history[i] = 0;
 	}
-	
+
 	const machine = ActiveMachine(state);
 	const ball_types = machine.BallTypes();
 	machine.OnActivate();
@@ -85,7 +85,7 @@ function LoadActiveMachine(state) {
 				header.id;
 		}
 	}
-	
+
 	const drop_zones = machine.board.drop_zones;
 	let html = "";
 	for (let i = 0; i < drop_zones.length; ++i) {
@@ -339,7 +339,7 @@ function SwitchMachine(index) {
 	UpdateMachinesHeader(state);
 	UpdateDarkMode();
 	ResizeCanvas();
-	
+
 	for (let i = 0; i < state.score_history.length; ++i) {
 		state.score_history[i] = 0;
 	}
@@ -454,7 +454,7 @@ function OnClick(event) {
 	let board_x = canvas_x / state.canvas_scale;
 	let board_y = canvas_y / state.canvas_scale;
 	let pos = new Point(board_x, board_y);
-	
+
 	let machine = ActiveMachine(state);
 	if (machine.board.CanDropAt(pos)) {
 		let save_data = machine.GetSaveData();
@@ -478,7 +478,7 @@ function UpdateDarkMode() {
 		document.body.style.backgroundColor = "#FFF";
 		color_scheme = "light";
 	}
-	
+
 	for (let i = 0; i < kColorSchemeClasses.length; ++i) {
 		let class_mapping = kColorSchemeClasses[i];
 		let elems = document.getElementsByClassName(class_mapping.base);
@@ -529,6 +529,6 @@ function Load() {
 
 	state.intervals.update = setInterval(Update, kFrameInterval);
 	state.intervals.score_history = setInterval(UpdateScoreHistory, 5000.0);
-	
+
 	console.log("Hi there! I don't mind if people hack/cheat, but if you make any screenshots, save files, videos, etc. that way, I'd appreciate it if you clearly label them as hacked. Thanks! --Poochy.EXE");
 }

@@ -16,7 +16,7 @@ class PachinkoMachine {
 			this.ball_type_rates.push(rate_upgrade.value_func(0) / 100.0);
 		}
 	}
-	
+
 	OnActivate() {}
 
 	InitBoard() {
@@ -26,11 +26,11 @@ class PachinkoMachine {
 	InitUpgrades() {
 		console.error("Not implemented!");
 	}
-	
+
 	NextUpgradeHint() {
 		console.error("Not implemented!");
 	}
-	
+
 	DropBonusBalls(ball_types) {
 		console.error("Not implemented!");
 	}
@@ -43,7 +43,7 @@ class PachinkoMachine {
 	CurrentPopupTextOptionName() {
 		return this.GetSetting("display_popup_text") ? "Enabled" : "Disabled";
 	}
-	
+
 	BuffDisplayText() {
 		return "";
 	}
@@ -69,7 +69,7 @@ class PachinkoMachine {
 		for (let upgrade_id in this.upgrades) {
 			save_data.upgrade_levels[upgrade_id] = 0;
 		}
-		
+
 		for (let i = 0; i < this.ball_types.length; ++i) {
 			let name = this.ball_types[i].name;
 			save_data.stats[name + "_balls"] = 0;
@@ -82,7 +82,7 @@ class PachinkoMachine {
 	BallTypes() {
 		return [kNormalBallType];
 	}
-	
+
 	BallType(id) {
 		return BallTypes()[id];
 	}
@@ -90,7 +90,7 @@ class PachinkoMachine {
 	GetSaveData() {
 		return state.save_file.machines[this.id];
 	}
-	
+
 	GetSetting(id) {
 		return this.GetSaveData().options[id];
 	}

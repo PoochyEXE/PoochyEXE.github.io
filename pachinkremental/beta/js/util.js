@@ -17,7 +17,7 @@ class Point {
 	Add(vec) {
 		return new Point(this.x + vec.x, this.y + vec.y);
 	}
-	
+
 	DebugStr() {
 		return `(${this.x}, ${this.y})`
 	}
@@ -67,7 +67,7 @@ class Vector {
 	Perpendicular() {
 		return new Vector(-this.y, this.x);
 	}
-	
+
 	DebugStr() {
 		return `<${this.x}, ${this.y}>`
 	}
@@ -80,7 +80,7 @@ class Rectangle {
 		this.min_y = min_y;
 		this.max_y = max_y;
 	}
-	
+
 	Contains(point) {
 		return this.min_x <= point.x && this.max_x >= point.x &&
 			this.min_y <= point.y && this.max_y >= point.y;

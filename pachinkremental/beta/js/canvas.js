@@ -106,7 +106,7 @@ function DrawPrismaticBalls(balls, ctx) {
 		DrawGlow(
 			pos, glow_color, kGlowAlpha, kBallRadius, kBallRadius + kGlowSize, ctx
 		);
-		
+
 		let inner_x = pos.x - kBallRadius / 3;
 		let inner_y = pos.y - kBallRadius / 3;
 		let inner_r = kBallRadius / 10;
@@ -158,7 +158,7 @@ function DrawEightBalls(balls, ctx) {
 		DrawGlow(
 			pos, k8BallHighlightColor, kGlowAlpha, kBallRadius, kBallRadius + kGlowSize, ctx
 		);
-		
+
 		let inner_r = kBallRadius * kInnerRadiusFraction;
 		let outer_r = kBallRadius;
 		let gradient = ctx.createRadialGradient(
@@ -181,7 +181,7 @@ function DrawEightBallsNoGradient(balls, ctx) {
 	const kGlowAlpha = 0.5;
 	for (let i = 0; i < balls.length; ++i) {
 		let pos = balls[i].pos;
-		
+
 		// Draw highlight
 		ctx.beginPath();
 		ctx.strokeStyle = "rgba(" + k8BallHighlightColor + ", " + kGlowAlpha + ")";
@@ -189,7 +189,7 @@ function DrawEightBallsNoGradient(balls, ctx) {
 		ctx.arc(pos.x, pos.y, kBallRadius, 0, 2 * Math.PI);
 		ctx.lineWidth = 2;
 		ctx.stroke();
-		
+
 		// Draw the ball itself
 		ctx.beginPath();
 		ctx.strokeStyle = "#000";
@@ -510,9 +510,9 @@ function DrawScoreText(score_text, font_size, duration, rise, stroke_color_rgb, 
 			color_rgba =
 				"rgba(" + curr_text.color_rgb + ", " + (1 - fraction) + ")";
 		}
-		
+
 		if (stroke_color_rgb) {
-			stroke_color_rgba = 
+			stroke_color_rgba =
 				"rgba(" + stroke_color_rgb + ", " + (1 - fraction) + ")";
 			ctx.strokeStyle = stroke_color_rgba;
 			ctx.strokeText(
@@ -521,7 +521,7 @@ function DrawScoreText(score_text, font_size, duration, rise, stroke_color_rgb, 
 				curr_text.pos.y - fraction * rise
 			);
 		}
-		
+
 		ctx.fillStyle = color_rgba;
 		ctx.fillText(
 			curr_text.text,
@@ -549,7 +549,7 @@ function DrawRipples(ripples, duration, expand, ctx) {
 		}
 		let fraction = elapsed / duration;
 		let radius = curr_ripples.start_radius + expand * fraction;
-		
+
 		if (curr_ripples.color_rgb == kBeachBall) {
 			let rotation = 4.0 * Math.PI * elapsed / duration;
 			for (let i = 0; i < kPrismaticCycleColors.length; ++i) {
@@ -842,7 +842,7 @@ function Draw(state) {
 
 	// Bonus wheel
 	if (
-		machine.bonus_wheel && 
+		machine.bonus_wheel &&
 		(
 			state.redraw_all ||
 			state.redraw_wheel ||

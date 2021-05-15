@@ -51,7 +51,7 @@ class CenterSlotTarget extends ScoreTarget {
 			pass_through: false
 		});
 	}
-	
+
 	OnHit(ball) {
 		super.OnHit(ball);
 		this.machine.OnCenterSlotHit(ball);
@@ -87,7 +87,7 @@ class SpinTarget extends Target {
 class FirstMachine extends PachinkoMachine {
 	constructor(id, display_name) {
 		super(id, display_name, kFirstMachineBallTypes);
-		
+
 		this.special_ball_multiplier = 2;
 		this.sapphire_ball_exponent = 1.0;
 		this.emerald_ball_exponent = 2.0;
@@ -98,11 +98,11 @@ class FirstMachine extends PachinkoMachine {
 		this.bonus_wheel = this.InitWheel();
 		this.bonus_wheel_speed = 1.0;
 	}
-	
+
 	OnActivate() {
 		this.bonus_wheel = this.InitWheel();
 	}
-	
+
 	BallTypes() {
 		return kFirstMachineBallTypes;
 	}
@@ -175,7 +175,7 @@ class FirstMachine extends PachinkoMachine {
 			),
 		];
 	}
-	
+
 	BaseSlotValues() {
 		return [20, 100, 200, 1, 250, 1, 200, 100, 20];
 	}
@@ -191,7 +191,7 @@ class FirstMachine extends PachinkoMachine {
 		const kBottomSlotRows = 5;
 		const kWidth = kHorizontalSpacing * kColumns + kWallSpacing;
 		const kHeight = 256;
-		
+
 		let pegs = Array(0);
 		let border_polyline = Array(0);
 		const left_wall_x = kHalfWallSpace;
@@ -206,7 +206,7 @@ class FirstMachine extends PachinkoMachine {
 		}
 		border_polyline.push(new Point(right_wall_x, top_y));
 		AppendInterpolatedPolyline(pegs, border_polyline, kWallSpacing);
-		
+
 		var y = kHeight - kHalfWallSpace - kWallSpacing;
 		for (let row = 1; row < kBottomSlotRows; ++row) {
 			for (let col = 1; col < kColumns; ++col) {
@@ -1113,11 +1113,11 @@ class FirstMachine extends PachinkoMachine {
 			return "None! Congratulations, you've maxed everything that can be maxed on this machine! Check the Machines section below for a new machine!"
 		}
 	}
-	
+
 	CenterSlotValue() {
 		return this.GetUpgradeValue("center_value") * this.GetUpgradeValue("multiplier");
 	}
-	
+
 	DropBonusBalls(ball_types) {
 		let drop_zone = this.board.drop_zones[0];
 		let y = (drop_zone.min_y + drop_zone.max_y) / 2;
@@ -1127,7 +1127,7 @@ class FirstMachine extends PachinkoMachine {
 			DropBall(x, y, ball_types[i]);
 		}
 	}
-	
+
 	InitWheel() {
 		let spaces = Array(0);
 		spaces.push(
@@ -1406,7 +1406,7 @@ class FirstMachine extends PachinkoMachine {
 			}
 			value = Math.floor(value);
 			this.GetSaveData().spins += value;
-			UpdateSpinCounter();			
+			UpdateSpinCounter();
 			if (ShouldShowPopupTextForBallType(ball.ball_type_index)) {
 				MaybeAddScoreText({
 					level: score_text_level,
@@ -1469,12 +1469,12 @@ class FirstMachine extends PachinkoMachine {
 			this.ActivateOrExtendScoreBuff(multiplier);
 		}
 	}
-	
+
 	ShouldDisplayGemstoneBallUpgrades() {
 		return this.IsMaxed("gold_ball_rate") &&
 			this.IsUnlocked("unlock_bonus_wheel");
 	}
-	
+
 	NumGemstoneBallsUnlocked() {
 		let prev_unlocks = 0;
 		const kGemstoneBalls = [
@@ -1493,12 +1493,12 @@ class FirstMachine extends PachinkoMachine {
 		}
 		return prev_unlocks;
 	}
-	
+
 	GemstoneBallUnlockCost() {
 		let prev_unlocks = this.machine.NumGemstoneBallsUnlocked();
 		return this.machine.NthGemstoneBallUnlockCost(prev_unlocks + 1);
 	}
-	
+
 	AllTier1GemstoneBallsUnlocked() {
 		return (
 			this.IsUnlocked("unlock_ruby_balls") &&
@@ -1506,7 +1506,7 @@ class FirstMachine extends PachinkoMachine {
 			this.IsUnlocked("unlock_emerald_balls")
 		);
 	}
-	
+
 	AnyTier1GemstoneBallsUnlocked() {
 		return (
 			this.IsUnlocked("unlock_ruby_balls") ||
@@ -1514,7 +1514,7 @@ class FirstMachine extends PachinkoMachine {
 			this.IsUnlocked("unlock_emerald_balls")
 		);
 	}
-	
+
 	AllTier2GemstoneBallsUnlocked() {
 		return (
 			this.IsUnlocked("unlock_topaz_balls") &&
@@ -1522,7 +1522,7 @@ class FirstMachine extends PachinkoMachine {
 			this.IsUnlocked("unlock_amethyst_balls")
 		);
 	}
-	
+
 	AnyTier2GemstoneBallsUnlocked() {
 		return (
 			this.IsUnlocked("unlock_topaz_balls") ||
@@ -1530,7 +1530,7 @@ class FirstMachine extends PachinkoMachine {
 			this.IsUnlocked("unlock_amethyst_balls")
 		);
 	}
-	
+
 	NthGemstoneBallUnlockCost(n) {
 		return 1e12 * Math.pow(2000, n - 1);
 	}
@@ -1623,7 +1623,7 @@ class FirstMachine extends PachinkoMachine {
 			return "";
 		}
 	}
-	
+
 	IsScoreBuffActive() {
 		const save_data = this.GetSaveData();
 		return save_data.score_buff_multiplier > 1 &&
