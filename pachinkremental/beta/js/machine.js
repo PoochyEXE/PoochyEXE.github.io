@@ -73,6 +73,7 @@ class PachinkoMachine {
 		for (let i = 0; i < this.ball_types.length; ++i) {
 			let name = this.ball_types[i].name;
 			save_data.stats[name + "_balls"] = 0;
+			save_data.stats[name + "_balls_points_scored"] = 0;
 			save_data.options[name + "_ball_opacity"] = 100;
 		}
 
@@ -84,7 +85,7 @@ class PachinkoMachine {
 	}
 
 	BallType(id) {
-		return BallTypes()[id];
+		return this.BallTypes()[id];
 	}
 
 	GetSaveData() {
@@ -102,6 +103,16 @@ class PachinkoMachine {
 		state.score_history[0] += points;
 		state.update_stats_panel = true;
 		state.update_upgrade_buttons = true;
+	}
+
+	AddPointsForBallToStats(points, ball_type_index) {
+		let id = this.BallType(ball_type_index).name + "_balls_points_scored";
+		let save_data = this.GetSaveData();
+		if (save_data.stats[id]) {
+			save_data.stats[id] += points;
+		} else {
+			save_data.stats[id] = points;
+		}
 	}
 
 	UpgradeHeaders() {
@@ -170,6 +181,7 @@ class PachinkoMachine {
 
 	AwardPoints(base_value, ball) {
 		this.AddScore(base_value);
+		this.AddPointsForBallToStats(base_value, ball.ball_type_index);
 		if (ShouldShowPopupTextForBallType(ball.ball_type_index)) {
 			MaybeAddScoreText({
 				level: 0,

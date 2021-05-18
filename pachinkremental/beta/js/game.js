@@ -1,4 +1,4 @@
-const kVersion = "v1.4.6-beta";
+const kVersion = "v1.4.7-beta";
 const kTitleAndVersion = "Pachinkremental " + kVersion;
 
 const kFrameInterval = 1000.0 / kFPS;
@@ -115,6 +115,7 @@ function InitState() {
 		balls_by_type: [],
 		score_text: new Array(0),
 		score_history: [...Array(12)].map(_ => 0),
+		last_score_history_update: Date.now(),
 		notifications: new Array(0),
 		upgrade_headers: null,
 		upgrade_category_to_header_map: {},
@@ -145,7 +146,6 @@ function InitState() {
 		intervals: {
 			auto_save: null,
 			update: null,
-			score_history: null
 		},
 		save_file: {
 			game_version: kSaveFileVersion,
@@ -243,8 +243,8 @@ function UpdateSpinCounter() {
 
 function InitStatsPanel(state) {
 	const ball_types = ActiveMachine(state).BallTypes();
-	let html = '';
-	for (let id = 1; id < ball_types.length; ++id) {
+	let html = '<b>Balls dropped by type:</b>';
+	for (let id = 0; id < ball_types.length; ++id) {
 		let type_name = ball_types[id].name + "_balls";
 		html +=
 			'<div id="stats_container_' + type_name +
@@ -254,6 +254,18 @@ function InitStatsPanel(state) {
 			'" class="statsEntry"></span></div>';
 	}
 	UpdateInnerHTML("stats_balls_dropped_by_type", html);
+
+	html = '<b>Points scored by ball type:</b>';
+	for (let id = 0; id < ball_types.length; ++id) {
+		let type_name = ball_types[id].name + "_balls";
+		html +=
+			'<div id="stats_container_' + type_name +
+			'_points_scored" class="statsRow" style="display: none;"><b>' +
+			ball_types[id].display_name +
+			'balls: </b><span id="stats_' + type_name +
+			'_points_scored" class="statsEntry"></span></div>';
+	}
+	UpdateInnerHTML("stats_points_earned_by_ball_type", html);
 }
 
 function UpdateStatsEntry(state, key, val) {
@@ -389,6 +401,11 @@ function UpdateOneFrame(state, draw) {
 		machine.bonus_wheel.UpdateOneFrame();
 	} else if (machine.AutoSpinOn() && save_data.spins > 0) {
 		SpinBonusWheel();
+	}
+
+	if (state.last_score_history_update + 5000.0 <= state.current_time) {
+		UpdateScoreHistory();
+		state.last_score_history_update = state.current_time;
 	}
 }
 
@@ -528,7 +545,6 @@ function Load() {
 	Draw(state);
 
 	state.intervals.update = setInterval(Update, kFrameInterval);
-	state.intervals.score_history = setInterval(UpdateScoreHistory, 5000.0);
 
 	console.log("Hi there! I don't mind if people hack/cheat, but if you make any screenshots, save files, videos, etc. that way, I'd appreciate it if you clearly label them as hacked. Thanks! --Poochy.EXE");
 }

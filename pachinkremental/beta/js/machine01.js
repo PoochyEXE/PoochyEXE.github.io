@@ -113,6 +113,7 @@ class FirstMachine extends PachinkoMachine {
 		save_data.score_buff_multiplier = 0;
 		save_data.score_buff_duration = 0;
 		save_data.stats.max_buff_multiplier = 0;
+		save_data.stats.bonus_wheel_points_scored = 0;
 		save_data.options.auto_spin_enabled = false;
 		save_data.options.multi_spin_enabled = false;
 		return save_data;
@@ -1362,6 +1363,7 @@ class FirstMachine extends PachinkoMachine {
 			}
 		}
 		this.AddScore(total_value);
+		this.AddPointsForBallToStats(total_value, ball.ball_type_index);
 		if (ShouldShowPopupTextForBallType(ball.ball_type_index)) {
 			MaybeAddScoreText({
 				level: popup_text_level,

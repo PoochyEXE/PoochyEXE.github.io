@@ -1045,7 +1045,9 @@ class BumperMachine extends PachinkoMachine {
 				total_value *= multiplier;
 			}
 		}
+
 		this.AddScore(total_value);
+		this.AddPointsForBallToStats(total_value, ball.ball_type_index);
 		if (ShouldShowPopupTextForBallType(ball.ball_type_index)) {
 			MaybeAddScoreText({
 				level: popup_text_level,

@@ -113,6 +113,7 @@ class BonusWheelPointSpace extends BonusWheelSpace {
 			value *= save_file.score_buff_multiplier;
 		}
 		machine.AddScore(value);
+		save_file.stats.bonus_wheel_points_scored += value;
 		MaybeAddBonusWheelText({
 			text: `+${FormatNumberShort(value)} points`,
 			pos: kWheelPopupTextPos,

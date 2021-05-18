@@ -87,6 +87,12 @@ div.statsContainerDark {
 	background: #003;
 }
 
+div.statsSection {
+	padding-top: 5px;
+	padding-right: 5px;
+	display: inline-block;
+}
+
 div.optionsContainerLight {
 	border: 2px solid #808;
 	background: #FCF;
