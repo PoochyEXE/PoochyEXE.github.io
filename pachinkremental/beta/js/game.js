@@ -289,6 +289,17 @@ function UpdateStatsEntry(state, key, val) {
 	}
 }
 
+function IsAnySpecialBallUnlocked(state) {
+	const machine = ActiveMachine(state);
+	const ball_types = machine.BallTypes();
+	for (let i = 1; i < ball_types.length; ++i) {
+		if (machine.IsBallTypeUnlocked(ball_types[i])) {
+			return true;
+		}
+	}
+	return false;
+}
+
 function UpdateStatsPanel(state) {
 	state.update_stats_panel = false;
 	for (key in state.save_file.stats) {
@@ -300,6 +311,11 @@ function UpdateStatsPanel(state) {
 		let val = machine_stats[key];
 		UpdateStatsEntry(state, key, val);
 	}
+
+	let show_stats_by_ball_type =
+		IsAnySpecialBallUnlocked(state) ? "inline-block" : "none";
+	UpdateDisplay("stats_balls_dropped_by_type", show_stats_by_ball_type);
+	UpdateDisplay("stats_points_earned_by_ball_type", show_stats_by_ball_type);
 }
 
 function CanDrop(state) {
