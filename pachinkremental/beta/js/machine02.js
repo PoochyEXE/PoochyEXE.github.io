@@ -157,7 +157,8 @@ class BumperMachine extends PachinkoMachine {
 			bottom: [10, 20, 30, 50, 100, 500, 100, 50, 30, 20, 10],
 			funnel_center: [1000, 500, 1000],
 			funnel_sides: [50, 100],
-			top: [5000, 10000, 5000],
+			top_sides: [10000, 5000, 10000],
+			top_center: [5000, 10000],
 		}
 	}
 
@@ -495,14 +496,40 @@ class BumperMachine extends PachinkoMachine {
 		target_sets.push(midfield_target_set({
 			machine: this,
 			points: [
-				new Point(grid_cols[1], y - kVerticalSpacing * 5.5),
+				new Point(grid_cols[11], y - kVerticalSpacing * 7.625),
 				new Point(grid_cols[11], y - kVerticalSpacing * 5.5),
-				new Point(grid_cols[21], y - kVerticalSpacing * 5.5),
 			],
-			set_id: "top",
-			target_ids: ["left", "center", "right"],
-			values: kBaseValues.top,
+			set_id: "top_center",
+			target_ids: ["upper", "lower"],
+			values: kBaseValues.top_center,
 		}));
+		target_sets[target_sets.length - 1].targets[0].active = false;
+		target_sets.push(midfield_target_set({
+			machine: this,
+			points: [
+				new Point(grid_cols[1], y - kVerticalSpacing * 7.625),
+				new Point(grid_cols[1], y - kVerticalSpacing * 5.5),
+				new Point(grid_cols[1], y - kVerticalSpacing * 1.875),
+			],
+			set_id: "top_left",
+			target_ids: ["upper", "middle", "lower"],
+			values: kBaseValues.top_sides,
+		}));
+		target_sets[target_sets.length - 1].targets[0].active = false;
+		target_sets[target_sets.length - 1].targets[2].active = false;
+		target_sets.push(midfield_target_set({
+			machine: this,
+			points: [
+				new Point(grid_cols[21], y - kVerticalSpacing * 7.625),
+				new Point(grid_cols[21], y - kVerticalSpacing * 5.5),
+				new Point(grid_cols[21], y - kVerticalSpacing * 1.875),
+			],
+			set_id: "top_right",
+			target_ids: ["upper", "middle", "lower"],
+			values: kBaseValues.top_sides,
+		}));
+		target_sets[target_sets.length - 1].targets[0].active = false;
+		target_sets[target_sets.length - 1].targets[2].active = false;
 
 		y -= kVerticalSpacing * 7.5;
 		const top_left_ramp = [
@@ -584,7 +611,9 @@ class BumperMachine extends PachinkoMachine {
 		this.UpdateScoreTargetSet(target_sets[1], kBaseValues.funnel_center);
 		this.UpdateScoreTargetSet(target_sets[2], kBaseValues.funnel_sides);
 		this.UpdateScoreTargetSet(target_sets[3], kBaseValues.funnel_sides);
-		this.UpdateScoreTargetSet(target_sets[5], kBaseValues.top);
+		this.UpdateScoreTargetSet(target_sets[5], kBaseValues.top_center);
+		this.UpdateScoreTargetSet(target_sets[6], kBaseValues.top_sides);
+		this.UpdateScoreTargetSet(target_sets[7], kBaseValues.top_sides);
 
 		// Set #4 is the bumpers, which is handled differently.
 		let bumpers = target_sets[4].targets;
@@ -626,7 +655,7 @@ class BumperMachine extends PachinkoMachine {
 				on_update: () => this.UpdateScoreTargets(),
 				on_buy: (new_level) => {
 					// Set #4 is the bumpers, so skip it.
-					const kScoreTargetSets = [0, 1, 2, 3, 5];
+					const kScoreTargetSets = [0, 1, 2, 3, 5, 6, 7];
 					let color_rgb =
 						GetSetting("dark_mode") ? "48,96,255" : "0,0,255"
 					let bottom_targets = this.board.target_sets[0].targets;
@@ -636,12 +665,14 @@ class BumperMachine extends PachinkoMachine {
 						let set_number = kScoreTargetSets[i];
 						let targets = this.board.target_sets[set_number].targets;
 						for (let j = 0; j < targets.length; ++j) {
-							MaybeAddScoreText({
-								level: 3,
-								text: popup_text,
-								pos: targets[j].pos,
-								color_rgb: color_rgb
-							});
+							if (targets[j].active) {
+								MaybeAddScoreText({
+									level: 3,
+									text: popup_text,
+									pos: targets[j].pos,
+									color_rgb: color_rgb
+								});
+							}
 						}
 					}
 					/* TODO: Add bonus wheel.
@@ -663,6 +694,29 @@ class BumperMachine extends PachinkoMachine {
 				value_suffix: "",
 				visible_func: null,
 				on_update: () => this.UpdateBumperValues(),
+			})
+		);
+		upgrades_list.push(
+			new FixedCostFeatureUnlockUpgrade({
+				machine: this,
+				id: "add_score_targets",
+				name: "Add Score Targets",
+				category: "board",
+				description: "Adds 5 more high-value blue score targets in hard-to-hit places.",
+				cost: 1e11,
+				visible_func: () => {
+					return this.ShouldDisplayGemstoneBallUpgrades();
+				},
+				on_update: function() {
+					let unlocked = this.GetValue() > 0;
+					let target_sets = this.machine.board.target_sets;
+					target_sets[5].targets[0].active = unlocked;
+					target_sets[6].targets[0].active = unlocked;
+					target_sets[6].targets[2].active = unlocked;
+					target_sets[7].targets[0].active = unlocked;
+					target_sets[7].targets[2].active = unlocked;
+					state.redraw_targets = true;
+				}
 			})
 		);
 		upgrades_list.push(
@@ -765,7 +819,7 @@ class BumperMachine extends PachinkoMachine {
 				machine: this,
 				ball_type: this.ball_types[kBumperMachineBallTypeIDs.RUBY],
 				ball_description:
-					"A Ruby ball gets +5% value (upgradable) per second.",
+					"A Ruby ball gets +10% value (upgradable) per second.",
 				cost_func: this.GemstoneBallUnlockCost,
 				visible_func: () => {
 					return this.ShouldDisplayGemstoneBallUpgrades();
@@ -789,7 +843,7 @@ class BumperMachine extends PachinkoMachine {
 				category: "ruby_balls",
 				description: "Point value increase per second for Ruby balls.",
 				cost_func: level => 2e10 * Math.pow(2, level),
-				value_func: level => level + 5,
+				value_func: level => 2 * level + 10,
 				max_level: 45,
 				value_suffix: "%",
 				visible_func: () => this.IsUnlocked("unlock_ruby_balls"),

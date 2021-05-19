@@ -40,6 +40,11 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
+### v1.5.0-beta (2021-05-19)
+* Bumpers machine updates:
+	* Buff: Double Ruby ball value increase per second.
+	* Add an upgrade that adds 5 more blue score targets.
+
 ### v1.4.7-beta (2021-05-18)
 * Add stats to track points scored by each ball type.
 * Tweak the logic that computes stats for points scored in the last 5/15/60 seconds to (hopefully) make the time window cutoffs more accurate when lagging or inactive.
