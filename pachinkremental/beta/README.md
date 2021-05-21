@@ -40,6 +40,9 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
+### v1.5.1-beta (2021-05-21)
+* Lower prices for Add Score Targets, Gold Ball Rate, and Gold Ball Value upgrades on Bumpers machine.
+
 ### v1.5.0-beta (2021-05-19)
 * Bumpers machine updates:
 	* Buff: Double Ruby ball value increase per second.

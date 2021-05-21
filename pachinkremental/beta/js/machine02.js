@@ -703,7 +703,7 @@ class BumperMachine extends PachinkoMachine {
 				name: "Add Score Targets",
 				category: "board",
 				description: "Adds 5 more high-value blue score targets in hard-to-hit places.",
-				cost: 1e11,
+				cost: 1e10,
 				visible_func: () => {
 					return this.ShouldDisplayGemstoneBallUpgrades();
 				},
@@ -789,7 +789,7 @@ class BumperMachine extends PachinkoMachine {
 			new BallTypeRateUpgrade({
 				machine: this,
 				ball_type: this.ball_types[kBumperMachineBallTypeIDs.GOLD],
-				cost_func: level => 100000 * Math.pow(2, level),
+				cost_func: level => 75000 * Math.pow(2, level),
 				value_func: level => level + 1,
 				max_level: 14
 			})
@@ -801,7 +801,7 @@ class BumperMachine extends PachinkoMachine {
 				name: "Gold Ball Value",
 				category: "gold_balls",
 				description: "Increases point multiplier for gold balls.",
-				cost_func: level => 100000 * Math.pow(5, level),
+				cost_func: level => 100000 * Math.pow(2, level),
 				value_func: level => level + 2,
 				max_level: Infinity,
 				value_suffix: kTimesSymbol,
