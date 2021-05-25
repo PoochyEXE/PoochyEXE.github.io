@@ -40,6 +40,11 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
+### v1.6.0-beta (2021-05-25)
+* Bumpers machine updates:
+	* Increase max Bumper Value and lower the cost of upgrading it.
+	* Add upgrades that increase the value of the middle score targets and the bottom slots.
+
 ### v1.5.1-beta (2021-05-21)
 * Lower prices for Add Score Targets, Gold Ball Rate, and Gold Ball Value upgrades on Bumpers machine.
 

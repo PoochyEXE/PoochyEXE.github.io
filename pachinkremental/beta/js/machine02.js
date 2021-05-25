@@ -596,9 +596,8 @@ class BumperMachine extends PachinkoMachine {
 		return new PegBoard(kWidth, kHeight, pegs, target_sets, drop_zones);
 	}
 
-	UpdateScoreTargetSet(target_set, base_values) {
+	UpdateScoreTargetSet(target_set, base_values, multiplier) {
 		console.assert(target_set.targets.length == base_values.length);
-		const multiplier = this.GetUpgradeValue("multiplier");
 		for (let i = 0; i < target_set.targets.length; ++i) {
 			target_set.targets[i].SetValue(base_values[i] * multiplier);
 		}
@@ -607,13 +606,18 @@ class BumperMachine extends PachinkoMachine {
 	UpdateScoreTargets() {
 		const kBaseValues = this.BaseValues();
 		let target_sets = this.board.target_sets;
-		this.UpdateScoreTargetSet(target_sets[0], kBaseValues.bottom);
-		this.UpdateScoreTargetSet(target_sets[1], kBaseValues.funnel_center);
-		this.UpdateScoreTargetSet(target_sets[2], kBaseValues.funnel_sides);
-		this.UpdateScoreTargetSet(target_sets[3], kBaseValues.funnel_sides);
-		this.UpdateScoreTargetSet(target_sets[5], kBaseValues.top_center);
-		this.UpdateScoreTargetSet(target_sets[6], kBaseValues.top_sides);
-		this.UpdateScoreTargetSet(target_sets[7], kBaseValues.top_sides);
+		const board_mult = this.GetUpgradeValue("multiplier");
+		const middle_mult =
+			this.GetUpgradeValue("middle_target_multiplier") * board_mult;
+		const bottom_mult =
+			this.GetUpgradeValue("bottom_slot_multiplier") * board_mult;
+		this.UpdateScoreTargetSet(target_sets[0], kBaseValues.bottom, bottom_mult);
+		this.UpdateScoreTargetSet(target_sets[1], kBaseValues.funnel_center, middle_mult);
+		this.UpdateScoreTargetSet(target_sets[2], kBaseValues.funnel_sides, middle_mult);
+		this.UpdateScoreTargetSet(target_sets[3], kBaseValues.funnel_sides, middle_mult);
+		this.UpdateScoreTargetSet(target_sets[5], kBaseValues.top_center, board_mult);
+		this.UpdateScoreTargetSet(target_sets[6], kBaseValues.top_sides, board_mult);
+		this.UpdateScoreTargetSet(target_sets[7], kBaseValues.top_sides, board_mult);
 
 		// Set #4 is the bumpers, which is handled differently.
 		let bumpers = target_sets[4].targets;
@@ -688,9 +692,9 @@ class BumperMachine extends PachinkoMachine {
 				name: "Bumper Value",
 				category: "board",
 				description: "Points awarded by bumpers when hit.",
-				cost_func: level => 100 * Math.pow(10, level),
+				cost_func: level => 100 * Math.pow(2, level),
 				value_func: level => level * 10,
-				max_level: 10,
+				max_level: 100,
 				value_suffix: "",
 				visible_func: null,
 				on_update: () => this.UpdateBumperValues(),
@@ -717,6 +721,36 @@ class BumperMachine extends PachinkoMachine {
 					target_sets[7].targets[2].active = unlocked;
 					state.redraw_targets = true;
 				}
+			})
+		);
+		upgrades_list.push(
+			new Upgrade({
+				machine: this,
+				id: "middle_target_multiplier",
+				name: "Middle Target Value",
+				category: "board",
+				description: "Multiplies the value of the score targets in the middle section (below the bumpers).",
+				cost_func: level => 1e10 * Math.pow(100, level),
+				value_func: level => level + 1,
+				max_level: 9,
+				value_suffix: kTimesSymbol,
+				visible_func: () => this.ShouldDisplayGemstoneBallUpgrades(),
+				on_update: () => this.UpdateScoreTargets(),
+			})
+		);
+		upgrades_list.push(
+			new Upgrade({
+				machine: this,
+				id: "bottom_slot_multiplier",
+				name: "Bottom Slot Value",
+				category: "board",
+				description: "Multiplies the value of the bottom slots.",
+				cost_func: level => 1e10 * Math.pow(100, level),
+				value_func: level => level + 1,
+				max_level: 9,
+				value_suffix: kTimesSymbol,
+				visible_func: () => this.ShouldDisplayGemstoneBallUpgrades(),
+				on_update: () => this.UpdateScoreTargets(),
 			})
 		);
 		upgrades_list.push(
