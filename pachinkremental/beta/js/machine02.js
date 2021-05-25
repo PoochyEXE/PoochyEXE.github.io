@@ -817,6 +817,7 @@ class BumperMachine extends PachinkoMachine {
 					"Unlocks combos. A ball that hits multiple bumpers and/or score targets in quick succession starts a combo, which multiplies the point values of everything hit in the combo. The 2nd thing hit is worth 2&times; points, the 3rd thing hit is worth 3&times;, and so on.",
 				cost: 10000,
 				visible_func: () => this.GetUpgradeLevel("bumper_value") > 0,
+				on_buy: UpdateOptionsButtons
 			})
 		);
 		upgrades_list.push(
