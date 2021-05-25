@@ -498,22 +498,23 @@ function DrawScoreText(score_text, font_size, duration, rise, stroke_color_rgb, 
 			continue;
 		}
 		let fraction = elapsed / duration;
+		let alpha = curr_text.opacity * (1 - fraction);
 		let color_rgba = "";
 		if (curr_text.color_rgb == kPrismatic) {
 			color_rgba = GetPrismaticColor(
 				elapsed,
 				duration / 2,
 				/*saturation=*/ kPrismaticSaturation,
-				/*alpha=*/ 1 - fraction
+				alpha,
 			);
 		} else {
 			color_rgba =
-				"rgba(" + curr_text.color_rgb + ", " + (1 - fraction) + ")";
+				"rgba(" + curr_text.color_rgb + ", " + alpha + ")";
 		}
 
 		if (stroke_color_rgb) {
 			stroke_color_rgba =
-				"rgba(" + stroke_color_rgb + ", " + (1 - fraction) + ")";
+				"rgba(" + stroke_color_rgb + ", " + alpha + ")";
 			ctx.strokeStyle = stroke_color_rgba;
 			ctx.strokeText(
 				curr_text.text,

@@ -125,13 +125,14 @@ function UpdateFaviconChoiceFromSaveFile(state) {
 	elem.checked = true;
 }
 
-function ShouldShowPopupTextForBallType(ball_type_index) {
-	if (GetSetting("hidden_balls_popup_text")) {
-		return true;
+function PopupTextOpacityForBallType(ball_type_index) {
+	if (GetSetting("apply_opacity_to_popup_text")) {
+		const machine = ActiveMachine(state);
+		const ball_type_name = machine.BallTypes()[ball_type_index].name;
+		return machine.GetSetting(ball_type_name + "_ball_opacity") / 100.0;
+	} else {
+		return 1.0;
 	}
-	const machine = ActiveMachine(state);
-	const ball_type_name = machine.BallTypes()[ball_type_index].name;
-	return machine.GetSetting(ball_type_name + "_ball_opacity") > 0;
 }
 
 function InitOptions(state) {
@@ -483,8 +484,11 @@ function UpdateOptionsButtons() {
 		"Style: " + (state.save_file.options.classic_opal_balls ? "Classic" : "Default"));
 	UpdateInnerHTML("button_scientific_notation",
 		"Scientific Notation: " + (state.save_file.options.scientific_notation ? "ON" : "OFF"));
-	UpdateInnerHTML("button_hidden_balls_popup_text",
-		"Pop-up text for opacity 0 balls: " + (state.save_file.options.hidden_balls_popup_text ? "Show" : "Hide"));
+	UpdateInnerHTML("button_apply_opacity_to_popup_text",
+		"Apply opacity settings to pop-up text: " + (state.save_file.options.apply_opacity_to_popup_text ? "ON" : "OFF"));
+	UpdateDisplay("button_show_combos", ActiveMachine(state).IsUnlocked("unlock_combos") ? "inline" : "none");
+	UpdateInnerHTML("button_show_combos",
+		"Show combos: " + (state.save_file.options.show_combos ? "ON" : "OFF"));
 }
 
 function UpdateAutoSaveInterval() {

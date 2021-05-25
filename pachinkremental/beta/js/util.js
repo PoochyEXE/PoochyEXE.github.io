@@ -94,6 +94,8 @@ class Ball {
 		this.ball_type_index = ball_type_index;
 		this.active = true;
 		this.last_hit = null;
+		this.last_hit_time = null;
+		this.combo = 0;
 		this.start_time = state.current_time;
 		this.rotation = rotation;  // Counterclockwise in radians
 		this.omega = omega;  // Angular velocity in radians/second
@@ -104,11 +106,12 @@ class Ball {
 }
 
 class RisingText {
-	constructor(text, pos, color_rgb) {
+	constructor(text, pos, color_rgb, opacity) {
 		this.text = text;
 		this.pos = new Point(pos.x, pos.y);
 		this.color_rgb = color_rgb;
 		this.start_time = state.current_time;
+		this.opacity = opacity;
 	}
 }
 
@@ -186,18 +189,19 @@ function UpdateDisplay(elem_id, display) {
 	}
 }
 
-function MaybeAddScoreText({ level, text, pos, color_rgb }) {
+function MaybeAddScoreText({ level, text, pos, color_rgb, opacity }) {
 	if (
 		state.enable_score_text &&
+		opacity > 0 &&
 		level >= ActiveMachine(state).GetSetting("display_popup_text")
 	) {
-		state.score_text.push(new RisingText(text, pos, color_rgb));
+		state.score_text.push(new RisingText(text, pos, color_rgb, opacity));
 	}
 }
 
 function MaybeAddBonusWheelText({ text, pos, color_rgb }) {
 	if (state.enable_score_text) {
-		state.wheel_popup_text.push(new RisingText(text, pos, color_rgb));
+		state.wheel_popup_text.push(new RisingText(text, pos, color_rgb, 1.0));
 	}
 }
 

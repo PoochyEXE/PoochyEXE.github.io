@@ -42,8 +42,10 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 ### v1.6.0-beta (2021-05-25)
 * Bumpers machine updates:
+	* New feature: Combos!
 	* Increase max Bumper Value and lower the cost of upgrading it.
 	* Add upgrades that increase the value of the middle score targets and the bottom slots.
+* Change "Pop-up text for opacity 0 balls" option to "Apply opacity settings to pop-up text", making it apply non-zero opacity settings to pop-up text.
 
 ### v1.5.1-beta (2021-05-21)
 * Lower prices for Add Score Targets, Gold Ball Rate, and Gold Ball Value upgrades on Bumpers machine.

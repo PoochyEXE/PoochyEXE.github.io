@@ -1364,14 +1364,13 @@ class FirstMachine extends PachinkoMachine {
 		}
 		this.AddScore(total_value);
 		this.AddPointsForBallToStats(total_value, ball.ball_type_index);
-		if (ShouldShowPopupTextForBallType(ball.ball_type_index)) {
-			MaybeAddScoreText({
-				level: popup_text_level,
-				text: `+${FormatNumberShort(total_value)}`,
-				pos: ball.pos,
-				color_rgb
-			});
-		}
+		MaybeAddScoreText({
+			level: popup_text_level,
+			text: `+${FormatNumberShort(total_value)}`,
+			pos: ball.pos,
+			color_rgb,
+			opacity: PopupTextOpacityForBallType(ball.ball_type_index)
+		});
 	}
 
 	AwardSpins(ball, text_pos) {
@@ -1409,25 +1408,23 @@ class FirstMachine extends PachinkoMachine {
 			value = Math.floor(value);
 			this.GetSaveData().spins += value;
 			UpdateSpinCounter();
-			if (ShouldShowPopupTextForBallType(ball.ball_type_index)) {
-				MaybeAddScoreText({
-					level: score_text_level,
-					text: `+${FormatNumberShort(value)} Spins`,
-					pos: text_pos,
-					color_rgb: color_rgb
-				});
-			}
+			MaybeAddScoreText({
+				level: score_text_level,
+				text: `+${FormatNumberShort(value)} Spins`,
+				pos: text_pos,
+				color_rgb: color_rgb,
+				opacity: PopupTextOpacityForBallType(ball.ball_type_index),
+			});
 		} else {
 			++this.GetSaveData().spins;
 			UpdateSpinCounter();
-			if (ShouldShowPopupTextForBallType(ball.ball_type_index)) {
-				MaybeAddScoreText({
-					level: 0,
-					text: "+1 Spin",
-					pos: text_pos,
-					color_rgb: "0,170,0"
-				});
-			}
+			MaybeAddScoreText({
+				level: 0,
+				text: "+1 Spin",
+				pos: text_pos,
+				color_rgb: "0,170,0",
+				opacity: PopupTextOpacityForBallType(ball.ball_type_index),
+			});
 		}
 	}
 
@@ -1460,14 +1457,13 @@ class FirstMachine extends PachinkoMachine {
 				color_rgb = "255,255,0"
 			}
 			let mult_display = FormatNumberShort(multiplier);
-			if (ShouldShowPopupTextForBallType(ball.ball_type_index)) {
-				MaybeAddScoreText({
-					level: text_level,
-					text: mult_display + "\u00D7 scoring!",
-					pos: text_pos,
-					color_rgb: color_rgb
-				});
-			}
+			MaybeAddScoreText({
+				level: text_level,
+				text: mult_display + "\u00D7 scoring!",
+				pos: text_pos,
+				color_rgb: color_rgb,
+				opacity: PopupTextOpacityForBallType(ball.ball_type_index),
+			});
 			this.ActivateOrExtendScoreBuff(multiplier);
 		}
 	}

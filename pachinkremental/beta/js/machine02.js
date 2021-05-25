@@ -39,6 +39,7 @@ class BumperMachine extends PachinkoMachine {
 		this.ruby_ball_value_percent = 5;
 		this.sapphire_ball_value_percent = 10;
 		this.emerald_ball_value_percent = 50;
+		this.combo_timeout = 1;
 
 		//this.bonus_wheel = this.InitWheel();
 	}
@@ -125,6 +126,7 @@ class BumperMachine extends PachinkoMachine {
 		return [
 			new UpgradeHeader(this, "board", "Board"),
 			new UpgradeHeader(this, "auto_drop", "Auto-Drop", this.upgrades["auto_drop"].visible_func),
+			new UpgradeHeader(this, "combos", "Combos", this.upgrades["unlock_combos"].visible_func),
 			/* TODO: Add bonus wheel.
 			new UpgradeHeader(this, "bonus_wheel", "Bonus Wheel", this.upgrades["unlock_bonus_wheel"].visible_func),
 			*/
@@ -135,9 +137,7 @@ class BumperMachine extends PachinkoMachine {
 				this,
 				"gemstone_balls",
 				"Gemstone Balls",
-				() => {
-					return this.ShouldDisplayGemstoneBallUpgrades();
-				},
+				() => this.ShouldDisplayGemstoneBallUpgrades(),
 				[
 					"ruby_balls",
 					"topaz_balls",
@@ -708,9 +708,7 @@ class BumperMachine extends PachinkoMachine {
 				category: "board",
 				description: "Adds 5 more high-value blue score targets in hard-to-hit places.",
 				cost: 1e10,
-				visible_func: () => {
-					return this.ShouldDisplayGemstoneBallUpgrades();
-				},
+				visible_func: () => this.ShouldDisplayGemstoneBallUpgrades(),
 				on_update: function() {
 					let unlocked = this.GetValue() > 0;
 					let target_sets = this.machine.board.target_sets;
@@ -810,6 +808,35 @@ class BumperMachine extends PachinkoMachine {
 			})
 		);
 		upgrades_list.push(
+			new FixedCostFeatureUnlockUpgrade({
+				machine: this,
+				id: "unlock_combos",
+				name: "Unlock Combos",
+				category: "combos",
+				description:
+					"Unlocks combos. A ball that hits multiple bumpers and/or score targets in quick succession starts a combo, which multiplies the point values of everything hit in the combo. The 2nd thing hit is worth 2&times; points, the 3rd thing hit is worth 3&times;, and so on.",
+				cost: 10000,
+				visible_func: () => this.GetUpgradeLevel("bumper_value") > 0,
+			})
+		);
+		upgrades_list.push(
+			new Upgrade({
+				machine: this,
+				id: "combo_timeout",
+				name: "Combo Timeout",
+				category: "combos",
+				description: "Increase the time a ball can go without hitting a bumper or target before its combo breaks.",
+				cost_func: level => 1e6 * Math.pow(100, level),
+				value_func: level => (level + 1) / 2.0,
+				max_level: 9,
+				value_suffix: " sec",
+				visible_func: () => this.IsUnlocked("unlock_combos"),
+				on_update: function() {
+					this.machine.combo_timeout = this.GetValue();
+				},
+			})
+		);
+		upgrades_list.push(
 			new BallTypeUnlockUpgrade({
 				machine: this,
 				ball_type: this.ball_types[kBumperMachineBallTypeIDs.GOLD],
@@ -855,9 +882,7 @@ class BumperMachine extends PachinkoMachine {
 				ball_description:
 					"A Ruby ball gets +10% value (upgradable) per second.",
 				cost_func: this.GemstoneBallUnlockCost,
-				visible_func: () => {
-					return this.ShouldDisplayGemstoneBallUpgrades();
-				},
+				visible_func: () => this.ShouldDisplayGemstoneBallUpgrades(),
 			})
 		);
 		upgrades_list.push(
@@ -893,9 +918,7 @@ class BumperMachine extends PachinkoMachine {
 				ball_description:
 					"A Sapphire ball gets +50% value (upgradable) each time it hits a blue score target.",
 				cost_func: this.GemstoneBallUnlockCost,
-				visible_func: () => {
-					return this.ShouldDisplayGemstoneBallUpgrades();
-				},
+				visible_func: () => this.ShouldDisplayGemstoneBallUpgrades(),
 			})
 		);
 		upgrades_list.push(
@@ -931,9 +954,7 @@ class BumperMachine extends PachinkoMachine {
 				ball_description:
 					"An Emerald ball gets +10% value (upgradable) each time it hits a green bumper.",
 				cost_func: this.GemstoneBallUnlockCost,
-				visible_func: () => {
-					return this.ShouldDisplayGemstoneBallUpgrades();
-				},
+				visible_func: () => this.ShouldDisplayGemstoneBallUpgrades(),
 			})
 		);
 		upgrades_list.push(
@@ -1032,9 +1053,7 @@ class BumperMachine extends PachinkoMachine {
 				ball_description:
 					"Opal balls have the combined bonuses of all the other gemstone balls. (The three multipliers stack additively.)",
 				cost_func: this.GemstoneBallUnlockCost,
-				visible_func: () => {
-					return this.AllTier2GemstoneBallsUnlocked();
-				},
+				visible_func: () => this.AllTier2GemstoneBallsUnlocked(),
 			})
 		);
 		upgrades_list.push(
@@ -1108,9 +1127,12 @@ class BumperMachine extends PachinkoMachine {
 	}
 
 	AwardPoints(base_value, ball) {
+		const kTimesSymbol = "\u00D7";
+
 		let color_rgb = this.PopupTextColorForBallType(ball.ball_type_index);
 		let popup_text_level = this.PopupTextLevelForBallType(ball.ball_type_index);
 		let total_value = base_value;
+		
 		if (ball.ball_type_index != kBumperMachineBallTypeIDs.NORMAL) {
 			total_value *= this.special_ball_multiplier;
 			if (ball.ball_type_index != kBumperMachineBallTypeIDs.GOLD) {
@@ -1134,16 +1156,41 @@ class BumperMachine extends PachinkoMachine {
 			}
 		}
 
+		let popup_text_opacity =
+			PopupTextOpacityForBallType(ball.ball_type_index);
+		
+		if (this.IsUnlocked("unlock_combos")) {
+			const combo_timeout_ms = this.combo_timeout * 1000;
+			if (
+				ball.combo == 0 ||
+				ball.last_hit_time + combo_timeout_ms < state.current_time
+			) {
+				ball.combo = 1;
+			} else {
+				++ball.combo;
+				total_value *= ball.combo;
+				if (GetSetting("show_combos")) {
+					MaybeAddScoreText({
+						level: popup_text_level,
+						text: kTimesSymbol + ball.combo + " combo",
+						pos: new Point(ball.pos.x, ball.pos.y - 10),
+						color_rgb,
+						opacity: popup_text_opacity,
+					});
+				}
+			}
+			ball.last_hit_time = state.current_time;
+		}
+		
 		this.AddScore(total_value);
 		this.AddPointsForBallToStats(total_value, ball.ball_type_index);
-		if (ShouldShowPopupTextForBallType(ball.ball_type_index)) {
-			MaybeAddScoreText({
-				level: popup_text_level,
-				text: `+${FormatNumberShort(total_value)}`,
-				pos: ball.pos,
-				color_rgb
-			});
-		}
+		MaybeAddScoreText({
+			level: popup_text_level,
+			text: `+${FormatNumberShort(total_value)}`,
+			pos: ball.pos,
+			color_rgb,
+			opacity: popup_text_opacity,
+		});
 	}
 
 	ShouldDisplayGemstoneBallUpgrades() {
