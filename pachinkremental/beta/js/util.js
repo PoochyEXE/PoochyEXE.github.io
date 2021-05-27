@@ -96,6 +96,7 @@ class Ball {
 		this.last_hit = null;
 		this.last_hit_time = null;
 		this.combo = 0;
+		this.combo_bonus = 0;
 		this.start_time = state.current_time;
 		this.rotation = rotation;  // Counterclockwise in radians
 		this.omega = omega;  // Angular velocity in radians/second

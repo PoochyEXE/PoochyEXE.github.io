@@ -40,6 +40,9 @@ class BumperMachine extends PachinkoMachine {
 		this.sapphire_ball_value_percent = 10;
 		this.emerald_ball_value_percent = 50;
 		this.combo_timeout = 1;
+		this.hyper_multiplier = 10;
+		this.max_hyper_charge = 50000;
+		this.hyper_duration = 15000;
 
 		//this.bonus_wheel = this.InitWheel();
 	}
@@ -54,6 +57,10 @@ class BumperMachine extends PachinkoMachine {
 
 	DefaultSaveData() {
 		let save_data = super.DefaultSaveData();
+		save_data.options.auto_hyper_enabled = false;
+		save_data.hyper_charge = 0;
+		save_data.score_buff_duration = 0;
+		save_data.stats.hyper_activations = 0;
 		//save_data.options.auto_spin_enabled = false;
 		//save_data.options.multi_spin_enabled = false;
 		return save_data;
@@ -127,6 +134,7 @@ class BumperMachine extends PachinkoMachine {
 			new UpgradeHeader(this, "board", "Board"),
 			new UpgradeHeader(this, "auto_drop", "Auto-Drop", this.upgrades["auto_drop"].visible_func),
 			new UpgradeHeader(this, "combos", "Combos", this.upgrades["unlock_combos"].visible_func),
+			new UpgradeHeader(this, "hyper", "Hyper System", this.upgrades["unlock_hyper_system"].visible_func),
 			/* TODO: Add bonus wheel.
 			new UpgradeHeader(this, "bonus_wheel", "Bonus Wheel", this.upgrades["unlock_bonus_wheel"].visible_func),
 			*/
@@ -161,7 +169,6 @@ class BumperMachine extends PachinkoMachine {
 			top_center: [5000, 10000],
 		}
 	}
-
 
 	InitBoard() {
 		const kBaseValues = this.BaseValues();
@@ -814,7 +821,7 @@ class BumperMachine extends PachinkoMachine {
 				name: "Unlock Combos",
 				category: "combos",
 				description:
-					"Unlocks combos. A ball that hits multiple bumpers and/or score targets in quick succession starts a combo, which multiplies the point values of everything hit in the combo. The 2nd thing hit is worth 2&times; points, the 3rd thing hit is worth 3&times;, and so on.",
+					"Unlocks combos. A ball that hits multiple bumpers and/or score targets in quick succession starts a combo, which multiplies the point values of everything hit in the combo. The 2nd hit is worth 2&times; points, the 3rd thing hit is 3&times;, and so on.",
 				cost: 10000,
 				visible_func: () => this.GetUpgradeLevel("bumper_value") > 0,
 				on_buy: UpdateOptionsButtons
@@ -835,6 +842,48 @@ class BumperMachine extends PachinkoMachine {
 				on_update: function() {
 					this.machine.combo_timeout = this.GetValue();
 				},
+			})
+		);
+		upgrades_list.push(
+			new FixedCostFeatureUnlockUpgrade({
+				machine: this,
+				id: "gp_system",
+				name: "GP System",
+				category: "combos",
+				description:
+					'The base value of each bumper or target hit is added to the base value of all subsequent hits in the combo.' +
+					'<div class="small">Example: Hitting a 1000-point target, a 100-point bumper, then a 500-point target in a combo awards 1000 points for the 1st hit, (1000+100)\u00D72 points for the 2nd hit, and (1000+100+500)\u00D73 points for the 3rd hit.</div><div>「死ぬがよい」</div>',
+				cost: 8e8,
+				visible_func: () => this.IsUnlocked("unlock_combos"),
+			})
+		);
+		upgrades_list.push(
+			new FixedCostFeatureUnlockUpgrade({
+				machine: this,
+				id: "unlock_hyper_system",
+				name: "Hyper System",
+				category: "hyper",
+				description:
+					"Unlock the Hyper System, which is charged by combos. The more hits in a combo, the more charge it's worth. When it's fully charged, activate the Hyper System to gain 10\u00D7 scoring for 15 seconds!",
+				cost: 8e9,
+				visible_func: () => this.IsUnlocked("unlock_combos"),
+				on_buy: () => {
+					state.update_buff_display = true
+				},
+			})
+		);
+		upgrades_list.push(
+			new ToggleUnlockUpgrade({
+				machine: this,
+				id: "auto_hyper",
+				name: "Auto-Hyper",
+				category: "hyper",
+				description:
+					"Automatically activates the Hyper System when it's fully charged.",
+				cost: 8e10,
+				visible_func: () =>
+					this.IsUnlocked("unlock_hyper_system") &&
+					this.GetSaveData().stats.hyper_activations > 0,
 			})
 		);
 		upgrades_list.push(
@@ -1127,13 +1176,92 @@ class BumperMachine extends PachinkoMachine {
 		return upgrades_map;
 	}
 
+	BuffDisplayText() {
+		let save_data = this.GetSaveData();
+		if (save_data.score_buff_duration > 0) {
+			let duration_sec =
+				Math.round(save_data.score_buff_duration / 1000.0);
+			return "All scoring \u00D7" +
+				FormatNumberShort(this.hyper_multiplier) +
+				" for " + duration_sec + " seconds!";
+		} else if (this.IsUnlocked("unlock_hyper_system")) {
+			return 'Score multiplier: \u00D71';
+		} else {
+			return "";
+		}
+	}
+
+	ActivateHyperSystem() {
+		let save_data = this.GetSaveData();
+		if (save_data.hyper_charge >= this.max_hyper_charge) {
+			save_data.score_buff_duration = this.hyper_duration;
+			save_data.hyper_charge = 0;
+			++save_data.stats.hyper_activations;
+		}
+		state.update_buff_display = true;
+	}
+
+	AutoHyperOn() {
+		return this.IsUnlocked("auto_hyper") &&
+			this.GetSaveData().options.auto_hyper_enabled;
+	}
+
 	AwardPoints(base_value, ball) {
 		const kTimesSymbol = "\u00D7";
 
 		let color_rgb = this.PopupTextColorForBallType(ball.ball_type_index);
 		let popup_text_level = this.PopupTextLevelForBallType(ball.ball_type_index);
+		let popup_text_opacity =
+			PopupTextOpacityForBallType(ball.ball_type_index);
+
+		let save_data = this.GetSaveData();
 		let total_value = base_value;
-		
+
+		if (this.IsUnlocked("unlock_combos")) {
+			let gp_system_unlocked = this.IsUnlocked("gp_system");
+			const combo_timeout_ms = this.combo_timeout * 1000;
+			if (
+				ball.combo == 0 ||
+				ball.last_hit_time + combo_timeout_ms < state.current_time
+			) {
+				ball.combo = 1;
+				ball.combo_bonus = gp_system_unlocked ? base_value : 0;
+			} else {
+				++ball.combo;
+				if (gp_system_unlocked) {
+					ball.combo_bonus += base_value;
+					total_value = ball.combo_bonus;
+				}
+				total_value *= ball.combo;
+				if (GetSetting("show_combos")) {
+					MaybeAddScoreText({
+						level: popup_text_level,
+						text: kTimesSymbol + ball.combo + " combo",
+						pos: new Point(ball.pos.x, ball.pos.y - 10),
+						color_rgb,
+						opacity: popup_text_opacity,
+					});
+				}
+			}
+			ball.last_hit_time = state.current_time;
+			
+			if (this.IsUnlocked("unlock_hyper_system")) {
+				if (save_data.score_buff_duration > 0) {
+					total_value *= this.hyper_multiplier;
+				} else {
+					save_data.hyper_charge += ball.combo;
+					if (save_data.hyper_charge >= this.max_hyper_charge) {
+						if (this.AutoHyperOn()) {
+							this.ActivateHyperSystem();
+						} else {
+							save_data.hyper_charge = this.max_hyper_charge;
+						}
+					}
+					state.update_buff_display = true;
+				}
+			}
+		}
+
 		if (ball.ball_type_index != kBumperMachineBallTypeIDs.NORMAL) {
 			total_value *= this.special_ball_multiplier;
 			if (ball.ball_type_index != kBumperMachineBallTypeIDs.GOLD) {
@@ -1155,32 +1283,6 @@ class BumperMachine extends PachinkoMachine {
 				let multiplier = 1.0 + (gem_add_percent / 100.0);
 				total_value *= multiplier;
 			}
-		}
-
-		let popup_text_opacity =
-			PopupTextOpacityForBallType(ball.ball_type_index);
-		
-		if (this.IsUnlocked("unlock_combos")) {
-			const combo_timeout_ms = this.combo_timeout * 1000;
-			if (
-				ball.combo == 0 ||
-				ball.last_hit_time + combo_timeout_ms < state.current_time
-			) {
-				ball.combo = 1;
-			} else {
-				++ball.combo;
-				total_value *= ball.combo;
-				if (GetSetting("show_combos")) {
-					MaybeAddScoreText({
-						level: popup_text_level,
-						text: kTimesSymbol + ball.combo + " combo",
-						pos: new Point(ball.pos.x, ball.pos.y - 10),
-						color_rgb,
-						opacity: popup_text_opacity,
-					});
-				}
-			}
-			ball.last_hit_time = state.current_time;
 		}
 		
 		this.AddScore(total_value);

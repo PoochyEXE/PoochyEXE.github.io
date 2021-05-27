@@ -35,6 +35,10 @@ class PachinkoMachine {
 		console.error("Not implemented!");
 	}
 
+	ActivateHyperSystem() {
+		console.error("Not implemented!");
+	}
+
 	TogglePopupText() {
 		let options = this.GetSaveData().options;
 		options.display_popup_text = 1 - options.display_popup_text;

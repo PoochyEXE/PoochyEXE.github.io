@@ -2,6 +2,8 @@
 <head>
 	<title>Pachinkremental</title>
 
+	<meta charset="UTF-8">
+
 	<link rel="icon" id="favicon" type="image/png" href="favicon/normal.png">
 	<link rel="stylesheet" type="text/css" href="style.css" />
 	<link rel="preconnect" href="https://fonts.gstatic.com">
@@ -41,6 +43,15 @@
 			<td class="rightUI" style="vertical-align: top;">
 				<div id="message_box" class="messageBox">
 					<span class="messageBoxLarge">Loading...</div>
+				</div>
+				<div id="hyper_system" class="hyperContainer" style="display: none;">
+					<button type="button" class="hyperSystem" id="button_hyper" onclick="ActivateHyper()">Activate Hyper System</button>
+					<div class="menuPadding"></div>
+					<div id="hyper_meter" class="hyperMeterBorder">
+						<div id="hyper_meter_fill" class="hyperMeterFill"></div>
+					</div>
+					<div class="menuPadding"></div>
+					<div id="hyper_status"></div>
 				</div>
 				<div id="buff" class="messageBox"> </div>
 				<div id="bonus_wheel" class="bonusWheel" style="display: none;">

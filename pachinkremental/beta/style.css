@@ -11,6 +11,64 @@ canvas.bonusWheel {
 	font-family: sans-serif;
 }
 
+button.bonusWheel {
+	border: 1px solid #0F0;
+	color: #0F0;
+	background: #050;
+	border-radius: 20px;
+	font-family: sans-serif;
+	font-size: 14px;
+	margin-top: 2.5px;
+	margin-bottom: 2.5px;
+	transition-duration: 250ms;
+}
+
+button.bonusWheel:disabled {
+	border: 1px solid #080;
+	color: #080;
+	background: #555;
+}
+
+div.hyperContainer {
+	border-radius: 15px;
+	padding: 5px;
+	margin: 2.5px;
+	width: 250px;
+	text-align: center;
+	border: 2px solid #880;
+	background: #220;
+	color: #FF0;
+	font-family: sans-serif;
+}
+
+div.hyperMeterBorder {
+	border: 2px solid #FF0;
+	height: 10px;
+}
+
+button.hyperSystem {
+	border: 1px solid #FF0;
+	color: #FF0;
+	background: #550;
+	border-radius: 20px;
+	font-family: sans-serif;
+	font-size: 14px;
+	margin-top: 2.5px;
+	margin-bottom: 2.5px;
+	transition-duration: 250ms;
+}
+
+button.hyperSystem:disabled {
+	border: 1px solid #880;
+	color: #880;
+	background: #555;
+}
+
+div.hyperMeterFill {
+	background: #FF0;
+	height: 10px;
+}
+
 button.notification {
 	float: right;
 	border: 2px solid #000;
@@ -26,6 +84,14 @@ div.notifications {
 	top: 3px;
 	right: 3px;
 	font-family: sans-serif;
+}
+
+div.flavorText {
+	font-style: italic;
+}
+
+div.small {
+	font-size: 10px;
 }
 
 td.rightUI {

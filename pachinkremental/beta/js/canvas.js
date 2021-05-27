@@ -860,6 +860,7 @@ function Draw(state) {
 		UpdateAutoSaveInterval();
 		UpdateOptionsButtons();
 		UpdateSpinCounter();
+		UpdateHyperSystemDisplay();
 	}
 
 	UpdateNotifications(state);

@@ -40,6 +40,13 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
+### v1.7.0-beta (2021-05-27)
+* Bumpers machine updates:
+	* Add an upgrade to combos which makes the base value accumulate with each hit.
+	* New feature: Hyper System, which is charged up by combos and awards a 10x score buff for 15 seconds when fully charged.
+* Change the look of the "Spin the wheel!" button.
+* Fix Auto-Spin making the "Spin the wheel!" button flicker.
+
 ### v1.6.0-beta (2021-05-25)
 * Bumpers machine updates:
 	* New feature: Combos!
