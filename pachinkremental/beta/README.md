@@ -40,6 +40,9 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
+### v1.7.1-beta (2021-05-28)
+* Add upgrades for the Hyper System's score multiplier and charge rate.
+
 ### v1.7.0-beta (2021-05-27)
 * Bumpers machine updates:
 	* Add an upgrade to combos which makes the base value accumulate with each hit.

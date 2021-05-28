@@ -42,6 +42,7 @@ class BumperMachine extends PachinkoMachine {
 		this.combo_timeout = 1;
 		this.hyper_multiplier = 10;
 		this.max_hyper_charge = 50000;
+		this.hyper_charge_rate = 1.0;
 		this.hyper_duration = 15000;
 
 		//this.bonus_wheel = this.InitWheel();
@@ -873,6 +874,40 @@ class BumperMachine extends PachinkoMachine {
 			})
 		);
 		upgrades_list.push(
+			new Upgrade({
+				machine: this,
+				id: "hyper_multiplier",
+				name: "Hyper Multiplier",
+				category: "hyper",
+				description: "Increases the Hyper System score multiplier.",
+				cost_func: level => 8e10 * Math.pow(10, level),
+				value_func: level => level + 10,
+				max_level: 20,
+				value_suffix: kTimesSymbol,
+				visible_func: () => this.IsUnlocked("unlock_hyper_system"),
+				on_update: function() {
+					this.machine.hyper_multiplier = this.GetValue();
+				},
+			})
+		);
+		upgrades_list.push(
+			new Upgrade({
+				machine: this,
+				id: "hyper_charge_rate",
+				name: "Charge Rate",
+				category: "hyper",
+				description: "Makes the Hyper System charge faster.",
+				cost_func: level => 2e10 * Math.pow(3, level),
+				value_func: level => (level / 10.0) + 1.0,
+				max_level: 40,
+				value_suffix: kTimesSymbol,
+				visible_func: () => this.IsUnlocked("unlock_hyper_system"),
+				on_update: function() {
+					this.machine.hyper_charge_rate = this.GetValue();
+				},
+			})
+		);
+		upgrades_list.push(
 			new ToggleUnlockUpgrade({
 				machine: this,
 				id: "auto_hyper",
@@ -1249,7 +1284,7 @@ class BumperMachine extends PachinkoMachine {
 				if (save_data.score_buff_duration > 0) {
 					total_value *= this.hyper_multiplier;
 				} else {
-					save_data.hyper_charge += ball.combo;
+					save_data.hyper_charge += ball.combo * this.hyper_charge_rate;
 					if (save_data.hyper_charge >= this.max_hyper_charge) {
 						if (this.AutoHyperOn()) {
 							this.ActivateHyperSystem();
