@@ -670,7 +670,6 @@ class BumperMachine extends PachinkoMachine {
 					const kScoreTargetSets = [0, 1, 2, 3, 5, 6, 7];
 					let color_rgb =
 						GetSetting("dark_mode") ? "48,96,255" : "0,0,255"
-					let bottom_targets = this.board.target_sets[0].targets;
 					let multiple = ((new_level % 3) == 2) ? "2.5" : "2"
 					let popup_text = kTimesSymbol + multiple;
 					for (let i = 0; i < kScoreTargetSets.length; ++i) {
@@ -682,7 +681,8 @@ class BumperMachine extends PachinkoMachine {
 									level: 3,
 									text: popup_text,
 									pos: targets[j].pos,
-									color_rgb: color_rgb
+									color_rgb: color_rgb,
+									opacity: 1.0,
 								});
 							}
 						}
@@ -1217,7 +1217,7 @@ class BumperMachine extends PachinkoMachine {
 			let duration_sec =
 				Math.round(save_data.score_buff_duration / 1000.0);
 			return "All scoring \u00D7" +
-				FormatNumberShort(this.hyper_multiplier) +
+				FormatNumberMedium(this.hyper_multiplier) +
 				" for " + duration_sec + " seconds!";
 		} else if (this.IsUnlocked("unlock_hyper_system")) {
 			return 'Score multiplier: \u00D71';

@@ -367,7 +367,8 @@ class FirstMachine extends PachinkoMachine {
 							level: 3,
 							text: popup_text,
 							pos: bottom_targets[i].pos,
-							color_rgb: "0,0,255"
+							color_rgb: "0,0,255",
+							opacity: 1.0,
 						});
 					}
 					this.bonus_wheel.UpdateAllSpaces();
@@ -388,13 +389,14 @@ class FirstMachine extends PachinkoMachine {
 				visible_func: null,
 				on_update: () => this.UpdateBottomTargets(),
 				on_buy: (level) => {
-					let target = this.target_sets[0].targets[4];
+					let pos = this.board.target_sets[0].targets[4].pos;
 					let popup_text = kTimesSymbol + "2";
 					MaybeAddScoreText({
 						level: 3,
 						text: popup_text,
-						pos: target.pos,
-						color_rgb: "0,0,255"
+						pos: pos,
+						color_rgb: "0,0,255",
+						opacity: 1.0,
 					});
 					this.bonus_wheel.UpdateAllSpaces();
 				}
@@ -1613,7 +1615,7 @@ class FirstMachine extends PachinkoMachine {
 			let duration_sec =
 				Math.round(save_data.score_buff_duration / 1000.0);
 			return "All scoring \u00D7" +
-				FormatNumberShort(save_data.score_buff_multiplier) +
+				FormatNumberMedium(save_data.score_buff_multiplier) +
 				" for " + duration_sec + " seconds!";
 		} else if (this.IsUnlocked("unlock_ruby_balls")) {
 			return 'Score multiplier: \u00D71';

@@ -40,6 +40,10 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
+### v1.7.2-beta (2021-05-29)
+* Fix popup text not appearing when buying Point Multiplier or Center Slot Value upgrades.
+* Add engineering and 漢字 (Japanese kanji) notations.
+
 ### v1.7.1-beta (2021-05-28)
 * Add upgrades for the Hyper System's score multiplier and charge rate.
 

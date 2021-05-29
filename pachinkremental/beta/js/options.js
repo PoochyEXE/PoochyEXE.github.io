@@ -1,10 +1,11 @@
 const kQualityOptions = ["High", "Medium", "Low"];
 const kAprilFoolsOptions = ["Disabled", "Always On", "Enabled"];
 const kMaxedUpgradesOptions = ["Full Size", "Shrink"];
+const kNotationOptions = ["English", "Scientific", "Engineering", "漢字"];
 const kIsLiveVersion = false;
 const kLiveSaveFileName = "save_file";
 const kBetaSaveFileName = "beta_save_file";
-const kSaveFileVersion = 5;
+const kSaveFileVersion = 6;
 const kSaveFileName = kIsLiveVersion ? kLiveSaveFileName : kBetaSaveFileName;
 
 const kPrevSaveFileVersions = [
@@ -23,6 +24,24 @@ const kPrevSaveFileVersions = [
 	{
 		archive_id: "beta_0",
 		last_version: "v0.12.2 beta",
+	},
+
+	// 3
+	{
+		archive_id: null,
+		last_version: "v1.0.1-RC2",
+	},
+
+	// 4
+	{
+		archive_id: null,
+		last_version: "v1.1.1",
+	},
+
+	// 5
+	{
+		archive_id: null,
+		last_version: "v1.7.1-beta",
 	},
 ];
 
@@ -237,6 +256,11 @@ function LoadGame(save_file_str) {
 			...default_state.save_file.options,
 			...load_save.options
 		};
+		if (load_save.game_version < 6) {
+			state.save_file.options.notation =
+				load_save.options.scientific_notation ? 1 : 0;
+			delete state.save_file.options.scientific_notation;
+		}
 		if (load_save.game_version < 5) {
 			let first_machine_save = state.save_file.machines[kFirstMachineID];
 			for (let key in first_machine_save) {
@@ -482,8 +506,8 @@ function UpdateOptionsButtons() {
 		"April Fools: " + kAprilFoolsOptions[GetSetting("april_fools_enabled")]);
 	UpdateInnerHTML("button_classic_opal_balls",
 		"Style: " + (state.save_file.options.classic_opal_balls ? "Classic" : "Default"));
-	UpdateInnerHTML("button_scientific_notation",
-		"Scientific Notation: " + (state.save_file.options.scientific_notation ? "ON" : "OFF"));
+	UpdateInnerHTML("button_notation",
+		"Notation: " + kNotationOptions[GetSetting("notation")]);
 	UpdateInnerHTML("button_apply_opacity_to_popup_text",
 		"Apply opacity settings to pop-up text: " + (state.save_file.options.apply_opacity_to_popup_text ? "ON" : "OFF"));
 	UpdateDisplay("button_show_combos", ActiveMachine(state).IsUnlocked("unlock_combos") ? "inline" : "none");
@@ -534,9 +558,11 @@ function ToggleDarkMode() {
 	UpdateOptionsButtons();
 }
 
-function ToggleScientificNotation(id) {
-	state.save_file.options.scientific_notation =
-		!state.save_file.options.scientific_notation;
+function ToggleNotation() {
+	++state.save_file.options.notation;
+	if (state.save_file.options.notation >= kNotationOptions.length) {
+		state.save_file.options.notation = 0;
+	}
 	state.update_upgrade_buttons = true;
 	state.update_buff_display = true;
 	state.redraw_wheel = true;

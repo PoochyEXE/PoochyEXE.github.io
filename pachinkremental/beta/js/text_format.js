@@ -18,6 +18,82 @@ function FormatNumberScientificNotation(num, trim_zeros) {
 	return result;
 }
 
+function FormatNumberEngineeringNotationShort(num) {
+	let exponent = 3 * Math.floor(Math.log10(num) / 3);
+	if (exponent == 0) {
+		return FormatSmallNumberShort(num);
+	}
+	let prefix = num / Math.pow(10, exponent);
+	return FormatSmallNumberShort(prefix) + "e" + exponent.toString();
+}
+
+function FormatNumberEngineeringNotationLong(num) {
+	let exponent = 3 * Math.floor(Math.log10(num) / 3);
+	if (exponent == 0) {
+		return FormatSmallNumberShort(num);
+	}
+	let prefix = num / Math.pow(10, exponent);
+	return prefix.toFixed(kNumericPrecision) + "e" + exponent.toString();
+}
+
+const kKanji =
+	["", "万", "億", "兆", "京", "垓", "秭", "穣", "溝", "澗", "正", "載", "極"];
+
+function FormatNumberShortKanji(num) {
+	let suffix_index = Math.floor(Math.log10(num) / 4);
+	if (suffix_index == 0) {
+		return FormatSmallNumberShort(num);
+	} else if (suffix_index >= kKanji.length) {
+		return FormatNumberScientificNotation(num, /*trim_zeros=*/true);
+	}
+	let prefix = Math.round(num / Math.pow(10000, suffix_index));
+	return prefix.toString() + kKanji[suffix_index];
+}
+
+function FormatNumberMediumKanji(num) {
+	let suffix_index = Math.floor(Math.log10(num) / 4);
+	if (suffix_index == 0) {
+		return FormatSmallNumberShort(num);
+	} else if (suffix_index >= kKanji.length) {
+		return FormatNumberScientificNotation(num, /*trim_zeros=*/true);
+	}
+	let prefix2 = Math.round(num / Math.pow(10000, suffix_index - 1));
+	let prefix1 = Math.floor(prefix2 / 10000);
+	prefix2 %= 10000;
+	if (prefix2 == 0) {
+		return prefix1.toString() + kKanji[suffix_index];
+	} else {
+		return prefix1.toString() + kKanji[suffix_index] +
+			ZeroPad(prefix2.toString(), 4) + kKanji[suffix_index - 1];
+	}
+}
+
+function FormatNumberLongKanji(num) {
+	let suffix_index = Math.floor(Math.log10(num) / 4);
+	if (suffix_index == 0) {
+		return FormatSmallNumberShort(num);
+	} else if (suffix_index == 1) {
+		return FormatNumberMediumKanji(num);
+	} else if (suffix_index >= kKanji.length) {
+		return FormatNumberScientificNotation(num, /*trim_zeros=*/false);
+	}
+	let prefix3 = Math.round(num / Math.pow(10000, suffix_index - 2));
+	let prefix2 = Math.floor(prefix3 / 10000);
+	let prefix1 = Math.floor(prefix2 / 10000);
+	prefix2 %= 10000;
+	prefix3 %= 10000;
+	if (prefix3 == 0 && prefix2 == 0) {
+		return prefix1.toString() + kKanji[suffix_index];
+	} else if (prefix3 == 0) {
+		return prefix1.toString() + kKanji[suffix_index] +
+			ZeroPad(prefix2.toString(), 4) + kKanji[suffix_index - 1];
+	} else {
+	return prefix1.toString() + kKanji[suffix_index] +
+		ZeroPad(prefix2.toString(), 4) + kKanji[suffix_index - 1] +
+		ZeroPad(prefix3.toString(), 4) + kKanji[suffix_index - 2];
+	}
+}
+
 const kShortSuffixes = [
 	"",
 	"K",
@@ -62,13 +138,10 @@ const kShortSuffixes = [
 	"NoTr",
 ];
 
-function FormatNumberShort(num) {
-	if (num < 1000) {
-		return FormatSmallNumberShort(num);
-	}
+function FormatNumberShortEnglish(num) {
 	let suffix_index = Math.floor(Math.log10(num) / 3);
 	if (suffix_index == 0) {
-		return FormatSmallNumberShort(num, /*trim_zeros=*/true);
+		return FormatSmallNumberShort(num);
 	}
 	if (
 		GetSetting("scientific_notation") ||
@@ -125,19 +198,13 @@ const kLongSuffixes = [
 	"noventrigintillion",
 ];
 
-function FormatNumberLong(num) {
-	if (num < 1000) {
-		return FormatSmallNumberShort(num);
-	}
+function FormatNumberLongEnglish(num) {
 	let suffix_index = Math.floor(Math.log10(num) / 3);
-	if (suffix_index >= kShortSuffixes.length) {
-		return FormatNumberScientificNotation(num);
+	if (suffix_index >= kLongSuffixes.length) {
+		return FormatNumberScientificNotation(num, /*trim_zeros=*/false);
 	}
 	if (kLongSuffixes[suffix_index] == "") {
 		return num.toLocaleString();
-	}
-	if (GetSetting("scientific_notation")) {
-		return FormatNumberScientificNotation(num, /*trim_zeros=*/false);
 	}
 	let prefix = num / Math.pow(1000, suffix_index);
 	return prefix.toFixed(kNumericPrecision) + " " +
@@ -146,6 +213,57 @@ function FormatNumberLong(num) {
 
 function ZeroPad(num, len) {
 	return String(num).padStart(len, "0");
+}
+
+function FormatNumberShort(num) {
+	if (num < 1000) {
+		return FormatSmallNumberShort(num);
+	}
+	switch (GetSetting("notation")) {
+		case 0:
+			return FormatNumberShortEnglish(num);
+		case 1:
+		default:
+			return FormatNumberScientificNotation(num, /*trim_zeros=*/true);
+		case 2:
+			return FormatNumberEngineeringNotationShort(num);
+		case 3:
+			return FormatNumberShortKanji(num);
+	}
+}
+
+function FormatNumberMedium(num) {
+	if (num < 1000) {
+		return FormatSmallNumberShort(num);
+	}
+	switch (GetSetting("notation")) {
+		case 0:
+			return FormatNumberShortEnglish(num);
+		case 1:
+		default:
+			return FormatNumberScientificNotation(num, /*trim_zeros=*/true);
+		case 2:
+			return FormatNumberEngineeringNotationShort(num);
+		case 3:
+			return FormatNumberMediumKanji(num);
+	}
+}
+
+function FormatNumberLong(num) {
+	if (num < 1000) {
+		return FormatSmallNumberShort(num);
+	}
+	switch (GetSetting("notation")) {
+		case 0:
+			return FormatNumberLongEnglish(num);
+		case 1:
+		default:
+			return FormatNumberScientificNotation(num, /*trim_zeros=*/false);
+		case 2:
+			return FormatNumberEngineeringNotationLong(num);
+		case 3:
+			return FormatNumberLongKanji(num);
+	}
 }
 
 function FormatDurationLong(duration_ms) {

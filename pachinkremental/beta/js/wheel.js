@@ -101,7 +101,7 @@ class BonusWheelPointSpace extends BonusWheelSpace {
 	}
 
 	GetText() {
-		return FormatNumberShort(this.value_func()) + " points";
+		return FormatNumberMedium(this.value_func()) + " points";
 	}
 
 	OnHit(machine, multi_spin) {
@@ -115,7 +115,7 @@ class BonusWheelPointSpace extends BonusWheelSpace {
 		machine.AddScore(value);
 		save_file.stats.bonus_wheel_points_scored += value;
 		MaybeAddBonusWheelText({
-			text: `+${FormatNumberShort(value)} points`,
+			text: `+${FormatNumberMedium(value)} points`,
 			pos: kWheelPopupTextPos,
 			color_rgb: kWheelPopupTextColor
 		});

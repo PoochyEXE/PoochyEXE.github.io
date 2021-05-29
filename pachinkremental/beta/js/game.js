@@ -1,4 +1,4 @@
-const kVersion = "v1.7.1-beta";
+const kVersion = "v1.7.2-beta";
 const kTitleAndVersion = "Pachinkremental " + kVersion;
 
 const kFrameInterval = 1000.0 / kFPS;
@@ -168,9 +168,9 @@ function InitState() {
 				dark_mode: false,
 				classic_opal_balls: false,
 				show_upgrade_levels: false,
-				scientific_notation: false,
 				apply_opacity_to_popup_text: true,
 				show_combos: true,
+				notation: 0,
 				favicon: -1,
 				april_fools_enabled: 2,
 				quality: 0,

@@ -110,16 +110,16 @@ class Upgrade {
 		let level = this.GetLevel();
 		result +=
 			"<br>" +
-			FormatNumberShort(this.value_func(level)) +
+			FormatNumberMedium(this.value_func(level)) +
 			this.value_suffix;
 		if (this.IsMaxed()) {
 			result += " (MAX)";
 		} else {
 			result +=
 				" \u2192 " +
-				FormatNumberShort(this.value_func(level + 1)) +
+				FormatNumberMedium(this.value_func(level + 1)) +
 				this.value_suffix;
-			result += "<br>Cost: " + FormatNumberShort(this.cost_func(level));
+			result += "<br>Cost: " + FormatNumberMedium(this.cost_func(level));
 		}
 		if (GetSetting("show_upgrade_levels")) {
 			result += "<br>Bought: " + level;
@@ -169,10 +169,10 @@ class DelayReductionUpgrade extends Upgrade {
 		let rate_now = 60000.0 / delay_now;
 		if (this.IsMaxed()) {
 			result +=
-				"<br>" + FormatNumberShort(delay_now) + this.value_suffix;
+				"<br>" + FormatNumberMedium(delay_now) + this.value_suffix;
 			result +=
 				"<br>(" +
-				FormatNumberShort(rate_now) +
+				FormatNumberMedium(rate_now) +
 				" " +
 				this.item_suffix +
 				"/min) (MAX)";
@@ -180,13 +180,13 @@ class DelayReductionUpgrade extends Upgrade {
 			let delay_next = this.value_func(level + 1);
 			let rate_next = 60000.0 / delay_next;
 			result +=
-				"<br>" + FormatNumberShort(delay_now) + this.value_suffix;
+				"<br>" + FormatNumberMedium(delay_now) + this.value_suffix;
 			result +=
-				" \u2192 " + FormatNumberShort(delay_next) + this.value_suffix;
-			result += "<br>(" + FormatNumberShort(rate_now);
-			result += " \u2192 " + FormatNumberShort(rate_next);
+				" \u2192 " + FormatNumberMedium(delay_next) + this.value_suffix;
+			result += "<br>(" + FormatNumberMedium(rate_now);
+			result += " \u2192 " + FormatNumberMedium(rate_next);
 			result += " " + this.item_suffix + "/min)";
-			result += "<br>Cost: " + FormatNumberShort(this.cost_func(level));
+			result += "<br>Cost: " + FormatNumberMedium(this.cost_func(level));
 		}
 		if (GetSetting("show_upgrade_levels")) {
 			result += "<br>Bought: " + level;
@@ -234,7 +234,7 @@ class FeatureUnlockUpgrade extends Upgrade {
 	GetText() {
 		let result = "<b>" + this.name + "</b><br>";
 		if (this.GetLevel() == 0) {
-			return "<b>" + this.name + "</b><br>Cost: " + FormatNumberShort(this.cost_func());
+			return "<b>" + this.name + "</b><br>Cost: " + FormatNumberMedium(this.cost_func());
 		} else {
 			return "<b>" + this.unlocked_name + "</b><br>Unlocked!";
 		}
@@ -327,7 +327,7 @@ class ToggleUnlockUpgrade extends FixedCostFeatureUnlockUpgrade {
 	GetText() {
 		let result = "<b>" + this.name + "</b><br>";
 		if (this.GetLevel() == 0) {
-			result += "Cost: " + FormatNumberShort(this.GetCost());
+			result += "Cost: " + FormatNumberMedium(this.GetCost());
 		} else if (this.GetToggleState()) {
 			result += "ON";
 		} else {
