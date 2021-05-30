@@ -418,7 +418,7 @@ function SwitchMachine(index) {
 
 }
 
-function UpdateOneFrame(state, draw) {
+function UpdateOneFrame(state) {
 	state.current_time += kFrameInterval;
 	let machine = ActiveMachine(state);
 	let save_data = machine.GetSaveData();
@@ -498,7 +498,7 @@ function Update() {
 	}
 	for (let i = 0; i < num_frames; ++i) {
 		state.enable_score_text = num_frames - i < 60;
-		UpdateOneFrame(state, false);
+		UpdateOneFrame(state);
 	}
 
 	UpdateScoreDisplay(state, /*force_update=*/false);
