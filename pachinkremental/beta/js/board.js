@@ -141,7 +141,7 @@ class Bumper extends Target {
 		ball.pos = this.pos.Add(delta_norm.Multiply(this.hitbox_radius));
 		ball.last_hit = null;
 		++ball.bumpers_hit;
-		state.redraw_targets = true;
+		state.redraw_bumpers = true;
 	}
 
 	ResetText() {
@@ -162,13 +162,17 @@ class Bumper extends Target {
 }
 
 class PegBoard {
-	constructor(width, height, pegs, target_sets, drop_zones, bumper_sets) {
+	constructor(width, height, pegs, drop_zones, target_sets, bumper_sets) {
 		this.width = width;
 		this.height = height;
 		this.pegs = pegs;
-		this.target_sets = target_sets;
 		this.drop_zones = drop_zones;
-		this.bumper_sets = bumper_sets;
+		this.target_sets = target_sets;
+		if (bumper_sets) {
+			this.bumper_sets = bumper_sets;
+		} else {
+			this.bumper_sets = Array(0);
+		}
 		this.grid_cols = Math.ceil(width / kCellSize);
 		this.grid_rows = Math.ceil(height / kCellSize);
 		this.cache =

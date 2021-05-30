@@ -33,12 +33,13 @@
 					<button type="button" class="dropZone" id="drop_zone"
 							style="z-index: 0; left: 15px; top: 5px; width: 140px; height: 30px;"></button>
 				</span>
-				<canvas id="canvas1" class="board" style="z-index: 1;"></canvas>
-				<canvas id="canvas2" class="board" style="z-index: 2;"></canvas>
-				<canvas id="canvas3" class="board" style="z-index: 3;"></canvas>
-				<canvas id="canvas4" class="board" style="z-index: 4;"></canvas>
-				<canvas id="canvas5" class="board" style="z-index: 5;"></canvas>
-				<canvas id="canvas6" class="board" style="z-index: 6;"></canvas>
+				<canvas id="canvas_board" class="board" style="z-index: 1;"></canvas>
+				<canvas id="canvas_balls" class="board" style="z-index: 2;"></canvas>
+				<canvas id="canvas_targets" class="board" style="z-index: 3;"></canvas>
+				<canvas id="canvas_bumpers" class="board" style="z-index: 3;"></canvas>
+				<canvas id="canvas_auto_drop" class="board" style="z-index: 4;"></canvas>
+				<canvas id="canvas_score_text" class="board" style="z-index: 5;"></canvas>
+				<canvas id="canvas_ripples" class="board" style="z-index: 6;"></canvas>
 			</td>
 			<td class="rightUI" style="vertical-align: top;">
 				<div id="message_box" class="messageBox">
@@ -62,7 +63,7 @@
 							| Multi&#x2011;Spin:&nbsp;&#xD7;<span id="multi_spin_count">1</span>
 						</span>
 					</div>
-					<canvas id="canvasBonusWheel" class="bonusWheel" style="display: block; z-index: 1; margin: 5px"></canvas>
+					<canvas id="canvas_bonus_wheel" class="bonusWheel" style="display: block; z-index: 1; margin: 5px"></canvas>
 				</div>
 			</td>
 		</tr>

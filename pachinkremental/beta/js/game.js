@@ -1,10 +1,10 @@
-const kVersion = "v1.7.2-beta";
+const kVersion = "v1.7.3-beta";
 const kTitleAndVersion = "Pachinkremental " + kVersion;
 
 const kFrameInterval = 1000.0 / kFPS;
 
 const kMinCooldownToDraw = 300.0;
-const kTopCanvasLayer = "canvas6";
+const kTopCanvasLayer = "canvas_ripples";
 
 function CreateBallWithNoise(x, y, dx, dy, ball_type_index) {
 	let dNoise = SampleGaussianNoise(0.0, 20.0);
@@ -525,7 +525,7 @@ function Update() {
 	}
 
 	Draw(state);
-	if (state.update_stats_panel) {
+	if (state.update_stats_panel && !IsCollapsed("stats")) {
 		UpdateStatsPanel(state);
 	}
 	if (state.update_buff_display) {
@@ -535,7 +535,7 @@ function Update() {
 	if (state.update_upgrades) {
 		UpdateUpgrades(state);
 	}
-	if (state.update_upgrade_buttons) {
+	if (state.update_upgrade_buttons && !IsCollapsed("upgrades")) {
 		UpdateUpgradeButtons(state);
 	}
 }

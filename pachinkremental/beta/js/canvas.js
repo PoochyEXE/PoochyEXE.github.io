@@ -308,7 +308,7 @@ function DrawCircle(ctx, pos, radius, color) {
 }
 
 function GetCanvasLayer(layer_id) {
-	return document.getElementById("canvas" + layer_id);
+	return document.getElementById("canvas_" + layer_id);
 }
 
 function GetCanvasContext(layer_id) {
@@ -462,16 +462,7 @@ function DrawTargets(target_sets, ctx) {
 			}
 			const pos = target.pos;
 			let radius = target.draw_radius;
-			if (target.color == kBumperColor) {
-				if (target.hit_animation > 0) {
-					radius += kBumperHitExpandSizes[target.hit_animation];
-					target.hit_animation -= 1;
-					state.redraw_targets = true;
-				}
-				ctx.fillStyle = CreateBumperGradient(ctx, pos, radius);
-			} else {
-				ctx.fillStyle = target.color;
-			}
+			ctx.fillStyle = target.color;
 			ctx.beginPath();
 			ctx.arc(pos.x, pos.y, radius, 0, 2 * Math.PI);
 			ctx.fill();
@@ -481,6 +472,38 @@ function DrawTargets(target_sets, ctx) {
 			ctx.font = font_size + "px sans-serif";
 			let text_width = target.draw_radius * 1.5;
 			ctx.fillText(target.text, pos.x, pos.y + font_size / 3, text_width);
+		}
+	}
+}
+
+function DrawBumpers(bumper_sets, ctx) {
+	let font_size = 8;
+	for (let i = 0; i < bumper_sets.length; ++i) {
+		const bumpers = bumper_sets[i].targets;
+		for (let j = 0; j < bumpers.length; ++j) {
+			const bumper = bumpers[j];
+			if (!bumper.active) {
+				continue;
+			}
+			const pos = bumper.pos;
+			let radius = bumper.draw_radius;
+			if (bumper.hit_animation > 0) {
+				radius += kBumperHitExpandSizes[bumper.hit_animation];
+				bumper.hit_animation -= 1;
+				state.redraw_bumpers = true;
+			}
+			ctx.fillStyle = CreateBumperGradient(ctx, pos, radius);
+			ctx.beginPath();
+			ctx.arc(pos.x, pos.y, radius, 0, 2 * Math.PI);
+			ctx.fill();
+
+			if (bumper.text) {
+				ctx.textAlign = "center";
+				ctx.fillStyle = "#000";
+				ctx.font = font_size + "px sans-serif";
+				let text_width = bumper.draw_radius * 1.5;
+				ctx.fillText(bumper.text, pos.x, pos.y + font_size / 3, text_width);
+			}
 		}
 	}
 }
@@ -655,7 +678,7 @@ function DrawWheelSpace(space, is_active, left_x, top_y, ctx) {
 }
 
 function DrawWheel(wheel) {
-	let canvas = GetCanvasLayer("BonusWheel");
+	let canvas = GetCanvasLayer("bonus_wheel");
 	let ctx = canvas.getContext("2d");
 	ctx.setTransform(1, 0, 0, 1, 0, 0);
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -713,7 +736,7 @@ function DrawWheel(wheel) {
 function Draw(state) {
 	const machine = ActiveMachine(state);
 	const board = machine.board;
-	// Layer 0: Drop Zone
+	// Drop Zone
 	const can_drop =
 		CanDrop(state) ||
 		(machine.AutoDropOn() && state.auto_drop_cooldown < kMinCooldownToDraw);
@@ -750,20 +773,20 @@ function Draw(state) {
 		}
 		state.last_drawn.can_drop = can_drop;
 	}
-	// Layer 1: Board
+	// Board
 	if (state.redraw_all) {
-		let ctx = ClearLayerAndReturnContext(1);
+		let ctx = ClearLayerAndReturnContext("board");
 		if (GetSetting("quality") <= 1) {
 			DrawPegs(board.pegs, ctx);
 		} else {
 			DrawPegsNoGradient(board.pegs, ctx);
 		}
 	}
-	// Layer 2: Balls
+	// Balls
 	let total_balls = TotalBalls(state);
 	if (state.redraw_all || total_balls > 0 || state.last_drawn.num_balls > 0) {
 		const ball_types = machine.BallTypes();
-		let ctx = ClearLayerAndReturnContext(2);
+		let ctx = ClearLayerAndReturnContext("balls");
 		for (let i = 0; i < state.balls_by_type.length; ++i) {
 			let opacity_id = ball_types[i].name + "_ball_opacity";
 			let opacity_pct = machine.GetSetting(opacity_id);
@@ -788,21 +811,21 @@ function Draw(state) {
 		}
 		state.last_drawn.num_balls = total_balls;
 	}
-	// Layer 3: Targets
+	// Targets
 	if (state.redraw_all || state.redraw_targets) {
-		let ctx = ClearLayerAndReturnContext(3);
-		for (let i = 0; i < machine.board.target_sets.length; ++i) {
-			let targets = machine.board.target_sets[i].targets;
-			for (let j = 0; j < targets.length; ++j) {
-				targets[j].ResetText();
-			}
-		}
+		let ctx = ClearLayerAndReturnContext("targets");
 		state.redraw_targets = false;
 		DrawTargets(machine.board.target_sets, ctx);
 	}
-	// Layer 4: Auto-Drop position
+	// Bumpers
+	if (state.redraw_all || state.redraw_bumpers) {
+		let ctx = ClearLayerAndReturnContext("bumpers");
+		state.redraw_bumpers = false;
+		DrawBumpers(machine.board.bumper_sets, ctx);
+	}
+	// Auto-Drop position
 	if (state.redraw_all || state.redraw_auto_drop) {
-		let ctx = ClearLayerAndReturnContext(4);
+		let ctx = ClearLayerAndReturnContext("auto_drop");
 		if (machine.AutoDropOn()) {
 			let cooldown = 0;
 			if (state.auto_drop_cooldown >= kMinCooldownToDraw) {
@@ -813,13 +836,13 @@ function Draw(state) {
 		}
 		state.redraw_auto_drop = false;
 	}
-	// Layer 5: Score text
+	// Score text
 	if (
 		state.redraw_all ||
 		state.score_text.length > 0 ||
 		state.last_drawn.num_score_text > 0
 	) {
-		let ctx = ClearLayerAndReturnContext(5);
+		let ctx = ClearLayerAndReturnContext("score_text");
 		DrawScoreText(
 			state.score_text,
 			/*font_size=*/ 8,
@@ -836,7 +859,7 @@ function Draw(state) {
 		state.ripples.length > 0 ||
 		state.last_drawn.num_ripples > 0
 	) {
-		let ctx = ClearLayerAndReturnContext(6);
+		let ctx = ClearLayerAndReturnContext("ripples");
 		DrawRipples(state.ripples, /*duration=*/ 1000.0, /*expand=*/ 20.0, ctx);
 		state.last_drawn.num_ripples = state.ripples.length;
 	}

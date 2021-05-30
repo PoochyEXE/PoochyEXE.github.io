@@ -40,6 +40,10 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
+### v1.7.3-beta (2021-05-30)
+* Refactored the code and optimized the engine a bit.
+* Fix "Next upgrade reveal at:" messages for Bumpers machine.
+
 ### v1.7.2-beta (2021-05-29)
 * Fix popup text not appearing when buying Point Multiplier or Center Slot Value upgrades.
 * Add engineering and 漢字 (Japanese kanji) notations.
