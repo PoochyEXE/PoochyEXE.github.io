@@ -853,7 +853,7 @@ function Draw(state) {
 		);
 		state.last_drawn.num_score_texts = state.score_text.length;
 	}
-	// Layer 6: Ripple effects
+	// Ripple effects
 	if (
 		state.redraw_all ||
 		state.ripples.length > 0 ||
