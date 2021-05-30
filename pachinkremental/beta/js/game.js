@@ -141,11 +141,15 @@ function InitState() {
 			num_balls: 0,
 			num_score_texts: 0,
 			num_wheel_popup_texts: 0,
-			num_ripples: 0
+			num_ripples: 0,
+			april_fools: false,
 		},
 		intervals: {
 			auto_save: null,
 			update: null,
+		},
+		timeouts: {
+			check_event: null,
 		},
 		save_file: {
 			game_version: kSaveFileVersion,
@@ -481,15 +485,23 @@ function IsAprilFoolsActive() {
 	return date.getMonth() == 3 && date.getDate() == 1;
 }
 
-function Update() {
-	let now_april_fools = IsAprilFoolsActive();
-	if (now_april_fools != state.april_fools) {
-		state.redraw_all = true;
-		state.april_fools = now_april_fools;
-		if (now_april_fools) {
-			state.notifications.push(new Notification("Happy April Fools Day!", "#F8F"));
-		}
+function MillisecondsToMidnight() {
+  var now = new Date();
+  var midnight = new Date(now);
+  midnight.setHours(24, 0, 0, 0);
+  return (midnight - now);
+}
+
+function CheckEvents() {
+	state.april_fools = IsAprilFoolsActive();
+
+	if (state.timeouts.check_event) {
+		clearTimeout(state.timeouts.check_event);
 	}
+	state.timeouts.check_event = setTimeout(CheckEvents, MillisecondsToMidnight());
+}
+
+function Update() {
 	const num_frames = Math.floor(
 		(Date.now() - state.current_time) / kFrameInterval
 	);
@@ -503,6 +515,14 @@ function Update() {
 	}
 
 	UpdateScoreDisplay(state, /*force_update=*/false);
+
+	if (state.last_drawn.april_fools != state.april_fools) {
+		state.redraw_all = true;
+		state.last_drawn.april_fools = state.april_fools;
+		if (state.april_fools) {
+			state.notifications.push(new Notification("Happy April Fools Day!", "#F8F"));
+		}
+	}
 
 	Draw(state);
 	if (state.update_stats_panel) {
@@ -607,6 +627,7 @@ function Load() {
 	Draw(state);
 
 	state.intervals.update = setInterval(Update, kFrameInterval);
+	CheckEvents();
 
 	console.log("Hi there! I don't mind if people hack/cheat, but if you make any screenshots, save files, videos, etc. that way, I'd appreciate it if you clearly label them as hacked. Thanks! --Poochy.EXE");
 }

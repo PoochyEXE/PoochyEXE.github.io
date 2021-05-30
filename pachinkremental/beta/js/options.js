@@ -598,5 +598,6 @@ function ToggleAprilFools() {
 	if (state.save_file.options.april_fools_enabled >= kAprilFoolsOptions.length) {
 		state.save_file.options.april_fools_enabled = 0;
 	}
+	state.april_fools = IsAprilFoolsActive();
 	UpdateOptionsButtons();
 }
