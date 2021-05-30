@@ -1279,7 +1279,7 @@ class BumperMachine extends PachinkoMachine {
 				}
 			}
 			ball.last_hit_time = state.current_time;
-			
+
 			if (this.IsUnlocked("unlock_hyper_system")) {
 				if (save_data.score_buff_duration > 0) {
 					total_value *= this.hyper_multiplier;
@@ -1319,7 +1319,7 @@ class BumperMachine extends PachinkoMachine {
 				total_value *= multiplier;
 			}
 		}
-		
+
 		this.AddScore(total_value);
 		this.AddPointsForBallToStats(total_value, ball.ball_type_index);
 		MaybeAddScoreText({

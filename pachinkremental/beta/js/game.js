@@ -470,10 +470,11 @@ function UpdateOneFrame(state) {
 }
 
 function IsAprilFoolsActive() {
-	if (GetSetting("april_fools_enabled") == 0) {
+	const april_fools_enabled = GetSetting("april_fools_enabled");
+	if (april_fools_enabled == 0) {
 		return false;
 	}
-	if (GetSetting("april_fools_enabled") == 1) {
+	if (april_fools_enabled == 1) {
 		return true;
 	}
 	const date = new Date();
