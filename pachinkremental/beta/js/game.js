@@ -610,7 +610,7 @@ function Load() {
 	document.title = kTitleAndVersion;
 	document.getElementById("title_version").innerHTML = kTitleAndVersion;
 	document.getElementById("version_ending").innerHTML = kVersion;
-	if (loaded_save) {
+	if (loaded_save && ActiveMachine(state).GetSaveData().points) {
 		UpdateScoreDisplay(state, /*force_update=*/true);
 	} else {
 		document.getElementById("message_box").innerHTML =

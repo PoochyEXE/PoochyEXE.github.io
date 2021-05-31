@@ -313,7 +313,7 @@ function LoadGame(save_file_str) {
 			state.save_file.is_beta = true;
 		}
 		LoadActiveMachine(state);
-		if (ActiveMachine(state).GetSaveData().stats.total_score > 0) {
+		if (ActiveMachine(state).GetSaveData().points) {
 			UpdateScoreDisplay(state, /*forceUpdate=*/ true);
 		}
 		UpdateOptionsButtons();
