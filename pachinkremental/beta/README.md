@@ -40,6 +40,9 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
+### v1.7.4-beta (2021-05-30)
+* Add extra protections against save file corruption.
+
 ### v1.7.3-beta (2021-05-30)
 * Refactored the code and optimized the engine a bit.
 * Fix "Next upgrade reveal at:" messages for Bumpers machine.

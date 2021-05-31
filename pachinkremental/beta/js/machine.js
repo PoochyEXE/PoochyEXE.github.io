@@ -101,6 +101,10 @@ class PachinkoMachine {
 	}
 
 	AddScore(points) {
+		if (!points) {
+			console.error("AddScore() called without a valid point amount.");
+			return;
+		}
 		let save_data = this.GetSaveData();
 		save_data.stats.total_score += points;
 		save_data.points += points;
@@ -110,6 +114,10 @@ class PachinkoMachine {
 	}
 
 	AddPointsForBallToStats(points, ball_type_index) {
+		if (!points) {
+			console.error("AddPointsForBallToStats() called without a valid point amount.");
+			return;
+		}
 		let id = this.BallType(ball_type_index).name + "_balls_points_scored";
 		let save_data = this.GetSaveData();
 		if (save_data.stats[id]) {
