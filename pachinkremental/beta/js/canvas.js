@@ -811,17 +811,17 @@ function Draw(state) {
 		}
 		state.last_drawn.num_balls = total_balls;
 	}
-	// Targets
-	if (state.redraw_all || state.redraw_targets) {
-		let ctx = ClearLayerAndReturnContext("targets");
-		state.redraw_targets = false;
-		DrawTargets(machine.board.target_sets, ctx);
-	}
 	// Bumpers
 	if (state.redraw_all || state.redraw_bumpers) {
 		let ctx = ClearLayerAndReturnContext("bumpers");
 		state.redraw_bumpers = false;
 		DrawBumpers(machine.board.bumper_sets, ctx);
+	}
+	// Targets
+	if (state.redraw_all || state.redraw_targets) {
+		let ctx = ClearLayerAndReturnContext("targets");
+		state.redraw_targets = false;
+		DrawTargets(machine.board.target_sets, ctx);
 	}
 	// Auto-Drop position
 	if (state.redraw_all || state.redraw_auto_drop) {
