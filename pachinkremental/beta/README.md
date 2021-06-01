@@ -40,6 +40,11 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
+### v1.7.5-beta (2021-06-01)
+* Buff: Make Bumper Value increase twice as fast after 500, since its cost-effectiveness becomes pretty rubbish in the late game. (It's still pretty underpowered in the late game, just less so.)
+* Add stats for points earned in the last 5/15/60 seconds by ball type.
+* Fix stats panel displaying "Highest buff multiplier: ×0" when switching machines from Basic to Bumpers.
+
 ### v1.7.4-beta (2021-05-30)
 * Add extra protections against save file corruption.
 * Minor improvements to the way the game handles a corrupted save file.

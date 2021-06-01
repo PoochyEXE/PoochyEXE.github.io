@@ -13,6 +13,7 @@
 	<script type="text/javascript" src="js/notifications.js"></script>
 	<script type="text/javascript" src="js/options.js"></script>
 	<script type="text/javascript" src="js/physics.js"></script>
+	<script type="text/javascript" src="js/stats.js"></script>
 	<script type="text/javascript" src="js/text_format.js"></script>
 	<script type="text/javascript" src="js/upgrades.js"></script>
 	<script type="text/javascript" src="js/util.js"></script>
@@ -126,8 +127,18 @@
 						<div id="stats_container_balls_dropped_manual" class="statsRow" style="display: none;">
 							<b>Balls dropped manually: </b><span id="stats_balls_dropped_manual" class="statsEntry"></span>
 						</div>
-						<div id="stats_balls_dropped_by_type" class="statsSection"></div>
-						<div id="stats_points_earned_by_ball_type" class="statsSection"></div>
+						<div id="stats_container_stats_by_ball_type" class="statsSection">
+							<label for="stats_by_ball_type_select"><b>Stats by ball type:</b></label>
+							<select name="stats_by_ball_type_select" id="stats_by_ball_type_select"
+									onchange="UpdateStatsByBallType()">
+								<option value="balls_dropped">Total balls dropped</option>
+								<option value="total_points">Total points scored</option>
+								<option value="last5s_points">Points scored in last 5 seconds</option>
+								<option value="last15s_points">Points scored in last 15 seconds</option>
+								<option value="last60s_points">Points scored in last 60 seconds</option>
+							</select>
+							<div id="stats_by_ball_type" style="clear: both;"></div>
+						</div>
 						<div class="menuPadding"></div>
 					</div>
 				</div>

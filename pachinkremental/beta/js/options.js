@@ -299,6 +299,17 @@ function LoadGame(save_file_str) {
 			}
 		}
 		for (let i = 0; i < state.machines.length; ++i) {
+			const machine_id = state.machines[i].id;
+			const upgrades = state.machines[i].upgrades;
+			let machine_save = state.save_file.machines[machine_id];
+			for (let upgrade_id in upgrades) {
+				let max_level = upgrades[upgrade_id].max_level;
+				if (machine_save.upgrade_levels[upgrade_id] > max_level) {
+					machine_save.upgrade_levels[upgrade_id] = max_level;
+				}
+			}
+		}
+		for (let i = 0; i < state.machines.length; ++i) {
 			if (state.machines[i].id == state.save_file.active_machine) {
 				state.active_machine_index = i;
 				break;

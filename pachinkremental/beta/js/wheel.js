@@ -125,3 +125,26 @@ class BonusWheelPointSpace extends BonusWheelSpace {
 		this.text = this.text_func();
 	}
 }
+
+function SpinBonusWheel() {
+	const machine = ActiveMachine(state);
+	if (machine.bonus_wheel) {
+		machine.bonus_wheel.Spin();
+		UpdateSpinCounter();
+	}
+}
+
+function UpdateSpinCounter() {
+	const machine = ActiveMachine(state);
+	if (!machine.bonus_wheel || !machine.IsUnlocked("unlock_bonus_wheel")) {
+		UpdateDisplay("bonus_wheel", "none");
+		return;
+	}
+	const save_data = machine.GetSaveData();
+	UpdateDisplay("bonus_wheel", "inline");
+	UpdateInnerHTML("spin_count", FormatNumberLong(save_data.spins));
+	document.getElementById("button_spin").disabled =
+		machine.bonus_wheel.IsSpinning() || save_data.spins <= 0;
+	UpdateDisplay("multi_spin", machine.IsUnlocked("multi_spin") ? "inline" : "none");
+	UpdateInnerHTML("multi_spin_count", FormatNumberLong(machine.bonus_wheel.multi_spin));
+}

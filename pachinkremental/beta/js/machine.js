@@ -125,6 +125,7 @@ class PachinkoMachine {
 		} else {
 			save_data.stats[id] = points;
 		}
+		state.score_history_by_ball_type.per_5s[ball_type_index][0] += points;
 	}
 
 	UpgradeHeaders() {

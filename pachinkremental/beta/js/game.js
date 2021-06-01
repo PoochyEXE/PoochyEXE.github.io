@@ -1,4 +1,4 @@
-const kVersion = "v1.7.4-beta";
+const kVersion = "v1.7.5-beta";
 const kTitleAndVersion = "Pachinkremental " + kVersion;
 
 const kFrameInterval = 1000.0 / kFPS;
@@ -44,7 +44,7 @@ function TotalBalls(state) {
 	return total;
 }
 
-function UpdateScoreHistory() {
+function UpdateScoreHistory(state) {
 	let total = 0;
 	for (let i = 0; i < state.score_history.length; ++i) {
 		total += state.score_history[i];
@@ -60,6 +60,26 @@ function UpdateScoreHistory() {
 		state.score_history[i] = state.score_history[i - 1];
 	}
 	state.score_history[0] = 0;
+
+	const ball_types = ActiveMachine(state).BallTypes();
+	for (let i = 0; i < ball_types.length; ++i) {
+		let total = 0;
+		let ball_type_history = state.score_history_by_ball_type.per_5s[i];
+		for (let j = 0; j < ball_type_history.length; ++j) {
+			total += ball_type_history[j];
+			if (j == 0) {
+				state.score_history_by_ball_type.last_5s[i] = total;
+			} else if (j == 2) {
+				state.score_history_by_ball_type.last_15s[i] = total;
+			} else if (j == 11) {
+				state.score_history_by_ball_type.last_60s[i] = total;
+			}
+		}
+		for (let j = ball_type_history.length - 1; j > 0; --j) {
+			ball_type_history[j] = ball_type_history[j - 1];
+		}
+		ball_type_history[0] = 0;
+	}
 }
 
 function LoadActiveMachine(state) {
@@ -68,15 +88,12 @@ function LoadActiveMachine(state) {
 	state.update_upgrades = true;
 	state.update_buff_display = true;
 	state.redraw_all = true;
-	for (let i = 0; i < state.score_history.length; ++i) {
-		state.score_history[i] = 0;
-	}
 
 	const machine = ActiveMachine(state);
-	const ball_types = machine.BallTypes();
+	const num_ball_types = machine.BallTypes().length;
 	machine.OnActivate();
 	state.display_points = machine.GetSaveData(state).points;
-	state.balls_by_type = [...Array(ball_types.length)].map(_ => new Array(0));
+	state.balls_by_type = [...Array(num_ball_types)].map(_ => new Array(0));
 	state.upgrade_headers = machine.UpgradeHeaders();
 	for (let i = 0; i < state.upgrade_headers.length; ++i) {
 		let header = state.upgrade_headers[i];
@@ -85,6 +102,13 @@ function LoadActiveMachine(state) {
 				header.id;
 		}
 	}
+	
+	state.score_history.fill(0);
+	state.score_history_by_ball_type.per_5s =
+		[...Array(num_ball_types)].map(_ => Array(12).fill(0));
+	state.score_history_by_ball_type.last_5s = Array(num_ball_types).fill(0);
+	state.score_history_by_ball_type.last_15s = Array(num_ball_types).fill(0);
+	state.score_history_by_ball_type.last_60s = Array(num_ball_types).fill(0);
 
 	const drop_zones = machine.board.drop_zones;
 	let html = "";
@@ -115,6 +139,12 @@ function InitState() {
 		balls_by_type: [],
 		score_text: new Array(0),
 		score_history: [...Array(12)].map(_ => 0),
+		score_history_by_ball_type: {
+			per_5s: [],
+			last_5s: [],
+			last_15s: [],
+			last_60s: [],
+		},
 		last_score_history_update: Date.now(),
 		notifications: new Array(0),
 		upgrade_headers: null,
@@ -223,29 +253,6 @@ function UpdateBuffDisplay(state) {
 	UpdateInnerHTML("buff", ActiveMachine(state).BuffDisplayText());
 }
 
-function SpinBonusWheel() {
-	const machine = ActiveMachine(state);
-	if (machine.bonus_wheel) {
-		machine.bonus_wheel.Spin();
-		UpdateSpinCounter();
-	}
-}
-
-function UpdateSpinCounter() {
-	const machine = ActiveMachine(state);
-	if (!machine.bonus_wheel || !machine.IsUnlocked("unlock_bonus_wheel")) {
-		UpdateDisplay("bonus_wheel", "none");
-		return;
-	}
-	const save_data = machine.GetSaveData();
-	UpdateDisplay("bonus_wheel", "inline");
-	UpdateInnerHTML("spin_count", FormatNumberLong(save_data.spins));
-	document.getElementById("button_spin").disabled =
-		machine.bonus_wheel.IsSpinning() || save_data.spins <= 0;
-	UpdateDisplay("multi_spin", machine.IsUnlocked("multi_spin") ? "inline" : "none");
-	UpdateInnerHTML("multi_spin_count", FormatNumberLong(machine.bonus_wheel.multi_spin));
-}
-
 function UpdateHyperSystemDisplay() {
 	const machine = ActiveMachine(state);
 	if (!machine.IsUnlocked("unlock_hyper_system")) {
@@ -287,83 +294,6 @@ function UpdateHyperSystemDisplay() {
 function ActivateHyper() {
 	const machine = ActiveMachine(state);
 	machine.ActivateHyperSystem();
-}
-
-function InitStatsPanel(state) {
-	const ball_types = ActiveMachine(state).BallTypes();
-	let html = '<b>Balls dropped by type:</b>';
-	for (let id = 0; id < ball_types.length; ++id) {
-		let type_name = ball_types[id].name + "_balls";
-		html +=
-			'<div id="stats_container_' + type_name +
-			'" class="statsRow" style="display: none;"><b>' +
-			ball_types[id].display_name +
-			'balls: </b><span id="stats_' + type_name +
-			'" class="statsEntry"></span></div>';
-	}
-	UpdateInnerHTML("stats_balls_dropped_by_type", html);
-
-	html = '<b>Points scored by ball type:</b>';
-	for (let id = 0; id < ball_types.length; ++id) {
-		let type_name = ball_types[id].name + "_balls";
-		html +=
-			'<div id="stats_container_' + type_name +
-			'_points_scored" class="statsRow" style="display: none;"><b>' +
-			ball_types[id].display_name +
-			'balls: </b><span id="stats_' + type_name +
-			'_points_scored" class="statsEntry"></span></div>';
-	}
-	UpdateInnerHTML("stats_points_earned_by_ball_type", html);
-}
-
-function UpdateStatsEntry(state, key, val) {
-	let elem = document.getElementById("stats_" + key);
-	if (!elem || val == null || val == undefined) {
-		return;
-	}
-	let visible = (val != 0);
-	if (key == "balls_dropped_manual") {
-		visible = ActiveMachine(state).IsUnlocked("auto_drop");
-	}
-	if (visible) {
-		let container = document.getElementById("stats_container_" + key);
-		if (container && container.style.display != "block") {
-			container.style.display = "block";
-		}
-	}
-	let html = Number.isFinite(val) ? FormatNumberLong(val) : val;
-	if (elem.innerHTML != html) {
-		elem.innerHTML = html;
-	}
-}
-
-function IsAnySpecialBallUnlocked(state) {
-	const machine = ActiveMachine(state);
-	const ball_types = machine.BallTypes();
-	for (let i = 1; i < ball_types.length; ++i) {
-		if (machine.IsBallTypeUnlocked(ball_types[i])) {
-			return true;
-		}
-	}
-	return false;
-}
-
-function UpdateStatsPanel(state) {
-	state.update_stats_panel = false;
-	for (key in state.save_file.stats) {
-		let val = state.save_file.stats[key];
-		UpdateStatsEntry(state, key, val);
-	}
-	const machine_stats = ActiveMachine(state).GetSaveData().stats;
-	for (key in machine_stats) {
-		let val = machine_stats[key];
-		UpdateStatsEntry(state, key, val);
-	}
-
-	let show_stats_by_ball_type =
-		IsAnySpecialBallUnlocked(state) ? "inline-block" : "none";
-	UpdateDisplay("stats_balls_dropped_by_type", show_stats_by_ball_type);
-	UpdateDisplay("stats_points_earned_by_ball_type", show_stats_by_ball_type);
 }
 
 function CanDrop(state) {
@@ -468,7 +398,7 @@ function UpdateOneFrame(state) {
 	}
 
 	if (state.last_score_history_update + 5000.0 <= state.current_time) {
-		UpdateScoreHistory();
+		UpdateScoreHistory(state);
 		state.last_score_history_update = state.current_time;
 	}
 }
