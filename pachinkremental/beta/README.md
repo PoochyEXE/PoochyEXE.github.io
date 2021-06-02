@@ -40,6 +40,9 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
+### v1.7.7-beta (2021-06-02)
+* Add stats for highest combo and number of times the Hyper System has been activated.
+
 ### v1.7.6-beta (2021-06-02)
 * Save file now saves which collapsible headers are collapsed, and will restore them to their previous state when loading or switching between machines.
 * Fix the "New!" notice always appearing in the Upgrades header if it's collapsed when switching machines, even when switching to a machine where none of the upgrades are newly revealed.

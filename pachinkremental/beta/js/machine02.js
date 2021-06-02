@@ -62,6 +62,7 @@ class BumperMachine extends PachinkoMachine {
 		save_data.hyper_charge = 0;
 		save_data.score_buff_duration = 0;
 		save_data.stats.hyper_activations = 0;
+		save_data.stats.max_combo = 0;
 		//save_data.options.auto_spin_enabled = false;
 		//save_data.options.multi_spin_enabled = false;
 		return save_data;
@@ -1289,6 +1290,9 @@ class BumperMachine extends PachinkoMachine {
 					state.update_buff_display = true;
 				}
 			}
+			
+			save_data.stats.max_combo =
+				Math.max(save_data.stats.max_combo, ball.combo);
 		}
 
 		if (ball.ball_type_index != kBumperMachineBallTypeIDs.NORMAL) {

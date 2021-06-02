@@ -1,4 +1,4 @@
-const kVersion = "v1.7.6-beta";
+const kVersion = "v1.7.7-beta";
 const kTitleAndVersion = "Pachinkremental " + kVersion;
 
 const kFrameInterval = 1000.0 / kFPS;

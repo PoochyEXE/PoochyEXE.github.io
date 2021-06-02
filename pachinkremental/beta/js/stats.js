@@ -14,6 +14,8 @@ function InitStatsPanel(state) {
 	UpdateInnerHTML("stats_by_ball_type", html);
 	
 	UpdateDisplay("stats_container_max_buff_multiplier", "none");
+	UpdateDisplay("stats_container_max_combo", "none");
+	UpdateDisplay("stats_container_hyper_activations", "none");
 	UpdateDisplay("stats_container_balls_dropped_manual", "none");
 }
 
