@@ -256,6 +256,10 @@ function LoadGame(save_file_str) {
 			...default_state.save_file.options,
 			...load_save.options
 		};
+		state.save_file.options.collapsed = {
+			...default_state.save_file.options.collapsed,
+			...load_save.options.collapsed
+		};
 		if (load_save.game_version < 6) {
 			state.save_file.options.notation =
 				load_save.options.scientific_notation ? 1 : 0;
@@ -296,6 +300,10 @@ function LoadGame(save_file_str) {
 					...default_state.save_file.machines[machine_id].options,
 					...load_save.machines[machine_id].options
 				};
+				state.save_file.machines[machine_id].options.collapsed = {
+					...default_state.save_file.machines[machine_id].options.collapsed,
+					...load_save.machines[machine_id].options.collapsed
+				};
 			}
 		}
 		for (let i = 0; i < state.machines.length; ++i) {
@@ -334,6 +342,7 @@ function LoadGame(save_file_str) {
 		UpdateFavicon(state);
 		UpdateOpacitySlidersFromSaveFile(state);
 		UpdateFaviconChoiceFromSaveFile(state);
+		UpdateCollapsibles(state.save_file.options.collapsed);
 		state.notifications.push(new Notification("Game loaded", "#8F8"));
 		return true;
 	} else {

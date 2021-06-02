@@ -66,12 +66,19 @@ class PachinkoMachine {
 			options: {
 				auto_drop_enabled: false,
 				display_popup_text: 0,
-				favicon: -1
+				favicon: -1,
+				collapsed: {}
 			}
 		}
 
 		for (let upgrade_id in this.upgrades) {
 			save_data.upgrade_levels[upgrade_id] = 0;
+		}
+		
+		const upgrade_headers = this.UpgradeHeaders();
+		for (let i = 0; i < upgrade_headers.length; ++i) {
+			let header_id = upgrade_headers[i].id;
+			save_data.options.collapsed[header_id] = false;
 		}
 
 		for (let i = 0; i < this.ball_types.length; ++i) {

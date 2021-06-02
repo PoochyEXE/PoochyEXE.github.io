@@ -1,4 +1,4 @@
-const kVersion = "v1.7.5-beta";
+const kVersion = "v1.7.6-beta";
 const kTitleAndVersion = "Pachinkremental " + kVersion;
 
 const kFrameInterval = 1000.0 / kFPS;
@@ -91,8 +91,9 @@ function LoadActiveMachine(state) {
 
 	const machine = ActiveMachine(state);
 	const num_ball_types = machine.BallTypes().length;
+	const save_data = machine.GetSaveData();
 	machine.OnActivate();
-	state.display_points = machine.GetSaveData(state).points;
+	state.display_points = save_data.points;
 	state.balls_by_type = [...Array(num_ball_types)].map(_ => new Array(0));
 	state.upgrade_headers = machine.UpgradeHeaders();
 	for (let i = 0; i < state.upgrade_headers.length; ++i) {
@@ -125,6 +126,7 @@ function LoadActiveMachine(state) {
 	UpdateFavicon(state);
 	UpdateOpacitySlidersFromSaveFile(state);
 	UpdateFaviconChoiceFromSaveFile(state);
+	UpdateCollapsibles(save_data.options.collapsed);
 	OnResize();
 }
 
@@ -210,6 +212,12 @@ function InitState() {
 				quality: 0,
 				display_popup_text: 0,
 				maxed_upgrades: 1,
+				collapsed: {
+					upgrades: false,
+					machines: false,
+					stats: true,
+					options: true,
+				},
 			},
 		}
 	};
@@ -303,20 +311,38 @@ function CanDrop(state) {
 	return true;
 }
 
-function ToggleVisibility(id) {
-	let collapsed = document.getElementById(id + "_collapsed");
+function SetCollapsibleHeaderState(id, collapse) {
+	let collapsed_display = document.getElementById(id + "_collapsed");
 	let contents = document.getElementById(id + "_contents");
-	if (contents.style.height == "0px") {
-		contents.style.height = "auto";
-		collapsed.innerHTML = "[&ndash;]";
-	} else {
-		contents.style.height = "0px";
-		collapsed.innerHTML = "[+]";
+	if (contents && collapsed_display) {
+		contents.style.height = collapse ? "0px" : "auto";
+		collapsed_display.innerHTML = collapse ? "[+]" : "[&ndash;]";
 	}
-	let header_new = document.getElementById(id + "_header_new");
-	if (header_new) {
-		header_new.style.display = "none";
+
+	let header = document.getElementById("button_" + id + "_header");
+	if (header) {
+		let options = header.classList.contains("upgradesSubHeader") ?
+				ActiveMachine(state).GetSaveData().options :
+				state.save_file.options;
+		options.collapsed[id] = collapse;
 	}
+
+	if (!collapse) {
+		let header_new = document.getElementById(id + "_header_new");
+		if (header_new) {
+			header_new.style.display = "none";
+		}
+	}
+}
+
+function UpdateCollapsibles(collapsed_options) {
+	for (let id in collapsed_options) {
+		SetCollapsibleHeaderState(id, collapsed_options[id]);
+	}
+}
+
+function ToggleVisibility(id) {
+	SetCollapsibleHeaderState(id, !IsCollapsed(id));
 }
 
 function IsCollapsed(panel_name) {

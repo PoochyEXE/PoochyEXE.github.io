@@ -40,6 +40,10 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
+### v1.7.6-beta (2021-06-02)
+* Save file now saves which collapsible headers are collapsed, and will restore them to their previous state when loading or switching between machines.
+* Fix the "New!" notice always appearing in the Upgrades header if it's collapsed when switching machines, even when switching to a machine where none of the upgrades are newly revealed.
+
 ### v1.7.5-beta (2021-06-01)
 * Buff: Make Bumper Value increase twice as fast after 500, since its cost-effectiveness becomes pretty rubbish in the late game. (It's still pretty underpowered in the late game, just less so.)
 * Add stats for points earned in the last 5/15/60 seconds by ball type.

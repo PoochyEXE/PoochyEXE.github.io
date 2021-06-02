@@ -539,7 +539,7 @@ function UpdateUpgradeButtons(state) {
 		let display = visible ? "inline" : "none";
 		if (elem.style.display != display) {
 			elem.style.display = display;
-			if (visible) {
+			if (visible && !machine.IsUnlocked(id)) {
 				let header =
 					state.upgrade_category_to_header_map[upgrade.category];
 				if (IsCollapsed(header)) {
