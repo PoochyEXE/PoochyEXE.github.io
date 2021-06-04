@@ -1290,7 +1290,7 @@ class BumperMachine extends PachinkoMachine {
 					state.update_buff_display = true;
 				}
 			}
-			
+
 			save_data.stats.max_combo =
 				Math.max(save_data.stats.max_combo, ball.combo);
 		}

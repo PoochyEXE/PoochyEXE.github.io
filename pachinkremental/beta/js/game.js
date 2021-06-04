@@ -103,7 +103,7 @@ function LoadActiveMachine(state) {
 				header.id;
 		}
 	}
-	
+
 	state.score_history.fill(0);
 	state.score_history_by_ball_type.per_5s =
 		[...Array(num_ball_types)].map(_ => Array(12).fill(0));

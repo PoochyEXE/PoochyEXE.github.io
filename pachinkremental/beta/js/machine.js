@@ -74,7 +74,7 @@ class PachinkoMachine {
 		for (let upgrade_id in this.upgrades) {
 			save_data.upgrade_levels[upgrade_id] = 0;
 		}
-		
+
 		const upgrade_headers = this.UpgradeHeaders();
 		for (let i = 0; i < upgrade_headers.length; ++i) {
 			let header_id = upgrade_headers[i].id;
