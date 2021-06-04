@@ -183,6 +183,19 @@ class PachinkoMachine {
 		}
 		return true;
 	}
+	
+	CheckMachineMaxed() {
+		let stats = state.save_file.stats;
+		if (this.AreAllUpgradesMaxed()) {
+			if (!stats.machine_maxed_times[this.id]) {
+				stats.machine_maxed_times[this.id] = Date.now();
+				state.update_stats_panel = true;
+			}
+			UpdateMachinesHeader(state);
+		} else {
+			stats.machine_maxed_times[this.id] = null;
+		}
+	}
 
 	AutoDropOn() {
 		return this.IsUnlocked("auto_drop") &&
@@ -267,18 +280,5 @@ function UpdateMachinesHeader(state) {
 			html += "<br>(Active)";
 		}
 		UpdateInnerHTML(button_id, html);
-	}
-}
-
-function CheckActiveMachineMaxed(state) {
-	const machine = ActiveMachine(state);
-	if (machine.AreAllUpgradesMaxed()) {
-		let stats = state.save_file.stats;
-		if (!stats.machine_maxed_times[machine.id]) {
-			stats.machine_maxed_times[machine.id] = Date.now();
-			state.update_stats_panel = true;
-		}
-		UpdateMachinesHeader(state);
-		ShowEndingIfAllMachinesMaxed();
 	}
 }

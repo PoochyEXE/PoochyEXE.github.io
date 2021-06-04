@@ -138,7 +138,6 @@ function LoadGame(save_file_str) {
 				first_machine_save.options[key] = state.save_file.options[key];
 				delete state.save_file.options[key];
 			}
-			CheckActiveMachineMaxed(state);
 		} else {
 			for (let machine_id in default_state.save_file.machines) {
 				state.save_file.machines[machine_id] = {
@@ -173,6 +172,7 @@ function LoadGame(save_file_str) {
 					machine_save.upgrade_levels[upgrade_id] = max_level;
 				}
 			}
+			state.machines[i].CheckMachineMaxed();
 		}
 		for (let i = 0; i < state.machines.length; ++i) {
 			if (state.machines[i].id == state.save_file.active_machine) {

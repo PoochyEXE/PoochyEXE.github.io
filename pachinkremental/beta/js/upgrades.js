@@ -83,7 +83,8 @@ class Upgrade {
 		this.Update();
 		this.on_buy(new_level);
 		if (new_level == this.max_level) {
-			CheckActiveMachineMaxed(state);
+			this.machine.CheckMachineMaxed();
+			ShowEndingIfAllMachinesMaxed();
 		}
 		return true;
 	}
