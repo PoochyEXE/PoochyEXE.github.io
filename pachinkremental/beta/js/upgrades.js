@@ -83,8 +83,7 @@ class Upgrade {
 		this.Update();
 		this.on_buy(new_level);
 		if (new_level == this.max_level) {
-			UpdateMachinesHeader(state);
-			ShowEndingIfAllUpgradesMaxed();
+			CheckActiveMachineMaxed(state);
 		}
 		return true;
 	}
@@ -586,14 +585,18 @@ function HideUpgradeTooltip(button_elem) {
 	document.getElementById("tooltip").style.display = "none";
 }
 
-function ShowEndingIfAllUpgradesMaxed() {
+function CurrentPlayTime() {
+	return Date.now() - state.save_file.stats.start_time;;
+}
+
+function ShowEndingIfAllMachinesMaxed() {
 	for (let i = 0; i < state.machines.length; ++i) {
 		if (!state.machines[i].AreAllUpgradesMaxed()) {
 			return;
 		}
 	}
 
-	let play_time = Date.now() - state.save_file.stats.start_time;
-	UpdateInnerHTML("ending_play_time", FormatDurationLong(play_time));
+	let play_time = FormatDurationLong(CurrentPlayTime(), /*show_ms=*/true);
+	UpdateInnerHTML("ending_play_time", play_time);
 	document.getElementById("ending_modal").style.display = "block";
 }

@@ -269,3 +269,16 @@ function UpdateMachinesHeader(state) {
 		UpdateInnerHTML(button_id, html);
 	}
 }
+
+function CheckActiveMachineMaxed(state) {
+	const machine = ActiveMachine(state);
+	if (machine.AreAllUpgradesMaxed()) {
+		let stats = state.save_file.stats;
+		if (!stats.machine_maxed_times[machine.id]) {
+			stats.machine_maxed_times[machine.id] = Date.now();
+			state.update_stats_panel = true;
+		}
+		UpdateMachinesHeader(state);
+		ShowEndingIfAllMachinesMaxed();
+	}
+}

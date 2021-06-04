@@ -1,4 +1,4 @@
-const kVersion = "v1.7.7-beta";
+const kVersion = "v1.7.8-beta";
 const kTitleAndVersion = "Pachinkremental " + kVersion;
 
 const kFrameInterval = 1000.0 / kFPS;
@@ -188,15 +188,11 @@ function InitState() {
 			is_beta: !kIsLiveVersion,
 			active_machine: kFirstMachineID,
 			stats: {
-				total_score: 0,
 				score_last5s: 0,
 				score_last15s: 0,
 				score_last60s: 0,
-				balls_dropped: 0,
-				balls_dropped_manual: 0,
-				max_buff_multiplier: 0,
 				start_time: Date.now(),
-				target_hits: {}
+				machine_maxed_times: {}
 			},
 			machines: {},
 			options: {
@@ -225,6 +221,7 @@ function InitState() {
 		let machine = state.machines[i];
 		let id = machine.id;
 		state.save_file.machines[id] = machine.DefaultSaveData();
+		state.save_file.stats.machine_maxed_times[id] = null;
 	}
 	return state;
 }

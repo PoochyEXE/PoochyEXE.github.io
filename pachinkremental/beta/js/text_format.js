@@ -266,14 +266,18 @@ function FormatNumberLong(num) {
 	}
 }
 
-function FormatDurationLong(duration_ms) {
+function FormatDurationLong(duration_ms, show_ms) {
 	console.assert(duration_ms > 0);
 	let x = Math.round(duration_ms);
-	let ms = x % 1000;
+	let result = "";
+	if (show_ms) {
+		let ms = x % 1000;
+		result = " " + ZeroPad(ms, 3) + "ms";
+	}
 	x = Math.floor(x / 1000);
 	let secs = x % 60;
 	x = Math.floor(x / 60);
-	let result = ZeroPad(secs, 2) + "s " + ZeroPad(ms, 3) + "ms";
+	result = ZeroPad(secs, 2) + "s" + result;
 	if (x <= 0) {
 		return result;
 	}

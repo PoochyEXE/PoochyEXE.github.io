@@ -13,6 +13,18 @@ function InitStatsPanel(state) {
 	}
 	UpdateInnerHTML("stats_by_ball_type", html);
 	
+	html = '';
+	for (let i = 0; i < state.machines.length; ++i) {
+		let stat_id = "time_to_max_" + state.machines[i].id;
+		html +=
+			'<div id="stats_container_' + stat_id +
+			'" class="statsRow" style="display: none;"><b>' +
+			state.machines[i].display_name +
+			' machine maxed: </b><span id="stats_' + stat_id +
+			'" class="statsEntry"></span></div>';
+	}
+	UpdateInnerHTML("stats_section_milestones", html);
+	
 	UpdateDisplay("stats_container_max_buff_multiplier", "none");
 	UpdateDisplay("stats_container_max_combo", "none");
 	UpdateDisplay("stats_container_hyper_activations", "none");
@@ -39,7 +51,6 @@ function UpdateStatsEntry(state, key, val) {
 		elem.innerHTML = html;
 	}
 }
-
 
 function UpdateStatsByBallType() {
 	const stat_type = document.getElementById("stats_by_ball_type_select").value;
@@ -82,6 +93,28 @@ function IsAnySpecialBallUnlocked(state) {
 	return false;
 }
 
+function UpdateMilestoneStats() {
+	let play_time = FormatDurationLong(CurrentPlayTime(), /*show_ms=*/false);
+	UpdateInnerHTML("stats_save_file_started", play_time);
+	let machine_maxed_times = state.save_file.stats.machine_maxed_times;
+	const start_time = state.save_file.stats.start_time;
+	for (let machine_id in machine_maxed_times) {
+		if (!machine_maxed_times[machine_id]) {
+			continue;
+		}
+		let time_to_max = machine_maxed_times[machine_id] - start_time;
+		if (time_to_max <= 0) {
+			continue;
+		}
+		UpdateDisplay("stats_container_milestones", "block");
+		UpdateDisplay("stats_container_time_to_max_" + machine_id, "block");
+		UpdateInnerHTML(
+			"stats_time_to_max_" + machine_id,
+			FormatDurationLong(time_to_max, /*show_ms=*/true)
+		);
+	}
+}
+
 function UpdateStatsPanel(state) {
 	state.update_stats_panel = false;
 	for (key in state.save_file.stats) {
@@ -100,4 +133,6 @@ function UpdateStatsPanel(state) {
 	} else {
 		UpdateDisplay("stats_container_stats_by_ball_type", "none");
 	}
+
+	UpdateMilestoneStats();
 }

@@ -14,6 +14,7 @@
 	<script type="text/javascript" src="js/options.js"></script>
 	<script type="text/javascript" src="js/physics.js"></script>
 	<script type="text/javascript" src="js/stats.js"></script>
+	<script type="text/javascript" src="js/save_file.js"></script>
 	<script type="text/javascript" src="js/text_format.js"></script>
 	<script type="text/javascript" src="js/upgrades.js"></script>
 	<script type="text/javascript" src="js/util.js"></script>
@@ -144,6 +145,13 @@
 								<option value="last60s_points">Points scored in last 60 seconds</option>
 							</select>
 							<div id="stats_by_ball_type" style="clear: both;"></div>
+						</div>
+						<div class="menuPadding"></div>
+						<b>Save file started: </b><span id="stats_save_file_started" class="statsEntry"></span> ago
+						<div class="menuPadding"></div>
+						<div id="stats_container_milestones" style="display: none;">
+							<b>Time taken to reach milestones:</b>
+							<div id="stats_section_milestones"></div>
 						</div>
 						<div class="menuPadding"></div>
 					</div>

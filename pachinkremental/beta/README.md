@@ -40,6 +40,10 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
+### v1.7.8-beta (2021-06-02)
+* Fix CSS breaking on collapsible headers when importing a save from v1.1.1 or older directly into v1.7.6 or newer.
+* Show time since save file was started and time taken (since the save file was started) to max each machine in the Stats panel.
+
 ### v1.7.7-beta (2021-06-02)
 * Add stats for highest combo and number of times the Hyper System has been activated.
 
