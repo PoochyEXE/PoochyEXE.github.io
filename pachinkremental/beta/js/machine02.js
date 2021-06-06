@@ -60,9 +60,11 @@ class BumperMachine extends PachinkoMachine {
 		let save_data = super.DefaultSaveData();
 		save_data.options.auto_hyper_enabled = false;
 		save_data.hyper_charge = 0;
+		save_data.hyper_combo = 0;
 		save_data.score_buff_duration = 0;
 		save_data.stats.hyper_activations = 0;
 		save_data.stats.max_combo = 0;
+		save_data.stats.max_hyper_combo = 0;
 		//save_data.options.auto_spin_enabled = false;
 		//save_data.options.multi_spin_enabled = false;
 		return save_data;
@@ -917,6 +919,20 @@ class BumperMachine extends PachinkoMachine {
 			})
 		);
 		upgrades_list.push(
+			new FixedCostFeatureUnlockUpgrade({
+				machine: this,
+				id: "hyper_combo",
+				name: "Hyper Combo",
+				category: "hyper",
+				description: "The Hyper System gets its own combo, counting every bumper and score target hit by every ball during a Hyper System activation. The score multiplier grows as this combo increases. (The effect stacks multiplicatively with the Hyper Multiplier upgrade.)",
+				cost: 8e18,
+				visible_func: () =>
+					this.IsUnlocked("unlock_hyper_system") &&
+					this.IsUnlocked("unlock_combos") &&
+					this.GetSaveData().stats.hyper_activations > 0,
+			})
+		);
+		upgrades_list.push(
 			new BallTypeUnlockUpgrade({
 				machine: this,
 				ball_type: this.ball_types[kBumperMachineBallTypeIDs.GOLD],
@@ -1211,8 +1227,14 @@ class BumperMachine extends PachinkoMachine {
 		if (save_data.score_buff_duration > 0) {
 			let duration_sec =
 				Math.round(save_data.score_buff_duration / 1000.0);
+			let total_multiplier = this.hyper_multiplier;
+			let hyper_combo_value =
+				this.HyperComboValue(save_data.hyper_combo);
+			if (hyper_combo_value > 1.0) {
+				total_multiplier *= hyper_combo_value;
+			}
 			return "All scoring \u00D7" +
-				FormatNumberMedium(this.hyper_multiplier) +
+				FormatNumberMedium(total_multiplier) +
 				" for " + duration_sec + " seconds!";
 		} else if (this.IsUnlocked("unlock_hyper_system")) {
 			return 'Score multiplier: \u00D71';
@@ -1227,13 +1249,67 @@ class BumperMachine extends PachinkoMachine {
 			save_data.score_buff_duration = this.hyper_duration;
 			save_data.hyper_charge = 0;
 			++save_data.stats.hyper_activations;
+			save_data.hyper_combo = 0;
 		}
 		state.update_buff_display = true;
+	}
+
+	HyperComboValue(hyper_combo) {
+		return Math.max(1.0, hyper_combo / 200.0);
 	}
 
 	AutoHyperOn() {
 		return this.IsUnlocked("auto_hyper") &&
 			this.GetSaveData().options.auto_hyper_enabled;
+	}
+
+	UpdateHyperSystemDisplay(state) {
+		const machine = ActiveMachine(state);
+		if (!this.IsUnlocked("unlock_hyper_system")) {
+			UpdateDisplay("hyper_system", "none");
+			return;
+		}
+		UpdateDisplay("hyper_system", "inline-block");
+		const save_data = this.GetSaveData();
+		let button_elem = document.getElementById("button_hyper");
+		let status_text = "";
+		let meter_fraction = 0;
+		if (save_data.score_buff_duration > 0) {
+			meter_fraction =
+				save_data.score_buff_duration / this.hyper_duration;
+			button_elem.disabled = true;
+			if (save_data.hyper_combo > 0) {
+				status_text = save_data.hyper_combo + " hit";
+				if (save_data.hyper_combo > 1) {
+					status_text += "s";
+				}
+				let hyper_combo_value =
+					this.HyperComboValue(save_data.hyper_combo);
+				status_text += "! Multiplier \u00D7" +
+					hyper_combo_value.toFixed(2);
+			} else {
+				status_text = "Hyper System active!";
+			}
+		} else if (save_data.hyper_charge < this.max_hyper_charge) {
+			meter_fraction =
+				save_data.hyper_charge / this.max_hyper_charge;
+			button_elem.disabled = true;
+			status_text = "Hyper System charging...";
+		} else {
+			meter_fraction = 1.0;
+			button_elem.disabled = false;
+			status_text = "Hyper System ready!";
+		}
+		let meter_percent = 100.0 * meter_fraction;
+		if (meter_percent > 100.0) {
+			meter_percent = 100.0;
+		}
+		if (meter_percent < 0.0) {
+			meter_percent = 0.0;
+		}
+		document.getElementById("hyper_meter_fill").style.width =
+			meter_percent + "%";
+		UpdateInnerHTML("hyper_status", status_text);
 	}
 
 	AwardPoints(base_value, ball) {
@@ -1278,6 +1354,12 @@ class BumperMachine extends PachinkoMachine {
 			if (this.IsUnlocked("unlock_hyper_system")) {
 				if (save_data.score_buff_duration > 0) {
 					total_value *= this.hyper_multiplier;
+					if (this.IsUnlocked("hyper_combo")) {
+						++save_data.hyper_combo;
+						save_data.stats.max_hyper_combo =
+							Math.max(save_data.hyper_combo, save_data.stats.max_hyper_combo);
+						total_value *= this.HyperComboValue(save_data.hyper_combo);
+					}
 				} else {
 					save_data.hyper_charge += ball.combo * this.hyper_charge_rate;
 					if (save_data.hyper_charge >= this.max_hyper_charge) {

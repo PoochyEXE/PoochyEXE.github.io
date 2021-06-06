@@ -883,7 +883,7 @@ function Draw(state) {
 		UpdateAutoSaveInterval();
 		UpdateOptionsButtons();
 		UpdateSpinCounter();
-		UpdateHyperSystemDisplay();
+		machine.UpdateHyperSystemDisplay(state);
 	}
 
 	UpdateNotifications(state);

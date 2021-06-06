@@ -1,4 +1,4 @@
-const kVersion = "v1.7.8-beta";
+const kVersion = "v1.8.0-beta";
 const kTitleAndVersion = "Pachinkremental " + kVersion;
 
 const kFrameInterval = 1000.0 / kFPS;
@@ -258,44 +258,6 @@ function UpdateBuffDisplay(state) {
 	UpdateInnerHTML("buff", ActiveMachine(state).BuffDisplayText());
 }
 
-function UpdateHyperSystemDisplay() {
-	const machine = ActiveMachine(state);
-	if (!machine.IsUnlocked("unlock_hyper_system")) {
-		UpdateDisplay("hyper_system", "none");
-		return;
-	}
-	UpdateDisplay("hyper_system", "inline-block");
-	const save_data = machine.GetSaveData();
-	let button_elem = document.getElementById("button_hyper");
-	let status_text = "";
-	let meter_fraction = 0;
-	if (save_data.score_buff_duration > 0) {
-		meter_fraction =
-			save_data.score_buff_duration / machine.hyper_duration;
-		button_elem.disabled = true;
-		status_text = "Hyper System active!"
-	} else if (save_data.hyper_charge < machine.max_hyper_charge) {
-		meter_fraction =
-			save_data.hyper_charge / machine.max_hyper_charge;
-		button_elem.disabled = true;
-		status_text = "Hyper System charging..."
-	} else {
-		meter_fraction = 1.0;
-		button_elem.disabled = false;
-		status_text = "Hyper System ready!"
-	}
-	let meter_percent = 100.0 * meter_fraction;
-	if (meter_percent > 100.0) {
-		meter_percent = 100.0;
-	}
-	if (meter_percent < 0.0) {
-		meter_percent = 0.0;
-	}
-	document.getElementById("hyper_meter_fill").style.width =
-		meter_percent + "%";
-	UpdateInnerHTML("hyper_status", status_text);
-}
-
 function ActivateHyper() {
 	const machine = ActiveMachine(state);
 	machine.ActivateHyperSystem();
@@ -483,7 +445,7 @@ function Update() {
 	}
 	if (state.update_buff_display) {
 		UpdateBuffDisplay(state);
-		UpdateHyperSystemDisplay(state);
+		ActiveMachine(state).UpdateHyperSystemDisplay(state);
 	}
 	if (state.update_upgrades) {
 		UpdateUpgrades(state);

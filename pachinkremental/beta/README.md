@@ -40,6 +40,9 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
+### v1.8.0-beta (2021-06-06)
+* New Hyper System upgrade: Hyper Combo. The more hits scored in a single Hyper activation, the higher the multiplier goes!
+
 ### v1.7.8-beta (2021-06-02)
 * Fix CSS breaking on collapsible headers when importing a save from v1.1.1 or older directly into v1.7.6 or newer.
 * Show time since save file was started and time taken (since the save file was started) to max each machine in the Stats panel.
