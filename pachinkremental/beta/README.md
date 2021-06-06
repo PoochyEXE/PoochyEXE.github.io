@@ -42,6 +42,7 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 ### v1.8.0-beta (2021-06-06)
 * New Hyper System upgrade: Hyper Combo. The more hits scored in a single Hyper activation, the higher the multiplier goes!
+* Minor nerf: Rate-limit manual drops so that hypertapping/mashing the mouse button during a Hyper activation doesn't become the optimal strategy.
 
 ### v1.7.8-beta (2021-06-02)
 * Fix CSS breaking on collapsible headers when importing a save from v1.1.1 or older directly into v1.7.6 or newer.

@@ -3,6 +3,7 @@ const kTitleAndVersion = "Pachinkremental " + kVersion;
 
 const kFrameInterval = 1000.0 / kFPS;
 
+const kManualDropCooldown = 80.0;
 const kMinCooldownToDraw = 300.0;
 const kTopCanvasLayer = "canvas_ripples";
 
@@ -24,6 +25,7 @@ function DropBall(x, y, ball_type_index) {
 	);
 	++stats.balls_dropped;
 	++stats[ball_type.name + "_balls"];
+	state.last_ball_drop = state.current_time;
 	if (ball_type.ripple_color_rgb) {
 		state.ripples.push(
 			new RippleEffect(
@@ -148,6 +150,7 @@ function InitState() {
 			last_60s: [],
 		},
 		last_score_history_update: Date.now(),
+		last_ball_drop: 0,
 		notifications: new Array(0),
 		upgrade_headers: null,
 		upgrade_category_to_header_map: {},
@@ -472,7 +475,8 @@ function OnClick(event) {
 	let machine = ActiveMachine(state);
 	if (machine.board.CanDropAt(pos)) {
 		let save_data = machine.GetSaveData();
-		if (CanDrop(state)) {
+		let time_since_prev_drop = state.current_time - state.last_ball_drop;
+		if (time_since_prev_drop >= kManualDropCooldown && CanDrop(state)) {
 			DropBall(board_x, board_y);
 			++save_data.stats.balls_dropped_manual;
 		}
