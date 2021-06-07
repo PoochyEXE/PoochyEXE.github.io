@@ -44,12 +44,17 @@ class BumperMachine extends PachinkoMachine {
 		this.max_hyper_charge = 50000;
 		this.hyper_charge_rate = 1.0;
 		this.hyper_duration = 15000;
+		this.last_hyper_end_time = 0;
 
 		//this.bonus_wheel = this.InitWheel();
 	}
 
 	OnActivate() {
 		//this.bonus_wheel = this.InitWheel();
+	}
+	
+	OnBuffTimeout(state) {
+		this.last_hyper_end_time = state.current_time;
 	}
 
 	BallTypes() {
@@ -1272,14 +1277,15 @@ class BumperMachine extends PachinkoMachine {
 		UpdateDisplay("hyper_system", "inline-block");
 		const save_data = this.GetSaveData();
 		let button_elem = document.getElementById("button_hyper");
-		let status_text = "";
+		let status_elem = document.getElementById("hyper_status");
 		let meter_fraction = 0;
 		if (save_data.score_buff_duration > 0) {
+			status_elem.style.opacity = 1.0;
 			meter_fraction =
 				save_data.score_buff_duration / this.hyper_duration;
 			button_elem.disabled = true;
 			if (save_data.hyper_combo > 0) {
-				status_text = save_data.hyper_combo + " hit";
+				let status_text = save_data.hyper_combo + " hit";
 				if (save_data.hyper_combo > 1) {
 					status_text += "s";
 				}
@@ -1287,19 +1293,33 @@ class BumperMachine extends PachinkoMachine {
 					this.HyperComboValue(save_data.hyper_combo);
 				status_text += "! Multiplier \u00D7" +
 					hyper_combo_value.toFixed(2);
+				UpdateInnerHTML("hyper_status", status_text);
 			} else {
-				status_text = "Hyper System active!";
+				UpdateInnerHTML("hyper_status", "Hyper System active!");
 			}
 		} else if (save_data.hyper_charge < this.max_hyper_charge) {
 			meter_fraction =
 				save_data.hyper_charge / this.max_hyper_charge;
 			button_elem.disabled = true;
-			status_text = "Hyper System charging...";
+			let since_hyper_end = state.current_time - this.last_hyper_end_time;
+			const kFadeTime = 2000.0;
+			if (save_data.hyper_combo > 0 && since_hyper_end < kFadeTime) {
+				status_elem.style.opacity = 1.0 - (since_hyper_end / kFadeTime);
+			} else {
+				UpdateInnerHTML("hyper_status", "Hyper System charging...");
+				if (save_data.hyper_combo > 0 && since_hyper_end < kFadeTime * 2) {
+					status_elem.style.opacity = (since_hyper_end / kFadeTime) - 1.0;
+				} else {
+					status_elem.style.opacity = 1.0;
+				}
+			}
 		} else {
+			status_elem.style.opacity = 1.0;
 			meter_fraction = 1.0;
 			button_elem.disabled = false;
-			status_text = "Hyper System ready!";
+			UpdateInnerHTML("hyper_status", "Hyper System ready!");
 		}
+		
 		let meter_percent = 100.0 * meter_fraction;
 		if (meter_percent > 100.0) {
 			meter_percent = 100.0;
@@ -1309,7 +1329,6 @@ class BumperMachine extends PachinkoMachine {
 		}
 		document.getElementById("hyper_meter_fill").style.width =
 			meter_percent + "%";
-		UpdateInnerHTML("hyper_status", status_text);
 	}
 
 	AwardPoints(base_value, ball) {

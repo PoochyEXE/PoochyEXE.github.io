@@ -19,6 +19,8 @@ class PachinkoMachine {
 
 	OnActivate() {}
 
+	OnBuffTimeout(state) {}
+
 	InitBoard() {
 		console.error("Not implemented!");
 	}

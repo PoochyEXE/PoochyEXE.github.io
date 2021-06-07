@@ -357,8 +357,9 @@ function UpdateOneFrame(state) {
 
 	if (save_data.score_buff_duration > 0) {
 		save_data.score_buff_duration -= kFrameInterval;
-		if (save_data.score_buff_duration < 0) {
+		if (save_data.score_buff_duration <= 0) {
 			save_data.score_buff_duration = 0;
+			machine.OnBuffTimeout(state);
 		}
 		state.update_buff_display = true;
 	}

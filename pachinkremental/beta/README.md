@@ -42,6 +42,7 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 ### v1.8.1-beta (2021-06-07)
 * Fix upgrade tooltips sometimes going partially off-screen.
+* Make the Hyper Combo counter fade out when the Hyper System activation time runs out.
 
 ### v1.8.0-beta (2021-06-06)
 * New Hyper System upgrade: Hyper Combo. The more hits scored in a single Hyper activation, the higher the multiplier goes!
