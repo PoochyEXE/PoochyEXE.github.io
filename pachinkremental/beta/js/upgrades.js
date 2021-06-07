@@ -567,19 +567,23 @@ function UpdateUpgradeButtons(state) {
 function ShowUpgradeTooltip(elem) {
 	state.active_tooltip = elem.id;
 	const kWidth = 200;
+	const kPadding = 5;
 	let body_rect = document.body.getBoundingClientRect();
 	let button_rect = elem.getBoundingClientRect();
 	let tooltip_elem = document.getElementById("tooltip");
 	tooltip_elem.style.width = kWidth + "px";
-	let left_pos = Math.min(
-		(button_rect.left + button_rect.right - kWidth) / 2.0,
-		body_rect.right - kWidth - 5
-	);
 	tooltip_elem.style.display = "block";
 	tooltip_elem.innerHTML = ActiveMachine(state).upgrades[elem.id].description;
+	let left_pos = Math.min(
+		(button_rect.left + button_rect.right - kWidth) / 2.0,
+		body_rect.right - kWidth - kPadding
+	);
+	let top_pos = button_rect.top - tooltip_elem.offsetHeight - kPadding;
+	if (top_pos < 0) {
+		top_pos = button_rect.bottom + kPadding;
+	}
 	tooltip_elem.style.left = left_pos + "px";
-	tooltip_elem.style.top =
-		button_rect.top - tooltip_elem.offsetHeight - 5 + "px";
+	tooltip_elem.style.top = top_pos + "px";
 }
 
 function HideUpgradeTooltip(button_elem) {
