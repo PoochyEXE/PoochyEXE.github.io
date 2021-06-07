@@ -40,6 +40,9 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
+### v1.8.1-beta (2021-06-07)
+* Fix upgrade tooltips sometimes going partially off-screen.
+
 ### v1.8.0-beta (2021-06-06)
 * New Hyper System upgrade: Hyper Combo. The more hits scored in a single Hyper activation, the higher the multiplier goes!
 * Minor nerf: Rate-limit manual drops so that hypertapping/mashing the mouse button during a Hyper activation doesn't become the optimal strategy.
