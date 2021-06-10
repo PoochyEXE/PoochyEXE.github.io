@@ -45,20 +45,35 @@ class BumperMachine extends PachinkoMachine {
 		this.hyper_charge_rate = 1.0;
 		this.hyper_duration = 15000;
 		this.last_hyper_end_time = 0;
+		this.overdrive = false;
 
 		//this.bonus_wheel = this.InitWheel();
 	}
 
 	OnActivate() {
+		this.CheckOverdrive();
 		//this.bonus_wheel = this.InitWheel();
 	}
 	
 	OnBuffTimeout(state) {
+		this.DeactivateOverdrive();
 		this.last_hyper_end_time = state.current_time;
 	}
 
 	BallTypes() {
 		return kBumperMachineBallTypes;
+	}
+
+	RollBallType() {
+		let ball_type = super.RollBallType();
+		if (
+			ball_type == kBumperMachineBallTypeIDs.NORMAL &&
+			this.overdrive &&
+			this.IsUnlocked("overdrive_midas")
+		) {
+			ball_type = kBumperMachineBallTypeIDs.GOLD;
+		}
+		return ball_type;
 	}
 
 	DefaultSaveData() {
@@ -144,6 +159,7 @@ class BumperMachine extends PachinkoMachine {
 			new UpgradeHeader(this, "auto_drop", "Auto-Drop", this.upgrades["auto_drop"].visible_func),
 			new UpgradeHeader(this, "combos", "Combos", this.upgrades["unlock_combos"].visible_func),
 			new UpgradeHeader(this, "hyper", "Hyper System", this.upgrades["unlock_hyper_system"].visible_func),
+			new UpgradeHeader(this, "overdrive", "Overdrive", this.upgrades["unlock_overdrive"].visible_func),
 			/* TODO: Add bonus wheel.
 			new UpgradeHeader(this, "bonus_wheel", "Bonus Wheel", this.upgrades["unlock_bonus_wheel"].visible_func),
 			*/
@@ -938,6 +954,41 @@ class BumperMachine extends PachinkoMachine {
 			})
 		);
 		upgrades_list.push(
+			new FixedCostFeatureUnlockUpgrade({
+				machine: this,
+				id: "unlock_overdrive",
+				name: "Overdrive",
+				category: "overdrive",
+				description: "Unlock Overdrive, which activates whenever the Hyper Combo is over 1000 hits. It doubles the Hyper Combo's effect and can be upgraded with additional effects.",
+				cost: 8e21,
+				visible_func: () =>
+					this.IsUnlocked("hyper_combo") &&
+					this.GetSaveData().stats.max_hyper_combo >= 1000,
+			})
+		);
+		upgrades_list.push(
+			new FixedCostFeatureUnlockUpgrade({
+				machine: this,
+				id: "overdrive_accelerator",
+				name: "OD Accelerator",
+				category: "overdrive",
+				description: "Overdrive makes the Hyper Combo's multiplier increase faster.",
+				cost: 8e24,
+				visible_func: () => this.IsUnlocked("unlock_overdrive"),
+			})
+		);
+		upgrades_list.push(
+			new FixedCostFeatureUnlockUpgrade({
+				machine: this,
+				id: "overdrive_midas",
+				name: "OD Midas",
+				category: "overdrive",
+				description: "Overdrive turns all normal balls into gold balls.",
+				cost: 8e24,
+				visible_func: () => this.IsUnlocked("unlock_overdrive"),
+			})
+		);
+		upgrades_list.push(
 			new BallTypeUnlockUpgrade({
 				machine: this,
 				ball_type: this.ball_types[kBumperMachineBallTypeIDs.GOLD],
@@ -1260,7 +1311,15 @@ class BumperMachine extends PachinkoMachine {
 	}
 
 	HyperComboValue(hyper_combo) {
-		return Math.max(1.0, hyper_combo / 200.0);
+		let value = Math.max(1.0, hyper_combo / 200.0);
+		if (this.overdrive) {
+			if (this.IsUnlocked("overdrive_accelerator")) {
+				value *= 1.0 + (hyper_combo / 1000.0);
+			} else {
+				value *= 2.0;
+			}
+		}
+		return value;
 	}
 
 	AutoHyperOn() {
@@ -1319,7 +1378,7 @@ class BumperMachine extends PachinkoMachine {
 			button_elem.disabled = false;
 			UpdateInnerHTML("hyper_status", "Hyper System ready!");
 		}
-		
+
 		let meter_percent = 100.0 * meter_fraction;
 		if (meter_percent > 100.0) {
 			meter_percent = 100.0;
@@ -1329,6 +1388,51 @@ class BumperMachine extends PachinkoMachine {
 		}
 		document.getElementById("hyper_meter_fill").style.width =
 			meter_percent + "%";
+	}
+	
+	ActivateOverdrive() {
+		this.overdrive = true;
+		document.getElementById("hyper_status").classList.add("overdrive");
+		
+		if (this.IsUnlocked("overdrive_midas")) {
+			const kNormal = kBumperMachineBallTypeIDs.NORMAL;
+			const kGold = kBumperMachineBallTypeIDs.GOLD;
+			let normal_balls = state.balls_by_type[kNormal];
+			let gold_balls = state.balls_by_type[kGold];
+			for (let i = 0; i < normal_balls.length; ++i) {
+				let ball = normal_balls[i];
+				ball.ball_type_index = kGold;
+				state.ripples.push(
+					new RippleEffect(
+						new Point(ball.pos.x, ball.pos.y),
+						kBumperMachineBallTypes[kGold].ripple_color_rgb,
+						kBallRadius
+					)
+				);
+				gold_balls.push(normal_balls[i]);
+			}
+			normal_balls.length = 0;
+		}
+	}
+	
+	DeactivateOverdrive() {
+		this.overdrive = false;
+		document.getElementById("hyper_status").classList.remove("overdrive");
+	}
+	
+	CheckOverdrive() {
+		let save_data = this.GetSaveData();
+		if (
+			save_data.score_buff_duration > 0 &&
+			save_data.hyper_combo >= 1000 &&
+			this.IsUnlocked("unlock_overdrive")
+		) {
+			if (!this.overdrive) {
+				this.ActivateOverdrive();
+			}
+		} else if (this.overdrive) {
+			this.DeactivateOverdrive();
+		}
 	}
 
 	AwardPoints(base_value, ball) {
@@ -1375,6 +1479,7 @@ class BumperMachine extends PachinkoMachine {
 					total_value *= this.hyper_multiplier;
 					if (this.IsUnlocked("hyper_combo")) {
 						++save_data.hyper_combo;
+						this.CheckOverdrive();
 						save_data.stats.max_hyper_combo =
 							Math.max(save_data.hyper_combo, save_data.stats.max_hyper_combo);
 						total_value *= this.HyperComboValue(save_data.hyper_combo);

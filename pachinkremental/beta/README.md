@@ -40,6 +40,9 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
+### v1.9.0-beta (2021-06-10)
+* Add Overdrive upgrades, which kick in when the Hyper Combo is over 1000 hits.
+
 ### v1.8.1-beta (2021-06-07)
 * Fix upgrade tooltips sometimes going partially off-screen.
 * Make the Hyper Combo counter fade out when the Hyper System activation time runs out.
