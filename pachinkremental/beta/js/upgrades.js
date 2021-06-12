@@ -12,7 +12,8 @@ class Upgrade {
 		value_suffix,
 		visible_func,
 		on_update,
-		on_buy
+		on_buy,
+		tooltip_width,
 	}) {
 		this.machine = machine;
 		this.id = id;
@@ -48,6 +49,7 @@ class Upgrade {
 		} else {
 			this.on_buy = kNoop;
 		}
+		this.tooltip_width = tooltip_width;
 	}
 
 	IsMaxed() {
@@ -142,7 +144,8 @@ class DelayReductionUpgrade extends Upgrade {
 		item_suffix,
 		visible_func,
 		on_update,
-		on_buy
+		on_buy,
+		tooltip_width,
 	}) {
 		super({
 			machine,
@@ -157,7 +160,8 @@ class DelayReductionUpgrade extends Upgrade {
 			value_suffix: " ms",
 			visible_func,
 			on_update,
-			on_buy
+			on_buy,
+			tooltip_width,
 		});
 		this.item_suffix = item_suffix;
 	}
@@ -207,7 +211,8 @@ class FeatureUnlockUpgrade extends Upgrade {
 		cost_func,
 		visible_func,
 		on_update,
-		on_buy
+		on_buy,
+		tooltip_width,
 	}) {
 		super({
 			machine,
@@ -222,7 +227,8 @@ class FeatureUnlockUpgrade extends Upgrade {
 			value_suffix: "",
 			visible_func,
 			on_update,
-			on_buy
+			on_buy,
+			tooltip_width,
 		});
 		if (unlocked_name) {
 			this.unlocked_name = unlocked_name;
@@ -254,7 +260,8 @@ class FixedCostFeatureUnlockUpgrade extends FeatureUnlockUpgrade {
 		cost,
 		visible_func,
 		on_update,
-		on_buy
+		on_buy,
+		tooltip_width,
 	}) {
 		super({
 			machine,
@@ -267,7 +274,8 @@ class FixedCostFeatureUnlockUpgrade extends FeatureUnlockUpgrade {
 			cost_func: () => cost,
 			visible_func,
 			on_update,
-			on_buy
+			on_buy,
+			tooltip_width,
 		});
 	}
 }
@@ -284,7 +292,8 @@ class ToggleUnlockUpgrade extends FixedCostFeatureUnlockUpgrade {
 		cost,
 		visible_func,
 		on_update,
-		on_buy
+		on_buy,
+		tooltip_width,
 	}) {
 		super({
 			machine,
@@ -297,7 +306,8 @@ class ToggleUnlockUpgrade extends FixedCostFeatureUnlockUpgrade {
 			cost,
 			visible_func,
 			on_update,
-			on_buy
+			on_buy,
+			tooltip_width,
 		});
 	}
 
@@ -350,7 +360,14 @@ function BallTypeUnlockUpgradeID(ball_type) {
 }
 
 class BallTypeUnlockUpgrade extends FeatureUnlockUpgrade {
-	constructor({ machine, ball_type, ball_description, cost_func, visible_func }) {
+	constructor({
+		machine,
+		ball_type,
+		ball_description,
+		cost_func,
+		visible_func,
+		tooltip_width,
+	}) {
 		super({
 			machine,
 			id: BallTypeUnlockUpgradeID(ball_type),
@@ -367,6 +384,7 @@ class BallTypeUnlockUpgrade extends FeatureUnlockUpgrade {
 				UpdateDisplay(ball_type.name + "_favicon_wrapper", display);
 				UpdateFavicon(state);
 			},
+			tooltip_width,
 		});
 	}
 }
@@ -572,15 +590,20 @@ function ShowUpgradeTooltip(elem) {
 	let body_rect = document.body.getBoundingClientRect();
 	let button_rect = elem.getBoundingClientRect();
 	let tooltip_elem = document.getElementById("tooltip");
-	tooltip_elem.style.width = kDefaultWidth + "px";
+	const upgrade = ActiveMachine(state).upgrades[elem.id];
 	tooltip_elem.style.display = "block";
-	tooltip_elem.innerHTML = ActiveMachine(state).upgrades[elem.id].description;
-	let tooltip_rect = tooltip_elem.getBoundingClientRect();
+	tooltip_elem.innerHTML = upgrade.description;
 	let width = kDefaultWidth;
-	if (tooltip_rect.width * kTargetAspectRatio < tooltip_rect.height) {
-		width = Math.max(kDefaultWidth, Math.ceil(Math.sqrt(tooltip_rect.width * tooltip_rect.height / kTargetAspectRatio)));
-		tooltip_elem.style.width = width + "px";
+	if (upgrade.tooltip_width) {
+		width = upgrade.tooltip_width;
+	} else {
+		tooltip_elem.style.width = kDefaultWidth + "px";
+		let tooltip_rect = tooltip_elem.getBoundingClientRect();
+		if (tooltip_rect.width * kTargetAspectRatio < tooltip_rect.height) {
+			width = Math.max(kDefaultWidth, Math.ceil(Math.sqrt(tooltip_rect.width * tooltip_rect.height / kTargetAspectRatio)));
+		}
 	}
+	tooltip_elem.style.width = width + "px";
 	let left_pos = Math.min(
 		(button_rect.left + button_rect.right - width) / 2.0,
 		body_rect.right - width - kPadding

@@ -40,6 +40,9 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
+### v1.9.1-beta (2021-06-11)
+* Fix game crashing when trying to load a save file that was saved while Overdrive was active.
+
 ### v1.9.0-beta (2021-06-10)
 * Add Overdrive upgrades, which kick in when the Hyper Combo is over 1000 hits.
 

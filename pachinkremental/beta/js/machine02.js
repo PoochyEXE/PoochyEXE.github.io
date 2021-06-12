@@ -1399,19 +1399,21 @@ class BumperMachine extends PachinkoMachine {
 			const kGold = kBumperMachineBallTypeIDs.GOLD;
 			let normal_balls = state.balls_by_type[kNormal];
 			let gold_balls = state.balls_by_type[kGold];
-			for (let i = 0; i < normal_balls.length; ++i) {
-				let ball = normal_balls[i];
-				ball.ball_type_index = kGold;
-				state.ripples.push(
-					new RippleEffect(
-						new Point(ball.pos.x, ball.pos.y),
-						kBumperMachineBallTypes[kGold].ripple_color_rgb,
-						kBallRadius
-					)
-				);
-				gold_balls.push(normal_balls[i]);
+			if (normal_balls && gold_balls) {
+				for (let i = 0; i < normal_balls.length; ++i) {
+					let ball = normal_balls[i];
+					ball.ball_type_index = kGold;
+					state.ripples.push(
+						new RippleEffect(
+							new Point(ball.pos.x, ball.pos.y),
+							kBumperMachineBallTypes[kGold].ripple_color_rgb,
+							kBallRadius
+						)
+					);
+					gold_balls.push(normal_balls[i]);
+				}
+				normal_balls.length = 0;
 			}
-			normal_balls.length = 0;
 		}
 	}
 	
