@@ -1412,7 +1412,7 @@ class BumperMachine extends PachinkoMachine {
 					);
 					gold_balls.push(normal_balls[i]);
 				}
-				normal_balls.length = 0;
+				normal_balls = [];
 			}
 		}
 	}
