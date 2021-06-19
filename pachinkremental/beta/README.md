@@ -40,6 +40,9 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
+### v1.9.2-beta (2021-06-19)
+* Fix point value text on score targets not updating when switching notations.
+
 ### v1.9.1-beta (2021-06-11)
 * Fix game crashing when trying to load a save file that was saved while Overdrive was active.
 

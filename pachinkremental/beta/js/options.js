@@ -264,6 +264,7 @@ function ToggleNotation() {
 	state.update_upgrade_buttons = true;
 	state.update_buff_display = true;
 	state.redraw_wheel = true;
+	state.reset_target_text = true;
 	state.redraw_targets = true;
 	state.update_stats_panel = true;
 	UpdateSpinCounter();

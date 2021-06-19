@@ -818,6 +818,16 @@ function Draw(state) {
 		DrawBumpers(machine.board.bumper_sets, ctx);
 	}
 	// Targets
+	if (state.reset_target_text) {
+		state.reset_target_text = false;
+		let target_sets = machine.board.target_sets;
+		for (let i = 0; i < target_sets.length; ++i) {
+			const targets = target_sets[i].targets;
+			for (let j = 0; j < targets.length; ++j) {
+				targets[j].ResetText();
+			}
+		}
+	}
 	if (state.redraw_all || state.redraw_targets) {
 		let ctx = ClearLayerAndReturnContext("targets");
 		state.redraw_targets = false;
