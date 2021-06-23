@@ -1269,7 +1269,7 @@ class BumperMachine extends PachinkoMachine {
 				machine: this,
 				ball_type: this.ball_types[kBumperMachineBallTypeIDs.BEACH_BALL],
 				ball_description:
-					"Beach balls have bonuses of Opal balls plus they never break their combo. They're also bouncier and lighter.",
+					"Beach balls have bonuses of Opal balls plus they never break their combo. They're also bouncier and floatier.",
 				cost_func: () => 2e20,
 				visible_func: () =>
 					this.IsUnlocked("unlock_opal_balls") &&
