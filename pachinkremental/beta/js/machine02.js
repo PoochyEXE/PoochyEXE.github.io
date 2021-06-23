@@ -582,6 +582,7 @@ class BumperMachine extends PachinkoMachine {
 			new Point(grid_cols[22], y - kVerticalSpacing),
 		]
 		AppendInterpolatedPolyline(pegs, top_right_ramp, kWallSpacing);
+		pegs.pop();
 		const top_center_ramp = [
 			new Point(grid_cols[8], y),
 			new Point(grid_cols[11], y - kVerticalSpacing * 0.75),

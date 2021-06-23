@@ -70,6 +70,21 @@ function UpdateBalls(balls, board, params) {
 				}
 			}
 		}
+		
+		// Invisible wall above the sides of the board to keep balls in play if they
+		// bounce over the top corner pegs.
+		if (pos.y < 0) {
+			const min_x = kBallRadius;
+			const max_x = board.width - kBallRadius;
+			while (pos.x < min_x || pos.x > max_x) {
+				vel.x = -1 * params.collision_elasticity * vel.x;
+				if (pos.x < min_x) {
+					pos.x += 2 * (min_x - pos.x);
+				} else if (pos.x > max_x) {
+					pos.x -= 2 * (pos.x - max_x);
+				}
+			}
+		}
 
 		balls[b].pos = pos;
 		balls[b].vel = vel;

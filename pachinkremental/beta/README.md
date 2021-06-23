@@ -45,6 +45,8 @@ I plan to archive the last version before any update that significantly nerfs pr
 * Add 3 more Overdrive upgrades.
 * Buff: Reduced costs of Overdrive upgrades.
 * Fix score multiplier display precision flickering between 1 decimal place and rounding to the nearest integer during a Hyper Combo.
+* Add invisible walls above the sides of the board, so that if a ball bounces wildly off a bumper and over one of the top corner pegs, it'll bounce back into play instead of simply despawning due to going out of bounds.
+* Remove an extraneous peg in the right wall of the Bumpers machine.
 
 ### v1.9.2-beta (2021-06-19)
 * Fix point value text on score targets not updating when switching notations.
