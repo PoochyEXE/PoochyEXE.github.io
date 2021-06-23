@@ -40,6 +40,12 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
+### v1.10.0-beta (2021-06-23)
+* Add Beach Balls to Bumpers machine.
+* Add 3 more Overdrive upgrades.
+* Buff: Reduced costs of Overdrive upgrades.
+* Fix score multiplier display precision flickering between 1 decimal place and rounding to the nearest integer during a Hyper Combo.
+
 ### v1.9.2-beta (2021-06-19)
 * Fix point value text on score targets not updating when switching notations.
 

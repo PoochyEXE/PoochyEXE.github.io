@@ -746,6 +746,10 @@ span.prismaticText {
 	color: transparent;
 }
 
+span.spellCard {
+	color: #F88;
+}
+
 @-webkit-keyframes prismaticTextLightColor {
   0% { color: #C00; }
   17% { color: #CC0; }

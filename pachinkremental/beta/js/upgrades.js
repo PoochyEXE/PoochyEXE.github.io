@@ -280,6 +280,42 @@ class FixedCostFeatureUnlockUpgrade extends FeatureUnlockUpgrade {
 	}
 }
 
+class CirnoFixedCostUpgrade extends FixedCostFeatureUnlockUpgrade {
+	constructor({
+		machine,
+		id,
+		name,
+		unlocked_name,
+		category,
+		button_class,
+		description,
+		cost,
+		visible_func,
+		on_update,
+		on_buy,
+		tooltip_width,
+	}) {
+		super({
+			machine,
+			id,
+			name,
+			unlocked_name,
+			category,
+			button_class,
+			description,
+			cost,
+			visible_func,
+			on_update,
+			on_buy,
+			tooltip_width,
+		});
+	}
+
+	GetText() {
+		return super.GetText().replace("9", "⑨");
+	}
+}
+
 class ToggleUnlockUpgrade extends FixedCostFeatureUnlockUpgrade {
 	constructor({
 		machine,
