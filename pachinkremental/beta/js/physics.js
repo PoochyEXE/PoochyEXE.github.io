@@ -79,9 +79,9 @@ function UpdateBalls(balls, board, params) {
 			while (pos.x < min_x || pos.x > max_x) {
 				vel.x = -1 * params.collision_elasticity * vel.x;
 				if (pos.x < min_x) {
-					pos.x += 2 * (min_x - pos.x);
+					pos.x += (1 + params.collision_elasticity) * (min_x - pos.x);
 				} else if (pos.x > max_x) {
-					pos.x -= 2 * (pos.x - max_x);
+					pos.x -= (1 + params.collision_elasticity) * (pos.x - max_x);
 				}
 			}
 		}
