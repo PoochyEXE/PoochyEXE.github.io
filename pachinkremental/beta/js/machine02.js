@@ -1005,7 +1005,9 @@ class BumperMachine extends PachinkoMachine {
 				button_class: "rubyUpgradeButton",
 				description: '<span class="spellCard">「幻朧月睨(ルナティックレッドアイズ)」</span><br>2&times; Ruby Ball Value during Overdrive.',
 				cost: 8e24,
-				visible_func: () => this.IsUnlocked("unlock_overdrive"),
+				visible_func: () =>
+					this.IsUnlocked("unlock_overdrive") &&
+					this.IsUnlocked("unlock_ruby_balls"),
 				tooltip_width: 270,
 			})
 		);
@@ -1018,7 +1020,9 @@ class BumperMachine extends PachinkoMachine {
 				button_class: "emeraldUpgradeButton",
 				description: '<span class="spellCard">嫉妬「緑色の眼をした見えない怪物」</span><br>2&times; Emerald Ball Value during Overdrive.',
 				cost: 11e24,
-				visible_func: () => this.IsUnlocked("unlock_overdrive"),
+				visible_func: () =>
+					this.IsUnlocked("unlock_overdrive") &&
+					this.IsUnlocked("unlock_emerald_balls"),
 				tooltip_width: 270,
 			})
 		);
@@ -1031,7 +1035,24 @@ class BumperMachine extends PachinkoMachine {
 				button_class: "sapphireUpgradeButton",
 				description: '<span class="spellCard">凍符「パーフェクトフリーズ」</span><br>2&times; Sapphire Ball Value during Overdrive.<br>⑨',
 				cost: 9e24,
-				visible_func: () => this.IsUnlocked("unlock_overdrive"),
+				visible_func: () =>
+					this.IsUnlocked("unlock_overdrive") &&
+					this.IsUnlocked("unlock_sapphire_balls"),
+				tooltip_width: 270,
+			})
+		);
+		upgrades_list.push(
+			new FixedCostFeatureUnlockUpgrade({
+				machine: this,
+				id: "overdrive_rainbow_ufo",
+				name: "OD Rainbow UFO",
+				category: "overdrive",
+				button_class: "opalUpgradeButton",
+				description: '<span class="spellCard">正体不明「恐怖の虹色ＵＦＯ襲来」</span><br>During Overdrive, the 3 gemstone ball multipliers stack multiplicatively instead of additively.',
+				cost: 12e27,
+				visible_func: () =>
+					this.IsUnlocked("unlock_overdrive") &&
+					this.IsUnlocked("unlock_opal_balls"),
 				tooltip_width: 270,
 			})
 		);
@@ -1585,42 +1606,42 @@ class BumperMachine extends PachinkoMachine {
 		if (ball.ball_type_index != kBumperMachineBallTypeIDs.NORMAL) {
 			total_value *= this.special_ball_multiplier;
 			if (ball.ball_type_index != kBumperMachineBallTypeIDs.GOLD) {
-				let gem_add_percent = 0;
+				let ruby_value = 0;
 				if (this.HasRubySpecial(ball.ball_type_index)) {
 					let sec_elapsed =
 						(state.current_time - ball.start_time) / 1000.0;
-					let ruby_value = sec_elapsed * this.ruby_ball_value_percent;
-					if (
-						this.overdrive &&
-						this.IsUnlocked("overdrive_lunatic_red_eyes")
-					) {
+					ruby_value = sec_elapsed * this.ruby_ball_value_percent;
+				}
+				let sapphire_value = 0;
+				if (this.HasSapphireSpecial(ball.ball_type_index)) {
+					sapphire_value =
+						ball.score_targets_hit * this.sapphire_ball_value_percent;
+				}
+				let emerald_value = 0;
+				if (this.HasEmeraldSpecial(ball.ball_type_index)) {
+					emerald_value =
+						ball.bumpers_hit * this.emerald_ball_value_percent;
+				}
+				if (this.overdrive) {
+					if (this.IsUnlocked("overdrive_lunatic_red_eyes")) {
 						ruby_value *= 2;
 					}
-					gem_add_percent += ruby_value;
-				}
-				if (this.HasSapphireSpecial(ball.ball_type_index)) {
-					let sapphire_value =
-						ball.score_targets_hit * this.sapphire_ball_value_percent;
-					if (
-						this.overdrive &&
-						this.IsUnlocked("overdrive_perfect_freeze")
-					) {
+					if (this.IsUnlocked("overdrive_perfect_freeze")) {
 						sapphire_value *= 2;
 					}
-					gem_add_percent += sapphire_value;
-				}
-				if (this.HasEmeraldSpecial(ball.ball_type_index)) {
-					let emerald_value =
-						ball.bumpers_hit * this.emerald_ball_value_percent;
-					if (
-						this.overdrive &&
-						this.IsUnlocked("overdrive_green_eyed_monster")
-					) {
+					if (this.IsUnlocked("overdrive_green_eyed_monster")) {
 						emerald_value *= 2;
 					}
-					gem_add_percent += emerald_value;
 				}
-				let multiplier = 1.0 + (gem_add_percent / 100.0);
+				let multiplier = 1.0;
+				if (this.overdrive && this.IsUnlocked("overdrive_rainbow_ufo")) {
+					multiplier *= 1.0 + ruby_value / 100.0;
+					multiplier *= 1.0 + sapphire_value / 100.0;
+					multiplier *= 1.0 + emerald_value / 100.0;
+				} else {
+					multiplier = 1.0 +
+						(ruby_value + sapphire_value + emerald_value) / 100.0;
+				}
 				total_value *= multiplier;
 			}
 		}
@@ -1784,8 +1805,6 @@ class BumperMachine extends PachinkoMachine {
 			return "Unlock Gold Balls";
 		} else if (!this.ShouldDisplayGemstoneBallUpgrades()) {
 			return "15% Gold Ball Rate";
-		} else if (!this.ShouldDisplayGemstoneBallUpgrades()) {
-			return "15% Gold Ball Rate";
 		} else if (!this.IsUnlocked("unlock_hyper_system")) {
 			return "Unlock Hyper System";
 		} else if (!this.AllTier1GemstoneBallsUnlocked()) {
@@ -1794,8 +1813,19 @@ class BumperMachine extends PachinkoMachine {
 			return "Unlock all 3 of Topaz, Turquoise, and Amethyst Balls";
 		} else if (!this.IsUnlocked("unlock_overdrive")) {
 			return "Unlock Overdrive";
+		} else if (!this.IsUnlocked("unlock_opal_balls")) {
+			return "Unlock Opal Balls";
+		} else if (!this.IsUnlocked("unlock_beach_balls")) {
+			return "Unlock Beach Balls";
 		} else {
-			return "None yet, please wait for the next beta update."
+			return "None! Congratulations, you've reached the current endgame!"
 		}
+		/*
+		} else if (!this.AreAllUpgradesMaxed()) {
+			return "Max all upgrades that can be maxed. (Costs about " + FormatNumberShort(1.34e30) + " points total. Point Multiplier and Gold Ball Multiplier have no maximum.)";
+		} else {
+			return "None! Congratulations, you've maxed everything that can be maxed on this machine! Please check back for more updates in the future."
+		}
+		*/
 	}
 }

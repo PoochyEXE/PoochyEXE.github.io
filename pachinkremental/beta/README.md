@@ -44,6 +44,10 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
+### v1.11.0-beta (2021-07-06)
+* Add another Overdrive upgrade.
+* Bugfix: Check that the corresponding gemstone ball type is unlocked before revealing the Overdrive upgrade for it.
+
 ### v1.10.1-beta (2021-07-06)
 * Keep the board on-screen when scrolling down, if enough headers are expanded to exceed the height of the screen.
 
