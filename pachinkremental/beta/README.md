@@ -24,6 +24,10 @@ Once you upgrade your auto-drop delay, the drop zone will stop turning red, to a
 
 A: This is intentional, both to make sure the game won't softlock with too many balls clogging up the board and to avoid draining batteries by making the collision detection code too performance-intensive. If you really must, pretend this is a very deep board and the balls are passing in front of or behind each other.
 
+### Q: Will there be a Prestige/New Game+ mechanic?
+
+A: I'm not saying it'll never happen, but I currently have no plans to add a prestige mechanic. I designed this game around discovering new features and mechanics as the main fun factor, drawing inspiration from games like Candy Box. I've yet to come up with a way to fit a prestige mechanic into that vision. But if you have ideas, I'll gladly listen.
+
 ## Known issues
 
 * Making the window too narrow can break some CSS and make the menu UI ugly.
@@ -39,6 +43,9 @@ I plan to archive the last version before any update that significantly nerfs pr
 ## Changelog
 
 **Caution: Spoilers below!**
+
+### v1.10.1-beta (2021-07-06)
+* Keep the board on-screen when scrolling down, if enough headers are expanded to exceed the height of the screen.
 
 ### v1.10.0-beta (2021-06-23)
 * Add Beach Balls to Bumpers machine.

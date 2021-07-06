@@ -1,5 +1,5 @@
 canvas.board {
-	position: absolute;
+	position: fixed;
 	left: 5px;
 	top: 5px;
 	font-family: sans-serif;
@@ -642,7 +642,7 @@ span.messageBoxLarge {
 
 button.dropZone {
 	border: 0px;
-	position: absolute;
+	position: fixed;
 	background: #0F0;
 	opacity: 0.25;
 	transition-duration: 200ms;
