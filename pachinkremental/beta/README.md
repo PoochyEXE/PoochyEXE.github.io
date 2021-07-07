@@ -44,6 +44,10 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
+### v1.11.1-beta (2021-07-06)
+* Fix balls acting weird after being transformed from normal to gold in mid-air by the Overdrive Midas upgrade.
+* Adjust gemstone ball description text to mention that they also don't count towards the max balls limit.
+
 ### v1.11.0-beta (2021-07-06)
 * Add another Overdrive upgrade.
 * Bugfix: Check that the corresponding gemstone ball type is unlocked before revealing the Overdrive upgrade for it.

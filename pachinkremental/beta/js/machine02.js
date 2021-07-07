@@ -187,7 +187,7 @@ class BumperMachine extends PachinkoMachine {
 					"amethyst_balls",
 					"opal_balls"
 				],
-				"Gemstone balls have the benefits of gold balls, plus an additional point value multiplier. Each type of gemstone ball has its own way to increase its multiplier.<br>NOTE: Each gemstone ball unlocked sharply increases the cost of unlocking the others!"
+				"Gemstone balls have the benefits of gold balls (including not counting towards the max balls limit), plus an additional point value multiplier. Each type of gemstone ball has its own way to increase its multiplier.<br>NOTE: Each gemstone ball unlocked sharply increases the cost of unlocking the others!"
 			),
 		];
 	}
@@ -1509,7 +1509,7 @@ class BumperMachine extends PachinkoMachine {
 					);
 					gold_balls.push(normal_balls[i]);
 				}
-				normal_balls = [];
+				state.balls_by_type[kNormal] = [];
 			}
 		}
 	}
