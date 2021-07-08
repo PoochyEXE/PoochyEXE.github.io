@@ -44,7 +44,11 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
-### v1.11.1-beta (2021-07-06)
+### v1.11.2-beta (2021-07-08)
+* Fix clicks in the drop zone being ignored when the page is scrolled down.
+* Add flavor text for Overdrive.
+
+### v1.11.1-beta (2021-07-07)
 * Fix balls acting weird after being transformed from normal to gold in mid-air by the Overdrive Midas upgrade.
 * Adjust gemstone ball description text to mention that they also don't count towards the max balls limit.
 

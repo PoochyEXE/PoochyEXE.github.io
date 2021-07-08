@@ -967,7 +967,7 @@ class BumperMachine extends PachinkoMachine {
 				id: "unlock_overdrive",
 				name: "Overdrive",
 				category: "overdrive",
-				description: "Unlock Overdrive, which activates whenever the Hyper Combo is over 1000 hits. It doubles the Hyper Combo's effect and can be upgraded with additional effects.",
+				description: 'Unlock Overdrive, which activates whenever the Hyper Combo is over 1000 hits. It doubles the Hyper Combo effect and can be upgraded with additional effects.<br><font color="#3FF">「届け蒼の彼方へ…♪」</font>',
 				cost: 8e21,
 				visible_func: () =>
 					this.IsUnlocked("hyper_combo") &&

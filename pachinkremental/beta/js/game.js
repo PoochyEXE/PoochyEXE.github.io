@@ -1,4 +1,4 @@
-const kVersion = "v1.11.1-beta";
+const kVersion = "v1.11.2-beta";
 const kTitleAndVersion = "Pachinkremental " + kVersion;
 
 const kFrameInterval = 1000.0 / kFPS;
@@ -464,8 +464,8 @@ function OnClick(event) {
 	let canvas = document.getElementById(kTopCanvasLayer);
 	let canvas_left = canvas.offsetLeft + canvas.clientLeft;
 	let canvas_top = canvas.offsetTop + canvas.clientTop;
-	let canvas_x = event.pageX - canvas_left;
-	let canvas_y = event.pageY - canvas_top;
+	let canvas_x = event.clientX - canvas_left;
+	let canvas_y = event.clientY - canvas_top;
 	if (state.april_fools) {
 		canvas_x = canvas.width - canvas_x;
 		canvas_y = canvas.height - canvas_y;
