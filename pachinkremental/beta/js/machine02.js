@@ -1807,10 +1807,16 @@ class BumperMachine extends PachinkoMachine {
 			return "15% Gold Ball Rate";
 		} else if (!this.IsUnlocked("unlock_hyper_system")) {
 			return "Unlock Hyper System";
+		} else if (!this.IsUpgradeVisible("auto_hyper")) {
+			return "Activate the Hyper System once";
 		} else if (!this.AllTier1GemstoneBallsUnlocked()) {
 			return "Unlock all 3 of Ruby, Sapphire, and Emerald Balls";
 		} else if (!this.AllTier2GemstoneBallsUnlocked()) {
 			return "Unlock all 3 of Topaz, Turquoise, and Amethyst Balls";
+		} else if (!this.IsUnlocked("hyper_combo")) {
+			return "Unlock Hyper Combo";
+		} else if (!this.IsUpgradeVisible("unlock_overdrive")) {
+			return "Reach a Hyper Combo of 1000";
 		} else if (!this.IsUnlocked("unlock_overdrive")) {
 			return "Unlock Overdrive";
 		} else if (!this.IsUnlocked("unlock_opal_balls")) {

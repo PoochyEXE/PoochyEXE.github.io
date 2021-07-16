@@ -44,6 +44,9 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
+### v1.11.3-beta (2021-07-15)
+* Add some missing next upgrade hints for the Bumpers machine.
+
 ### v1.11.2-beta (2021-07-08)
 * Fix clicks in the drop zone being ignored when the page is scrolled down.
 * Add flavor text for Overdrive.
