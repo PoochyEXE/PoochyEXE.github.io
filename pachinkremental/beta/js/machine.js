@@ -42,7 +42,7 @@ class PachinkoMachine {
 	}
 	
 	UpdateHyperSystemDisplay(state) {
-		console.error("Not implemented!");
+		UpdateDisplay("hyper_system", "none");
 	}
 
 	TogglePopupText() {

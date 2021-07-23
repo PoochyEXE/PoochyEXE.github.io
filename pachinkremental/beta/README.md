@@ -44,6 +44,9 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
+### v1.11.4-beta (2021-07-22)
+* Fix frozen Hyper System display remaining on screen when switching from Bumpers machine back to Basic.
+
 ### v1.11.3-beta (2021-07-15)
 * Add some missing next upgrade hints for the Bumpers machine.
 
