@@ -741,7 +741,7 @@ class BumperMachine extends PachinkoMachine {
 				name: "Add Score Targets",
 				category: "board",
 				description: "Adds 5 more high-value blue score targets in hard-to-hit places.",
-				cost: 1e10,
+				cost: 1e12,
 				visible_func: () => this.ShouldDisplayGemstoneBallUpgrades(),
 				on_update: function() {
 					let unlocked = this.GetValue() > 0;
@@ -910,7 +910,9 @@ class BumperMachine extends PachinkoMachine {
 				value_func: level => level + 10,
 				max_level: 20,
 				value_suffix: kTimesSymbol,
-				visible_func: () => this.IsUnlocked("unlock_hyper_system"),
+				visible_func: () =>
+					this.IsUnlocked("unlock_hyper_system") &&
+					this.GetSaveData().stats.hyper_activations > 0,
 				on_update: function() {
 					this.machine.hyper_multiplier = this.GetValue();
 				},
@@ -1007,7 +1009,7 @@ class BumperMachine extends PachinkoMachine {
 				cost: 8e24,
 				visible_func: () =>
 					this.IsUnlocked("unlock_overdrive") &&
-					this.IsUnlocked("unlock_ruby_balls"),
+					this.IsMaxed("ruby_ball_value_percent"),
 				tooltip_width: 270,
 			})
 		);
@@ -1022,7 +1024,7 @@ class BumperMachine extends PachinkoMachine {
 				cost: 11e24,
 				visible_func: () =>
 					this.IsUnlocked("unlock_overdrive") &&
-					this.IsUnlocked("unlock_emerald_balls"),
+					this.IsMaxed("emerald_ball_value_percent"),
 				tooltip_width: 270,
 			})
 		);
@@ -1037,7 +1039,7 @@ class BumperMachine extends PachinkoMachine {
 				cost: 9e24,
 				visible_func: () =>
 					this.IsUnlocked("unlock_overdrive") &&
-					this.IsUnlocked("unlock_sapphire_balls"),
+					this.IsMaxed("sapphire_ball_value_percent"),
 				tooltip_width: 270,
 			})
 		);
@@ -1052,6 +1054,9 @@ class BumperMachine extends PachinkoMachine {
 				cost: 12e27,
 				visible_func: () =>
 					this.IsUnlocked("unlock_overdrive") &&
+					this.IsUnlocked("overdrive_lunatic_red_eyes") &&
+					this.IsUnlocked("overdrive_green_eyed_monster") &&
+					this.IsUnlocked("overdrive_perfect_freeze") &&
 					this.IsUnlocked("unlock_opal_balls"),
 				tooltip_width: 270,
 			})
@@ -1291,7 +1296,7 @@ class BumperMachine extends PachinkoMachine {
 				ball_type: this.ball_types[kBumperMachineBallTypeIDs.BEACH_BALL],
 				ball_description:
 					"Beach balls have bonuses of Opal balls plus they never break their combo. They're also bouncier and floatier.",
-				cost_func: () => 2e20,
+				cost_func: () => 1e22,
 				visible_func: () =>
 					this.IsUnlocked("unlock_opal_balls") &&
 					this.IsMaxed("combo_timeout"),
@@ -1718,15 +1723,15 @@ class BumperMachine extends PachinkoMachine {
 	}
 
 	NthGemstoneBallUnlockCost(n) {
-		return 25e8 * Math.pow(20, n - 1);
+		return 1e12 * Math.pow(20, n - 1);
 	}
 
 	Tier1GemstoneBallRateCostFunc(level) {
-		return 1e9 * Math.pow(5, level);
+		return 1e12 * Math.pow(5, level);
 	}
 
 	Tier2GemstoneBallRateCostFunc(level) {
-		return 1e12 * Math.pow(5, level);
+		return 1e15 * Math.pow(5, level);
 	}
 
 	GemstoneBallRateValueFunc(level) {
@@ -1821,8 +1826,18 @@ class BumperMachine extends PachinkoMachine {
 			return "Unlock Overdrive";
 		} else if (!this.IsUnlocked("unlock_opal_balls")) {
 			return "Unlock Opal Balls";
+		} else if (!this.IsUpgradeVisible("unlock_beach_balls")) {
+			return "Upgrade Combo Timeout to 5 seconds";
 		} else if (!this.IsUnlocked("unlock_beach_balls")) {
 			return "Unlock Beach Balls";
+		} else if (
+			!this.IsMaxed("ruby_ball_value_percent") ||
+			!this.IsMaxed("emerald_ball_value_percent") ||
+			!this.IsMaxed("sapphire_ball_value_percent")
+		) {
+			return "100% Ruby Ball Value, 100% Emerald Ball Value, or 500% Sapphire Ball Value. Each one reveals a different upgrade when maxed.";
+		} else if (!this.IsUpgradeVisible("overdrive_rainbow_ufo")) {
+			return "Unlock all 3 Overdrive upgrades corresponding to Ruby, Sapphire, and Emerald Balls.";
 		} else {
 			return "None! Congratulations, you've reached the current endgame!"
 		}

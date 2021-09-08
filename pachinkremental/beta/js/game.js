@@ -1,4 +1,4 @@
-const kVersion = "v1.11.4-beta";
+const kVersion = "v1.11.5-beta";
 const kTitleAndVersion = "Pachinkremental " + kVersion;
 
 const kFrameInterval = 1000.0 / kFPS;
@@ -171,6 +171,7 @@ function InitState() {
 		active_tooltip: null,
 		wheel_popup_text: new Array(0),
 		ripples: new Array(0),
+		holding_shift: false,
 		april_fools: false,
 		last_drawn: {
 			can_drop: true,
@@ -338,7 +339,6 @@ function SwitchMachine(index) {
 	for (let i = 0; i < state.score_history.length; ++i) {
 		state.score_history[i] = 0;
 	}
-
 }
 
 function UpdateOneFrame(state) {
@@ -419,6 +419,21 @@ function CheckEvents() {
 		clearTimeout(state.timeouts.check_event);
 	}
 	state.timeouts.check_event = setTimeout(CheckEvents, MillisecondsToMidnight());
+}
+
+function CheckShiftKeyToggle(event) {
+	if (state.holding_shift != event.shiftKey) {
+		state.holding_shift = event.shiftKey;
+		state.update_upgrade_buttons = true;
+	}
+}
+
+function OnKeyUp(event) {
+	CheckShiftKeyToggle(event);
+}
+
+function OnKeyDown(event) {
+	CheckShiftKeyToggle(event);
 }
 
 function Update() {

@@ -24,10 +24,12 @@
 	<script type="text/javascript" src="js/machine01.js"></script>
 	<script type="text/javascript" src="js/machine02.js"></script>
 
+	<!-- <script type="text/javascript" src="js/debug.js"></script> -->
+
 	<script type="text/javascript" src="js/game.js"></script>
 
 </head>
-<body onload="Load()">
+<body onload="Load()" onkeydown="OnKeyDown(event)" onkeyup="OnKeyUp(event)">
 	<table id="outer_table">
 		<tr>
 			<td id="board-td" rowspan="2">
@@ -79,7 +81,7 @@
 					</button>
 					<div id="upgrades_contents" class="upgradesContents">
 						<div class="menuPadding"></div>
-						<div class="messageBox">Hover over an upgrade to see what it does.</div>
+						<div class="messageBox">Hover over an upgrade to see what it does. Hold Shift to buy as many levels as you can, in one click.</div>
 						<div class="messageBox">Next upgrade reveal at: <span id="next_upgrade_hint"></span></div>
 						<div class="menuPadding"></div>
 						<div id="upgrade_headers" class="upgradesContents"></div>

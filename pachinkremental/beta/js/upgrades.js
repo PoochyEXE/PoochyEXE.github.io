@@ -92,7 +92,11 @@ class Upgrade {
 	}
 
 	OnClick() {
-		this.Buy();
+		if (state.holding_shift) {
+			while (this.Buy());
+		} else {
+			this.Buy();
+		}
 	}
 
 	GetLevel() {
@@ -107,7 +111,7 @@ class Upgrade {
 		return this.value_func(this.GetLevel());
 	}
 
-	GetText() {
+	GetText(state) {
 		let result = "<b>" + this.name + "</b>";
 		let level = this.GetLevel();
 		result +=
@@ -117,11 +121,25 @@ class Upgrade {
 		if (this.IsMaxed()) {
 			result += " (MAX)";
 		} else {
+			let total_cost = this.cost_func(level);
+			let level_after = level + 1;
+			if (state.holding_shift) {
+				const points_left = this.machine.GetSaveData().points;
+				while (level_after <= this.max_level) {
+					let next_cost = total_cost + this.cost_func(level_after);
+					if (next_cost <= points_left) {
+						++level_after;
+						total_cost = next_cost;
+					} else {
+						break;
+					}
+				}
+			}
 			result +=
 				" \u2192 " +
-				FormatNumberMedium(this.value_func(level + 1)) +
+				FormatNumberMedium(this.value_func(level_after)) +
 				this.value_suffix;
-			result += "<br>Cost: " + FormatNumberMedium(this.cost_func(level));
+			result += "<br>Cost: " + FormatNumberMedium(total_cost);
 		}
 		if (GetSetting("show_upgrade_levels")) {
 			result += "<br>Bought: " + level;
@@ -166,7 +184,7 @@ class DelayReductionUpgrade extends Upgrade {
 		this.item_suffix = item_suffix;
 	}
 
-	GetText() {
+	GetText(state) {
 		let result = "<b>" + this.name + "</b>";
 		let level = this.GetLevel();
 		let delay_now = this.value_func(level);
@@ -181,7 +199,21 @@ class DelayReductionUpgrade extends Upgrade {
 				this.item_suffix +
 				"/min) (MAX)";
 		} else {
-			let delay_next = this.value_func(level + 1);
+			let total_cost = this.cost_func(level);
+			let level_after = level + 1;
+			if (state.holding_shift) {
+				const points_left = this.machine.GetSaveData().points;
+				while (level_after <= this.max_level) {
+					let next_cost = total_cost + this.cost_func(level_after);
+					if (next_cost <= points_left) {
+						++level_after;
+						total_cost = next_cost;
+					} else {
+						break;
+					}
+				}
+			}
+			let delay_next = this.value_func(level_after);
 			let rate_next = 60000.0 / delay_next;
 			result +=
 				"<br>" + FormatNumberMedium(delay_now) + this.value_suffix;
@@ -190,7 +222,7 @@ class DelayReductionUpgrade extends Upgrade {
 			result += "<br>(" + FormatNumberMedium(rate_now);
 			result += " \u2192 " + FormatNumberMedium(rate_next);
 			result += " " + this.item_suffix + "/min)";
-			result += "<br>Cost: " + FormatNumberMedium(this.cost_func(level));
+			result += "<br>Cost: " + FormatNumberMedium(total_cost);
 		}
 		if (GetSetting("show_upgrade_levels")) {
 			result += "<br>Bought: " + level;
@@ -237,7 +269,7 @@ class FeatureUnlockUpgrade extends Upgrade {
 		}
 	}
 
-	GetText() {
+	GetText(state) {
 		let result = "<b>" + this.name + "</b><br>";
 		if (this.GetLevel() == 0) {
 			return "<b>" + this.name + "</b><br>Cost: " + FormatNumberMedium(this.cost_func());
@@ -311,8 +343,8 @@ class CirnoFixedCostUpgrade extends FixedCostFeatureUnlockUpgrade {
 		});
 	}
 
-	GetText() {
-		return super.GetText().replace("9", "⑨");
+	GetText(state) {
+		return super.GetText(state).replace("9", "⑨");
 	}
 }
 
@@ -370,7 +402,7 @@ class ToggleUnlockUpgrade extends FixedCostFeatureUnlockUpgrade {
 		this.Update();
 	}
 
-	GetText() {
+	GetText(state) {
 		let result = "<b>" + this.name + "</b><br>";
 		if (this.GetLevel() == 0) {
 			result += "Cost: " + FormatNumberMedium(this.GetCost());

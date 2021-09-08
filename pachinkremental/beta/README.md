@@ -44,6 +44,14 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
+### v1.11.5-beta (2021-09-08)
+* New QoL feature: Hold Shift to buy as many levels of an upgrade as you can, in one click.
+* Bumpers machine adjustments:
+	* Fixed "Next upgrade reveal at:" hints.
+	* Nerf: Increased prices of Add Score Targets, unlocking ball types starting from gemstone balls, and gemstone ball rates besides Opal.
+	* Nerf: The Hyper System must be activated once before its multiplier can be upgraded.
+	* OD Lunatic Red Eyes, OD Green-Eyed Monster, and OD Perfect Freeze now only appear once the corresponding gemstone ball's value upgrade is maxed out, and those 3 upgrades are now prerequisites for OD Rainbow UFO to appear. (Not counting this as a nerf, since it's highly unlikely that a player would be able to afford the upgrades before satisfying the new prerequisites anyway.)
+
 ### v1.11.4-beta (2021-07-22)
 * Fix frozen Hyper System display remaining on screen when switching from Bumpers machine back to Basic.
 
