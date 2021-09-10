@@ -67,7 +67,8 @@ class SpinTarget extends Target {
 			hitbox_radius,
 			color,
 			text: "Spin",
-			id
+			id,
+			pass_through: true
 		});
 	}
 

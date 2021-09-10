@@ -579,7 +579,7 @@ function InitUpgradeButtons(upgrades) {
 		category_div.innerHTML +=
 			'<div class="upgradeButtonWrapper" id="' +
 			upgrade_id +
-			'" onmouseenter="ShowUpgradeTooltip(this)" onmouseleave="HideUpgradeTooltip(this)">' +
+			'" onmouseenter="ShowUpgradeTooltip(this)" onmouseleave="HideButtonTooltip(this)">' +
 			'<button type="button" class="' +
 			upgrade.button_class +
 			'" id="button_upgrade_' +
@@ -651,44 +651,8 @@ function UpdateUpgradeButtons(state) {
 }
 
 function ShowUpgradeTooltip(elem) {
-	state.active_tooltip = elem.id;
-	const kDefaultWidth = 200;
-	const kPadding = 5;
-	const kTargetAspectRatio = 0.75;
-	let body_rect = document.body.getBoundingClientRect();
-	let button_rect = elem.getBoundingClientRect();
-	let tooltip_elem = document.getElementById("tooltip");
 	const upgrade = ActiveMachine(state).upgrades[elem.id];
-	tooltip_elem.style.display = "block";
-	tooltip_elem.innerHTML = upgrade.description;
-	let width = kDefaultWidth;
-	if (upgrade.tooltip_width) {
-		width = upgrade.tooltip_width;
-	} else {
-		tooltip_elem.style.width = kDefaultWidth + "px";
-		let tooltip_rect = tooltip_elem.getBoundingClientRect();
-		if (tooltip_rect.width * kTargetAspectRatio < tooltip_rect.height) {
-			width = Math.max(kDefaultWidth, Math.ceil(Math.sqrt(tooltip_rect.width * tooltip_rect.height / kTargetAspectRatio)));
-		}
-	}
-	tooltip_elem.style.width = width + "px";
-	let left_pos = Math.min(
-		(button_rect.left + button_rect.right - width) / 2.0,
-		body_rect.right - width - kPadding
-	);
-	let top_pos = button_rect.top - tooltip_elem.offsetHeight - kPadding;
-	if (top_pos < 0) {
-		top_pos = button_rect.bottom + kPadding;
-	}
-	tooltip_elem.style.left = left_pos + "px";
-	tooltip_elem.style.top = top_pos + "px";
-}
-
-function HideUpgradeTooltip(button_elem) {
-	if (state.active_tooltip != button_elem.id) {
-		return;
-	}
-	document.getElementById("tooltip").style.display = "none";
+	ShowButtonTooltip(elem, upgrade.description, upgrade.tooltip_width);
 }
 
 function CurrentPlayTime() {

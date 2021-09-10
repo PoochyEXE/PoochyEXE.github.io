@@ -280,3 +280,43 @@ function SaveFileChecksum(save_file) {
 	}
 	return result;
 }
+
+function ShowButtonTooltip(elem, inner_html, tooltip_width) {
+	state.active_tooltip = elem.id;
+	const kDefaultWidth = 200;
+	const kPadding = 5;
+	const kTargetAspectRatio = 0.75;
+	let body_rect = document.body.getBoundingClientRect();
+	let button_rect = elem.getBoundingClientRect();
+	let tooltip_elem = document.getElementById("tooltip");
+	tooltip_elem.style.display = "block";
+	tooltip_elem.innerHTML = inner_html;
+	let width = kDefaultWidth;
+	if (tooltip_width) {
+		width = tooltip_width;
+	} else {
+		tooltip_elem.style.width = kDefaultWidth + "px";
+		let tooltip_rect = tooltip_elem.getBoundingClientRect();
+		if (tooltip_rect.width * kTargetAspectRatio < tooltip_rect.height) {
+			width = Math.max(kDefaultWidth, Math.ceil(Math.sqrt(tooltip_rect.width * tooltip_rect.height / kTargetAspectRatio)));
+		}
+	}
+	tooltip_elem.style.width = width + "px";
+	let left_pos = Math.min(
+		(button_rect.left + button_rect.right - width) / 2.0,
+		body_rect.right - width - kPadding
+	);
+	let top_pos = button_rect.top - tooltip_elem.offsetHeight - kPadding;
+	if (top_pos < 0) {
+		top_pos = button_rect.bottom + kPadding;
+	}
+	tooltip_elem.style.left = left_pos + "px";
+	tooltip_elem.style.top = top_pos + "px";
+}
+
+function HideButtonTooltip(button_elem) {
+	if (state.active_tooltip != button_elem.id) {
+		return;
+	}
+	document.getElementById("tooltip").style.display = "none";
+}

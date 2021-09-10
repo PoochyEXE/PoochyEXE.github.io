@@ -1,4 +1,4 @@
-const kVersion = "v1.11.5-beta";
+const kVersion = "v1.11.6-beta";
 const kTitleAndVersion = "Pachinkremental " + kVersion;
 
 const kFrameInterval = 1000.0 / kFPS;
@@ -159,8 +159,10 @@ function InitState() {
 		redraw_all: true,
 		redraw_targets: false,
 		redraw_auto_drop: false,
+		redraw_stats_overlay: false,
 		redraw_wheel: false,
 		reset_target_text: false,
+		show_hit_rates: false,
 		update_stats_panel: true,
 		update_upgrades: true,
 		update_upgrade_buttons: true,

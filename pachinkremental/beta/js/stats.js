@@ -137,3 +137,26 @@ function UpdateStatsPanel(state) {
 
 	UpdateMilestoneStats();
 }
+
+function ToggleHitRates() {
+	state.show_hit_rates = !state.show_hit_rates;
+	state.redraw_stats_overlay = true;
+	UpdateInnerHTML("button_stats_hit_rates",
+		"Show hit rates: " + (state.show_hit_rates ? "ON" : "OFF"));
+}
+
+function ShowHitRatesTooltip(elem) {
+	const kHitRatesTooltipText =
+		'Shows how often each target and slot is hit. ' +
+		'The number above each target or slot is how often it is hit per 100 balls, on average.' +
+		'<div class="small">(For targets, this can be over 100, if it is hit multiple times per ball on average.)</div>';
+	ShowButtonTooltip(elem, kHitRatesTooltipText);
+}
+
+function ResetHitRates() {
+	let target_hits = ActiveMachine(state).GetSaveData().stats.target_hits;
+	for (let id in target_hits) {
+		target_hits[id] = 0;
+	}
+	state.redraw_stats_overlay = true;
+}

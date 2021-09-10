@@ -44,6 +44,9 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
+### v1.11.6-beta (2021-09-10)
+* New UI feature: Add toggle in stats panel to show how often each target or slot is hit.
+
 ### v1.11.5-beta (2021-09-08)
 * New QoL feature: Hold Shift to buy as many levels of an upgrade as you can, in one click.
 * Bumpers machine adjustments:

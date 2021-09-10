@@ -4,7 +4,7 @@ const kBallRadius = 5.5;
 const kCellSize = 8.0;
 
 class Target {
-	constructor({ machine, pos, draw_radius, hitbox_radius, color, text, id, active }) {
+	constructor({ machine, pos, draw_radius, hitbox_radius, color, text, id, active, pass_through }) {
 		this.machine = machine;
 		this.pos = pos;
 		this.draw_radius = draw_radius;
@@ -14,6 +14,7 @@ class Target {
 		this.text = text;
 		this.id = id;
 		this.active = active;
+		this.pass_through = pass_through;
 	}
 
 	OnHit(ball) {
@@ -53,10 +54,10 @@ class ScoreTarget extends Target {
 			color,
 			text: FormatNumberShort(value),
 			id,
-			active
+			active,
+			pass_through
 		});
 		this.value = value;
-		this.pass_through = pass_through;
 	}
 
 	OnHit(ball) {
@@ -65,6 +66,9 @@ class ScoreTarget extends Target {
 		}
 		this.machine.AwardPoints(this.value, ball);
 		++ball.score_targets_hit;
+		if (state.show_hit_rates) {
+			state.redraw_stats_overlay = true;
+		}
 	}
 
 	ResetText() {
@@ -115,7 +119,8 @@ class Bumper extends Target {
 			color: kBumperColor,
 			text: "",
 			id,
-			active
+			active,
+			pass_through: true
 		});
 		this.value = value;
 		this.strength = strength;
@@ -142,6 +147,9 @@ class Bumper extends Target {
 		ball.last_hit = null;
 		++ball.bumpers_hit;
 		state.redraw_bumpers = true;
+		if (state.show_hit_rates) {
+			state.redraw_stats_overlay = true;
+		}
 	}
 
 	ResetText() {

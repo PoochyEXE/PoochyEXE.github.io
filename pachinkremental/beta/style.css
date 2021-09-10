@@ -593,13 +593,23 @@ button.machineButtonDark:disabled {
 	color: #FFF;
 }
 
-button.optionButton, button.optionButtonRed {
+button.statsButton, button.optionButton, button.optionButtonRed {
 	border: 1px solid #000;
 	border-radius: 20px;
 	font-family: sans-serif;
 	font-size: 14px;
 	margin-top: 2.5px;
 	margin-bottom: 2.5px;
+}
+
+button.statsButtonLight {
+	background: #88C;
+	color: #000;
+}
+
+button.statsButtonDark {
+	background: #338;
+	color: #FFF;
 }
 
 button.optionButtonLight {

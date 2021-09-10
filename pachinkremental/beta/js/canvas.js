@@ -508,6 +508,64 @@ function DrawBumpers(bumper_sets, ctx) {
 	}
 }
 
+function DrawHitRates(stats, target_sets, bumper_sets, ctx) {
+	let total_balls = 0;
+	for (let i = 0; i < target_sets.length; ++i) {
+		const targets = target_sets[i].targets;
+		for (let j = 0; j < targets.length; ++j) {
+			const target = targets[j];
+			if (!target.pass_through) {
+				total_balls += stats.target_hits[target.id];
+			}
+		}
+	}
+
+	const kFontSize = 8;
+	const dark_mode = GetSetting("dark_mode");
+	ctx.textAlign = "center";
+	ctx.fillStyle = dark_mode ? "#FFF" : "#000";
+	ctx.strokeStyle = dark_mode ? "#000" : "#FFF";
+	ctx.font = "bold " + kFontSize + "px sans-serif";
+	for (let i = 0; i < target_sets.length; ++i) {
+		const targets = target_sets[i].targets;
+		for (let j = 0; j < targets.length; ++j) {
+			const target = targets[j];
+			if (!target.active) {
+				continue;
+			}
+			let target_hits = stats.target_hits[target.id];
+			let rate_text = "--";
+			if (total_balls > 0) {
+				let rate = Math.round(100 * target_hits / total_balls)
+				rate_text = rate.toLocaleString();
+			}
+			let x = target.pos.x;
+			let y = target.pos.y - target.draw_radius - 2;
+			ctx.strokeText(rate_text, x, y);
+			ctx.fillText(rate_text, x, y);
+		}
+	}
+	for (let i = 0; i < bumper_sets.length; ++i) {
+		const bumpers = bumper_sets[i].targets;
+		for (let j = 0; j < bumpers.length; ++j) {
+			const bumper = bumpers[j];
+			if (!bumper.active) {
+				continue;
+			}
+			let bumper_hits = stats.target_hits[bumper.id];
+			let rate_text = "--";
+			if (total_balls > 0) {
+				let rate = Math.round(100 * bumper_hits / total_balls)
+				rate_text = rate.toLocaleString();
+			}
+			let x = bumper.pos.x;
+			let y = bumper.pos.y - bumper.draw_radius - 4;
+			ctx.strokeText(rate_text, x, y);
+			ctx.fillText(rate_text, x, y);
+		}
+	}
+}
+
 function DrawScoreText(score_text, font_size, duration, rise, stroke_color_rgb, ctx) {
 	const kPrismaticSaturation = 0.8;
 	let next_index = 0;
@@ -832,6 +890,19 @@ function Draw(state) {
 		let ctx = ClearLayerAndReturnContext("targets");
 		state.redraw_targets = false;
 		DrawTargets(machine.board.target_sets, ctx);
+	}
+	// Stats
+	if (state.redraw_all || state.redraw_stats_overlay) {
+		let ctx = ClearLayerAndReturnContext("stats");
+		state.redraw_stats_overlay = false;
+		if (state.show_hit_rates) {
+			DrawHitRates(
+				machine.GetSaveData().stats,
+				machine.board.target_sets,
+				machine.board.bumper_sets,
+				ctx
+			);
+		}
 	}
 	// Auto-Drop position
 	if (state.redraw_all || state.redraw_auto_drop) {
