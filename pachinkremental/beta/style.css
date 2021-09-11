@@ -567,18 +567,18 @@ button.beachBallUpgradeButtonDark:disabled {
 button.rubberBandBallUpgradeButtonLight {
 	background: repeating-linear-gradient(
 	  120deg,
-	  #E88,
+	  #8E8,
+	  #8E8 3px,
 	  #E88 3px,
-	  #8EE 3px,
-	  #8EE 6px,
-	  #8E8 6px,
-	  #8E8 9px,
-	  #E8E 9px,
-	  #E8E 12px,
-	  #88E 12px,
-	  #88E 15px,
-	  #EE8 15px,
-	  #EE8 18px
+	  #E88 6px,
+	  #88E 6px,
+	  #88E 9px,
+	  #EE8 9px,
+	  #EE8 12px,
+	  #8EE 12px,
+	  #8EE 15px,
+	  #E8E 15px,
+	  #E8E 18px
 	);
 	color: #000;
 }
@@ -586,18 +586,18 @@ button.rubberBandBallUpgradeButtonLight {
 button.rubberBandBallUpgradeButtonLight:disabled {
 	background: repeating-linear-gradient(
 	  120deg,
-	  #A77,
+	  #7A7,
+	  #7A7 3px,
 	  #A77 3px,
-	  #7AA 3px,
-	  #7AA 6px,
-	  #7A7 6px,
-	  #7A7 9px,
-	  #A7A 9px,
-	  #A7A 12px,
-	  #77A 12px,
-	  #77A 15px,
-	  #AA7 15px,
-	  #AA7 18px
+	  #A77 6px,
+	  #77A 6px,
+	  #77A 9px,
+	  #AA7 9px,
+	  #AA7 12px,
+	  #7AA 12px,
+	  #7AA 15px,
+	  #A7A 15px,
+	  #A7A 18px
 	);
 	color: #000;
 }
@@ -605,18 +605,18 @@ button.rubberBandBallUpgradeButtonLight:disabled {
 button.rubberBandBallUpgradeButtonDark {
 	background: repeating-linear-gradient(
 	  120deg,
-	  #822,
+	  #282,
+	  #282 3px,
 	  #822 3px,
-	  #288 3px,
-	  #288 6px,
-	  #282 6px,
-	  #282 9px,
-	  #828 9px,
-	  #828 12px,
-	  #228 12px,
-	  #228 15px,
-	  #882 15px,
-	  #882 18px
+	  #822 6px,
+	  #228 6px,
+	  #228 9px,
+	  #882 9px,
+	  #882 12px,
+	  #288 12px,
+	  #288 15px,
+	  #828 15px,
+	  #828 18px
 	);
 	color: #FFF;
 }
@@ -624,18 +624,18 @@ button.rubberBandBallUpgradeButtonDark {
 button.rubberBandBallUpgradeButtonDark:disabled {
 	background: repeating-linear-gradient(
 	  120deg,
-	  #300,
+	  #030,
+	  #030 3px,
 	  #300 3px,
-	  #033 3px,
-	  #033 6px,
-	  #030 6px,
-	  #030 9px,
-	  #303 9px,
-	  #303 12px,
-	  #003 12px,
-	  #003 15px,
-	  #330 15px,
-	  #330 18px
+	  #300 6px,
+	  #003 6px,
+	  #003 9px,
+	  #330 9px,
+	  #330 12px,
+	  #033 12px,
+	  #033 15px,
+	  #303 15px,
+	  #303 18px
 	);
 	color: #FFF;
 }
