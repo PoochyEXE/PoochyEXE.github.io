@@ -44,6 +44,9 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
+### v1.12.0-beta (2021-09-11)
+* New ball type: Rubber band balls! They're very bouncy, and increase in value with each bounce.
+
 ### v1.11.6-beta (2021-09-10)
 * New UI feature: Add toggle in stats panel to show how often each target or slot is hit.
 

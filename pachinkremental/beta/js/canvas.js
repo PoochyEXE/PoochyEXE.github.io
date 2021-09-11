@@ -12,6 +12,7 @@ const kPrismatic = "PRISMATIC";
 const k8Ball = "8-BALL";
 const k8BallHighlightColor = "246, 31,183";
 const kBeachBall = "BEACH";
+const kRubberBand = "RUBBER_BAND";
 const kBumperColor = "BUMPER";
 
 const kBumperHitExpandSizes = [0, 1, 2, 3, 2, 1];
@@ -24,6 +25,12 @@ const kPrismaticCycleColors = [
 	[1, 0, 0],
 	[1, 1, 0]
 ];
+
+// The order to shuffle kPrismaticCycleColors into for rubber band balls.
+const kRubberBandColorIndices = [4, 5, 2, 1, 3, 0];
+// The order to draw the rubber bands.
+const kRubberBandLayerOrder = [0, 2, 3, 1, 4, 5];
+
 const kPrismaticSaturationOuter = 0.8;
 const kPrismaticSaturationInner = 0.25;
 const kPrismaticCycleDuration = 2000.0;
@@ -205,14 +212,14 @@ function DrawBeachBalls(balls, ctx) {
 	for (let i = 0; i < balls.length; ++i) {
 		let pos = balls[i].pos;
 		let rotation = balls[i].rotation;
-		for (let i = 0; i < kPrismaticCycleColors.length; ++i) {
+		for (let j = 0; j < kPrismaticCycleColors.length; ++j) {
 			let segment_rotation =
-				Math.PI * 2.0 * i / kPrismaticCycleColors.length - rotation;
+				Math.PI * 2.0 * j / kPrismaticCycleColors.length - rotation;
 			outer_color = GetPrismaticColor(
-				i, 6.0, kPrismaticSaturationOuter, 1.0
+				j, 6.0, kPrismaticSaturationOuter, 1.0
 			);
 			inner_color = GetPrismaticColor(
-				i, 6.0, kPrismaticSaturationInner, 1.0
+				j, 6.0, kPrismaticSaturationInner, 1.0
 			);
 			ctx.fillStyle =
 				CreateBallGradient(ctx, pos, kBallRadius, inner_color, outer_color);
@@ -235,11 +242,11 @@ function DrawBeachBallsNoGradient(balls, ctx) {
 	for (let i = 0; i < balls.length; ++i) {
 		let pos = balls[i].pos;
 		let rotation = balls[i].rotation;
-		for (let i = 0; i < kPrismaticCycleColors.length; ++i) {
+		for (let j = 0; j < kPrismaticCycleColors.length; ++j) {
 			let segment_rotation =
-				Math.PI * 2.0 * i / kPrismaticCycleColors.length - rotation;
+				Math.PI * 2.0 * j / kPrismaticCycleColors.length - rotation;
 			ctx.fillStyle = GetPrismaticColor(
-				i, 6.0, kPrismaticSaturationOuter, 1.0
+				j, 6.0, kPrismaticSaturationOuter, 1.0
 			);
 			ctx.beginPath();
 			ctx.moveTo(pos.x, pos.y);
@@ -251,6 +258,72 @@ function DrawBeachBallsNoGradient(balls, ctx) {
 				segment_rotation + Math.PI / 3.0
 			);
 			ctx.lineTo(pos.x, pos.y);
+			ctx.fill();
+		}
+	}
+}
+
+function DrawRubberBandBalls(balls, ctx) {
+	for (let i = 0; i < balls.length; ++i) {
+		let pos = balls[i].pos;
+		let rotation = balls[i].rotation;
+		for (let j = 0; j < kRubberBandColorIndices.length; ++j) {
+			let segment_rotation =
+				Math.PI * kRubberBandLayerOrder[j] / kRubberBandColorIndices.length - rotation;
+			outer_color = GetPrismaticColor(
+				kRubberBandColorIndices[j], 6.0, kPrismaticSaturationOuter, 1.0
+			);
+			inner_color = GetPrismaticColor(
+				kRubberBandColorIndices[j], 6.0, kPrismaticSaturationInner, 1.0
+			);
+			ctx.fillStyle =
+				CreateBallGradient(ctx, pos, kBallRadius, inner_color, outer_color);
+			ctx.beginPath();
+			ctx.arc(
+				pos.x,
+				pos.y,
+				kBallRadius,
+				segment_rotation,
+				segment_rotation + Math.PI / 6.0
+			);
+			ctx.arc(
+				pos.x,
+				pos.y,
+				kBallRadius,
+				segment_rotation + Math.PI,
+				segment_rotation + Math.PI * 7.0 / 6.0
+			);
+			ctx.fill();
+		}
+	}
+}
+
+function DrawRubberBandBallsNoGradient(balls, ctx) {
+	for (let i = 0; i < balls.length; ++i) {
+		let pos = balls[i].pos;
+		let rotation = balls[i].rotation;
+		for (let j = 0; j < kRubberBandColorIndices.length; ++j) {
+			let segment_rotation =
+				Math.PI * j / kRubberBandColorIndices.length - rotation;
+			ctx.fillStyle = GetPrismaticColor(
+				kRubberBandColorIndices[j], 6.0, kPrismaticSaturationOuter, 1.0
+			);
+			ctx.beginPath();
+			ctx.moveTo(pos.x, pos.y);
+			ctx.arc(
+				pos.x,
+				pos.y,
+				kBallRadius,
+				segment_rotation,
+				segment_rotation + Math.PI / 6.0
+			);
+			ctx.arc(
+				pos.x,
+				pos.y,
+				kBallRadius,
+				segment_rotation + Math.PI,
+				segment_rotation + Math.PI * 7.0 / 6.0
+			);
 			ctx.fill();
 		}
 	}
@@ -387,6 +460,10 @@ function DrawBalls(balls, inner_color, outer_color, ctx) {
 		DrawBeachBalls(balls, ctx);
 		return;
 	}
+	if (inner_color == kRubberBand && outer_color == kRubberBand) {
+		DrawRubberBandBalls(balls, ctx);
+		return;
+	}
 	if (
 		!GetSetting("classic_opal_balls") &&
 		inner_color == kPrismatic &&
@@ -432,6 +509,9 @@ function DrawBallsNoGradient(balls, color, ctx) {
 		return;
 	} else if (color == kBeachBall) {
 		DrawBeachBallsNoGradient(balls, ctx);
+		return;
+	} else if (color == kRubberBand) {
+		DrawRubberBandBallsNoGradient(balls, ctx);
 		return;
 	}
 	const kPrismaticSaturation = 0.8;
@@ -651,6 +731,37 @@ function DrawRipples(ripples, duration, expand, ctx) {
 					radius,
 					segment_rotation,
 					segment_rotation + Math.PI / 3.0
+				);
+				ctx.stroke();
+			}
+		} else if (curr_ripples.color_rgb == kRubberBand) {
+			let rotation = 4.0 * Math.PI * elapsed / duration;
+			for (let i = 0; i < kRubberBandColorIndices.length; ++i) {
+				let segment_rotation =
+					rotation + Math.PI * i / kRubberBandColorIndices.length;
+				color_rgba = GetPrismaticColor(
+					kRubberBandColorIndices[i],
+					6.0,
+					/*saturation=*/ kPrismaticSaturation,
+					/*alpha=*/ 1 - fraction
+				);
+				ctx.strokeStyle = color_rgba;
+				ctx.beginPath();
+				ctx.arc(
+					curr_ripples.pos.x,
+					curr_ripples.pos.y,
+					radius,
+					segment_rotation,
+					segment_rotation + Math.PI / 6.0
+				);
+				ctx.stroke();
+				ctx.beginPath();
+				ctx.arc(
+					curr_ripples.pos.x,
+					curr_ripples.pos.y,
+					radius,
+					segment_rotation + Math.PI,
+					segment_rotation + Math.PI * 7.0 / 6.0
 				);
 				ctx.stroke();
 			}

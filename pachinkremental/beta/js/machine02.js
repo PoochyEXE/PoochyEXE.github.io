@@ -1,17 +1,18 @@
 const kBumperMachineID = "bumper";
 
 const kBumperMachineBallTypes = [
-	//          | id |    name    | display_name |      physics_params       | inner_color | outer_color | ripple_color_rgb |
+	//          | id |    name     | display_name  |      physics_params      | inner_color | outer_color | ripple_color_rgb |
 	kNormalBallType,
-	new BallType(1,   "gold",      "Gold ",       kPhysicsParams.normal,     "#FFD700",    "#AA8F00",    "170,143,  0"    ),
-	new BallType(2,   "ruby",      "Ruby ",       kPhysicsParams.normal,     "#FBB",       "#F33",       "255, 48, 48"    ),
-	new BallType(3,   "sapphire",  "Sapphire ",   kPhysicsParams.normal,     "#BBF",       "#33F",       " 48, 48,255"    ),
-	new BallType(4,   "emerald",   "Emerald ",    kPhysicsParams.normal,     "#BFB",       "#3F3",       " 48,255, 48"    ),
-	new BallType(5,   "topaz",     "Topaz ",      kPhysicsParams.normal,     "#FFB",       "#FF3",       "255,255, 48"    ),
-	new BallType(6,   "turquoise", "Turquoise ",  kPhysicsParams.normal,     "#BFF",       "#3FF",       " 48,255,255"    ),
-	new BallType(7,   "amethyst",  "Amethyst ",   kPhysicsParams.normal,     "#FBF",       "#F3F",       "255, 48,255"    ),
-	new BallType(8,   "opal",      "Opal ",       kPhysicsParams.normal,     kPrismatic,   kPrismatic,   kPrismatic       ),
-	new BallType(9,   "beach",     "Beach ",      kPhysicsParams.beach_ball, kBeachBall,   kBeachBall,   kBeachBall       ),
+	new BallType(1,   "gold",       "Gold ",        kPhysicsParams.normal,     "#FFD700",    "#AA8F00",    "170,143,  0"    ),
+	new BallType(2,   "ruby",       "Ruby ",        kPhysicsParams.normal,     "#FBB",       "#F33",       "255, 48, 48"    ),
+	new BallType(3,   "sapphire",   "Sapphire ",    kPhysicsParams.normal,     "#BBF",       "#33F",       " 48, 48,255"    ),
+	new BallType(4,   "emerald",    "Emerald ",     kPhysicsParams.normal,     "#BFB",       "#3F3",       " 48,255, 48"    ),
+	new BallType(5,   "topaz",      "Topaz ",       kPhysicsParams.normal,     "#FFB",       "#FF3",       "255,255, 48"    ),
+	new BallType(6,   "turquoise",  "Turquoise ",   kPhysicsParams.normal,     "#BFF",       "#3FF",       " 48,255,255"    ),
+	new BallType(7,   "amethyst",   "Amethyst ",    kPhysicsParams.normal,     "#FBF",       "#F3F",       "255, 48,255"    ),
+	new BallType(8,   "opal",       "Opal ",        kPhysicsParams.normal,     kPrismatic,   kPrismatic,   kPrismatic       ),
+	new BallType(9,   "beach",      "Beach ",       kPhysicsParams.beach_ball, kBeachBall,   kBeachBall,   kBeachBall       ),
+	new BallType(10,  "rubberband", "Rubber Band ", kPhysicsParams.rubber,     kRubberBand,  kRubberBand,  kRubberBand      ),
 ];
 
 const kBumperMachineBallTypeIDs = {
@@ -25,6 +26,7 @@ const kBumperMachineBallTypeIDs = {
 	AMETHYST: 7,
 	OPAL: 8,
 	BEACH_BALL: 9,
+	RUBBER_BAND: 10,
 };
 
 const kBumperMachinePopupTextOptions = [
@@ -38,9 +40,10 @@ class BumperMachine extends PachinkoMachine {
 	constructor(id, display_name) {
 		super(id, display_name, kBumperMachineBallTypes);
 
-		this.ruby_ball_value_percent = 5;
+		this.ruby_ball_value_percent = 10;
 		this.sapphire_ball_value_percent = 10;
 		this.emerald_ball_value_percent = 50;
+		this.rubberband_ball_value_percent = 1;
 		this.combo_timeout = 1;
 		this.hyper_multiplier = 10;
 		this.max_hyper_charge = 50000;
@@ -124,6 +127,7 @@ class BumperMachine extends PachinkoMachine {
 				"255,  0,255",
 				kPrismatic,
 				kPrismatic,
+				kPrismatic,
 			]
 			return kDarkModeColors[ball_type_index];
 		} else {
@@ -136,6 +140,7 @@ class BumperMachine extends PachinkoMachine {
 				"192,192,  0",
 				"  0,192,192",
 				"192,  0,192",
+				kPrismatic,
 				kPrismatic,
 				kPrismatic,
 			]
@@ -172,6 +177,9 @@ class BumperMachine extends PachinkoMachine {
 			),
 			new SingleBallTypeUpgradeHeader(
 				this, this.ball_types[kBumperMachineBallTypeIDs.BEACH_BALL]
+			),
+			new SingleBallTypeUpgradeHeader(
+				this, this.ball_types[kBumperMachineBallTypeIDs.RUBBER_BAND]
 			),
 			new UpgradeHeader(
 				this,
@@ -1311,6 +1319,44 @@ class BumperMachine extends PachinkoMachine {
 				max_level: 9
 			})
 		);
+		upgrades_list.push(
+			new BallTypeUnlockUpgrade({
+				machine: this,
+				ball_type: this.ball_types[kBumperMachineBallTypeIDs.RUBBER_BAND],
+				ball_description:
+					"Rubber band balls have bonuses of Opal balls plus they never break their combo. They're also much bouncier and they increase in value with each bounce. (Stacks multiplicatively with gemstone ball multipliers.)",
+				cost_func: () => 1e22,
+				visible_func: () =>
+					this.IsUnlocked("unlock_opal_balls") &&
+					this.IsMaxed("combo_timeout"),
+			})
+		);
+		upgrades_list.push(
+			new BallTypeRateUpgrade({
+				machine: this,
+				ball_type: this.ball_types[kBumperMachineBallTypeIDs.RUBBER_BAND],
+				cost_func: level => 1e21 * Math.pow(10, level),
+				value_func: level => (level + 1) / 2.0,
+				max_level: 9
+			})
+		);
+		upgrades_list.push(
+			new Upgrade({
+				machine: this,
+				id: "rubberband_ball_value_percent",
+				name: "Rubber Band Ball Value",
+				category: "rubberband_balls",
+				description: "Point value increase per bounce for Rubber Band balls.",
+				cost_func: level => 1e21 * Math.pow(10, level),
+				value_func: level => (level + 1),
+				max_level: 9,
+				value_suffix: "%",
+				visible_func: () => this.IsUnlocked("unlock_rubberband_balls"),
+				on_update: function() {
+					this.machine.rubberband_ball_value_percent = this.GetValue();
+				},
+			})
+		);
 		/* TODO: Add bonus wheel.
 		upgrades_list.push(
 			new FixedCostFeatureUnlockUpgrade({
@@ -1557,6 +1603,7 @@ class BumperMachine extends PachinkoMachine {
 				ball.combo == 0 ||
 				(
 					!this.HasBeachBallSpecial(ball.ball_type_index) &&
+					!this.HasRubberBandBallSpecial(ball.ball_type_index) &&
 					ball.last_hit_time + combo_timeout_ms < state.current_time
 				)
 			) {
@@ -1646,6 +1693,11 @@ class BumperMachine extends PachinkoMachine {
 				} else {
 					multiplier = 1.0 +
 						(ruby_value + sapphire_value + emerald_value) / 100.0;
+				}
+				if (this.HasRubberBandBallSpecial(ball.ball_type_index)) {
+					let rubberband_value =
+						ball.bounces * this.rubberband_ball_value_percent;
+					multiplier *= 1.0 + rubberband_value / 100.0;
 				}
 				total_value *= multiplier;
 			}
@@ -1742,10 +1794,15 @@ class BumperMachine extends PachinkoMachine {
 		return ball_type_index == kBumperMachineBallTypeIDs.BEACH_BALL;
 	}
 
+	HasRubberBandBallSpecial(ball_type_index) {
+		return ball_type_index == kBumperMachineBallTypeIDs.RUBBER_BAND;
+	}
+
 	HasOpalSpecial(ball_type_index) {
 		return (
 			ball_type_index == kBumperMachineBallTypeIDs.OPAL ||
-			this.HasBeachBallSpecial(ball_type_index)
+			this.HasBeachBallSpecial(ball_type_index) || 
+			this.HasRubberBandBallSpecial(ball_type_index)
 		);
 	}
 

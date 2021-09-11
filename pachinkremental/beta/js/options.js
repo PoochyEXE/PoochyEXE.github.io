@@ -35,6 +35,7 @@ const kColorSchemeClasses = [
 	new ColorSchemeClassMapping("opalUpgradeButton", "opalUpgradeButtonLight", "opalUpgradeButtonDark"),
 	new ColorSchemeClassMapping("eightBallUpgradeButton", "eightBallUpgradeButtonLight", "eightBallUpgradeButtonDark"),
 	new ColorSchemeClassMapping("beachBallUpgradeButton", "beachBallUpgradeButtonLight", "beachBallUpgradeButtonDark"),
+	new ColorSchemeClassMapping("rubberBandBallUpgradeButton", "rubberBandBallUpgradeButtonLight", "rubberBandBallUpgradeButtonDark"),
 	new ColorSchemeClassMapping("machineButton", "machineButtonLight", "machineButtonDark"),
 	new ColorSchemeClassMapping("statsButton", "statsButtonLight", "statsButtonDark"),
 	new ColorSchemeClassMapping("optionButton", "optionButtonLight", "optionButtonDark"),

@@ -7,7 +7,11 @@ const kPhysicsParams = {
 	beach_ball: {
 		accel: 100,
 		collision_elasticity: 0.7
-	}
+	},
+	rubber: {
+		accel: 300,
+		collision_elasticity: 0.85
+	},
 };
 
 function UpdateBalls(balls, board, params) {
@@ -57,6 +61,7 @@ function UpdateBalls(balls, board, params) {
 				vel = vel.Add(parallel_vel.Multiply(-1 - params.collision_elasticity));
 				omega *= params.collision_elasticity;
 				omega += perp_vel.DotProduct(perp_delta) / kBallRadius;
+				++balls[b].bounces;
 
 				// In the extremely unlikely event a ball is balanced perfectly
 				// on top of a peg, give it a tiny nudge.

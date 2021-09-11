@@ -247,7 +247,7 @@ div.upgradeButtonWrapper {
 	margin: 2.5px;
 }
 
-button.upgradeButton, button.rubyUpgradeButton, button.sapphireUpgradeButton, button.emeraldUpgradeButton, button.topazUpgradeButton, button.turquoiseUpgradeButton, button.amethystUpgradeButton, button.opalUpgradeButton, button.eightBallUpgradeButton, button.beachBallUpgradeButton {
+button.upgradeButton, button.rubyUpgradeButton, button.sapphireUpgradeButton, button.emeraldUpgradeButton, button.topazUpgradeButton, button.turquoiseUpgradeButton, button.amethystUpgradeButton, button.opalUpgradeButton, button.eightBallUpgradeButton, button.beachBallUpgradeButton, button.rubberBandBallUpgradeButton {
 	border: 1px solid #000;
 	border-radius: 10px;
 	font-family: sans-serif;
@@ -560,6 +560,82 @@ button.beachBallUpgradeButtonDark:disabled {
 	  #003 50px,
 	  #303 50px,
 	  #303 60px
+	);
+	color: #FFF;
+}
+
+button.rubberBandBallUpgradeButtonLight {
+	background: repeating-linear-gradient(
+	  120deg,
+	  #E88,
+	  #E88 3px,
+	  #8EE 3px,
+	  #8EE 6px,
+	  #8E8 6px,
+	  #8E8 9px,
+	  #E8E 9px,
+	  #E8E 12px,
+	  #88E 12px,
+	  #88E 15px,
+	  #EE8 15px,
+	  #EE8 18px
+	);
+	color: #000;
+}
+
+button.rubberBandBallUpgradeButtonLight:disabled {
+	background: repeating-linear-gradient(
+	  120deg,
+	  #A77,
+	  #A77 3px,
+	  #7AA 3px,
+	  #7AA 6px,
+	  #7A7 6px,
+	  #7A7 9px,
+	  #A7A 9px,
+	  #A7A 12px,
+	  #77A 12px,
+	  #77A 15px,
+	  #AA7 15px,
+	  #AA7 18px
+	);
+	color: #000;
+}
+
+button.rubberBandBallUpgradeButtonDark {
+	background: repeating-linear-gradient(
+	  120deg,
+	  #822,
+	  #822 3px,
+	  #288 3px,
+	  #288 6px,
+	  #282 6px,
+	  #282 9px,
+	  #828 9px,
+	  #828 12px,
+	  #228 12px,
+	  #228 15px,
+	  #882 15px,
+	  #882 18px
+	);
+	color: #FFF;
+}
+
+button.rubberBandBallUpgradeButtonDark:disabled {
+	background: repeating-linear-gradient(
+	  120deg,
+	  #300,
+	  #300 3px,
+	  #033 3px,
+	  #033 6px,
+	  #030 6px,
+	  #030 9px,
+	  #303 9px,
+	  #303 12px,
+	  #003 12px,
+	  #003 15px,
+	  #330 15px,
+	  #330 18px
 	);
 	color: #FFF;
 }

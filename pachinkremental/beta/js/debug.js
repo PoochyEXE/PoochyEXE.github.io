@@ -26,3 +26,27 @@ function CostToMaxMap() {
 	}
 	return result;
 }
+
+function DrawFavicon(ball_type_index) {
+	UpdateDisplay("debug", "block")
+	let canvas = document.getElementById("favicon_canvas");
+	let ctx = canvas.getContext("2d");
+	ctx.setTransform(1, 0, 0, 1, 0, 0);
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
+	ctx.scale(
+		canvas.width / (2.0 * kBallRadius),
+		canvas.height / (2.0 * kBallRadius)
+	);
+	
+	const ball_type = ActiveMachine(state).BallTypes()[ball_type_index];
+	DrawBalls(
+		[new Ball(kBallRadius, kBallRadius, 0, 0, ball_type_index, 0, 0)],
+		ball_type.inner_color,
+		ball_type.outer_color,
+		ctx
+	);
+	
+	let a_elem = document.getElementById("favicon_link")
+	a_elem.setAttribute('download', ball_type.name + '.png');
+	a_elem.setAttribute('href', canvas.toDataURL("image/png").replace("image/png", "image/octet-stream"));
+}
