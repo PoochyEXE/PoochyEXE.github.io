@@ -27,7 +27,7 @@ const kPrismaticCycleColors = [
 ];
 
 // The order to shuffle kPrismaticCycleColors into for rubber band balls.
-const kRubberBandColorIndices = [4, 5, 2, 1, 3, 0];
+const kRubberBandColorIndices = [4, 5, 1, 2, 3, 0];
 // The order to draw the rubber bands.
 const kRubberBandLayerOrder = [0, 2, 3, 1, 4, 5];
 
