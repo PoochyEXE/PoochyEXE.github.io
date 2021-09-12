@@ -44,7 +44,7 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
-### v1.12.1-beta (2021-09-12)
+### v1.12.2-beta (2021-09-12)
 * Fix a bug where holding Shift with significantly more than enough points to max an upgrade could cause that upgrade's button to display an incorrect value and cost, above the max value and the cost needed to max it.
 
 ### v1.12.1-beta (2021-09-12)
