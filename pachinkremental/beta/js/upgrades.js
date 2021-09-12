@@ -125,7 +125,7 @@ class Upgrade {
 			let level_after = level + 1;
 			if (state.holding_shift) {
 				const points_left = this.machine.GetSaveData().points;
-				while (level_after <= this.max_level) {
+				while (level_after < this.max_level) {
 					let next_cost = total_cost + this.cost_func(level_after);
 					if (next_cost <= points_left) {
 						++level_after;
