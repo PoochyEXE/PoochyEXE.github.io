@@ -138,11 +138,18 @@ function UpdateStatsPanel(state) {
 	UpdateMilestoneStats();
 }
 
-function ToggleHitRates() {
-	state.show_hit_rates = !state.show_hit_rates;
+function UpdateHitRatesDisplay(state) {
 	state.redraw_stats_overlay = true;
+	const show_hit_rates = GetSetting("show_hit_rates");
 	UpdateInnerHTML("button_stats_hit_rates",
-		"Show hit rates: " + (state.show_hit_rates ? "ON" : "OFF"));
+		"Show hit rates: " + (show_hit_rates ? "ON" : "OFF"));
+	UpdateDisplay("stats_container_hit_rates_balls_counted",
+		show_hit_rates ? "inline-block" : "none");
+}
+
+function ToggleHitRates() {
+	state.save_file.options.show_hit_rates = !state.save_file.options.show_hit_rates;
+	UpdateHitRatesDisplay(state);
 }
 
 function ShowHitRatesTooltip(elem) {

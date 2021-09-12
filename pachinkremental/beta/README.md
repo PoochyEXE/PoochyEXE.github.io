@@ -44,6 +44,13 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
+### v1.12.1-beta (2021-09-12)
+* Hit rate stats feature now shows how many balls have been counted.
+* Save file now saves whether hit rate stats are turned on.
+* Bumpers machine buffs:
+	* Reduced cost of unlocking Beach and Rubber Band balls.
+	* Reduced cost of Rubber Band Ball Value upgrade and increased initial and maximum values.
+
 ### v1.12.0-beta (2021-09-11)
 * New ball type: Rubber band balls! They're very bouncy, and increase in value with each bounce.
 

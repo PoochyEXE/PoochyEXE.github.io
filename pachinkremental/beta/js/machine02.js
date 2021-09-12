@@ -1304,7 +1304,7 @@ class BumperMachine extends PachinkoMachine {
 				ball_type: this.ball_types[kBumperMachineBallTypeIDs.BEACH_BALL],
 				ball_description:
 					"Beach balls have bonuses of Opal balls plus they never break their combo. They're also bouncier and floatier.",
-				cost_func: () => 1e22,
+				cost_func: () => 1e21,
 				visible_func: () =>
 					this.IsUnlocked("unlock_opal_balls") &&
 					this.IsMaxed("combo_timeout"),
@@ -1325,7 +1325,7 @@ class BumperMachine extends PachinkoMachine {
 				ball_type: this.ball_types[kBumperMachineBallTypeIDs.RUBBER_BAND],
 				ball_description:
 					"Rubber band balls have bonuses of Opal balls plus they never break their combo. They're also much bouncier and they increase in value with each bounce. (Stacks multiplicatively with gemstone ball multipliers.)",
-				cost_func: () => 1e22,
+				cost_func: () => 1e21,
 				visible_func: () =>
 					this.IsUnlocked("unlock_opal_balls") &&
 					this.IsMaxed("combo_timeout"),
@@ -1347,9 +1347,9 @@ class BumperMachine extends PachinkoMachine {
 				name: "Rubber Band Ball Value",
 				category: "rubberband_balls",
 				description: "Point value increase per bounce for Rubber Band balls.",
-				cost_func: level => 1e21 * Math.pow(10, level),
-				value_func: level => (level + 1),
-				max_level: 9,
+				cost_func: level => 1e21 * Math.pow(2, level),
+				value_func: level => (level + 5),
+				max_level: 25,
 				value_suffix: "%",
 				visible_func: () => this.IsUnlocked("unlock_rubberband_balls"),
 				on_update: function() {
@@ -1885,8 +1885,11 @@ class BumperMachine extends PachinkoMachine {
 			return "Unlock Opal Balls";
 		} else if (!this.IsUpgradeVisible("unlock_beach_balls")) {
 			return "Upgrade Combo Timeout to 5 seconds";
-		} else if (!this.IsUnlocked("unlock_beach_balls")) {
-			return "Unlock Beach Balls";
+		} else if (
+			!this.IsUnlocked("unlock_beach_balls") ||
+			!this.IsUnlocked("unlock_rubberband_balls")
+		) {
+			return "Unlock Beach Balls and Rubber Band Balls";
 		} else if (
 			!this.IsMaxed("ruby_ball_value_percent") ||
 			!this.IsMaxed("emerald_ball_value_percent") ||

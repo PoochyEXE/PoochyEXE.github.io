@@ -66,7 +66,7 @@ class ScoreTarget extends Target {
 		}
 		this.machine.AwardPoints(this.value, ball);
 		++ball.score_targets_hit;
-		if (state.show_hit_rates) {
+		if (GetSetting("show_hit_rates")) {
 			state.redraw_stats_overlay = true;
 		}
 	}
@@ -147,7 +147,7 @@ class Bumper extends Target {
 		ball.last_hit = null;
 		++ball.bumpers_hit;
 		state.redraw_bumpers = true;
-		if (state.show_hit_rates) {
+		if (GetSetting("show_hit_rates")) {
 			state.redraw_stats_overlay = true;
 		}
 	}

@@ -1,4 +1,4 @@
-const kVersion = "v1.12.0-beta";
+const kVersion = "v1.12.1-beta";
 const kTitleAndVersion = "Pachinkremental " + kVersion;
 
 const kFrameInterval = 1000.0 / kFPS;
@@ -129,6 +129,7 @@ function LoadActiveMachine(state) {
 	UpdateOpacitySlidersFromSaveFile(state);
 	UpdateFaviconChoiceFromSaveFile(state);
 	UpdateCollapsibles(save_data.options.collapsed);
+	UpdateHitRatesDisplay(state);
 	OnResize();
 }
 
@@ -162,7 +163,6 @@ function InitState() {
 		redraw_stats_overlay: false,
 		redraw_wheel: false,
 		reset_target_text: false,
-		show_hit_rates: false,
 		update_stats_panel: true,
 		update_upgrades: true,
 		update_upgrade_buttons: true,
@@ -209,6 +209,7 @@ function InitState() {
 				show_upgrade_levels: false,
 				apply_opacity_to_popup_text: true,
 				show_combos: true,
+				show_hit_rates: false,
 				notation: 0,
 				favicon: -1,
 				april_fools_enabled: 2,
