@@ -25,10 +25,16 @@ function InitStatsPanel(state) {
 	}
 	UpdateInnerHTML("stats_section_milestones", html);
 	
+	UpdateDisplay("stats_container_max_beach_ball_rotated_degrees", "none");
+	UpdateDisplay("stats_container_longest_lasting_beach_ball", "none");
 	UpdateDisplay("stats_container_max_buff_multiplier", "none");
 	UpdateDisplay("stats_container_max_combo", "none");
 	UpdateDisplay("stats_container_hyper_activations", "none");
 	UpdateDisplay("stats_container_max_hyper_combo", "none");
+	UpdateDisplay("stats_container_longest_lasting_ruby_ball", "none");
+	UpdateDisplay("stats_container_sapphire_ball_most_target_hits", "none");
+	UpdateDisplay("stats_container_emerald_ball_most_bumper_hits", "none");
+	UpdateDisplay("stats_container_rubberband_ball_most_bounces", "none");
 	UpdateDisplay("stats_container_balls_dropped_manual", "none");
 }
 

@@ -44,6 +44,17 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
+### v1.12.3-beta (2021-09-12)
+* Added a bunch more stats:
+	* Basic machine:
+		* Longest-lasting Beach Ball
+		* Most rotations by a Beach Ball
+	* Bumpers machine:
+		* Longest-lasting ball with the Ruby Ball bonus
+		* Most target hits by a ball with the Sapphire Ball bonus
+		* Most bumper hits by a ball with the Emerald Ball bonus
+		* Most bounces by a Rubber Band Ball
+
 ### v1.12.2-beta (2021-09-12)
 * Fix a bug where holding Shift with significantly more than enough points to max an upgrade could cause that upgrade's button to display an incorrect value and cost, above the max value and the cost needed to max it.
 

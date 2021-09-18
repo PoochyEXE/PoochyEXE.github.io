@@ -115,6 +115,8 @@ class FirstMachine extends PachinkoMachine {
 		save_data.score_buff_duration = 0;
 		save_data.stats.max_buff_multiplier = 0;
 		save_data.stats.bonus_wheel_points_scored = 0;
+		save_data.stats.longest_lasting_beach_ball = 0;
+		save_data.stats.max_beach_ball_rotated_degrees = 0;
 		save_data.options.auto_spin_enabled = false;
 		save_data.options.multi_spin_enabled = false;
 		return save_data;
@@ -1325,6 +1327,7 @@ class FirstMachine extends PachinkoMachine {
 			total_value *= this.GetSaveData().score_buff_multiplier;
 		}
 		let popup_text_level = 0;
+		let stats = this.GetSaveData().stats;
 		if (ball.ball_type_index != kFirstMachineBallTypeIDs.NORMAL) {
 			if (this.HasEightBallSpecial(ball.ball_type_index)) {
 				popup_text_level = 3;
@@ -1342,6 +1345,9 @@ class FirstMachine extends PachinkoMachine {
 							sec_elapsed, this.beach_ball_score_exponent
 						);
 						multiplier = Math.max(multiplier, 2.0);
+
+						stats.longest_lasting_beach_ball =
+							Math.max(sec_elapsed, stats.longest_lasting_beach_ball);
 					}
 					const k2Pi = Math.PI * 2;
 					if (
@@ -1349,6 +1355,11 @@ class FirstMachine extends PachinkoMachine {
 						ball.total_rotations > k2Pi
 					) {
 						multiplier *= ball.total_rotations / k2Pi;
+						
+						stats.max_beach_ball_rotated_degrees = Math.max(
+							ball.total_rotations * 180.0 / Math.PI,
+							stats.max_beach_ball_rotated_degrees
+						);
 					}
 					total_value *= multiplier;
 					color_rgb = kPrismatic;

@@ -90,6 +90,10 @@ class BumperMachine extends PachinkoMachine {
 		save_data.stats.hyper_activations = 0;
 		save_data.stats.max_combo = 0;
 		save_data.stats.max_hyper_combo = 0;
+		save_data.stats.longest_lasting_ruby_ball = 0;
+		save_data.stats.emerald_ball_most_bumper_hits = 0;
+		save_data.stats.sapphire_ball_most_target_hits = 0;
+		save_data.stats.rubberband_ball_most_bounces = 0;
 		//save_data.options.auto_spin_enabled = false;
 		//save_data.options.multi_spin_enabled = false;
 		return save_data;
@@ -1663,16 +1667,31 @@ class BumperMachine extends PachinkoMachine {
 					let sec_elapsed =
 						(state.current_time - ball.start_time) / 1000.0;
 					ruby_value = sec_elapsed * this.ruby_ball_value_percent;
+
+					save_data.stats.longest_lasting_ruby_ball = Math.max(
+						save_data.stats.longest_lasting_ruby_ball,
+						sec_elapsed
+					);
 				}
 				let sapphire_value = 0;
 				if (this.HasSapphireSpecial(ball.ball_type_index)) {
 					sapphire_value =
 						ball.score_targets_hit * this.sapphire_ball_value_percent;
+
+					save_data.stats.sapphire_ball_most_target_hits = Math.max(
+						save_data.stats.sapphire_ball_most_target_hits,
+						ball.score_targets_hit
+					);
 				}
 				let emerald_value = 0;
 				if (this.HasEmeraldSpecial(ball.ball_type_index)) {
 					emerald_value =
 						ball.bumpers_hit * this.emerald_ball_value_percent;
+
+					save_data.stats.emerald_ball_most_bumper_hits = Math.max(
+						save_data.stats.emerald_ball_most_bumper_hits,
+						ball.bumpers_hit
+					);
 				}
 				if (this.overdrive) {
 					if (this.IsUnlocked("overdrive_lunatic_red_eyes")) {
@@ -1698,6 +1717,11 @@ class BumperMachine extends PachinkoMachine {
 					let rubberband_value =
 						ball.bounces * this.rubberband_ball_value_percent;
 					multiplier *= 1.0 + rubberband_value / 100.0;
+
+					save_data.stats.rubberband_ball_most_bounces = Math.max(
+						save_data.stats.rubberband_ball_most_bounces,
+						ball.bounces
+					);
 				}
 				total_value *= multiplier;
 			}
