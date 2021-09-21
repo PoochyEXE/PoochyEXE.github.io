@@ -247,7 +247,7 @@ div.upgradeButtonWrapper {
 	margin: 2.5px;
 }
 
-button.upgradeButton, button.rubyUpgradeButton, button.sapphireUpgradeButton, button.emeraldUpgradeButton, button.topazUpgradeButton, button.turquoiseUpgradeButton, button.amethystUpgradeButton, button.opalUpgradeButton, button.eightBallUpgradeButton, button.beachBallUpgradeButton, button.rubberBandBallUpgradeButton {
+button.upgradeButton, button.rubyUpgradeButton, button.sapphireUpgradeButton, button.emeraldUpgradeButton, button.topazUpgradeButton, button.turquoiseUpgradeButton, button.amethystUpgradeButton, button.opalUpgradeButton, button.opalStaticUpgradeButton, button.eightBallUpgradeButton, button.beachBallUpgradeButton, button.rubberBandBallUpgradeButton {
 	border: 1px solid #000;
 	border-radius: 10px;
 	font-family: sans-serif;
@@ -486,6 +486,62 @@ button.opalUpgradeButtonDark:disabled {
     -webkit-animation-name: opalUpgradeButtonDarkDisabledColor;
     -webkit-animation-iteration-count: infinite;
     -webkit-animation-duration: 2s;
+}
+
+button.opalStaticUpgradeButtonLight {
+	background: repeating-linear-gradient(
+	  135deg,
+	  #F88,
+	  #FF8 10px,
+	  #8F8 20px,
+	  #8FF 30px,
+	  #88F 40px,
+	  #F8F 50px,
+	  #F88 60px
+	);
+	color: #000;
+}
+
+button.opalStaticUpgradeButtonLight:disabled {
+	background: repeating-linear-gradient(
+	  135deg,
+	  #A77,
+	  #AA7 10px,
+	  #7A7 20px,
+	  #7AA 30px,
+	  #77A 40px,
+	  #A7A 50px,
+	  #A77 60px
+	);
+	color: #000;
+}
+
+button.opalStaticUpgradeButtonDark {
+	background: repeating-linear-gradient(
+	  135deg,
+	  #A33,
+	  #AA3 10px,
+	  #3A3 20px,
+	  #3AA 30px,
+	  #33A 40px,
+	  #A3A 50px,
+	  #A33 60px
+	);
+	color: #FFF;
+}
+
+button.opalStaticUpgradeButtonDark:disabled {
+	background: repeating-linear-gradient(
+	  135deg,
+	  #300,
+	  #330 10px,
+	  #030 20px,
+	  #033 30px,
+	  #003 40px,
+	  #303 50px,
+	  #300 60px
+	);
+	color: #FFF;
 }
 
 button.beachBallUpgradeButtonLight {

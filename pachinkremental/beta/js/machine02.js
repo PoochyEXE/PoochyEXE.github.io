@@ -978,6 +978,19 @@ class BumperMachine extends PachinkoMachine {
 		upgrades_list.push(
 			new FixedCostFeatureUnlockUpgrade({
 				machine: this,
+				id: "hyper_recharge",
+				name: "Hyper Recharge",
+				category: "hyper",
+				description: "When time runs out, the Hyper System regains some charge based on the length of the Hyper Combo achieved. (Does not stack with the Charge Rate upgrade.)",
+				cost: 888e24,
+				visible_func: () =>
+					this.IsUnlocked("hyper_combo") &&
+					this.GetSaveData().stats.hyper_activations > 0,
+			})
+		);
+		upgrades_list.push(
+			new FixedCostFeatureUnlockUpgrade({
+				machine: this,
 				id: "unlock_overdrive",
 				name: "Overdrive",
 				category: "overdrive",
@@ -1641,6 +1654,13 @@ class BumperMachine extends PachinkoMachine {
 						save_data.stats.max_hyper_combo =
 							Math.max(save_data.hyper_combo, save_data.stats.max_hyper_combo);
 						total_value *= this.HyperComboValue(save_data.hyper_combo);
+						
+						if (this.IsUnlocked("hyper_recharge")) {
+							save_data.hyper_charge = Math.min(
+								save_data.hyper_charge + 10,
+								this.max_hyper_charge * 0.3
+							);
+						}
 					}
 				} else {
 					save_data.hyper_charge += ball.combo * this.hyper_charge_rate;

@@ -44,6 +44,10 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
+### v1.12.4-beta (2021-09-21)
+* New upgrade: Hyper Recharge
+* Add alternate non-animated style for Opal ball upgrade buttons, toggleable in the options.
+
 ### v1.12.3-beta (2021-09-12)
 * Added a bunch more stats:
 	* Basic machine:

@@ -195,6 +195,7 @@ function LoadGame(save_file_str) {
 		UpdateOptionsButtons();
 		UpdateAutoSaveInterval();
 		UpdateDarkMode();
+		UpdateOpalBallUpgradesStyle();
 		UpdateMachinesHeader(state);
 		UpdateFavicon(state);
 		UpdateOpacitySlidersFromSaveFile(state);

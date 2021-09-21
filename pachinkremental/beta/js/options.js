@@ -33,6 +33,7 @@ const kColorSchemeClasses = [
 	new ColorSchemeClassMapping("turquoiseUpgradeButton", "turquoiseUpgradeButtonLight", "turquoiseUpgradeButtonDark"),
 	new ColorSchemeClassMapping("amethystUpgradeButton", "amethystUpgradeButtonLight", "amethystUpgradeButtonDark"),
 	new ColorSchemeClassMapping("opalUpgradeButton", "opalUpgradeButtonLight", "opalUpgradeButtonDark"),
+	new ColorSchemeClassMapping("opalStaticUpgradeButton", "opalStaticUpgradeButtonLight", "opalStaticUpgradeButtonDark"),
 	new ColorSchemeClassMapping("eightBallUpgradeButton", "eightBallUpgradeButtonLight", "eightBallUpgradeButtonDark"),
 	new ColorSchemeClassMapping("beachBallUpgradeButton", "beachBallUpgradeButtonLight", "beachBallUpgradeButtonDark"),
 	new ColorSchemeClassMapping("rubberBandBallUpgradeButton", "rubberBandBallUpgradeButtonLight", "rubberBandBallUpgradeButtonDark"),
@@ -206,13 +207,45 @@ function UpdateOptionsButtons() {
 		"April Fools: " + kAprilFoolsOptions[GetSetting("april_fools_enabled")]);
 	UpdateInnerHTML("button_classic_opal_balls",
 		"Style: " + (state.save_file.options.classic_opal_balls ? "Classic" : "Default"));
+	UpdateDisplay("button_opal_balls_upgrades_style",
+		ActiveMachine(state).IsUpgradeVisible("unlock_opal_balls") ? "inline" : "none");
+	UpdateInnerHTML("button_opal_balls_upgrades_style",
+		"Opal ball upgrade button style: " + (state.save_file.options.static_opal_ball_upgrade_buttons ? "Static" : "Default"));
 	UpdateInnerHTML("button_notation",
 		"Notation: " + kNotationOptions[GetSetting("notation")]);
 	UpdateInnerHTML("button_apply_opacity_to_popup_text",
 		"Apply opacity settings to pop-up text: " + (state.save_file.options.apply_opacity_to_popup_text ? "ON" : "OFF"));
-	UpdateDisplay("button_show_combos", ActiveMachine(state).IsUnlocked("unlock_combos") ? "inline" : "none");
+	UpdateDisplay("button_show_combos",
+		ActiveMachine(state).IsUnlocked("unlock_combos") ? "inline" : "none");
 	UpdateInnerHTML("button_show_combos",
 		"Show combos: " + (state.save_file.options.show_combos ? "ON" : "OFF"));
+}
+
+function ToggleOpalBallUpgradesStyle() {
+	state.save_file.options.static_opal_ball_upgrade_buttons = !state.save_file.options.static_opal_ball_upgrade_buttons;
+	UpdateOpalBallUpgradesStyle();
+	UpdateOptionsButtons();
+}
+
+function UpdateOpalBallUpgradesStyle() {
+	const kClasses = [
+		["opalUpgradeButton", "opalStaticUpgradeButton"],
+		["opalUpgradeButtonLight", "opalStaticUpgradeButtonLight"],
+		["opalUpgradeButtonDark", "opalStaticUpgradeButtonDark"],
+	];
+
+	const from_index = state.save_file.options.static_opal_ball_upgrade_buttons ? 0 : 1;
+	const to_index = 1 - from_index;
+	for (let i = 0; i < kClasses.length; ++i) {
+		const from_class = kClasses[i][from_index];
+		const to_class = kClasses[i][to_index];
+		let elems = document.getElementsByClassName(from_class);
+		for (let j = elems.length - 1; j >= 0; --j) {
+			let elem = elems[j];
+			elem.classList.add(to_class);
+			elem.classList.remove(from_class);
+		}
+	}
 }
 
 function UpdateAutoSaveInterval() {

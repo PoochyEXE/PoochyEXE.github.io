@@ -1,4 +1,4 @@
-const kVersion = "v1.12.3-beta";
+const kVersion = "v1.12.4-beta";
 const kTitleAndVersion = "Pachinkremental " + kVersion;
 
 const kFrameInterval = 1000.0 / kFPS;
@@ -206,6 +206,7 @@ function InitState() {
 				auto_save_enabled: true,
 				dark_mode: false,
 				classic_opal_balls: false,
+				static_opal_ball_upgrade_buttons: false,
 				show_upgrade_levels: false,
 				apply_opacity_to_popup_text: true,
 				show_combos: true,
@@ -337,6 +338,7 @@ function SwitchMachine(index) {
 	UpdateScoreDisplay(state, /*force_update=*/true);
 	UpdateMachinesHeader(state);
 	UpdateDarkMode();
+	UpdateOpalBallUpgradesStyle();
 	ResizeCanvas();
 
 	for (let i = 0; i < state.score_history.length; ++i) {
@@ -560,6 +562,7 @@ function Load() {
 	document.getElementById(other_ver).style.display = "inline-block";
 	DisplayArchivedSaveFileButtons();
 	UpdateDarkMode();
+	UpdateOpalBallUpgradesStyle();
 
 	window.onresize = OnResize;
 

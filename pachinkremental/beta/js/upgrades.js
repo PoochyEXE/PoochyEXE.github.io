@@ -453,6 +453,7 @@ class BallTypeUnlockUpgrade extends FeatureUnlockUpgrade {
 				UpdateFavicon(state);
 			},
 			tooltip_width,
+			on_buy: UpdateOptionsButtons
 		});
 	}
 }
