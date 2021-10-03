@@ -44,6 +44,11 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
+### v1.13.1-beta (2021-10-03)
+* New upgrade: OD ↑↑↓↓←→←→BA
+* Bumpers machine now shows remaining Hyper System time to tenths of a second.
+* Re-order Board upgrades in Bumpers machine to go by progression.
+
 ### v1.13.0-beta (2021-10-03)
 * New upgrade: OD Heaven's Time
 

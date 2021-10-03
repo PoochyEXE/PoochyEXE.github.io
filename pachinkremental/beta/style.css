@@ -944,3 +944,8 @@ span.warning {
 	color: #F00;
 	font-weight: bold;
 }
+
+span.arrows {
+	font-weight: bolder;
+	font-family: monospace;
+}

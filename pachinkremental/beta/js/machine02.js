@@ -748,6 +748,24 @@ class BumperMachine extends PachinkoMachine {
 			})
 		);
 		upgrades_list.push(
+			new Upgrade({
+				machine: this,
+				id: "max_balls",
+				name: "Max Balls",
+				category: "board",
+				description:
+					"Maximum number of balls allowed on the board at once.",
+				cost_func: level => 25000 * Math.pow(2, level),
+				value_func: level => level + 1,
+				max_level: 49,
+				value_suffix: "",
+				visible_func: () => this.GetUpgradeLevel("multiplier") > 1,
+				on_update: function() {
+					this.machine.max_balls = this.GetValue();
+				},
+			})
+		);
+		upgrades_list.push(
 			new FixedCostFeatureUnlockUpgrade({
 				machine: this,
 				id: "add_score_targets",
@@ -833,24 +851,6 @@ class BumperMachine extends PachinkoMachine {
 						state.auto_drop_cooldown_left = state.auto_drop_cooldown;
 					}
 					state.redraw_auto_drop = true;
-				},
-			})
-		);
-		upgrades_list.push(
-			new Upgrade({
-				machine: this,
-				id: "max_balls",
-				name: "Max Balls",
-				category: "board",
-				description:
-					"Maximum number of balls allowed on the board at once.",
-				cost_func: level => 25000 * Math.pow(2, level),
-				value_func: level => level + 1,
-				max_level: 49,
-				value_suffix: "",
-				visible_func: () => this.GetUpgradeLevel("multiplier") > 1,
-				on_update: function() {
-					this.machine.max_balls = this.GetValue();
 				},
 			})
 		);
@@ -1032,6 +1032,17 @@ class BumperMachine extends PachinkoMachine {
 				category: "overdrive",
 				description: "Overdrive dilates time for the Hyper System, making its energy drain half as fast.",
 				cost: 11e24,
+				visible_func: () => this.IsUnlocked("unlock_overdrive"),
+			})
+		);
+		upgrades_list.push(
+			new FixedCostFeatureUnlockUpgrade({
+				machine: this,
+				id: "overdrive_secret_code",
+				name: 'OD <span class="arrows">&uarr;&uarr;&darr;&darr;&larr;&rarr;&larr;&rarr;</span>BA',
+				category: "overdrive",
+				description: "+30 base Hyper Multiplier during Overdrive.",
+				cost: 573e24,
 				visible_func: () => this.IsUnlocked("unlock_overdrive"),
 			})
 		);
@@ -1450,13 +1461,16 @@ class BumperMachine extends PachinkoMachine {
 	BuffDisplayText() {
 		let save_data = this.GetSaveData();
 		if (save_data.score_buff_duration > 0) {
-			let duration_sec =
-				Math.round(save_data.score_buff_duration / 1000.0);
+			let duration_sec = save_data.score_buff_duration / 1000.0;
 			let hyper_combo_value =
 				this.HyperComboValue(save_data.hyper_combo);
+			let hyper_mult = this.hyper_multiplier;
+			if (this.IsUnlocked("overdrive_secret_code")) {
+				hyper_mult += 30;
+			}
 			let multiplier_text = ""
 			if (hyper_combo_value > 1.0) {
-				let total_multiplier = this.hyper_multiplier * hyper_combo_value;
+				let total_multiplier = hyper_mult * hyper_combo_value;
 				if (total_multiplier < 100) {
 					// Prevent flickering between 1 decimal place and rounding to
 					// the nearest integer.
@@ -1465,10 +1479,10 @@ class BumperMachine extends PachinkoMachine {
 					multiplier_text = FormatNumberMedium(total_multiplier)
 				}
 			} else {
-				multiplier_text = FormatNumberMedium(this.hyper_multiplier);
+				multiplier_text = FormatNumberMedium(hyper_mult);
 			}
 			return "All scoring \u00D7" + multiplier_text + " for " +
-				duration_sec + " seconds!";
+				duration_sec.toFixed(1) + " seconds!";
 		} else if (this.IsUnlocked("unlock_hyper_system")) {
 			return 'Score multiplier: \u00D71';
 		} else {
