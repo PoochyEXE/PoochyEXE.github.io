@@ -113,6 +113,7 @@ class FirstMachine extends PachinkoMachine {
 		save_data.spins = 0;
 		save_data.score_buff_multiplier = 0;
 		save_data.score_buff_duration = 0;
+		save_data.score_buff_time_dilation = 1.0;
 		save_data.stats.max_buff_multiplier = 0;
 		save_data.stats.bonus_wheel_points_scored = 0;
 		save_data.stats.longest_lasting_beach_ball = 0;

@@ -362,7 +362,11 @@ function UpdateOneFrame(state) {
 	}
 
 	if (save_data.score_buff_duration > 0) {
-		save_data.score_buff_duration -= kFrameInterval;
+		let elapsed = kFrameInterval;
+		if (save_data.score_buff_time_dilation > 1.0) {
+			elapsed /= save_data.score_buff_time_dilation;
+		}
+		save_data.score_buff_duration -= elapsed;
 		if (save_data.score_buff_duration <= 0) {
 			save_data.score_buff_duration = 0;
 			machine.OnBuffTimeout(state);

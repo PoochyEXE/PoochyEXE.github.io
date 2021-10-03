@@ -44,6 +44,9 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
+### v1.13.0-beta (2021-10-03)
+* New upgrade: OD Heaven's Time
+
 ### v1.12.4-beta (2021-09-21)
 * New upgrade: Hyper Recharge
 * Add alternate non-animated style for Opal ball upgrade buttons, toggleable in the options.

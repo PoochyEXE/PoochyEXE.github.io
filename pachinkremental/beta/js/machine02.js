@@ -87,6 +87,7 @@ class BumperMachine extends PachinkoMachine {
 		save_data.hyper_charge = 0;
 		save_data.hyper_combo = 0;
 		save_data.score_buff_duration = 0;
+		save_data.score_buff_time_dilation = 1.0;
 		save_data.stats.hyper_activations = 0;
 		save_data.stats.max_combo = 0;
 		save_data.stats.max_hyper_combo = 0;
@@ -1026,6 +1027,17 @@ class BumperMachine extends PachinkoMachine {
 		upgrades_list.push(
 			new FixedCostFeatureUnlockUpgrade({
 				machine: this,
+				id: "overdrive_heavens_time",
+				name: "OD Heaven's Time",
+				category: "overdrive",
+				description: "Overdrive dilates time for the Hyper System, making its energy drain half as fast.",
+				cost: 11e24,
+				visible_func: () => this.IsUnlocked("unlock_overdrive"),
+			})
+		);
+		upgrades_list.push(
+			new FixedCostFeatureUnlockUpgrade({
+				machine: this,
 				id: "overdrive_lunatic_red_eyes",
 				name: "OD Lunatic Red Eyes",
 				category: "overdrive",
@@ -1468,6 +1480,7 @@ class BumperMachine extends PachinkoMachine {
 		let save_data = this.GetSaveData();
 		if (save_data.hyper_charge >= this.max_hyper_charge) {
 			save_data.score_buff_duration = this.hyper_duration;
+			save_data.score_buff_time_dilation = 1.0;
 			save_data.hyper_charge = 0;
 			++save_data.stats.hyper_activations;
 			save_data.hyper_combo = 0;
@@ -1580,11 +1593,16 @@ class BumperMachine extends PachinkoMachine {
 				state.balls_by_type[kNormal] = [];
 			}
 		}
+		
+		if (this.IsUnlocked("overdrive_heavens_time")) {
+			this.GetSaveData().score_buff_time_dilation = 2.0;
+		}
 	}
 	
 	DeactivateOverdrive() {
 		this.overdrive = false;
 		document.getElementById("hyper_status").classList.remove("overdrive");
+		this.GetSaveData().score_buff_time_dilation = 1.0;
 	}
 	
 	CheckOverdrive() {
