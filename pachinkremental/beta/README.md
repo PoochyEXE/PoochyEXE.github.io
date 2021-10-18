@@ -44,6 +44,10 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
+### v1.13.2-beta (2021-10-18)
+* Bugfix: Fix Rubber Band Balls looking slightly weird in medium and low quality modes.
+* Under-the-hood refactor of some of the stats display code.
+
 ### v1.13.1-beta (2021-10-03)
 * New upgrade: OD ↑↑↓↓←→←→BA
 * Bumpers machine now shows remaining Hyper System time to tenths of a second.

@@ -163,6 +163,10 @@ div.statsSection {
 	display: inline-block;
 }
 
+div.statsRow {
+	display: block;
+}
+
 div.optionsContainerLight {
 	border: 2px solid #808;
 	background: #FCF;

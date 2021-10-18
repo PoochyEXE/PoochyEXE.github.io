@@ -6,7 +6,7 @@ function InitStatsPanel(state) {
 		let type_name = ball_types[id].name + "_balls";
 		html +=
 			'<div id="stats_container_' + type_name +
-			'_stat" class="statsRow" style="display: none;"><b>' +
+			'_stat" class="statsRowUnlockable"><b>' +
 			ball_types[id].display_name +
 			'balls: </b><span id="stats_' + type_name +
 			'_stat" class="statsEntry"></span></div>';
@@ -18,24 +18,17 @@ function InitStatsPanel(state) {
 		let stat_id = "time_to_max_" + state.machines[i].id;
 		html +=
 			'<div id="stats_container_' + stat_id +
-			'" class="statsRow" style="display: none;"><b>' +
+			'" class="statsRowUnlockable"><b>' +
 			state.machines[i].display_name +
 			' machine maxed: </b><span id="stats_' + stat_id +
 			'" class="statsEntry"></span></div>';
 	}
 	UpdateInnerHTML("stats_section_milestones", html);
 	
-	UpdateDisplay("stats_container_max_beach_ball_rotated_degrees", "none");
-	UpdateDisplay("stats_container_longest_lasting_beach_ball", "none");
-	UpdateDisplay("stats_container_max_buff_multiplier", "none");
-	UpdateDisplay("stats_container_max_combo", "none");
-	UpdateDisplay("stats_container_hyper_activations", "none");
-	UpdateDisplay("stats_container_max_hyper_combo", "none");
-	UpdateDisplay("stats_container_longest_lasting_ruby_ball", "none");
-	UpdateDisplay("stats_container_sapphire_ball_most_target_hits", "none");
-	UpdateDisplay("stats_container_emerald_ball_most_bumper_hits", "none");
-	UpdateDisplay("stats_container_rubberband_ball_most_bounces", "none");
-	UpdateDisplay("stats_container_balls_dropped_manual", "none");
+	let unlockable_stats = document.getElementsByClassName("statsRowUnlockable");
+	for (let i = 0; i < unlockable_stats.length; ++i) {
+		unlockable_stats[i].style.display = "none";
+	}
 }
 
 function UpdateStatsEntry(state, key, val) {

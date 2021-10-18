@@ -304,12 +304,11 @@ function DrawRubberBandBallsNoGradient(balls, ctx) {
 		let rotation = balls[i].rotation;
 		for (let j = 0; j < kRubberBandColorIndices.length; ++j) {
 			let segment_rotation =
-				Math.PI * j / kRubberBandColorIndices.length - rotation;
+				Math.PI * kRubberBandLayerOrder[j] / kRubberBandColorIndices.length - rotation;
 			ctx.fillStyle = GetPrismaticColor(
 				kRubberBandColorIndices[j], 6.0, kPrismaticSaturationOuter, 1.0
 			);
 			ctx.beginPath();
-			ctx.moveTo(pos.x, pos.y);
 			ctx.arc(
 				pos.x,
 				pos.y,
