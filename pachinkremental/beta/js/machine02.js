@@ -13,6 +13,7 @@ const kBumperMachineBallTypes = [
 	new BallType(8,   "opal",       "Opal ",        kPhysicsParams.normal,     kPrismatic,   kPrismatic,   kPrismatic       ),
 	new BallType(9,   "beach",      "Beach ",       kPhysicsParams.beach_ball, kBeachBall,   kBeachBall,   kBeachBall       ),
 	new BallType(10,  "rubberband", "Rubber Band ", kPhysicsParams.rubber,     kRubberBand,  kRubberBand,  kRubberBand      ),
+	new BallType(11,  "spiral",     "Spiral ",      kPhysicsParams.normal,     kSpiral,      kSpiral,      kPrismatic       ),
 ];
 
 const kBumperMachineBallTypeIDs = {
@@ -27,6 +28,7 @@ const kBumperMachineBallTypeIDs = {
 	OPAL: 8,
 	BEACH_BALL: 9,
 	RUBBER_BAND: 10,
+	SPIRAL: 11,
 };
 
 const kBumperMachinePopupTextOptions = [
@@ -51,6 +53,8 @@ class BumperMachine extends PachinkoMachine {
 		this.hyper_duration = 15000;
 		this.last_hyper_end_time = 0;
 		this.overdrive = false;
+		this.spiral_power = 0.0;
+		this.spiral_multiplier = 1.0;
 
 		//this.bonus_wheel = this.InitWheel();
 	}
@@ -86,6 +90,7 @@ class BumperMachine extends PachinkoMachine {
 		save_data.options.auto_hyper_enabled = false;
 		save_data.hyper_charge = 0;
 		save_data.hyper_combo = 0;
+		save_data.spiral_power = 0;
 		save_data.score_buff_duration = 0;
 		save_data.score_buff_time_dilation = 1.0;
 		save_data.stats.hyper_activations = 0;
@@ -95,6 +100,7 @@ class BumperMachine extends PachinkoMachine {
 		save_data.stats.emerald_ball_most_bumper_hits = 0;
 		save_data.stats.sapphire_ball_most_target_hits = 0;
 		save_data.stats.rubberband_ball_most_bounces = 0;
+		save_data.stats.max_spiral_power_percent = 0;
 		//save_data.options.auto_spin_enabled = false;
 		//save_data.options.multi_spin_enabled = false;
 		return save_data;
@@ -133,6 +139,7 @@ class BumperMachine extends PachinkoMachine {
 				kPrismatic,
 				kPrismatic,
 				kPrismatic,
+				kPrismatic,
 			]
 			return kDarkModeColors[ball_type_index];
 		} else {
@@ -145,6 +152,7 @@ class BumperMachine extends PachinkoMachine {
 				"192,192,  0",
 				"  0,192,192",
 				"192,  0,192",
+				kPrismatic,
 				kPrismatic,
 				kPrismatic,
 				kPrismatic,
@@ -185,6 +193,9 @@ class BumperMachine extends PachinkoMachine {
 			),
 			new SingleBallTypeUpgradeHeader(
 				this, this.ball_types[kBumperMachineBallTypeIDs.RUBBER_BAND]
+			),
+			new SingleBallTypeUpgradeHeader(
+				this, this.ball_types[kBumperMachineBallTypeIDs.SPIRAL]
 			),
 			new UpgradeHeader(
 				this,
@@ -1397,6 +1408,44 @@ class BumperMachine extends PachinkoMachine {
 				},
 			})
 		);
+		upgrades_list.push(
+			new BallTypeUnlockUpgrade({
+				machine: this,
+				ball_type: this.ball_types[kBumperMachineBallTypeIDs.SPIRAL],
+				ball_description:
+					"Spiral balls have bonuses of Opal balls plus they generate Spiral Power when they rotate. Spiral Power provides a global score buff, but drains over time.<br>「俺を誰だと思ってやがる！」",
+				cost_func: () => 1e21,
+				visible_func: () =>
+					this.IsUnlocked("unlock_opal_balls") &&
+					this.IsMaxed("combo_timeout"),
+			})
+		);
+		upgrades_list.push(
+			new BallTypeRateUpgrade({
+				machine: this,
+				ball_type: this.ball_types[kBumperMachineBallTypeIDs.SPIRAL],
+				cost_func: level => 1e21 * Math.pow(10, level),
+				value_func: level => (level + 1) / 2.0,
+				max_level: 9
+			})
+		);
+		upgrades_list.push(
+			new FixedCostFeatureUnlockUpgrade({
+				machine: this,
+				id: "pierce_the_heavens",
+				name: "Pierce the Heavens",
+				category: "spiral_balls",
+				description: "Allows Spiral Power to exceed 100%, with diminishing returns above 100%.",
+				cost: 1e27,
+				visible_func: () =>
+					this.IsUnlocked("unlock_overdrive") &&
+					this.IsUnlocked("overdrive_lunatic_red_eyes") &&
+					this.IsUnlocked("overdrive_green_eyed_monster") &&
+					this.IsUnlocked("overdrive_perfect_freeze") &&
+					this.IsUnlocked("unlock_opal_balls"),
+				tooltip_width: 270,
+			})
+		);
 		/* TODO: Add bonus wheel.
 		upgrades_list.push(
 			new FixedCostFeatureUnlockUpgrade({
@@ -1520,7 +1569,6 @@ class BumperMachine extends PachinkoMachine {
 	}
 
 	UpdateHyperSystemDisplay(state) {
-		const machine = ActiveMachine(state);
 		if (!this.IsUnlocked("unlock_hyper_system")) {
 			UpdateDisplay("hyper_system", "none");
 			return;
@@ -1581,7 +1629,7 @@ class BumperMachine extends PachinkoMachine {
 		document.getElementById("hyper_meter_fill").style.width =
 			meter_percent + "%";
 	}
-	
+
 	ActivateOverdrive() {
 		this.overdrive = true;
 		document.getElementById("hyper_status").classList.add("overdrive");
@@ -1634,6 +1682,50 @@ class BumperMachine extends PachinkoMachine {
 		}
 	}
 
+	UpdateOneFrame() {
+		let save_data = this.GetSaveData();
+
+		if (!this.IsUnlocked("unlock_spiral_balls")) {
+			UpdateDisplay("spiral_power", "none");
+		} else {
+			UpdateDisplay("spiral_power", "inline-block");
+			const kMaxSpiralPower = 5000;
+			const kMaxSpiralMultiplier = 10;
+			save_data.spiral_power *= 0.99;
+			const spiral_balls =
+				state.balls_by_type[kBumperMachineBallTypeIDs.SPIRAL];
+			for (let i = 0; i < spiral_balls.length; ++i) {
+				save_data.spiral_power += Math.abs(spiral_balls[i].omega);
+			}
+			if (!this.IsUnlocked("pierce_the_heavens")) {
+				save_data.spiral_power =
+					Math.min(save_data.spiral_power, kMaxSpiralPower);
+			}
+			let meter_fraction = save_data.spiral_power / kMaxSpiralPower;
+			let multiplier_fraction = meter_fraction;
+			if (multiplier_fraction > 1.0) {
+				multiplier_fraction = Math.sqrt(multiplier_fraction);
+			}
+			this.spiral_multiplier =
+				1.0 + multiplier_fraction * (kMaxSpiralMultiplier - 1);
+			let meter_percent = 100.0 * meter_fraction;
+			save_data.stats.max_spiral_power_percent =
+				Math.max(save_data.stats.max_spiral_power_percent, meter_percent);
+			if (meter_percent < 0.0) {
+				meter_percent = 0.0;
+			}
+			let display_percent =
+				meter_percent.toFixed(2).padStart(6, "\xa0") + "%";
+			UpdateInnerHTML("spiral_power_percent", display_percent);
+			if (meter_percent > 100.0) {
+				meter_percent = 100.0;
+			}
+			document.getElementById("spiral_meter_fill").style.width =
+				meter_percent + "%";
+			UpdateInnerHTML("spiral_multiplier", this.spiral_multiplier.toFixed(2));
+		}
+	}
+
 	AwardPoints(base_value, ball) {
 		const kTimesSymbol = "\u00D7";
 
@@ -1653,6 +1745,7 @@ class BumperMachine extends PachinkoMachine {
 				(
 					!this.HasBeachBallSpecial(ball.ball_type_index) &&
 					!this.HasRubberBandBallSpecial(ball.ball_type_index) &&
+					!this.HasSpiralBallSpecial(ball.ball_type_index) &&
 					ball.last_hit_time + combo_timeout_ms < state.current_time
 				)
 			) {
@@ -1775,6 +1868,12 @@ class BumperMachine extends PachinkoMachine {
 						ball.bounces
 					);
 				}
+				if (
+					this.IsUnlocked("unlock_spiral_balls") &&
+					this.spiral_multiplier > 1.0
+				) {
+					multiplier *= this.spiral_multiplier;
+				}
 				total_value *= multiplier;
 			}
 		}
@@ -1874,9 +1973,14 @@ class BumperMachine extends PachinkoMachine {
 		return ball_type_index == kBumperMachineBallTypeIDs.RUBBER_BAND;
 	}
 
+	HasSpiralBallSpecial(ball_type_index) {
+		return ball_type_index == kBumperMachineBallTypeIDs.SPIRAL;
+	}
+
 	HasOpalSpecial(ball_type_index) {
 		return (
 			ball_type_index == kBumperMachineBallTypeIDs.OPAL ||
+			ball_type_index == kBumperMachineBallTypeIDs.SPIRAL ||
 			this.HasBeachBallSpecial(ball_type_index) || 
 			this.HasRubberBandBallSpecial(ball_type_index)
 		);

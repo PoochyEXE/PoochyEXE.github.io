@@ -21,6 +21,8 @@ class PachinkoMachine {
 
 	OnBuffTimeout(state) {}
 
+	UpdateOneFrame() {}
+
 	InitBoard() {
 		console.error("Not implemented!");
 	}
@@ -41,9 +43,7 @@ class PachinkoMachine {
 		console.error("Not implemented!");
 	}
 	
-	UpdateHyperSystemDisplay(state) {
-		UpdateDisplay("hyper_system", "none");
-	}
+	UpdateHyperSystemDisplay(state) {}
 
 	TogglePopupText() {
 		let options = this.GetSaveData().options;

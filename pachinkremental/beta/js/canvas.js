@@ -13,6 +13,7 @@ const k8Ball = "8-BALL";
 const k8BallHighlightColor = "246, 31,183";
 const kBeachBall = "BEACH";
 const kRubberBand = "RUBBER_BAND";
+const kSpiral = "SPIRAL";
 const kBumperColor = "BUMPER";
 
 const kBumperHitExpandSizes = [0, 1, 2, 3, 2, 1];
@@ -208,7 +209,7 @@ function DrawEightBallsNoGradient(balls, ctx) {
 	}
 }
 
-function DrawBeachBalls(balls, ctx) {
+function DrawBeachBalls(balls, use_gradient, ctx) {
 	for (let i = 0; i < balls.length; ++i) {
 		let pos = balls[i].pos;
 		let rotation = balls[i].rotation;
@@ -218,11 +219,16 @@ function DrawBeachBalls(balls, ctx) {
 			outer_color = GetPrismaticColor(
 				j, 6.0, kPrismaticSaturationOuter, 1.0
 			);
-			inner_color = GetPrismaticColor(
-				j, 6.0, kPrismaticSaturationInner, 1.0
-			);
-			ctx.fillStyle =
-				CreateBallGradient(ctx, pos, kBallRadius, inner_color, outer_color);
+			if (use_gradient) {
+				inner_color = GetPrismaticColor(
+					j, 6.0, kPrismaticSaturationInner, 1.0
+				);
+				ctx.fillStyle = CreateBallGradient(
+					ctx, pos, kBallRadius, inner_color, outer_color
+				);
+			} else {
+				ctx.fillStyle = outer_color;
+			}
 			ctx.beginPath();
 			ctx.moveTo(pos.x, pos.y);
 			ctx.arc(
@@ -238,32 +244,7 @@ function DrawBeachBalls(balls, ctx) {
 	}
 }
 
-function DrawBeachBallsNoGradient(balls, ctx) {
-	for (let i = 0; i < balls.length; ++i) {
-		let pos = balls[i].pos;
-		let rotation = balls[i].rotation;
-		for (let j = 0; j < kPrismaticCycleColors.length; ++j) {
-			let segment_rotation =
-				Math.PI * 2.0 * j / kPrismaticCycleColors.length - rotation;
-			ctx.fillStyle = GetPrismaticColor(
-				j, 6.0, kPrismaticSaturationOuter, 1.0
-			);
-			ctx.beginPath();
-			ctx.moveTo(pos.x, pos.y);
-			ctx.arc(
-				pos.x,
-				pos.y,
-				kBallRadius,
-				segment_rotation,
-				segment_rotation + Math.PI / 3.0
-			);
-			ctx.lineTo(pos.x, pos.y);
-			ctx.fill();
-		}
-	}
-}
-
-function DrawRubberBandBalls(balls, ctx) {
+function DrawRubberBandBalls(balls, use_gradient, ctx) {
 	for (let i = 0; i < balls.length; ++i) {
 		let pos = balls[i].pos;
 		let rotation = balls[i].rotation;
@@ -273,11 +254,16 @@ function DrawRubberBandBalls(balls, ctx) {
 			outer_color = GetPrismaticColor(
 				kRubberBandColorIndices[j], 6.0, kPrismaticSaturationOuter, 1.0
 			);
-			inner_color = GetPrismaticColor(
-				kRubberBandColorIndices[j], 6.0, kPrismaticSaturationInner, 1.0
-			);
-			ctx.fillStyle =
-				CreateBallGradient(ctx, pos, kBallRadius, inner_color, outer_color);
+			if (use_gradient) {
+				inner_color = GetPrismaticColor(
+					kRubberBandColorIndices[j], 6.0, kPrismaticSaturationInner, 1.0
+				);
+				ctx.fillStyle = CreateBallGradient(
+					ctx, pos, kBallRadius, inner_color, outer_color
+				);
+			} else {
+				ctx.fillStyle = outer_color;
+			}
 			ctx.beginPath();
 			ctx.arc(
 				pos.x,
@@ -298,37 +284,77 @@ function DrawRubberBandBalls(balls, ctx) {
 	}
 }
 
-function DrawRubberBandBallsNoGradient(balls, ctx) {
+function DrawSpiralOnBall(pos, rotation, inner_color, outer_color, ctx) {
+	const kTransparent = "rgba(0, 0, 0, 0)";
+	const kEpsilon = 1e-7;
+	const kLineWidth = 2;
+	let gradient = CreateRadialGradientForBall(ctx, pos, kBallRadius);
+	
+	gradient.addColorStop(0.0, inner_color);
+	gradient.addColorStop(1.0 - kEpsilon, outer_color);
+	gradient.addColorStop(1, kTransparent);
+	ctx.strokeStyle = gradient;
+	ctx.lineCap = "round";
+	ctx.lineWidth = kLineWidth;
+	ctx.beginPath();
+	let first_shift = new Vector(Math.cos(rotation), Math.sin(rotation));
+	first_shift = first_shift.Multiply(kLineWidth / 2.0);
+	let first_vertex = pos.Add(first_shift);
+	ctx.moveTo(first_vertex.x, first_vertex.y);
+	const kStep = 8;
+	const kMaxIter = kStep * (Math.ceil(kBallRadius / kLineWidth));
+	for (let r = 0; r < kMaxIter; ++r) {
+		rotation += Math.PI / kStep;
+		let shift = new Vector(Math.cos(rotation), Math.sin(rotation));
+		shift = shift.Multiply(kLineWidth * (0.5 + r / kStep));
+		let vertex = pos.Add(shift);
+		ctx.lineTo(vertex.x, vertex.y);
+	}
+	ctx.stroke();
+}
+
+function DrawSpiralBalls(balls, current_time, use_gradient, ctx) {
 	for (let i = 0; i < balls.length; ++i) {
 		let pos = balls[i].pos;
 		let rotation = balls[i].rotation;
-		for (let j = 0; j < kRubberBandColorIndices.length; ++j) {
-			let segment_rotation =
-				Math.PI * kRubberBandLayerOrder[j] / kRubberBandColorIndices.length - rotation;
-			ctx.fillStyle = GetPrismaticColor(
-				kRubberBandColorIndices[j], 6.0, kPrismaticSaturationOuter, 1.0
+		
+		const kPrismaticCycleShift = kPrismaticCycleDuration / 2.0;
+		let color_1_outer = GetPrismaticColor(
+			current_time - balls[i].start_time,
+			kPrismaticCycleDuration,
+			/*saturation=*/ kPrismaticSaturationOuter,
+			/*alpha=*/1.0
+		);
+		let color_2_outer = GetPrismaticColor(
+			current_time + kPrismaticCycleShift - balls[i].start_time,
+			kPrismaticCycleDuration,
+			/*saturation=*/ kPrismaticSaturationOuter,
+			/*alpha=*/1.0
+		);
+		let rot2 = rotation + Math.PI;
+		if (use_gradient) {
+			let color_1_inner = GetPrismaticColor(
+				current_time - balls[i].start_time,
+				kPrismaticCycleDuration,
+				/*saturation=*/ kPrismaticSaturationInner,
+				/*alpha=*/1.0
 			);
-			ctx.beginPath();
-			ctx.arc(
-				pos.x,
-				pos.y,
-				kBallRadius,
-				segment_rotation,
-				segment_rotation + Math.PI / 6.0
+			let color_2_inner = GetPrismaticColor(
+				current_time + kPrismaticCycleShift - balls[i].start_time,
+				kPrismaticCycleDuration,
+				/*saturation=*/ kPrismaticSaturationInner,
+				/*alpha=*/1.0
 			);
-			ctx.arc(
-				pos.x,
-				pos.y,
-				kBallRadius,
-				segment_rotation + Math.PI,
-				segment_rotation + Math.PI * 7.0 / 6.0
-			);
-			ctx.fill();
+			DrawSpiralOnBall(pos, -rotation, color_1_inner, color_1_outer, ctx);
+			DrawSpiralOnBall(pos, -rot2, color_2_inner, color_2_outer, ctx);
+		} else {
+			DrawSpiralOnBall(pos, -rotation, color_1_outer, color_1_outer, ctx);
+			DrawSpiralOnBall(pos, -rot2, color_2_outer, color_2_outer, ctx);
 		}
 	}
 }
 
-function CreateBallGradient(ctx, pos, radius, inner_color, outer_color) {
+function CreateRadialGradientForBall(ctx, pos, radius) {
 	let inner_x = pos.x - radius / 3;
 	let inner_y = pos.y - radius / 3;
 	let inner_r = radius / 10;
@@ -343,6 +369,11 @@ function CreateBallGradient(ctx, pos, radius, inner_color, outer_color) {
 		outer_y,
 		outer_r
 	);
+	return gradient;
+}
+
+function CreateBallGradient(ctx, pos, radius, inner_color, outer_color) {
+	let gradient = CreateRadialGradientForBall(ctx, pos, radius);
 	gradient.addColorStop(0, inner_color);
 	gradient.addColorStop(1, outer_color);
 	return gradient;
@@ -456,11 +487,15 @@ function DrawBalls(balls, inner_color, outer_color, ctx) {
 		return;
 	}
 	if (inner_color == kBeachBall && outer_color == kBeachBall) {
-		DrawBeachBalls(balls, ctx);
+		DrawBeachBalls(balls, true, ctx);
 		return;
 	}
 	if (inner_color == kRubberBand && outer_color == kRubberBand) {
-		DrawRubberBandBalls(balls, ctx);
+		DrawRubberBandBalls(balls, true, ctx);
+		return;
+	}
+	if (inner_color == kSpiral && outer_color == kSpiral) {
+		DrawSpiralBalls(balls, state.current_time, true, ctx);
 		return;
 	}
 	if (
@@ -507,10 +542,13 @@ function DrawBallsNoGradient(balls, color, ctx) {
 		DrawEightBallsNoGradient(balls, ctx);
 		return;
 	} else if (color == kBeachBall) {
-		DrawBeachBallsNoGradient(balls, ctx);
+		DrawBeachBalls(balls, false, ctx);
 		return;
 	} else if (color == kRubberBand) {
-		DrawRubberBandBallsNoGradient(balls, ctx);
+		DrawRubberBandBalls(balls, false, ctx);
+		return;
+	} else if (color == kSpiral) {
+		DrawSpiralBalls(balls, state.current_time, false, ctx);
 		return;
 	}
 	const kPrismaticSaturation = 0.8;

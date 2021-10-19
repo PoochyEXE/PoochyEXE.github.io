@@ -44,6 +44,10 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
+### v1.14.0-beta (2021-10-19)
+* New ball type: Spiral Ball!
+* Under-the-hood refactor of the rendering code for Beach Balls and Rubber Band Balls.
+
 ### v1.13.2-beta (2021-10-18)
 * Bugfix: Fix Rubber Band Balls looking slightly weird in medium and low quality modes.
 * Under-the-hood refactor of some of the stats display code.

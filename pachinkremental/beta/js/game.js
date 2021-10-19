@@ -1,4 +1,4 @@
-const kVersion = "v1.13.2-beta";
+const kVersion = "v1.14.0-beta";
 const kTitleAndVersion = "Pachinkremental " + kVersion;
 
 const kFrameInterval = 1000.0 / kFPS;
@@ -90,6 +90,9 @@ function LoadActiveMachine(state) {
 	state.update_upgrades = true;
 	state.update_buff_display = true;
 	state.redraw_all = true;
+
+	UpdateDisplay("hyper_system", "none");
+	UpdateDisplay("spiral_power", "none");
 
 	const machine = ActiveMachine(state);
 	const num_ball_types = machine.BallTypes().length;
@@ -395,6 +398,8 @@ function UpdateOneFrame(state) {
 	} else if (machine.AutoSpinOn() && save_data.spins > 0) {
 		SpinBonusWheel();
 	}
+
+	machine.UpdateOneFrame();
 
 	if (state.last_score_history_update + 5000.0 <= state.current_time) {
 		UpdateScoreHistory(state);

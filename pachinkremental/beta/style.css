@@ -73,6 +73,32 @@ div.overdrive {
 	color: #0FF;
 }
 
+div.spiralContainer {
+	border-radius: 15px;
+	padding: 5px;
+	margin: 2.5px;
+	width: 250px;
+	text-align: center;
+	border: 2px solid #080;
+	background: #020;
+	color: #0F0;
+	font-family: sans-serif;
+}
+
+span.spiralPowerPercent {
+	font-family: monospace;
+}
+
+div.spiralMeterBorder {
+	border: 2px solid #0F0;
+	height: 10px;
+}
+
+div.spiralMeterFill {
+	background: #0F0;
+	height: 10px;
+}
+
 button.notification {
 	float: right;
 	border: 2px solid #000;
