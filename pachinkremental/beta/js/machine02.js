@@ -1437,13 +1437,7 @@ class BumperMachine extends PachinkoMachine {
 				category: "spiral_balls",
 				description: "Allows Spiral Power to exceed 100%, with diminishing returns above 100%.",
 				cost: 1e27,
-				visible_func: () =>
-					this.IsUnlocked("unlock_overdrive") &&
-					this.IsUnlocked("overdrive_lunatic_red_eyes") &&
-					this.IsUnlocked("overdrive_green_eyed_monster") &&
-					this.IsUnlocked("overdrive_perfect_freeze") &&
-					this.IsUnlocked("unlock_opal_balls"),
-				tooltip_width: 270,
+				visible_func: () => this.IsUnlocked("unlock_spiral_balls"),
 			})
 		);
 		/* TODO: Add bonus wheel.
