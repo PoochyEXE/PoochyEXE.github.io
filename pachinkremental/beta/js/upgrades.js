@@ -86,7 +86,6 @@ class Upgrade {
 		this.on_buy(new_level);
 		if (new_level == this.max_level) {
 			this.machine.CheckMachineMaxed();
-			ShowEndingIfAllMachinesMaxed();
 		}
 		return true;
 	}
@@ -665,11 +664,12 @@ function CurrentPlayTime() {
 function ShowEndingIfAllMachinesMaxed() {
 	for (let i = 0; i < state.machines.length; ++i) {
 		if (!state.machines[i].AreAllUpgradesMaxed()) {
-			return;
+			return false;
 		}
 	}
 
 	let play_time = FormatDurationLong(CurrentPlayTime(), /*show_ms=*/true);
 	UpdateInnerHTML("ending_play_time", play_time);
 	document.getElementById("ending_modal").style.display = "block";
+	return true;
 }

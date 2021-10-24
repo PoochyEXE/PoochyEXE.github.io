@@ -196,11 +196,21 @@ class PachinkoMachine {
 			if (!stats.machine_maxed_times[this.id]) {
 				stats.machine_maxed_times[this.id] = Date.now();
 				state.update_stats_panel = true;
+				if (!ShowEndingIfAllMachinesMaxed()) {
+					this.ShowMachineMaxedModal();
+				}
 			}
 			UpdateMachinesHeader(state);
 		} else {
 			stats.machine_maxed_times[this.id] = null;
 		}
+	}
+	
+	ShowMachineMaxedModal() {
+		let play_time = FormatDurationLong(CurrentPlayTime(), /*show_ms=*/true);
+		UpdateInnerHTML("machine_maxed_time", play_time);
+		UpdateInnerHTML("maxed_machine_name", this.display_name);
+		document.getElementById("machine_maxed_modal").style.display = "block";
 	}
 
 	AutoDropOn() {

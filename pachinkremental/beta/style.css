@@ -958,15 +958,15 @@ span.prismaticTextDark {
     -webkit-animation-duration: 2s;
 }
 
-span.speedrunTimerCompleted {
+span.speedrunTimerCompleted, span.speedrunTimerSplit {
 	font-weight: bold;
 }
 
-span.speedrunTimerCompletedLight {
+span.speedrunTimerCompletedLight, span.speedrunTimerSplitLight {
 	color: #00F;
 }
 
-span.speedrunTimerCompletedDark {
+span.speedrunTimerCompletedDark, span.speedrunTimerSplitDark {
 	color: #0FF;
 }
 

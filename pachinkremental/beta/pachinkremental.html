@@ -289,6 +289,20 @@
 			<textarea id="exported_save" class="exportedSave" onclick="this.select()" readonly></textarea>
 		</div>
 	</div>
+	<div id="machine_maxed_modal" class="modal">
+		<div id="machine_maxed_modal_content" class="modalContent">
+			<span class="modalCloseButton" onmousedown="CloseModal('machine_maxed_modal')">&#xD7</span>
+			<span style="text-align: center; vertical-align: middle;">
+				<span class="prismaticText"><b>Excellent!</b></span>
+				<br><br>
+				You've maxed all the upgrades that can be maxed on the <span id="maxed_machine_name"></span> machine!
+				<br><br>
+				As a reward, you've unlocked a new machine! Check it out in the Machines menu, between Upgrades and Stats.
+				<br><br>
+				By the way, it's been <span id="machine_maxed_time" class="speedrunTimerSplit"></span> since you started playing on this save file. You can check how long it took you to reach this milestone, as well as any other milestones you've reached, in the Stats menu.
+			</span>
+		</div>
+	</div>
 	<div id="ending_modal" class="modal">
 		<div id="ending_modal_content" class="modalContent">
 			<span class="modalCloseButton" onmousedown="CloseModal('ending_modal')">&#xD7</span>

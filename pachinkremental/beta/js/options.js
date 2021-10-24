@@ -45,6 +45,7 @@ const kColorSchemeClasses = [
 	new ColorSchemeClassMapping("modalCloseButton", "modalCloseButtonLight", "modalCloseButtonDark"),
 	new ColorSchemeClassMapping("prismaticText", "prismaticTextLight", "prismaticTextDark"),
 	new ColorSchemeClassMapping("speedrunTimerCompleted", "speedrunTimerCompletedLight", "speedrunTimerCompletedDark"),
+	new ColorSchemeClassMapping("speedrunTimerSplit", "speedrunTimerSplitLight", "speedrunTimerSplitDark"),
 	new ColorSchemeClassMapping("exportedSave", "exportedSaveLight", "exportedSaveDark"),
 ];
 
