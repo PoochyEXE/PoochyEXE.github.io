@@ -10,6 +10,14 @@ function FormatSmallNumberShort(num) {
 	}
 }
 
+function FormatSmallNumberLong(num) {
+	if (Number.isInteger(num)) {
+		return num.toString();
+	} else {
+		return num.toFixed(2);
+	}
+}
+
 function FormatNumberScientificNotation(num, trim_zeros) {
 	let result = num.toPrecision(kNumericPrecision).replace("+", "");
 	if (trim_zeros) {
@@ -30,7 +38,7 @@ function FormatNumberEngineeringNotationShort(num) {
 function FormatNumberEngineeringNotationLong(num) {
 	let exponent = 3 * Math.floor(Math.log10(num) / 3);
 	if (exponent == 0) {
-		return FormatSmallNumberShort(num);
+		return FormatSmallNumberLong(num);
 	}
 	let prefix = num / Math.pow(10, exponent);
 	return prefix.toFixed(kNumericPrecision) + "e" + exponent.toString();
@@ -71,7 +79,7 @@ function FormatNumberMediumKanji(num) {
 function FormatNumberLongKanji(num) {
 	let suffix_index = Math.floor(Math.log10(num) / 4);
 	if (suffix_index == 0) {
-		return FormatSmallNumberShort(num);
+		return FormatSmallNumberLong(num);
 	} else if (suffix_index == 1) {
 		return FormatNumberMediumKanji(num);
 	} else if (suffix_index >= kKanji.length) {
@@ -251,7 +259,7 @@ function FormatNumberMedium(num) {
 
 function FormatNumberLong(num) {
 	if (num < 1000) {
-		return FormatSmallNumberShort(num);
+		return FormatSmallNumberLong(num);
 	}
 	switch (GetSetting("notation")) {
 		case 0:

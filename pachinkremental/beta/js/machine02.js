@@ -100,6 +100,7 @@ class BumperMachine extends PachinkoMachine {
 		save_data.stats.emerald_ball_most_bumper_hits = 0;
 		save_data.stats.sapphire_ball_most_target_hits = 0;
 		save_data.stats.rubberband_ball_most_bounces = 0;
+		save_data.stats.max_spiral_ball_rotated_degrees = 0;
 		save_data.stats.max_spiral_power_percent = 0;
 		//save_data.options.auto_spin_enabled = false;
 		//save_data.options.multi_spin_enabled = false;
@@ -1413,7 +1414,7 @@ class BumperMachine extends PachinkoMachine {
 				machine: this,
 				ball_type: this.ball_types[kBumperMachineBallTypeIDs.SPIRAL],
 				ball_description:
-					"Spiral balls have bonuses of Opal balls plus they generate Spiral Power when they rotate. Spiral Power provides a global score buff, but drains over time.<br>「俺を誰だと思ってやがる！」",
+					"Spiral balls have bonuses of Opal balls plus they generate Spiral Power when they rotate. Spiral Power provides a global score buff, but drains over time. Spiral balls also never break their combo.<br>「俺を誰だと思ってやがる！」",
 				cost_func: () => 1e21,
 				visible_func: () =>
 					this.IsUnlocked("unlock_opal_balls") &&
@@ -1436,7 +1437,20 @@ class BumperMachine extends PachinkoMachine {
 				name: "Pierce the Heavens",
 				category: "spiral_balls",
 				description: "Allows Spiral Power to exceed 100%, with diminishing returns above 100%.",
-				cost: 1e27,
+				cost: 50e24,
+				visible_func: () =>
+					this.IsUnlocked("unlock_spiral_balls") &&
+					this.GetSaveData().stats.max_spiral_power_percent >= 100.0,
+			})
+		);
+		upgrades_list.push(
+			new FixedCostFeatureUnlockUpgrade({
+				machine: this,
+				id: "giga_drill_break",
+				name: "Giga Drill Break",
+				category: "spiral_balls",
+				description: "Each individual Spiral Ball increases in value based on how much Spiral Power it has generated. (Stacks multiplicatively with gemstone ball multipliers.)",
+				cost: 999e24,
 				visible_func: () => this.IsUnlocked("unlock_spiral_balls"),
 			})
 		);
@@ -1862,11 +1876,22 @@ class BumperMachine extends PachinkoMachine {
 						ball.bounces
 					);
 				}
-				if (
-					this.IsUnlocked("unlock_spiral_balls") &&
-					this.spiral_multiplier > 1.0
-				) {
-					multiplier *= this.spiral_multiplier;
+				if (this.IsUnlocked("unlock_spiral_balls")) {
+					if (this.spiral_multiplier > 1.0) {
+						multiplier *= this.spiral_multiplier;
+					}
+					if (
+						this.HasSpiralBallSpecial(ball.ball_type_index) &&
+						this.IsUnlocked("giga_drill_break")
+					) {
+						let rotated_degrees = ball.total_rotations * 180.0 / Math.PI;
+						multiplier *= 1.0 + rotated_degrees / 100.0;
+
+						save_data.stats.max_spiral_ball_rotated_degrees = Math.max(
+							save_data.stats.max_spiral_ball_rotated_degrees,
+							rotated_degrees
+						);
+					}
 				}
 				total_value *= multiplier;
 			}
@@ -1974,9 +1999,9 @@ class BumperMachine extends PachinkoMachine {
 	HasOpalSpecial(ball_type_index) {
 		return (
 			ball_type_index == kBumperMachineBallTypeIDs.OPAL ||
-			ball_type_index == kBumperMachineBallTypeIDs.SPIRAL ||
 			this.HasBeachBallSpecial(ball_type_index) || 
-			this.HasRubberBandBallSpecial(ball_type_index)
+			this.HasRubberBandBallSpecial(ball_type_index) ||
+			this.HasSpiralBallSpecial(ball_type_index)
 		);
 	}
 
@@ -2061,15 +2086,18 @@ class BumperMachine extends PachinkoMachine {
 			return "Upgrade Combo Timeout to 5 seconds";
 		} else if (
 			!this.IsUnlocked("unlock_beach_balls") ||
-			!this.IsUnlocked("unlock_rubberband_balls")
+			!this.IsUnlocked("unlock_rubberband_balls") ||
+			!this.IsUnlocked("unlock_spiral_balls")
 		) {
-			return "Unlock Beach Balls and Rubber Band Balls";
+			return "Unlock Beach Balls, Rubber Band Balls, and Spiral Balls";
 		} else if (
 			!this.IsMaxed("ruby_ball_value_percent") ||
 			!this.IsMaxed("emerald_ball_value_percent") ||
 			!this.IsMaxed("sapphire_ball_value_percent")
 		) {
 			return "100% Ruby Ball Value, 100% Emerald Ball Value, or 500% Sapphire Ball Value. Each one reveals a different upgrade when maxed.";
+		} else if (!this.IsUpgradeVisible("pierce_the_heavens")) {
+			return "Reach 100% Spiral Power.";
 		} else if (!this.IsUpgradeVisible("overdrive_rainbow_ufo")) {
 			return "Unlock all 3 Overdrive upgrades corresponding to Ruby, Sapphire, and Emerald Balls.";
 		} else {
