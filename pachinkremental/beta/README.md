@@ -44,7 +44,7 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
-### v1.14.0-beta (2021-10-24)
+### v1.14.1-beta (2021-10-24)
 * New upgrade: Giga Drill Break
 * Reduce the cost of Pierce the Heavens, but require having reached 100% Spiral Power at least once to unlock it.
 * Fix Spiral Ball tooltip to include the fact that they never break their combo.
