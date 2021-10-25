@@ -44,6 +44,9 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
+### v1.14.2-beta (2021-10-25)
+* Optimize the Spiral Ball rendering code a bit. It was previously allocating and freeing memory so much that it single-handedly forced the JS engine's garbage collector to work twice as hard. Oops.
+
 ### v1.14.1-beta (2021-10-24)
 * New upgrade: Giga Drill Break
 * Reduce the cost of Pierce the Heavens, but require having reached 100% Spiral Power at least once to unlock it.

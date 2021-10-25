@@ -297,18 +297,20 @@ function DrawSpiralOnBall(pos, rotation, inner_color, outer_color, ctx) {
 	ctx.lineCap = "round";
 	ctx.lineWidth = kLineWidth;
 	ctx.beginPath();
-	let first_shift = new Vector(Math.cos(rotation), Math.sin(rotation));
-	first_shift = first_shift.Multiply(kLineWidth / 2.0);
-	let first_vertex = pos.Add(first_shift);
-	ctx.moveTo(first_vertex.x, first_vertex.y);
+	let shift_dist = kLineWidth / 2.0;
+	ctx.moveTo(
+		pos.x + Math.cos(rotation) * shift_dist,
+		pos.y + Math.sin(rotation) * shift_dist
+	);
 	const kStep = 8;
 	const kMaxIter = kStep * (Math.ceil(kBallRadius / kLineWidth));
 	for (let r = 0; r < kMaxIter; ++r) {
 		rotation += Math.PI / kStep;
-		let shift = new Vector(Math.cos(rotation), Math.sin(rotation));
-		shift = shift.Multiply(kLineWidth * (0.5 + r / kStep));
-		let vertex = pos.Add(shift);
-		ctx.lineTo(vertex.x, vertex.y);
+		shift_dist += kLineWidth / kStep;
+		ctx.lineTo(
+			pos.x + Math.cos(rotation) * shift_dist,
+			pos.y + Math.sin(rotation) * shift_dist
+		);
 	}
 	ctx.stroke();
 }
