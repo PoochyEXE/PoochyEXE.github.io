@@ -696,6 +696,7 @@ function DrawScoreText(score_text, font_size, duration, rise, stroke_color_rgb, 
 		let curr_text = score_text[i];
 		let elapsed = state.current_time - curr_text.start_time;
 		if (elapsed > duration) {
+			object_pool.ReleaseRisingText(curr_text)
 			continue;
 		}
 		let fraction = elapsed / duration;
@@ -747,6 +748,7 @@ function DrawRipples(ripples, duration, expand, ctx) {
 		let curr_ripples = ripples[i];
 		let elapsed = state.current_time - curr_ripples.start_time;
 		if (elapsed > duration) {
+			object_pool.ReleaseRipple(curr_ripples);
 			continue;
 		}
 		let fraction = elapsed / duration;

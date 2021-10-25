@@ -1,7 +1,58 @@
+class ObjectPool {
+	constructor() {
+		this.ball_pool = [];
+		this.ripple_pool = [];
+		this.rising_text_pool = [];
+	}
+	
+	NewBall(x, y, dx, dy, ball_type_index, rotation, omega) {
+		if (this.ball_pool.length == 0) {
+			return new Ball(x, y, dx, dy, ball_type_index, rotation, omega);
+		} else {
+			let ball = this.ball_pool.pop();
+			ball.Reset(x, y, dx, dy, ball_type_index, rotation, omega);
+			return ball;
+		}
+	}
+	
+	ReleaseBall(ball) {
+		this.ball_pool.push(ball);
+	}
+	
+	NewRipple(x, y, color_rgb, start_radius) {
+		if (this.ripple_pool.length == 0) {
+			return new RippleEffect(x, y, color_rgb, start_radius);
+		} else {
+			let ripple = this.ripple_pool.pop();
+			ripple.Reset(x, y, color_rgb, start_radius);
+			return ripple;
+		}
+	}
+	
+	ReleaseRipple(ripple) {
+		this.ripple_pool.push(ripple);
+	}
+	
+	NewRisingText(text, pos, color_rgb, opacity) {
+		if (this.rising_text_pool.length == 0) {
+			return new RisingText(text, pos, color_rgb, opacity);
+		} else {
+			let rising_text = this.rising_text_pool.pop();
+			rising_text.Reset(text, pos, color_rgb, opacity);
+			return rising_text;
+		}
+	}
+	
+	ReleaseRisingText(rising_text) {
+		this.rising_text_pool.push(rising_text);
+	}
+}
+
+object_pool = new ObjectPool();
+
 class Point {
 	constructor(x, y) {
-		this.x = x;
-		this.y = y;
+		this.Reset(x, y);
 	}
 
 	Reset(x, y) {
@@ -45,8 +96,7 @@ class Point {
 
 class Vector {
 	constructor(x, y) {
-		this.x = x;
-		this.y = y;
+		this.Reset(x, y);
 	}
 
 	Reset(x, y) {
@@ -148,6 +198,12 @@ class Ball {
 	constructor(x, y, dx, dy, ball_type_index, rotation, omega) {
 		this.pos = new Point(x, y);
 		this.vel = new Vector(dx, dy);
+		this.Reset(x, y, dx, dy, ball_type_index, rotation, omega);
+	}
+
+	Reset(x, y, dx, dy, ball_type_index, rotation, omega) {
+		this.pos.Reset(x, y);
+		this.vel.Reset(dx, dy);
 		this.ball_type_index = ball_type_index;
 		this.active = true;
 		this.last_hit = null;
@@ -166,8 +222,13 @@ class Ball {
 
 class RisingText {
 	constructor(text, pos, color_rgb, opacity) {
-		this.text = text;
 		this.pos = new Point(pos.x, pos.y);
+		this.Reset(text, pos, color_rgb, opacity);
+	}
+	
+	Reset(text, pos, color_rgb, opacity) {
+		this.text = text;
+		this.pos.Reset(pos.x, pos.y);
 		this.color_rgb = color_rgb;
 		this.start_time = state.current_time;
 		this.opacity = opacity;
@@ -254,19 +315,28 @@ function MaybeAddScoreText({ level, text, pos, color_rgb, opacity }) {
 		opacity > 0 &&
 		level >= ActiveMachine(state).GetSetting("display_popup_text")
 	) {
-		state.score_text.push(new RisingText(text, pos, color_rgb, opacity));
+		state.score_text.push(
+			object_pool.NewRisingText(text, pos, color_rgb, opacity)
+		);
 	}
 }
 
 function MaybeAddBonusWheelText({ text, pos, color_rgb }) {
 	if (state.enable_score_text) {
-		state.wheel_popup_text.push(new RisingText(text, pos, color_rgb, 1.0));
+		state.wheel_popup_text.push(
+			object_pool.NewRisingText(text, pos, color_rgb, 1.0)
+		);
 	}
 }
 
 class RippleEffect {
-	constructor(pos, color_rgb, start_radius) {
-		this.pos = pos;
+	constructor(x, y, color_rgb, start_radius) {
+		this.pos = new Point(x, y);
+		this.Reset(x, y, color_rgb, start_radius);
+	}
+	
+	Reset(x, y, color_rgb, start_radius) {
+		this.pos.Reset(x, y);
 		this.color_rgb = color_rgb;
 		this.start_radius = start_radius;
 		this.start_time = state.current_time;

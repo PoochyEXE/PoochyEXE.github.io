@@ -114,13 +114,19 @@ function UpdateBalls(balls, board, params) {
 	}
 
 	// Remove balls that are inactive or have fallen outside the board.
-	var next_index = 0;
 	for (let b = 0; b < balls.length; ++b) {
 		if (!balls[b].active) {
 			continue;
 		}
 		let pos = balls[b].pos;
 		if (pos.x < 0 || pos.x > board.width || pos.y > board.height) {
+			balls[b].active = false;
+		}
+	}
+	var next_index = 0;
+	for (let b = 0; b < balls.length; ++b) {
+		if (!balls[b].active) {
+			object_pool.ReleaseBall(balls[b]);
 			continue;
 		}
 		if (next_index != b) {

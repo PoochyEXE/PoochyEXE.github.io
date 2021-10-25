@@ -10,7 +10,9 @@ const kTopCanvasLayer = "canvas_ripples";
 function CreateBallWithNoise(x, y, dx, dy, ball_type_index) {
 	let dNoise = SampleGaussianNoise(0.0, 20.0);
 	let angleNoise = SampleGaussianNoise(0.0, 0.1);
-	return new Ball(x, y, dx + dNoise.x, dy + dNoise.y, ball_type_index, angleNoise.x, angleNoise.y);
+	return object_pool.NewBall(
+		x, y, dx + dNoise.x, dy + dNoise.y, ball_type_index, angleNoise.x, angleNoise.y
+	);
 }
 
 function DropBall(x, y, ball_type_index) {
@@ -28,8 +30,9 @@ function DropBall(x, y, ball_type_index) {
 	state.last_ball_drop = state.current_time;
 	if (ball_type.ripple_color_rgb) {
 		state.ripples.push(
-			new RippleEffect(
-				new Point(x, y),
+			object_pool.NewRipple(
+				x,
+				y,
 				ball_type.ripple_color_rgb,
 				kBallRadius
 			)

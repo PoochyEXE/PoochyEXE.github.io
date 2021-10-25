@@ -1652,8 +1652,9 @@ class BumperMachine extends PachinkoMachine {
 					let ball = normal_balls[i];
 					ball.ball_type_index = kGold;
 					state.ripples.push(
-						new RippleEffect(
-							new Point(ball.pos.x, ball.pos.y),
+						object_pool.NewRipple(
+							ball.pos.x,
+							ball.pos.y,
 							kBumperMachineBallTypes[kGold].ripple_color_rgb,
 							kBallRadius
 						)
