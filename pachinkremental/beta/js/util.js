@@ -4,6 +4,16 @@ class Point {
 		this.y = y;
 	}
 
+	Reset(x, y) {
+		this.x = x;
+		this.y = y;
+	}
+
+	CopyFrom(other) {
+		this.x = other.x;
+		this.y = other.y;
+	}
+
 	DistanceSqrToPoint(other) {
 		const dx = this.x - other.x;
 		const dy = this.y - other.y;
@@ -18,6 +28,16 @@ class Point {
 		return new Point(this.x + vec.x, this.y + vec.y);
 	}
 
+	MutateAdd(vec) {
+		this.x += vec.x;
+		this.y += vec.y;
+	}
+
+	MutateAddNTimes(vec, n) {
+		this.x += vec.x * n;
+		this.y += vec.y * n;
+	}
+
 	DebugStr() {
 		return `(${this.x}, ${this.y})`
 	}
@@ -27,6 +47,16 @@ class Vector {
 	constructor(x, y) {
 		this.x = x;
 		this.y = y;
+	}
+
+	Reset(x, y) {
+		this.x = x;
+		this.y = y;
+	}
+
+	CopyFrom(other) {
+		this.x = other.x;
+		this.y = other.y;
 	}
 
 	Add(other) {
@@ -39,6 +69,26 @@ class Vector {
 
 	Multiply(mult) {
 		return new Vector(this.x * mult, this.y * mult);
+	}
+
+	MutateAdd(other) {
+		this.x += other.x;
+		this.y += other.y;
+	}
+
+	MutateAddNTimes(other, n) {
+		this.x += other.x * n;
+		this.y += other.y * n;
+	}
+
+	MutateSubtract(other) {
+		this.x -= other.x;
+		this.y -= other.y;
+	}
+
+	MutateMultiply(mult) {
+		this.x *= mult;
+		this.y *= mult;
 	}
 
 	MagnitudeSqr() {
@@ -54,13 +104,20 @@ class Vector {
 		return new Vector(this.x / magnitude, this.y / magnitude);
 	}
 
+	MutateNormalize() {
+		const magnitude = this.Magnitude();
+		this.x /= magnitude;
+		this.y /= magnitude;
+	}
+
 	DotProduct(other) {
 		return this.x * other.x + this.y * other.y;
 	}
 
 	ProjectionOnto(other) {
-		const other_norm = other.Normalize();
-		return other_norm.Multiply(other_norm.DotProduct(this));
+		let result = other.Normalize();
+		result.MutateMultiply(result.DotProduct(this));
+		return result;
 	}
 
 	// Rotates 90 degrees left.

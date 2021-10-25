@@ -18,6 +18,7 @@ function UpdateBalls(balls, board, params) {
 	const kEpsilon = 1e-3 / kFPS;
 	const k2Pi = Math.PI * 2;
 	const kPegSearchRadius = kPegRadius + kBallRadius;
+	let new_pos = new Point(0, 0);
 	for (let b = 0; b < balls.length; ++b) {
 		let time_to_sim = 1.0 / kFPS;
 		let pos = balls[b].pos;
@@ -25,40 +26,45 @@ function UpdateBalls(balls, board, params) {
 		let omega = balls[b].omega;
 
 		for (let iter = 0; iter < 10 && time_to_sim >= kEpsilon; ++iter) {
-			let new_pos = pos.Add(vel.Multiply(time_to_sim));
-			let collide_peg = board.FindNearestPeg(new_pos, kPegSearchRadius);
-			if (collide_peg == null) {
-				pos = new_pos;
-				break;
-			}
 			let time_step = time_to_sim;
 			let speed = vel.Magnitude();
 			if (time_step * speed > 2.0 * kBallRadius) {
 				time_step = Math.max(2.0 * kBallRadius / speed, kEpsilon);
 			}
+			new_pos.CopyFrom(pos);
+			new_pos.MutateAddNTimes(vel, time_step);
+			let collide_peg = board.FindNearestPeg(new_pos, kPegSearchRadius);
+			if (collide_peg == null) {
+				pos.CopyFrom(new_pos);
+				time_to_sim -= time_step;
+				continue;
+			}
 			while (time_step >= kEpsilon) {
 				time_step /= 2;
-				new_pos = pos.Add(vel.Multiply(time_step));
+				new_pos.CopyFrom(pos);
+				new_pos.MutateAddNTimes(vel, time_step);
 				let collide_peg = board.FindNearestPeg(
 					new_pos,
 					kPegSearchRadius
 				);
 				if (collide_peg == null) {
-					pos = new_pos;
+					pos.CopyFrom(new_pos);
 					time_to_sim -= time_step;
 				}
 			}
-			new_pos = pos.Add(vel.Multiply(time_step));
+			new_pos.CopyFrom(pos);
+			new_pos.MutateAddNTimes(vel, time_step);
 			collide_peg = board.FindNearestPeg(new_pos, kPegSearchRadius);
 			if (collide_peg == null) {
 				time_to_sim -= time_step;
-				pos = new_pos;
+				pos.CopyFrom(new_pos);
 			} else {
 				let delta = pos.DeltaToPoint(collide_peg);
-				let perp_delta = delta.Perpendicular().Normalize();
-				let perp_vel = vel.ProjectionOnto(perp_delta);
-				let parallel_vel = vel.Subtract(perp_vel);
-				vel = vel.Add(parallel_vel.Multiply(-1 - params.collision_elasticity));
+				let perp_delta = delta.Perpendicular();
+				perp_delta.MutateNormalize();
+				let parallel_vel = vel.ProjectionOnto(delta);
+				let perp_vel = vel.Subtract(parallel_vel);
+				vel.MutateAddNTimes(parallel_vel, -1 - params.collision_elasticity);
 				omega *= params.collision_elasticity;
 				omega += perp_vel.DotProduct(perp_delta) / kBallRadius;
 				++balls[b].bounces;
@@ -71,7 +77,7 @@ function UpdateBalls(balls, board, params) {
 						" stuck perfectly balanced on peg at " +
 						collide_peg.DebugStr() + " -- giving it a tiny nudge."
 					);
-					vel = vel.Add(SampleGaussianNoise(0, 1e-5));
+					vel.MutateAdd(SampleGaussianNoise(0, 1e-5));
 				}
 			}
 		}

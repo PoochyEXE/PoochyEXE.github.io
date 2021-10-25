@@ -46,6 +46,7 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 ### v1.14.2-beta (2021-10-25)
 * Optimize the Spiral Ball rendering code a bit. It was previously allocating and freeing memory so much that it single-handedly forced the JS engine's garbage collector to work twice as hard. Oops.
+* Also optimize the physics engine to reduce memory churn there, too.
 
 ### v1.14.1-beta (2021-10-24)
 * New upgrade: Giga Drill Break
