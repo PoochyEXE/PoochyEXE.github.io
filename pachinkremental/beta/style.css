@@ -277,7 +277,7 @@ div.upgradeButtonWrapper {
 	margin: 2.5px;
 }
 
-button.upgradeButton, button.rubyUpgradeButton, button.sapphireUpgradeButton, button.emeraldUpgradeButton, button.topazUpgradeButton, button.turquoiseUpgradeButton, button.amethystUpgradeButton, button.opalUpgradeButton, button.opalStaticUpgradeButton, button.eightBallUpgradeButton, button.beachBallUpgradeButton, button.rubberBandBallUpgradeButton {
+button.upgradeButton, button.rubyUpgradeButton, button.sapphireUpgradeButton, button.emeraldUpgradeButton, button.topazUpgradeButton, button.turquoiseUpgradeButton, button.amethystUpgradeButton, button.opalUpgradeButton, button.opalStaticUpgradeButton, button.eightBallUpgradeButton, button.beachBallUpgradeButton, button.rubberBandBallUpgradeButton, button.spiralBallUpgradeButton {
 	border: 1px solid #000;
 	border-radius: 10px;
 	font-family: sans-serif;
@@ -722,6 +722,50 @@ button.rubberBandBallUpgradeButtonDark:disabled {
 	  #033 15px,
 	  #303 15px,
 	  #303 18px
+	);
+	color: #FFF;
+}
+
+button.spiralBallUpgradeButtonLight {
+	background: repeating-radial-gradient(
+	  circle at -3px,
+	  #2C2,
+	  #2C2 3px,
+	  #7F7 3px,
+	  #7F7 6px
+	);
+	color: #000;
+}
+
+button.spiralBallUpgradeButtonLight:disabled {
+	background: repeating-radial-gradient(
+	  circle at -3px,
+	  #8C8,
+	  #8C8 3px,
+	  #AFA 3px,
+	  #AFA 6px
+	);
+	color: #000;
+}
+
+button.spiralBallUpgradeButtonDark {
+	background: repeating-radial-gradient(
+	  circle at -3px,
+	  #282,
+	  #282 3px,
+	  #060 3px,
+	  #060 6px
+	);
+	color: #FFF;
+}
+
+button.spiralBallUpgradeButtonDark:disabled {
+	background: repeating-radial-gradient(
+	  circle at -3px,
+	  #030,
+	  #030 3px,
+	  #010 3px,
+	  #010 6px
 	);
 	color: #FFF;
 }

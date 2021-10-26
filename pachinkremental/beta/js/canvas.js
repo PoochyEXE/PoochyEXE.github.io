@@ -807,6 +807,34 @@ function DrawRipples(ripples, duration, expand, ctx) {
 				);
 				ctx.stroke();
 			}
+		} else if (curr_ripples.color_rgb == kSpiral) {
+			let rotation = Math.PI * elapsed / duration;
+			let color1 = GetPrismaticColor(
+				elapsed,
+				duration / 2,
+				/*saturation=*/ kPrismaticSaturation,
+				/*alpha=*/ 1 - fraction
+			);
+			let color2 = GetPrismaticColor(
+				elapsed + duration / 4,
+				duration / 2,
+				/*saturation=*/ kPrismaticSaturation,
+				/*alpha=*/ 1 - fraction
+			);
+			const kRepetitions = 6;
+			for (let i = 0; i < kRepetitions * 2; ++i) {
+				let segment_rotation = rotation + Math.PI * i / kRepetitions;
+				ctx.strokeStyle = (i & 1) ? color1 : color2;
+				ctx.beginPath();
+				ctx.arc(
+					curr_ripples.pos.x,
+					curr_ripples.pos.y,
+					radius,
+					segment_rotation,
+					segment_rotation + Math.PI / kRepetitions
+				);
+				ctx.stroke();
+			}
 		} else {
 			let color_rgba = "";
 			if (curr_ripples.color_rgb == kPrismatic) {

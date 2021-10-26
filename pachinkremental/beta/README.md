@@ -44,6 +44,10 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
+### v1.14.3-beta (2021-10-26)
+* Add a background for Spiral Ball upgrade buttons.
+* Add a new ripple effect for Spiral Balls as well.
+
 ### v1.14.2-beta (2021-10-25)
 * Optimize the Spiral Ball rendering code a bit. It was previously allocating and freeing memory so much that it single-handedly forced the JS engine's garbage collector to work twice as hard. Oops.
 * Also optimize the physics engine to reduce memory churn there, too.

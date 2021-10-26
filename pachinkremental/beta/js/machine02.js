@@ -13,7 +13,7 @@ const kBumperMachineBallTypes = [
 	new BallType(8,   "opal",       "Opal ",        kPhysicsParams.normal,     kPrismatic,   kPrismatic,   kPrismatic       ),
 	new BallType(9,   "beach",      "Beach ",       kPhysicsParams.beach_ball, kBeachBall,   kBeachBall,   kBeachBall       ),
 	new BallType(10,  "rubberband", "Rubber Band ", kPhysicsParams.rubber,     kRubberBand,  kRubberBand,  kRubberBand      ),
-	new BallType(11,  "spiral",     "Spiral ",      kPhysicsParams.normal,     kSpiral,      kSpiral,      kPrismatic       ),
+	new BallType(11,  "spiral",     "Spiral ",      kPhysicsParams.normal,     kSpiral,      kSpiral,      kSpiral          ),
 ];
 
 const kBumperMachineBallTypeIDs = {

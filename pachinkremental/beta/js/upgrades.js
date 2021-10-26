@@ -568,6 +568,8 @@ function ButtonClassForUpgradeCategory(category) {
 		return "beachBallUpgradeButton";
 	} else if (category == "rubberband_balls") {
 		return "rubberBandBallUpgradeButton";
+	} else if (category == "spiral_balls") {
+		return "spiralBallUpgradeButton";
 	} else {
 		return "upgradeButton";
 	}
