@@ -11,6 +11,14 @@ canvas.bonusWheel {
 	font-family: sans-serif;
 }
 
+canvas.spiralPowerMeter {
+	position: absolute;
+	left: 0px;
+	width: 100px;
+	height: 100px;
+	font-family: sans-serif;
+}
+
 button.bonusWheel {
 	border: 1px solid #0F0;
 	color: #0F0;
@@ -77,16 +85,11 @@ div.spiralContainer {
 	border-radius: 15px;
 	padding: 5px;
 	margin: 2.5px;
-	width: 250px;
 	text-align: center;
 	border: 2px solid #080;
 	background: #020;
 	color: #0F0;
 	font-family: sans-serif;
-}
-
-span.spiralPowerPercent {
-	font-family: monospace;
 }
 
 div.spiralMeterBorder {

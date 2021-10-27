@@ -55,11 +55,13 @@ class BumperMachine extends PachinkoMachine {
 		this.overdrive = false;
 		this.spiral_power = 0.0;
 		this.spiral_multiplier = 1.0;
+		this.last_drawn_spiral_meter_ticks = 0;
 
 		//this.bonus_wheel = this.InitWheel();
 	}
 
 	OnActivate() {
+		this.InitSpiralMeter();
 		this.CheckOverdrive();
 		//this.bonus_wheel = this.InitWheel();
 	}
@@ -1723,16 +1725,145 @@ class BumperMachine extends PachinkoMachine {
 			if (meter_percent < 0.0) {
 				meter_percent = 0.0;
 			}
-			let display_percent =
-				meter_percent.toFixed(2).padStart(6, "\xa0") + "%";
+			let display_percent = meter_percent.toFixed(2) + "%";
 			UpdateInnerHTML("spiral_power_percent", display_percent);
-			if (meter_percent > 100.0) {
-				meter_percent = 100.0;
-			}
-			document.getElementById("spiral_meter_fill").style.width =
-				meter_percent + "%";
+			this.UpdateSpiralMeterFill(Math.min(meter_fraction, 100.0));
 			UpdateInnerHTML("spiral_multiplier", this.spiral_multiplier.toFixed(2));
 		}
+	}
+	
+	InitSpiralMeter() {
+		const kSpiralMeterSize = 100;
+		const kCenterXY = kSpiralMeterSize / 2;
+		this.spiral_meter_line_width = 2;
+		let canvas = GetCanvasLayer("spiral2");
+		canvas.width  = kSpiralMeterSize;
+		canvas.height = kSpiralMeterSize; 
+		let ctx = canvas.getContext("2d");
+		ctx.setTransform(1, 0, 0, 1, 0, 0);
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+		const max_radius = kCenterXY - this.spiral_meter_line_width / 2 - 1;
+		const center = new Point(kCenterXY, kCenterXY);
+		const kThetaStep = 0.2;
+		const kRDelta = 10;
+		const kRStep = 0.4;
+		this.spiral_meter_inner_vertices = [center];
+		this.spiral_meter_outer_vertices = [center];
+		let theta = 0;
+		let outer_r = 0;
+		let inner_r = -kRDelta;
+		let shift_dir = new Vector(1, 0);
+		while (inner_r < max_radius - 3) {
+			theta += kThetaStep;
+			outer_r += kRStep;
+			inner_r += kRStep;
+			shift_dir.Reset(Math.cos(theta), Math.sin(theta));
+			let clamped_outer_r = outer_r;
+			if (clamped_outer_r > max_radius) {
+				clamped_outer_r = max_radius;
+			}
+			if (clamped_outer_r < 0) {
+				clamped_outer_r = 0;
+			}
+			let outer_vertex = center.Add(shift_dir.Multiply(clamped_outer_r));
+			this.spiral_meter_outer_vertices.push(outer_vertex);
+			let clamped_inner_r = inner_r;
+			if (clamped_inner_r > max_radius) {
+				clamped_inner_r = max_radius;
+			}
+			if (clamped_inner_r < 0) {
+				clamped_inner_r = 0;
+			}
+			let inner_vertex = center.Add(shift_dir.Multiply(clamped_inner_r));
+			this.spiral_meter_inner_vertices.push(inner_vertex);
+		}
+		const num_vertices = this.spiral_meter_outer_vertices.length;
+		console.assert(num_vertices == this.spiral_meter_inner_vertices.length);
+
+		const kMinTickDist = 10;
+		let dist = 0;
+		this.spiral_meter_ticks = Array(num_vertices).fill(false);
+		this.spiral_meter_ticks[num_vertices - 1] = true;
+		let last_tick = 0;
+		let total_ticks = 1;
+		for (let i = 1; i < num_vertices; ++i) {
+			const prev_pt = this.spiral_meter_outer_vertices[i - 1];
+			const next_pt = this.spiral_meter_outer_vertices[i];
+			dist += Math.sqrt(prev_pt.DistanceSqrToPoint(next_pt));
+			if (dist > kMinTickDist) {
+				this.spiral_meter_ticks[i] = true;
+				last_tick = i;
+				++total_ticks;
+				dist = 0;
+			}
+		}
+		if (dist < kMinTickDist / 2) {
+			--total_ticks;
+			this.spiral_meter_ticks[last_tick] = false;
+		}
+		this.spiral_meter_num_ticks = total_ticks;
+
+		ctx.strokeStyle = "#0F0";
+		ctx.lineWidth = this.spiral_meter_line_width;
+		ctx.beginPath();
+		const first_pt = this.spiral_meter_inner_vertices[0];
+		ctx.moveTo(first_pt.x, first_pt.y);
+		for (let i = 1; i < num_vertices; ++i) {
+			const pt = this.spiral_meter_inner_vertices[i];
+			ctx.lineTo(pt.x, pt.y);
+		}
+		for (let i = num_vertices - 1; i >= 0; --i) {
+			const pt = this.spiral_meter_outer_vertices[i];
+			ctx.lineTo(pt.x, pt.y);
+		}
+		ctx.stroke();
+		for (let i = 1; i < num_vertices; ++i) {
+			if (this.spiral_meter_ticks[i]) {
+				const inner_pt = this.spiral_meter_inner_vertices[i];
+				const outer_pt = this.spiral_meter_outer_vertices[i];
+				ctx.beginPath();
+				ctx.moveTo(inner_pt.x, inner_pt.y);
+				ctx.lineTo(outer_pt.x, outer_pt.y);
+				ctx.stroke();
+			}
+		}
+
+		let canvas1 = GetCanvasLayer("spiral1");
+		canvas1.width  = kSpiralMeterSize;
+		canvas1.height = kSpiralMeterSize; 
+	}
+	
+	UpdateSpiralMeterFill(meter_fraction) {
+		let ticks = Math.floor(meter_fraction * this.spiral_meter_num_ticks);
+		if (ticks == this.last_drawn_spiral_meter_ticks) {
+			return;
+		}
+		this.last_drawn_spiral_meter_ticks = ticks;
+
+		let canvas = GetCanvasLayer("spiral1");
+		let ctx = canvas.getContext("2d");
+		ctx.setTransform(1, 0, 0, 1, 0, 0);
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+		ctx.fillStyle = "#AFA";
+		ctx.beginPath();
+		const first_pt = this.spiral_meter_inner_vertices[0];
+		ctx.moveTo(first_pt.x, first_pt.y);
+		let i = 1;
+		while (ticks > 0 && i < this.spiral_meter_ticks.length) {
+			const pt = this.spiral_meter_inner_vertices[i];
+			ctx.lineTo(pt.x, pt.y);
+			if (this.spiral_meter_ticks[i]) {
+				--ticks;
+			}
+			++i;
+		}
+		while (i > 0) {
+			--i;
+			const pt = this.spiral_meter_outer_vertices[i];
+			ctx.lineTo(pt.x, pt.y);
+		}
+		ctx.fill();
 	}
 
 	AwardPoints(base_value, ball) {

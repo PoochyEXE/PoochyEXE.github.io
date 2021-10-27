@@ -44,6 +44,9 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
+### v1.14.4-beta (2021-10-27)
+* Change the Spiral Power meter into a spiral shape.
+
 ### v1.14.3-beta (2021-10-26)
 * Add a background for Spiral Ball upgrade buttons.
 * Add a new ripple effect for Spiral Balls as well.
