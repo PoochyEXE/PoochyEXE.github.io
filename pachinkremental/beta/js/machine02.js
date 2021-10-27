@@ -1834,7 +1834,8 @@ class BumperMachine extends PachinkoMachine {
 	}
 	
 	UpdateSpiralMeterFill(meter_fraction) {
-		let ticks = Math.floor(meter_fraction * this.spiral_meter_num_ticks);
+		let draw_fraction = Math.min(1.0, meter_fraction);
+		let ticks = Math.floor(draw_fraction * this.spiral_meter_num_ticks);
 		if (ticks == this.last_drawn_spiral_meter_ticks) {
 			return;
 		}
