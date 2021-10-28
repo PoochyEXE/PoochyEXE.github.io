@@ -44,6 +44,10 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
+### v1.14.5-beta (2021-10-28)
+* Add an effect for when Spiral Power is above 100% with Pierce the Heavens.
+* Slight buff: Without the Pierce the Heavens upgrade, excess Spiral Power generated past 100% is stored into an invisible power bank that's automatically used to offset decay, up to 2%. (Spiral Power stored in the power bank also decays.) This should make the meter flicker between 100% and 99.xx% less often.
+
 ### v1.14.4-beta (2021-10-27)
 * Change the Spiral Power meter into a spiral shape.
 

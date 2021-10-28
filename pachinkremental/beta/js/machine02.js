@@ -65,7 +65,7 @@ class BumperMachine extends PachinkoMachine {
 		this.CheckOverdrive();
 		//this.bonus_wheel = this.InitWheel();
 	}
-	
+
 	OnBuffTimeout(state) {
 		this.DeactivateOverdrive();
 		this.last_hyper_end_time = state.current_time;
@@ -1643,7 +1643,7 @@ class BumperMachine extends PachinkoMachine {
 	ActivateOverdrive() {
 		this.overdrive = true;
 		document.getElementById("hyper_status").classList.add("overdrive");
-		
+
 		if (this.IsUnlocked("overdrive_midas")) {
 			const kNormal = kBumperMachineBallTypeIDs.NORMAL;
 			const kGold = kBumperMachineBallTypeIDs.GOLD;
@@ -1666,18 +1666,18 @@ class BumperMachine extends PachinkoMachine {
 				state.balls_by_type[kNormal] = [];
 			}
 		}
-		
+
 		if (this.IsUnlocked("overdrive_heavens_time")) {
 			this.GetSaveData().score_buff_time_dilation = 2.0;
 		}
 	}
-	
+
 	DeactivateOverdrive() {
 		this.overdrive = false;
 		document.getElementById("hyper_status").classList.remove("overdrive");
 		this.GetSaveData().score_buff_time_dilation = 1.0;
 	}
-	
+
 	CheckOverdrive() {
 		let save_data = this.GetSaveData();
 		if (
@@ -1708,11 +1708,12 @@ class BumperMachine extends PachinkoMachine {
 			for (let i = 0; i < spiral_balls.length; ++i) {
 				save_data.spiral_power += Math.abs(spiral_balls[i].omega);
 			}
+			let meter_fraction = save_data.spiral_power / kMaxSpiralPower;
 			if (!this.IsUnlocked("pierce_the_heavens")) {
 				save_data.spiral_power =
-					Math.min(save_data.spiral_power, kMaxSpiralPower);
+					Math.min(save_data.spiral_power, 1.02 * kMaxSpiralPower);
+				meter_fraction = Math.min(meter_fraction, 1.0);
 			}
-			let meter_fraction = save_data.spiral_power / kMaxSpiralPower;
 			let multiplier_fraction = meter_fraction;
 			if (multiplier_fraction > 1.0) {
 				multiplier_fraction = Math.sqrt(multiplier_fraction);
@@ -1727,18 +1728,18 @@ class BumperMachine extends PachinkoMachine {
 			}
 			let display_percent = meter_percent.toFixed(2) + "%";
 			UpdateInnerHTML("spiral_power_percent", display_percent);
-			this.UpdateSpiralMeterFill(Math.min(meter_fraction, 100.0));
+			this.UpdateSpiralMeterFill(meter_fraction);
 			UpdateInnerHTML("spiral_multiplier", this.spiral_multiplier.toFixed(2));
 		}
 	}
-	
+
 	InitSpiralMeter() {
 		const kSpiralMeterSize = 100;
 		const kCenterXY = kSpiralMeterSize / 2;
 		this.spiral_meter_line_width = 2;
 		let canvas = GetCanvasLayer("spiral2");
 		canvas.width  = kSpiralMeterSize;
-		canvas.height = kSpiralMeterSize; 
+		canvas.height = kSpiralMeterSize;
 		let ctx = canvas.getContext("2d");
 		ctx.setTransform(1, 0, 0, 1, 0, 0);
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -1797,7 +1798,7 @@ class BumperMachine extends PachinkoMachine {
 				dist = 0;
 			}
 		}
-		if (dist < kMinTickDist / 2) {
+		if (dist < kMinTickDist / 2 && last_tick != num_vertices - 1) {
 			--total_ticks;
 			this.spiral_meter_ticks[last_tick] = false;
 		}
@@ -1830,11 +1831,11 @@ class BumperMachine extends PachinkoMachine {
 
 		let canvas1 = GetCanvasLayer("spiral1");
 		canvas1.width  = kSpiralMeterSize;
-		canvas1.height = kSpiralMeterSize; 
+		canvas1.height = kSpiralMeterSize;
 	}
-	
+
 	UpdateSpiralMeterFill(meter_fraction) {
-		let draw_fraction = Math.min(1.0, meter_fraction);
+		let draw_fraction = Math.min(2.0, meter_fraction);
 		let ticks = Math.floor(draw_fraction * this.spiral_meter_num_ticks);
 		if (ticks == this.last_drawn_spiral_meter_ticks) {
 			return;
@@ -1845,26 +1846,43 @@ class BumperMachine extends PachinkoMachine {
 		let ctx = canvas.getContext("2d");
 		ctx.setTransform(1, 0, 0, 1, 0, 0);
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
+		if (ticks == 0) {
+			return;
+		}
 
-		ctx.fillStyle = "#AFA";
+		let i = 1;
+		let prev_i = 0;
+		let overflow_ticks_drawn = 0;
 		ctx.beginPath();
 		const first_pt = this.spiral_meter_inner_vertices[0];
 		ctx.moveTo(first_pt.x, first_pt.y);
-		let i = 1;
 		while (ticks > 0 && i < this.spiral_meter_ticks.length) {
-			const pt = this.spiral_meter_inner_vertices[i];
-			ctx.lineTo(pt.x, pt.y);
+			const inner_next = this.spiral_meter_inner_vertices[i];
+			ctx.lineTo(inner_next.x, inner_next.y);
 			if (this.spiral_meter_ticks[i]) {
+				if (ticks > this.spiral_meter_num_ticks) {
+					ctx.fillStyle = GetPrismaticColor(
+						overflow_ticks_drawn,
+						this.spiral_meter_num_ticks * 1.25,
+						/*saturation=*/0.8,
+						/*alpha=*/1.0
+					);
+					++overflow_ticks_drawn;
+				} else {
+					ctx.fillStyle = "#AFA";
+				}
+				for (let j = i; j >= prev_i; --j) {
+					const outer_next = this.spiral_meter_outer_vertices[j];
+					ctx.lineTo(outer_next.x, outer_next.y);
+				}
+				ctx.fill();
+				ctx.beginPath();
+				ctx.moveTo(inner_next.x, inner_next.y);
+				prev_i = i;
 				--ticks;
 			}
 			++i;
 		}
-		while (i > 0) {
-			--i;
-			const pt = this.spiral_meter_outer_vertices[i];
-			ctx.lineTo(pt.x, pt.y);
-		}
-		ctx.fill();
 	}
 
 	AwardPoints(base_value, ball) {
@@ -1920,7 +1938,7 @@ class BumperMachine extends PachinkoMachine {
 						save_data.stats.max_hyper_combo =
 							Math.max(save_data.hyper_combo, save_data.stats.max_hyper_combo);
 						total_value *= this.HyperComboValue(save_data.hyper_combo);
-						
+
 						if (this.IsUnlocked("hyper_recharge")) {
 							save_data.hyper_charge = Math.min(
 								save_data.hyper_charge + 10,
@@ -2132,7 +2150,7 @@ class BumperMachine extends PachinkoMachine {
 	HasOpalSpecial(ball_type_index) {
 		return (
 			ball_type_index == kBumperMachineBallTypeIDs.OPAL ||
-			this.HasBeachBallSpecial(ball_type_index) || 
+			this.HasBeachBallSpecial(ball_type_index) ||
 			this.HasRubberBandBallSpecial(ball_type_index) ||
 			this.HasSpiralBallSpecial(ball_type_index)
 		);

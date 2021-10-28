@@ -1356,7 +1356,7 @@ class FirstMachine extends PachinkoMachine {
 						ball.total_rotations > k2Pi
 					) {
 						multiplier *= ball.total_rotations / k2Pi;
-						
+
 						stats.max_beach_ball_rotated_degrees = Math.max(
 							ball.total_rotations * 180.0 / Math.PI,
 							stats.max_beach_ball_rotated_degrees

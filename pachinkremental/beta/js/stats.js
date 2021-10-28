@@ -12,7 +12,7 @@ function InitStatsPanel(state) {
 			'_stat" class="statsEntry"></span></div>';
 	}
 	UpdateInnerHTML("stats_by_ball_type", html);
-	
+
 	html = '';
 	for (let i = 0; i < state.machines.length; ++i) {
 		let stat_id = "time_to_max_" + state.machines[i].id;
@@ -24,7 +24,7 @@ function InitStatsPanel(state) {
 			'" class="statsEntry"></span></div>';
 	}
 	UpdateInnerHTML("stats_section_milestones", html);
-	
+
 	let unlockable_stats = document.getElementsByClassName("statsRowUnlockable");
 	for (let i = 0; i < unlockable_stats.length; ++i) {
 		unlockable_stats[i].style.display = "none";
@@ -70,7 +70,7 @@ function UpdateStatsByBallType() {
 			state.score_history_by_ball_type.last_60s[ball_type.id],
 	};
 	const stat_func = ball_type_stat_funcs[stat_type];
-	
+
 	for (let i = 0; i < ball_types.length; ++i) {
 		let unlock_upgrade_id = BallTypeUnlockUpgradeID(ball_types[i]);
 		let stat_name = ball_types[i].name + "_balls_stat";

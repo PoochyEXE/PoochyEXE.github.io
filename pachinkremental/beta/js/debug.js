@@ -37,7 +37,7 @@ function DrawFavicon(ball_type_index) {
 		canvas.width / (2.0 * kBallRadius),
 		canvas.height / (2.0 * kBallRadius)
 	);
-	
+
 	const ball_type = ActiveMachine(state).BallTypes()[ball_type_index];
 	DrawBalls(
 		[new Ball(kBallRadius, kBallRadius, 0, 0, ball_type_index, 0, 0)],
@@ -45,7 +45,7 @@ function DrawFavicon(ball_type_index) {
 		ball_type.outer_color,
 		ctx
 	);
-	
+
 	let a_elem = document.getElementById("favicon_link")
 	a_elem.setAttribute('download', ball_type.name + '.png');
 	a_elem.setAttribute('href', canvas.toDataURL("image/png").replace("image/png", "image/octet-stream"));

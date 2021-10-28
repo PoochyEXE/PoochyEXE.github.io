@@ -81,7 +81,7 @@ function UpdateBalls(balls, board, params) {
 				}
 			}
 		}
-		
+
 		// Invisible wall above the sides of the board to keep balls in play if they
 		// bounce over the top corner pegs.
 		if (pos.y < 0) {

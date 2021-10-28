@@ -42,7 +42,7 @@ class PachinkoMachine {
 	ActivateHyperSystem() {
 		console.error("Not implemented!");
 	}
-	
+
 	UpdateHyperSystemDisplay(state) {}
 
 	TogglePopupText() {
@@ -189,7 +189,7 @@ class PachinkoMachine {
 		}
 		return true;
 	}
-	
+
 	CheckMachineMaxed() {
 		let stats = state.save_file.stats;
 		if (this.AreAllUpgradesMaxed()) {
@@ -205,7 +205,7 @@ class PachinkoMachine {
 			stats.machine_maxed_times[this.id] = null;
 		}
 	}
-	
+
 	ShowMachineMaxedModal() {
 		let play_time = FormatDurationLong(CurrentPlayTime(), /*show_ms=*/true);
 		UpdateInnerHTML("machine_maxed_time", play_time);

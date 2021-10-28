@@ -4,7 +4,7 @@ class ObjectPool {
 		this.ripple_pool = [];
 		this.rising_text_pool = [];
 	}
-	
+
 	NewBall(x, y, dx, dy, ball_type_index, rotation, omega) {
 		if (this.ball_pool.length == 0) {
 			return new Ball(x, y, dx, dy, ball_type_index, rotation, omega);
@@ -14,11 +14,11 @@ class ObjectPool {
 			return ball;
 		}
 	}
-	
+
 	ReleaseBall(ball) {
 		this.ball_pool.push(ball);
 	}
-	
+
 	NewRipple(x, y, color_rgb, start_radius) {
 		if (this.ripple_pool.length == 0) {
 			return new RippleEffect(x, y, color_rgb, start_radius);
@@ -28,11 +28,11 @@ class ObjectPool {
 			return ripple;
 		}
 	}
-	
+
 	ReleaseRipple(ripple) {
 		this.ripple_pool.push(ripple);
 	}
-	
+
 	NewRisingText(text, pos, color_rgb, opacity) {
 		if (this.rising_text_pool.length == 0) {
 			return new RisingText(text, pos, color_rgb, opacity);
@@ -42,7 +42,7 @@ class ObjectPool {
 			return rising_text;
 		}
 	}
-	
+
 	ReleaseRisingText(rising_text) {
 		this.rising_text_pool.push(rising_text);
 	}
@@ -225,7 +225,7 @@ class RisingText {
 		this.pos = new Point(pos.x, pos.y);
 		this.Reset(text, pos, color_rgb, opacity);
 	}
-	
+
 	Reset(text, pos, color_rgb, opacity) {
 		this.text = text;
 		this.pos.Reset(pos.x, pos.y);
@@ -334,7 +334,7 @@ class RippleEffect {
 		this.pos = new Point(x, y);
 		this.Reset(x, y, color_rgb, start_radius);
 	}
-	
+
 	Reset(x, y, color_rgb, start_radius) {
 		this.pos.Reset(x, y);
 		this.color_rgb = color_rgb;

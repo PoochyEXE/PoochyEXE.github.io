@@ -289,7 +289,7 @@ function DrawSpiralOnBall(pos, rotation, inner_color, outer_color, ctx) {
 	const kEpsilon = 1e-7;
 	const kLineWidth = 2;
 	let gradient = CreateRadialGradientForBall(ctx, pos, kBallRadius);
-	
+
 	gradient.addColorStop(0.0, inner_color);
 	gradient.addColorStop(1.0 - kEpsilon, outer_color);
 	gradient.addColorStop(1, kTransparent);
@@ -319,7 +319,7 @@ function DrawSpiralBalls(balls, current_time, use_gradient, ctx) {
 	for (let i = 0; i < balls.length; ++i) {
 		let pos = balls[i].pos;
 		let rotation = balls[i].rotation;
-		
+
 		const kPrismaticCycleShift = kPrismaticCycleDuration / 2.0;
 		let color_1_outer = GetPrismaticColor(
 			current_time - balls[i].start_time,
