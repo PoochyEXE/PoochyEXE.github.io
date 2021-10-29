@@ -1745,9 +1745,9 @@ class BumperMachine extends PachinkoMachine {
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
 		const max_radius = kCenterXY - this.spiral_meter_line_width / 2 - 1;
 		const center = new Point(kCenterXY, kCenterXY);
-		const kThetaStep = 0.2;
+		const kThetaStep = 0.14;
 		const kRDelta = 10;
-		const kRStep = 0.4;
+		const kRStep = 2 * kThetaStep;
 		this.spiral_meter_inner_vertices = [center];
 		this.spiral_meter_outer_vertices = [center];
 		let theta = 0;
@@ -1781,16 +1781,19 @@ class BumperMachine extends PachinkoMachine {
 		const num_vertices = this.spiral_meter_outer_vertices.length;
 		console.assert(num_vertices == this.spiral_meter_inner_vertices.length);
 
-		const kMinTickDist = 10;
+		const kMinTickDist = 20;
 		let dist = 0;
 		this.spiral_meter_ticks = Array(num_vertices).fill(false);
 		this.spiral_meter_ticks[num_vertices - 1] = true;
 		let last_tick = 0;
 		let total_ticks = 1;
 		for (let i = 1; i < num_vertices; ++i) {
-			const prev_pt = this.spiral_meter_outer_vertices[i - 1];
-			const next_pt = this.spiral_meter_outer_vertices[i];
-			dist += Math.sqrt(prev_pt.DistanceSqrToPoint(next_pt));
+			const outer_prev_pt = this.spiral_meter_outer_vertices[i - 1];
+			const outer_next_pt = this.spiral_meter_outer_vertices[i];
+			dist += Math.sqrt(outer_prev_pt.DistanceSqrToPoint(outer_next_pt));
+			const inner_prev_pt = this.spiral_meter_inner_vertices[i - 1];
+			const inner_next_pt = this.spiral_meter_inner_vertices[i];
+			dist += Math.sqrt(inner_prev_pt.DistanceSqrToPoint(inner_next_pt));
 			if (dist > kMinTickDist) {
 				this.spiral_meter_ticks[i] = true;
 				last_tick = i;
