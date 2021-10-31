@@ -1736,16 +1736,16 @@ class BumperMachine extends PachinkoMachine {
 	InitSpiralMeter() {
 		const kSpiralMeterSize = 100;
 		const kCenterXY = kSpiralMeterSize / 2;
-		this.spiral_meter_line_width = 2;
+		const kLineWidth = 2;
 		let canvas = GetCanvasLayer("spiral2");
 		canvas.width  = kSpiralMeterSize;
 		canvas.height = kSpiralMeterSize;
 		let ctx = canvas.getContext("2d");
 		ctx.setTransform(1, 0, 0, 1, 0, 0);
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
-		const max_radius = kCenterXY - this.spiral_meter_line_width / 2 - 1;
+		const max_radius = kCenterXY - kLineWidth / 2 - 1;
 		const center = new Point(kCenterXY, kCenterXY);
-		const kThetaStep = 0.14;
+		const kThetaStep = 0.05;
 		const kRDelta = 10;
 		const kRStep = 2 * kThetaStep;
 		this.spiral_meter_inner_vertices = [center];
@@ -1754,7 +1754,7 @@ class BumperMachine extends PachinkoMachine {
 		let outer_r = 0;
 		let inner_r = -kRDelta;
 		let shift_dir = new Vector(1, 0);
-		while (inner_r < max_radius - 3) {
+		while (inner_r < max_radius - 1.5 * kLineWidth) {
 			theta += kThetaStep;
 			outer_r += kRStep;
 			inner_r += kRStep;
@@ -1781,8 +1781,9 @@ class BumperMachine extends PachinkoMachine {
 		const num_vertices = this.spiral_meter_outer_vertices.length;
 		console.assert(num_vertices == this.spiral_meter_inner_vertices.length);
 
-		const kMinTickDist = 20;
+		const kMinTickDist = 14;
 		let dist = 0;
+		let last_dist = 0;
 		this.spiral_meter_ticks = Array(num_vertices).fill(false);
 		this.spiral_meter_ticks[num_vertices - 1] = true;
 		let last_tick = 0;
@@ -1798,6 +1799,7 @@ class BumperMachine extends PachinkoMachine {
 				this.spiral_meter_ticks[i] = true;
 				last_tick = i;
 				++total_ticks;
+				last_dist = dist;
 				dist = 0;
 			}
 		}
@@ -1808,7 +1810,7 @@ class BumperMachine extends PachinkoMachine {
 		this.spiral_meter_num_ticks = total_ticks;
 
 		ctx.strokeStyle = "#0F0";
-		ctx.lineWidth = this.spiral_meter_line_width;
+		ctx.lineWidth = kLineWidth;
 		ctx.beginPath();
 		const first_pt = this.spiral_meter_inner_vertices[0];
 		ctx.moveTo(first_pt.x, first_pt.y);
@@ -1839,38 +1841,38 @@ class BumperMachine extends PachinkoMachine {
 
 	UpdateSpiralMeterFill(meter_fraction) {
 		let draw_fraction = Math.min(2.0, meter_fraction);
-		let ticks = Math.floor(draw_fraction * this.spiral_meter_num_ticks);
-		if (ticks == this.last_drawn_spiral_meter_ticks) {
+		const num_meter_ticks = this.spiral_meter_num_ticks;
+		let ticks_left = Math.floor(draw_fraction * num_meter_ticks);
+		if (ticks_left == this.last_drawn_spiral_meter_ticks) {
 			return;
 		}
-		this.last_drawn_spiral_meter_ticks = ticks;
+		this.last_drawn_spiral_meter_ticks = ticks_left;
 
 		let canvas = GetCanvasLayer("spiral1");
 		let ctx = canvas.getContext("2d");
 		ctx.setTransform(1, 0, 0, 1, 0, 0);
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
-		if (ticks == 0) {
+		if (ticks_left == 0) {
 			return;
 		}
 
 		let i = 1;
 		let prev_i = 0;
-		let overflow_ticks_drawn = 0;
+		let ticks_drawn = 0;
 		ctx.beginPath();
 		const first_pt = this.spiral_meter_inner_vertices[0];
 		ctx.moveTo(first_pt.x, first_pt.y);
-		while (ticks > 0 && i < this.spiral_meter_ticks.length) {
+		while (ticks_left > 0 && i < this.spiral_meter_ticks.length) {
 			const inner_next = this.spiral_meter_inner_vertices[i];
 			ctx.lineTo(inner_next.x, inner_next.y);
 			if (this.spiral_meter_ticks[i]) {
-				if (ticks > this.spiral_meter_num_ticks) {
+				if (ticks_left > num_meter_ticks) {
 					ctx.fillStyle = GetPrismaticColor(
-						overflow_ticks_drawn,
-						this.spiral_meter_num_ticks * 1.25,
+						2 + 7 * (ticks_drawn / num_meter_ticks),
+						12.0,
 						/*saturation=*/0.8,
 						/*alpha=*/1.0
 					);
-					++overflow_ticks_drawn;
 				} else {
 					ctx.fillStyle = "#AFA";
 				}
@@ -1882,7 +1884,8 @@ class BumperMachine extends PachinkoMachine {
 				ctx.beginPath();
 				ctx.moveTo(inner_next.x, inner_next.y);
 				prev_i = i;
-				--ticks;
+				--ticks_left;
+				++ticks_drawn;
 			}
 			++i;
 		}
