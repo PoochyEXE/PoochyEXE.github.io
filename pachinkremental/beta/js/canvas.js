@@ -316,6 +316,10 @@ function DrawSpiralOnBall(pos, rotation, inner_color, outer_color, ctx) {
 }
 
 function DrawSpiralBalls(balls, current_time, use_gradient, ctx) {
+	const kGlowSize = 3;
+	const kMaxGlowOmega = 50.0;
+	const kMaxGlowAlpha = 0.8;
+	const kGlowColor = "0,255,0";
 	for (let i = 0; i < balls.length; ++i) {
 		let pos = balls[i].pos;
 		let rotation = balls[i].rotation;
@@ -346,6 +350,12 @@ function DrawSpiralBalls(balls, current_time, use_gradient, ctx) {
 				kPrismaticCycleDuration,
 				/*saturation=*/ kPrismaticSaturationInner,
 				/*alpha=*/1.0
+			);
+			let glow_fraction = Math.sqrt(Math.abs(balls[i].omega) / kMaxGlowOmega);
+			glow_fraction = Math.min(glow_fraction, 1.0);
+			let glow_alpha = kMaxGlowAlpha * glow_fraction;
+			DrawGlow(
+				pos, kGlowColor, glow_alpha, kBallRadius, kBallRadius + kGlowSize, ctx
 			);
 			DrawSpiralOnBall(pos, -rotation, color_1_inner, color_1_outer, ctx);
 			DrawSpiralOnBall(pos, -rot2, color_2_inner, color_2_outer, ctx);

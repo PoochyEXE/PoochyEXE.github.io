@@ -44,6 +44,12 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
+### v1.15.0-beta (2021-11-07)
+* 3 new Overdrive upgrades.
+* Spiral Balls now glow green when they generate Spiral Power. The more Spiral Power they're generating, the stronger the glow.
+* Beach Balls, Rubber Band Balls, and Spiral Balls are now grouped into Ultimate Balls, and unlocking one sharply increases the cost of unlocking the others, like Gemstone Balls.
+* Nerf: Raised the price of OD Rainbow UFO.
+
 ### v1.14.6-beta (2021-10-29)
 * Adjust the look of the Spiral Power meter a little bit.
 

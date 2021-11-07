@@ -56,14 +56,11 @@ class BumperMachine extends PachinkoMachine {
 		this.spiral_power = 0.0;
 		this.spiral_multiplier = 1.0;
 		this.last_drawn_spiral_meter_ticks = 0;
-
-		//this.bonus_wheel = this.InitWheel();
 	}
 
 	OnActivate() {
 		this.InitSpiralMeter();
 		this.CheckOverdrive();
-		//this.bonus_wheel = this.InitWheel();
 	}
 
 	OnBuffTimeout(state) {
@@ -104,8 +101,6 @@ class BumperMachine extends PachinkoMachine {
 		save_data.stats.rubberband_ball_most_bounces = 0;
 		save_data.stats.max_spiral_ball_rotated_degrees = 0;
 		save_data.stats.max_spiral_power_percent = 0;
-		//save_data.options.auto_spin_enabled = false;
-		//save_data.options.multi_spin_enabled = false;
 		return save_data;
 	}
 
@@ -184,21 +179,19 @@ class BumperMachine extends PachinkoMachine {
 			new UpgradeHeader(this, "auto_drop", "Auto-Drop", this.upgrades["auto_drop"].visible_func),
 			new UpgradeHeader(this, "combos", "Combos", this.upgrades["unlock_combos"].visible_func),
 			new UpgradeHeader(this, "hyper", "Hyper System", this.upgrades["unlock_hyper_system"].visible_func),
-			new UpgradeHeader(this, "overdrive", "Overdrive", this.upgrades["unlock_overdrive"].visible_func),
-			/* TODO: Add bonus wheel.
-			new UpgradeHeader(this, "bonus_wheel", "Bonus Wheel", this.upgrades["unlock_bonus_wheel"].visible_func),
-			*/
+			new UpgradeHeader(
+				this,
+				"overdrive",
+				"Overdrive",
+				this.upgrades["unlock_overdrive"].visible_func,
+				[
+					"overdrive_basic",
+					"overdrive_gemstone",
+					"overdrive_ultimate",
+				],
+			),
 			new SingleBallTypeUpgradeHeader(
 				this, this.ball_types[kBumperMachineBallTypeIDs.GOLD]
-			),
-			new SingleBallTypeUpgradeHeader(
-				this, this.ball_types[kBumperMachineBallTypeIDs.BEACH_BALL]
-			),
-			new SingleBallTypeUpgradeHeader(
-				this, this.ball_types[kBumperMachineBallTypeIDs.RUBBER_BAND]
-			),
-			new SingleBallTypeUpgradeHeader(
-				this, this.ball_types[kBumperMachineBallTypeIDs.SPIRAL]
 			),
 			new UpgradeHeader(
 				this,
@@ -215,6 +208,18 @@ class BumperMachine extends PachinkoMachine {
 					"opal_balls"
 				],
 				"Gemstone balls have the benefits of gold balls (including not counting towards the max balls limit), plus an additional point value multiplier. Each type of gemstone ball has its own way to increase its multiplier.<br>NOTE: Each gemstone ball unlocked sharply increases the cost of unlocking the others!"
+			),
+			new UpgradeHeader(
+				this,
+				"ultimate_balls",
+				"Ultimate Balls",
+				() => this.ShouldDisplayUltimateBallUpgrades(),
+				[
+					"beach_balls",
+					"rubberband_balls",
+					"spiral_balls",
+				],
+				"Ultimate balls have all the benefits of Opal balls, plus they never break their combo. Each type of Ultimate ball has its own special trait.<br>NOTE: Each Ultimate ball unlocked sharply increases the cost of unlocking the others!"
 			),
 		];
 	}
@@ -637,29 +642,6 @@ class BumperMachine extends PachinkoMachine {
 			new Rectangle(min_drop_x, max_drop_x, min_drop_y, max_drop_y)
 		];
 
-		/* TODO: Add bonus wheel.
-		const kSpinTargetColor = "rgba(0, 0, 255, 0.5)";
-		let spin_targets = [
-			new SpinTarget({
-				machine: this,
-				pos: new Point(grid_cols[5], y),
-				draw_radius: kTargetDrawRadius,
-				hitbox_radius: kTargetHitboxRadius,
-				color: kSpinTargetColor,
-				id: "spin_left"
-			}),
-			new SpinTarget({
-				machine: this,
-				pos: new Point(grid_cols[17], y),
-				draw_radius: kTargetDrawRadius,
-				hitbox_radius: kTargetHitboxRadius,
-				color: kSpinTargetColor,
-				id: "spin_right"
-			})
-		];
-		target_sets.push(new TargetSet(spin_targets));
-		*/
-
 		return new PegBoard(kWidth, kHeight, pegs, drop_zones, target_sets, bumper_sets);
 	}
 
@@ -703,7 +685,7 @@ class BumperMachine extends PachinkoMachine {
 	}
 
 	InitUpgrades() {
-		const kTimesSymbol = "\u00D7";
+		const kTimesSymbol = "&times;";
 		let upgrades_list = new Array();
 		upgrades_list.push(
 			new Upgrade({
@@ -740,9 +722,6 @@ class BumperMachine extends PachinkoMachine {
 							}
 						}
 					}
-					/* TODO: Add bonus wheel.
-					this.bonus_wheel.UpdateAllSpaces();
-					*/
 				}
 			})
 		);
@@ -906,7 +885,7 @@ class BumperMachine extends PachinkoMachine {
 				category: "combos",
 				description:
 					'The base value of each bumper or target hit is added to the base value of all subsequent hits in the combo.' +
-					'<div class="small">Example: Hitting a 1000-point target, a 100-point bumper, then a 500-point target in a combo awards 1000 points for the 1st hit, (1000+100)\u00D72 points for the 2nd hit, and (1000+100+500)\u00D73 points for the 3rd hit.</div><div>「死ぬがよい」</div>',
+					'<div class="small">Example: Hitting a 1000-point target, a 100-point bumper, then a 500-point target in a combo awards 1000 points for the 1st hit, (1000+100)&times;2 points for the 2nd hit, and (1000+100+500)&times;3 points for the 3rd hit.</div><div>「死ぬがよい」</div>',
 				cost: 8e8,
 				visible_func: () => this.IsUnlocked("unlock_combos"),
 			})
@@ -918,7 +897,7 @@ class BumperMachine extends PachinkoMachine {
 				name: "Hyper System",
 				category: "hyper",
 				description:
-					"Unlock the Hyper System, which is charged by combos. The more hits in a combo, the more charge it's worth. When it's fully charged, activate the Hyper System to gain 10\u00D7 scoring for 15 seconds!",
+					"Unlock the Hyper System, which is charged by combos. The more hits in a combo, the more charge it's worth. When it's fully charged, activate the Hyper System to gain 10&times; scoring for 15 seconds!",
 				cost: 8e9,
 				visible_func: () => this.IsUnlocked("unlock_combos"),
 				on_buy: () => {
@@ -1008,7 +987,7 @@ class BumperMachine extends PachinkoMachine {
 				machine: this,
 				id: "unlock_overdrive",
 				name: "Overdrive",
-				category: "overdrive",
+				category: "overdrive_basic",
 				description: 'Unlock Overdrive, which activates whenever the Hyper Combo is over 1000 hits. It doubles the Hyper Combo effect and can be upgraded with additional effects.<br><font color="#3FF">「届け蒼の彼方へ…♪」</font>',
 				cost: 8e21,
 				visible_func: () =>
@@ -1021,7 +1000,7 @@ class BumperMachine extends PachinkoMachine {
 				machine: this,
 				id: "overdrive_midas",
 				name: "OD Midas",
-				category: "overdrive",
+				category: "overdrive_basic",
 				description: "Overdrive turns all normal balls into gold balls.",
 				cost: 8e22,
 				visible_func: () => this.IsUnlocked("unlock_overdrive"),
@@ -1032,7 +1011,7 @@ class BumperMachine extends PachinkoMachine {
 				machine: this,
 				id: "overdrive_accelerator",
 				name: "OD Accelerator",
-				category: "overdrive",
+				category: "overdrive_basic",
 				description: "Overdrive makes the Hyper Combo's multiplier increase faster.",
 				cost: 8e23,
 				visible_func: () => this.IsUnlocked("unlock_overdrive"),
@@ -1043,7 +1022,7 @@ class BumperMachine extends PachinkoMachine {
 				machine: this,
 				id: "overdrive_heavens_time",
 				name: "OD Heaven's Time",
-				category: "overdrive",
+				category: "overdrive_basic",
 				description: "Overdrive dilates time for the Hyper System, making its energy drain half as fast.",
 				cost: 11e24,
 				visible_func: () => this.IsUnlocked("unlock_overdrive"),
@@ -1054,7 +1033,7 @@ class BumperMachine extends PachinkoMachine {
 				machine: this,
 				id: "overdrive_secret_code",
 				name: 'OD <span class="arrows">&uarr;&uarr;&darr;&darr;&larr;&rarr;&larr;&rarr;</span>BA',
-				category: "overdrive",
+				category: "overdrive_basic",
 				description: "+30 base Hyper Multiplier during Overdrive.",
 				cost: 573e24,
 				visible_func: () => this.IsUnlocked("unlock_overdrive"),
@@ -1065,7 +1044,7 @@ class BumperMachine extends PachinkoMachine {
 				machine: this,
 				id: "overdrive_lunatic_red_eyes",
 				name: "OD Lunatic Red Eyes",
-				category: "overdrive",
+				category: "overdrive_gemstone",
 				button_class: "rubyUpgradeButton",
 				description: '<span class="spellCard">「幻朧月睨(ルナティックレッドアイズ)」</span><br>2&times; Ruby Ball Value during Overdrive.',
 				cost: 8e24,
@@ -1080,7 +1059,7 @@ class BumperMachine extends PachinkoMachine {
 				machine: this,
 				id: "overdrive_green_eyed_monster",
 				name: "OD Green-Eyed Monster",
-				category: "overdrive",
+				category: "overdrive_gemstone",
 				button_class: "emeraldUpgradeButton",
 				description: '<span class="spellCard">嫉妬「緑色の眼をした見えない怪物」</span><br>2&times; Emerald Ball Value during Overdrive.',
 				cost: 11e24,
@@ -1095,7 +1074,7 @@ class BumperMachine extends PachinkoMachine {
 				machine: this,
 				id: "overdrive_perfect_freeze",
 				name: "OD Perfect Freeze",
-				category: "overdrive",
+				category: "overdrive_gemstone",
 				button_class: "sapphireUpgradeButton",
 				description: '<span class="spellCard">凍符「パーフェクトフリーズ」</span><br>2&times; Sapphire Ball Value during Overdrive.<br>⑨',
 				cost: 9e24,
@@ -1110,10 +1089,10 @@ class BumperMachine extends PachinkoMachine {
 				machine: this,
 				id: "overdrive_rainbow_ufo",
 				name: "OD Rainbow UFO",
-				category: "overdrive",
+				category: "overdrive_gemstone",
 				button_class: "opalUpgradeButton",
 				description: '<span class="spellCard">正体不明「恐怖の虹色ＵＦＯ襲来」</span><br>During Overdrive, the 3 gemstone ball multipliers stack multiplicatively instead of additively.',
-				cost: 12e27,
+				cost: 1.2e30,
 				visible_func: () =>
 					this.IsUnlocked("unlock_overdrive") &&
 					this.IsUnlocked("overdrive_lunatic_red_eyes") &&
@@ -1121,6 +1100,48 @@ class BumperMachine extends PachinkoMachine {
 					this.IsUnlocked("overdrive_perfect_freeze") &&
 					this.IsUnlocked("unlock_opal_balls"),
 				tooltip_width: 270,
+			})
+		);
+		upgrades_list.push(
+			new FixedCostFeatureUnlockUpgrade({
+				machine: this,
+				id: "overdrive_tsunami_boost",
+				name: "OD Tsunami Boost",
+				category: "overdrive_ultimate",
+				button_class: "beachBallUpgradeButton",
+				description: 'Hits by Beach Balls during Overdrive increase both their individual combo and the Hyper Combo by 2 instead of 1.',
+				cost: 273e24,
+				visible_func: () =>
+					this.IsUnlocked("unlock_overdrive") &&
+					this.IsUnlocked("unlock_beach_balls"),
+			})
+		);
+		upgrades_list.push(
+			new FixedCostFeatureUnlockUpgrade({
+				machine: this,
+				id: "overdrive_bouncer_rabbit",
+				name: "OD Bouncer Rabbit",
+				category: "overdrive_ultimate",
+				button_class: "rubberBandBallUpgradeButton",
+				description: '2&times; Rubber Band Ball Value during Overdrive.',
+				cost: 175e24,
+				visible_func: () =>
+					this.IsUnlocked("unlock_overdrive") &&
+					this.IsUnlocked("unlock_rubberband_balls"),
+			})
+		);
+		upgrades_list.push(
+			new FixedCostFeatureUnlockUpgrade({
+				machine: this,
+				id: "overdrive_fight_the_power",
+				name: "OD Fight the Power",
+				category: "overdrive_ultimate",
+				button_class: "spiralBallUpgradeButton",
+				description: 'Spiral Power drains slower during Overdrive.',
+				cost: 66e24,
+				visible_func: () =>
+					this.IsUnlocked("unlock_overdrive") &&
+					this.IsUnlocked("unlock_spiral_balls"),
 			})
 		);
 		upgrades_list.push(
@@ -1156,9 +1177,6 @@ class BumperMachine extends PachinkoMachine {
 				visible_func: () => this.IsUnlocked("unlock_gold_balls"),
 				on_update: function() {
 					this.machine.special_ball_multiplier = this.GetValue();
-					/* TODO: Add bonus wheel.
-					this.machine.bonus_wheel.UpdateAllSpaces();
-					*/
 				},
 			})
 		);
@@ -1357,19 +1375,17 @@ class BumperMachine extends PachinkoMachine {
 				machine: this,
 				ball_type: this.ball_types[kBumperMachineBallTypeIDs.BEACH_BALL],
 				ball_description:
-					"Beach balls have bonuses of Opal balls plus they never break their combo. They're also bouncier and floatier.",
-				cost_func: () => 1e21,
-				visible_func: () =>
-					this.IsUnlocked("unlock_opal_balls") &&
-					this.IsMaxed("combo_timeout"),
+					"Beach balls are bouncier and floatier, making it easier for them to rack up big combos.",
+				cost_func: this.UltimateBallUnlockCost,
+				visible_func: () => this.ShouldDisplayUltimateBallUpgrades(),
 			})
 		);
 		upgrades_list.push(
 			new BallTypeRateUpgrade({
 				machine: this,
 				ball_type: this.ball_types[kBumperMachineBallTypeIDs.BEACH_BALL],
-				cost_func: level => 1e21 * Math.pow(10, level),
-				value_func: level => (level + 1) / 2.0,
+				cost_func: this.UltimateBallRateCostFunc,
+				value_func: this.UltimateBallRateValueFunc,
 				max_level: 9
 			})
 		);
@@ -1378,19 +1394,17 @@ class BumperMachine extends PachinkoMachine {
 				machine: this,
 				ball_type: this.ball_types[kBumperMachineBallTypeIDs.RUBBER_BAND],
 				ball_description:
-					"Rubber band balls have bonuses of Opal balls plus they never break their combo. They're also much bouncier and they increase in value with each bounce. (Stacks multiplicatively with gemstone ball multipliers.)",
-				cost_func: () => 1e21,
-				visible_func: () =>
-					this.IsUnlocked("unlock_opal_balls") &&
-					this.IsMaxed("combo_timeout"),
+					"Rubber band balls are much bouncier, and they increase in value with each bounce. (Stacks multiplicatively with gemstone ball multipliers.)",
+				cost_func: this.UltimateBallUnlockCost,
+				visible_func: () => this.ShouldDisplayUltimateBallUpgrades(),
 			})
 		);
 		upgrades_list.push(
 			new BallTypeRateUpgrade({
 				machine: this,
 				ball_type: this.ball_types[kBumperMachineBallTypeIDs.RUBBER_BAND],
-				cost_func: level => 1e21 * Math.pow(10, level),
-				value_func: level => (level + 1) / 2.0,
+				cost_func: this.UltimateBallRateCostFunc,
+				value_func: this.UltimateBallRateValueFunc,
 				max_level: 9
 			})
 		);
@@ -1416,19 +1430,18 @@ class BumperMachine extends PachinkoMachine {
 				machine: this,
 				ball_type: this.ball_types[kBumperMachineBallTypeIDs.SPIRAL],
 				ball_description:
-					"Spiral balls have bonuses of Opal balls plus they generate Spiral Power when they rotate. Spiral Power provides a global score buff, but drains over time. Spiral balls also never break their combo.<br>「俺を誰だと思ってやがる！」",
-				cost_func: () => 1e21,
-				visible_func: () =>
-					this.IsUnlocked("unlock_opal_balls") &&
-					this.IsMaxed("combo_timeout"),
+					"Spiral balls generate Spiral Power when they rotate. Spiral Power provides a global score buff, but drains over time.<br>「俺達を誰だと思っていやがるっ！！」",
+				tooltip_width: 270,
+				cost_func: this.UltimateBallUnlockCost,
+				visible_func: () => this.ShouldDisplayUltimateBallUpgrades(),
 			})
 		);
 		upgrades_list.push(
 			new BallTypeRateUpgrade({
 				machine: this,
 				ball_type: this.ball_types[kBumperMachineBallTypeIDs.SPIRAL],
-				cost_func: level => 1e21 * Math.pow(10, level),
-				value_func: level => (level + 1) / 2.0,
+				cost_func: this.UltimateBallRateCostFunc,
+				value_func: this.UltimateBallRateValueFunc,
 				max_level: 9
 			})
 		);
@@ -1456,57 +1469,6 @@ class BumperMachine extends PachinkoMachine {
 				visible_func: () => this.IsUnlocked("unlock_spiral_balls"),
 			})
 		);
-		/* TODO: Add bonus wheel.
-		upgrades_list.push(
-			new FixedCostFeatureUnlockUpgrade({
-				machine: this,
-				id: "unlock_bonus_wheel",
-				name: "Unlock Bonus Wheel",
-				unlocked_name: "Bonus Wheel",
-				category: "bonus_wheel",
-				description:
-					"Unlocks the Bonus Wheel. Also adds 2 targets, which award a spin for each ball that passes through them. Point values on the wheel scale based on your upgrades.",
-				cost: 2000000,
-				visible_func: () => this.IsUnlocked("unlock_gold_balls"),
-				on_update: function() {
-					let unlocked = this.GetValue() > 0;
-					UpdateDisplay("bonus_wheel", unlocked ? "inline" : "none");
-					let spin_targets = this.machine.board.target_sets[1].targets;
-					console.assert(spin_targets.length == 3);
-					spin_targets[0].active = unlocked;
-					spin_targets[2].active = unlocked;
-					UpdateSpinCounter();
-					this.machine.bonus_wheel.UpdateAllSpaces();
-					state.redraw_targets = true;
-				}
-			})
-		);
-		upgrades_list.push(
-			new ToggleUnlockUpgrade({
-				machine: this,
-				id: "auto_spin",
-				name: "Auto-Spin",
-				category: "bonus_wheel",
-				description: "Automatically spin the Bonus Wheel.",
-				cost: 100000000,
-				visible_func: () => this.IsUnlocked("unlock_bonus_wheel"),
-				on_update: null
-			})
-		);
-		upgrades_list.push(
-			new ToggleUnlockUpgrade({
-				machine: this,
-				id: "multi_spin",
-				name: "Multi-Spin",
-				category: "bonus_wheel",
-				description:
-					"Uses 10% of your available spins at a time, multiplying any points you win from that spin. NOTE: Bonus gold ball drops are not multiplied.",
-				cost: 100000000,
-				visible_func: () => this.IsUnlocked("unlock_bonus_wheel"),
-				on_update: null
-			})
-		);
-		*/
 
 		let upgrades_map = {};
 		for (let i = 0; i < upgrades_list.length; ++i) {
@@ -1540,10 +1502,10 @@ class BumperMachine extends PachinkoMachine {
 			} else {
 				multiplier_text = FormatNumberMedium(hyper_mult);
 			}
-			return "All scoring \u00D7" + multiplier_text + " for " +
+			return "All scoring &times;" + multiplier_text + " for " +
 				duration_sec.toFixed(1) + " seconds!";
 		} else if (this.IsUnlocked("unlock_hyper_system")) {
-			return 'Score multiplier: \u00D71';
+			return 'Score multiplier: &times;1';
 		} else {
 			return "";
 		}
@@ -1600,7 +1562,7 @@ class BumperMachine extends PachinkoMachine {
 				}
 				let hyper_combo_value =
 					this.HyperComboValue(save_data.hyper_combo);
-				status_text += "! Multiplier \u00D7" +
+				status_text += "! Multiplier &times;" +
 					hyper_combo_value.toFixed(2);
 				UpdateInnerHTML("hyper_status", status_text);
 			} else {
@@ -1702,7 +1664,11 @@ class BumperMachine extends PachinkoMachine {
 			UpdateDisplay("spiral_power", "inline-block");
 			const kMaxSpiralPower = 5000;
 			const kMaxSpiralMultiplier = 10;
-			save_data.spiral_power *= 0.99;
+			if (this.overdrive && this.IsUnlocked("overdrive_fight_the_power")) {
+				save_data.spiral_power *= 0.995;
+			} else {
+				save_data.spiral_power *= 0.99;
+			}
 			const spiral_balls =
 				state.balls_by_type[kBumperMachineBallTypeIDs.SPIRAL];
 			for (let i = 0; i < spiral_balls.length; ++i) {
@@ -1710,6 +1676,8 @@ class BumperMachine extends PachinkoMachine {
 			}
 			let meter_fraction = save_data.spiral_power / kMaxSpiralPower;
 			if (!this.IsUnlocked("pierce_the_heavens")) {
+				// Allow an extra hidden 2% to be stored to offset future
+				// decay, but still cap the buff at 100%.
 				save_data.spiral_power =
 					Math.min(save_data.spiral_power, 1.02 * kMaxSpiralPower);
 				meter_fraction = Math.min(meter_fraction, 1.0);
@@ -1892,8 +1860,6 @@ class BumperMachine extends PachinkoMachine {
 	}
 
 	AwardPoints(base_value, ball) {
-		const kTimesSymbol = "\u00D7";
-
 		let color_rgb = this.PopupTextColorForBallType(ball.ball_type_index);
 		let popup_text_level = this.PopupTextLevelForBallType(ball.ball_type_index);
 		let popup_text_opacity =
@@ -1903,35 +1869,37 @@ class BumperMachine extends PachinkoMachine {
 		let total_value = base_value;
 
 		if (this.IsUnlocked("unlock_combos")) {
+			let combo_increment = 1;
+			if (
+				this.overdrive &&
+				this.HasBeachBallSpecial(ball.ball_type_index) &&
+				this.IsUnlocked("overdrive_tsunami_boost")
+			) {
+				combo_increment = 2;
+			}
 			let gp_system_unlocked = this.IsUnlocked("gp_system");
 			const combo_timeout_ms = this.combo_timeout * 1000;
 			if (
-				ball.combo == 0 ||
-				(
-					!this.HasBeachBallSpecial(ball.ball_type_index) &&
-					!this.HasRubberBandBallSpecial(ball.ball_type_index) &&
-					!this.HasSpiralBallSpecial(ball.ball_type_index) &&
-					ball.last_hit_time + combo_timeout_ms < state.current_time
-				)
+				!this.HasUltimateBallSpecial(ball.ball_type_index) &&
+				ball.last_hit_time + combo_timeout_ms < state.current_time
 			) {
-				ball.combo = 1;
-				ball.combo_bonus = gp_system_unlocked ? base_value : 0;
-			} else {
-				++ball.combo;
-				if (gp_system_unlocked) {
-					ball.combo_bonus += base_value;
-					total_value = ball.combo_bonus;
-				}
-				total_value *= ball.combo;
-				if (GetSetting("show_combos")) {
-					MaybeAddScoreText({
-						level: popup_text_level,
-						text: kTimesSymbol + ball.combo + " combo",
-						pos: new Point(ball.pos.x, ball.pos.y - 10),
-						color_rgb,
-						opacity: popup_text_opacity,
-					});
-				}
+				ball.combo = 0;
+				ball.combo_bonus = 0;
+			}
+			ball.combo += combo_increment;
+			if (gp_system_unlocked) {
+				ball.combo_bonus += base_value;
+				total_value = ball.combo_bonus;
+			}
+			total_value *= ball.combo;
+			if (ball.combo > 1 && GetSetting("show_combos")) {
+				MaybeAddScoreText({
+					level: popup_text_level,
+					text: "\u00D7" + ball.combo + " combo",
+					pos: new Point(ball.pos.x, ball.pos.y - 10),
+					color_rgb,
+					opacity: popup_text_opacity,
+				});
 			}
 			ball.last_hit_time = state.current_time;
 
@@ -1939,7 +1907,7 @@ class BumperMachine extends PachinkoMachine {
 				if (save_data.score_buff_duration > 0) {
 					total_value *= this.hyper_multiplier;
 					if (this.IsUnlocked("hyper_combo")) {
-						++save_data.hyper_combo;
+						save_data.hyper_combo += combo_increment;
 						this.CheckOverdrive();
 						save_data.stats.max_hyper_combo =
 							Math.max(save_data.hyper_combo, save_data.stats.max_hyper_combo);
@@ -2026,6 +1994,9 @@ class BumperMachine extends PachinkoMachine {
 				if (this.HasRubberBandBallSpecial(ball.ball_type_index)) {
 					let rubberband_value =
 						ball.bounces * this.rubberband_ball_value_percent;
+					if (this.overdrive && this.IsUnlocked("overdrive_bouncer_rabbit")) {
+						rubberband_value *= 2;
+					}
 					multiplier *= 1.0 + rubberband_value / 100.0;
 
 					save_data.stats.rubberband_ball_most_bounces = Math.max(
@@ -2068,9 +2039,23 @@ class BumperMachine extends PachinkoMachine {
 	ShouldDisplayGemstoneBallUpgrades() {
 		return this.IsMaxed("gold_ball_rate");
 	}
+	
+	ShouldDisplayUltimateBallUpgrades() {
+		return this.IsUnlocked("unlock_opal_balls") && this.IsMaxed("combo_timeout");
+	}
 
-	NumGemstoneBallsUnlocked() {
+	NumBallTypesInListUnlocked(list) {
 		let prev_unlocks = 0;
+		const ball_types = this.BallTypes();
+		for (let i = 0; i < list.length; ++i) {
+			if (this.IsBallTypeUnlocked(ball_types[list[i]])) {
+				++prev_unlocks;
+			}
+		}
+		return prev_unlocks;
+	}
+	
+	NumGemstoneBallsUnlocked() {
 		const kGemstoneBalls = [
 			kBumperMachineBallTypeIDs.RUBY,
 			kBumperMachineBallTypeIDs.SAPPHIRE,
@@ -2079,13 +2064,16 @@ class BumperMachine extends PachinkoMachine {
 			kBumperMachineBallTypeIDs.TURQUOISE,
 			kBumperMachineBallTypeIDs.AMETHYST,
 		];
-		const ball_types = this.BallTypes();
-		for (let i = 0; i < kGemstoneBalls.length; ++i) {
-			if (this.IsBallTypeUnlocked(ball_types[kGemstoneBalls[i]])) {
-				++prev_unlocks;
-			}
-		}
-		return prev_unlocks;
+		return this.NumBallTypesInListUnlocked(kGemstoneBalls);
+	}
+
+	NumUltimateBallsUnlocked() {
+		const kGemstoneBalls = [
+			kBumperMachineBallTypeIDs.BEACH_BALL,
+			kBumperMachineBallTypeIDs.RUBBER_BAND,
+			kBumperMachineBallTypeIDs.SPIRAL,
+		];
+		return this.NumBallTypesInListUnlocked(kGemstoneBalls);
 	}
 
 	GemstoneBallUnlockCost() {
@@ -2141,6 +2129,23 @@ class BumperMachine extends PachinkoMachine {
 		return 1 + level / 2.0;
 	}
 
+	UltimateBallUnlockCost() {
+		let prev_unlocks = this.machine.NumUltimateBallsUnlocked();
+		return this.machine.NthUltimateBallUnlockCost(prev_unlocks + 1);
+	}
+
+	NthUltimateBallUnlockCost(n) {
+		return 1e21 * Math.pow(100, n - 1);
+	}
+
+	UltimateBallRateCostFunc(level) {
+		return 1e21 * Math.pow(10, level);
+	}
+
+	UltimateBallRateValueFunc(level) {
+		return (level + 1) / 2.0;
+	}
+
 	HasBeachBallSpecial(ball_type_index) {
 		return ball_type_index == kBumperMachineBallTypeIDs.BEACH_BALL;
 	}
@@ -2151,6 +2156,12 @@ class BumperMachine extends PachinkoMachine {
 
 	HasSpiralBallSpecial(ball_type_index) {
 		return ball_type_index == kBumperMachineBallTypeIDs.SPIRAL;
+	}
+
+	HasUltimateBallSpecial(ball_type_index) {
+		return this.HasBeachBallSpecial(ball_type_index) ||
+			this.HasRubberBandBallSpecial(ball_type_index) ||
+			this.HasSpiralBallSpecial(ball_type_index);
 	}
 
 	HasOpalSpecial(ball_type_index) {
@@ -2239,7 +2250,7 @@ class BumperMachine extends PachinkoMachine {
 			return "Unlock Overdrive";
 		} else if (!this.IsUnlocked("unlock_opal_balls")) {
 			return "Unlock Opal Balls";
-		} else if (!this.IsUpgradeVisible("unlock_beach_balls")) {
+		} else if (!this.ShouldDisplayUltimateBallUpgrades()) {
 			return "Upgrade Combo Timeout to 5 seconds";
 		} else if (
 			!this.IsUnlocked("unlock_beach_balls") ||

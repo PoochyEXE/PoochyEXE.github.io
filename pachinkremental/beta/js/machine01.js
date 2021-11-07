@@ -348,7 +348,7 @@ class FirstMachine extends PachinkoMachine {
 	}
 
 	InitUpgrades() {
-		const kTimesSymbol = "\u00D7";
+		const kTimesSymbol = "&times;";
 		let upgrades_list = new Array();
 		upgrades_list.push(
 			new Upgrade({
@@ -1627,11 +1627,11 @@ class FirstMachine extends PachinkoMachine {
 		if (save_data.score_buff_duration > 0) {
 			let duration_sec =
 				Math.round(save_data.score_buff_duration / 1000.0);
-			return "All scoring \u00D7" +
+			return "All scoring &times;" +
 				FormatNumberMedium(save_data.score_buff_multiplier) +
 				" for " + duration_sec + " seconds!";
 		} else if (this.IsUnlocked("unlock_ruby_balls")) {
-			return 'Score multiplier: \u00D71';
+			return 'Score multiplier: &times;1';
 		} else {
 			return "";
 		}
