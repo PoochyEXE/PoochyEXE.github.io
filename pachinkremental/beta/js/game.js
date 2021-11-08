@@ -89,7 +89,7 @@ function UpdateScoreHistory(state) {
 
 function LoadActiveMachine(state) {
 	state.update_stats_panel = true;
-	state.update_upgrade_buttons = true;
+	state.update_upgrade_buttons_all = true;
 	state.update_upgrades = true;
 	state.update_buff_display = true;
 	state.redraw_all = true;
@@ -171,7 +171,10 @@ function InitState() {
 		reset_target_text: false,
 		update_stats_panel: true,
 		update_upgrades: true,
-		update_upgrade_buttons: true,
+		update_upgrade_buttons_all: true,
+		update_upgrade_buttons_text: true,
+		update_upgrade_buttons_enabled: true,
+		update_upgrade_buttons_visible: true,
 		update_buff_display: true,
 		enable_score_text: true,
 		auto_drop_cooldown: 1000.0,
@@ -334,7 +337,7 @@ function SwitchMachine(index) {
 	state.redraw_all = true;
 	state.update_stats_panel = true;
 	state.update_upgrades = true;
-	state.update_upgrade_buttons = true;
+	state.update_upgrade_buttons_all = true;
 	state.update_buff_display = true;
 	state.display_points = new_active_machine.GetSaveData().points;
 	state.wheel_popup_text.length = 0;
@@ -441,7 +444,7 @@ function CheckEvents() {
 function CheckShiftKeyToggle(event) {
 	if (state.holding_shift != event.shiftKey) {
 		state.holding_shift = event.shiftKey;
-		state.update_upgrade_buttons = true;
+		state.update_upgrade_buttons_text = true;
 	}
 }
 
@@ -487,8 +490,19 @@ function Update() {
 	if (state.update_upgrades) {
 		UpdateUpgrades(state);
 	}
-	if (state.update_upgrade_buttons && !IsCollapsed("upgrades")) {
-		UpdateUpgradeButtons(state);
+	if (!IsCollapsed("upgrades")) {
+		if (state.update_upgrade_buttons_all) {
+			UpdateUpgradeButtonsAll(state);
+		}
+		if (state.update_upgrade_buttons_text) {
+			UpdateUpgradeButtonsText(state);
+		}
+		if (state.update_upgrade_buttons_enabled) {
+			UpdateUpgradeButtonsEnabled(state);
+		}
+		if (state.update_upgrade_buttons_visible) {
+			UpdateUpgradeButtonsVisible(state);
+		}
 	}
 }
 

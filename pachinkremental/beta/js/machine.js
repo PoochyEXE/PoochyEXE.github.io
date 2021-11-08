@@ -123,7 +123,10 @@ class PachinkoMachine {
 		save_data.points += points;
 		state.score_history[0] += points;
 		state.update_stats_panel = true;
-		state.update_upgrade_buttons = true;
+		state.update_upgrade_buttons_enabled = true;
+		if (state.holding_shift) {
+			state.update_upgrade_buttons_text = true;
+		}
 	}
 
 	AddPointsForBallToStats(points, ball_type_index) {

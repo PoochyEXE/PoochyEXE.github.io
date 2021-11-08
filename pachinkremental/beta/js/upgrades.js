@@ -68,7 +68,7 @@ class Upgrade {
 
 	Update() {
 		this.on_update();
-		state.update_upgrade_buttons = true;
+		state.update_upgrade_buttons_all = true;
 	}
 
 	Buy() {
@@ -607,24 +607,42 @@ function UpgradeButtonHandler(elem) {
 	ActiveMachine(state).upgrades[upgrade_id].OnClick();
 }
 
-function UpdateUpgradeButtons(state) {
-	state.update_upgrade_buttons = false;
-
+function UpdateUpgradeButtonsText(state) {
+	state.update_upgrade_buttons_text = false;
 	const machine = ActiveMachine(state);
-
 	UpdateInnerHTML("next_upgrade_hint", machine.NextUpgradeHint());
-
 	for (let id in machine.upgrades) {
-		let upgrade = machine.upgrades[id];
+		const upgrade = machine.upgrades[id];
+		UpdateInnerHTML("button_upgrade_" + id, upgrade.GetText(state));
+	}
+}
+
+function UpdateUpgradeButtonsEnabled(state) {
+	state.update_upgrade_buttons_enabled = false;
+	const machine = ActiveMachine(state);
+	UpdateInnerHTML("next_upgrade_hint", machine.NextUpgradeHint());
+	for (let id in machine.upgrades) {
+		const upgrade = machine.upgrades[id];
 		let elem = document.getElementById("button_upgrade_" + id);
-		let html = upgrade.GetText(state);
-		if (elem.innerHTML != html) {
-			elem.innerHTML = html;
-		}
 		let disabled = !upgrade.ShouldEnableButton();
 		if (elem.disabled != disabled) {
 			elem.disabled = disabled;
 		}
+		if (disabled && GetSetting("maxed_upgrades") == 1 && upgrade.IsMaxed()) {
+			elem.classList.add("upgradeButtonMaxedShrink");
+		} else {
+			elem.classList.remove("upgradeButtonMaxedShrink");
+		}
+	}
+}
+
+function UpdateUpgradeButtonsVisible(state) {
+	state.update_upgrade_buttons_visible = false;
+	const machine = ActiveMachine(state);
+	UpdateInnerHTML("next_upgrade_hint", machine.NextUpgradeHint());
+	for (let id in machine.upgrades) {
+		const upgrade = machine.upgrades[id];
+		let elem = document.getElementById("button_upgrade_" + id);
 		let visible = upgrade.visible_func();
 		let display = visible ? "inline" : "none";
 		if (elem.style.display != display) {
@@ -640,11 +658,6 @@ function UpdateUpgradeButtons(state) {
 				}
 			}
 		}
-		if (disabled && GetSetting("maxed_upgrades") == 1 && upgrade.IsMaxed()) {
-			elem.classList.add("upgradeButtonMaxedShrink");
-		} else {
-			elem.classList.remove("upgradeButtonMaxedShrink");
-		}
 	}
 
 	for (let i = 0; i < state.upgrade_headers.length; ++i) {
@@ -652,6 +665,13 @@ function UpdateUpgradeButtons(state) {
 		let display = header.visible_func() ? "inline-block" : "none";
 		UpdateDisplay(header.id + "_upgrades_container", display);
 	}
+}
+
+function UpdateUpgradeButtonsAll(state) {
+	state.update_upgrade_buttons_all = false;
+	UpdateUpgradeButtonsText(state);
+	UpdateUpgradeButtonsEnabled(state);
+	UpdateUpgradeButtonsVisible(state);
 }
 
 function ShowUpgradeTooltip(elem) {

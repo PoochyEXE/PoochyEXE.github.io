@@ -418,7 +418,6 @@ class FirstMachine extends PachinkoMachine {
 				visible_func: () => this.GetUpgradeLevel("center_value") > 1,
 				on_update: () => {
 					state.redraw_auto_drop = true;
-					state.update_upgrade_buttons = true;
 				}
 			})
 		);

@@ -46,6 +46,7 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 ### v1.15.1-beta (2021-11-08)
 * Optimize the code for rendering Beach Balls and Rubber Band Balls.
+* Improve performance by being smarter about what parts of upgrade buttons need to be updated, instead of re-rendering everything every time something changes.
 
 ### v1.15.0-beta (2021-11-07)
 * 3 new Overdrive upgrades.

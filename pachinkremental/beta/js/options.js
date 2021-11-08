@@ -298,7 +298,7 @@ function ToggleNotation() {
 	if (state.save_file.options.notation >= kNotationOptions.length) {
 		state.save_file.options.notation = 0;
 	}
-	state.update_upgrade_buttons = true;
+	state.update_upgrade_buttons_text = true;
 	state.update_buff_display = true;
 	state.redraw_wheel = true;
 	state.reset_target_text = true;
@@ -316,7 +316,7 @@ function ToggleBooleanOption(id) {
 function ToggleShowUpgradeLevels() {
 	state.save_file.options.show_upgrade_levels =
 		!state.save_file.options.show_upgrade_levels;
-	state.update_upgrade_buttons = true;
+	state.update_upgrade_buttons_text = true;
 	UpdateOptionsButtons();
 }
 
@@ -325,7 +325,7 @@ function ToggleMaxedUpgrades() {
 	if (state.save_file.options.maxed_upgrades >= kMaxedUpgradesOptions.length) {
 		state.save_file.options.maxed_upgrades = 0;
 	}
-	state.update_upgrade_buttons = true;
+	state.update_upgrade_buttons_enabled = true;
 	UpdateOptionsButtons();
 }
 

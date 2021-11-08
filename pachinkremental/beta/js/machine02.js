@@ -821,7 +821,6 @@ class BumperMachine extends PachinkoMachine {
 				visible_func: () => this.GetUpgradeLevel("multiplier") > 1,
 				on_update: () => {
 					state.redraw_auto_drop = true;
-					state.update_upgrade_buttons = true;
 				}
 			})
 		);
@@ -1521,6 +1520,7 @@ class BumperMachine extends PachinkoMachine {
 			save_data.hyper_combo = 0;
 		}
 		state.update_buff_display = true;
+		state.update_upgrade_buttons_visible = true;
 	}
 
 	HyperComboValue(hyper_combo) {
@@ -1642,16 +1642,14 @@ class BumperMachine extends PachinkoMachine {
 
 	CheckOverdrive() {
 		let save_data = this.GetSaveData();
-		if (
-			save_data.score_buff_duration > 0 &&
-			save_data.hyper_combo >= 1000 &&
-			this.IsUnlocked("unlock_overdrive")
-		) {
-			if (!this.overdrive) {
-				this.ActivateOverdrive();
+		if (save_data.hyper_combo >= 1000) {
+			if (this.IsUnlocked("unlock_overdrive")) {
+				if (save_data.score_buff_duration > 0 && !this.overdrive) {
+					this.ActivateOverdrive();
+				}
+			} else {
+				state.update_upgrade_buttons_visible = true;
 			}
-		} else if (this.overdrive) {
-			this.DeactivateOverdrive();
 		}
 	}
 
@@ -1676,6 +1674,9 @@ class BumperMachine extends PachinkoMachine {
 			}
 			let meter_fraction = save_data.spiral_power / kMaxSpiralPower;
 			if (!this.IsUnlocked("pierce_the_heavens")) {
+				if (save_data.spiral_power > kMaxSpiralPower) {
+					state.update_upgrade_buttons_visible = true;
+				}
 				// Allow an extra hidden 2% to be stored to offset future
 				// decay, but still cap the buff at 100%.
 				save_data.spiral_power =
