@@ -655,7 +655,10 @@ function DrawHitRates(stats, target_sets, bumper_sets, ctx) {
 			}
 		}
 	}
-	UpdateInnerHTML("stats_hit_rates_balls_counted", FormatNumberLong(total_balls));
+	if (!IsCollapsed("stats")) {
+		let total_balls_text = FormatNumberLong(total_balls);
+		UpdateInnerHTML("stats_hit_rates_balls_counted", total_balls_text);
+	}
 
 	const kFontSize = 8;
 	const dark_mode = GetSetting("dark_mode");

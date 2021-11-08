@@ -1,4 +1,3 @@
-
 function InitStatsPanel(state) {
 	const ball_types = ActiveMachine(state).BallTypes();
 	let html = '';

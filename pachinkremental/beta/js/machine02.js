@@ -2040,7 +2040,7 @@ class BumperMachine extends PachinkoMachine {
 	ShouldDisplayGemstoneBallUpgrades() {
 		return this.IsMaxed("gold_ball_rate");
 	}
-	
+
 	ShouldDisplayUltimateBallUpgrades() {
 		return this.IsUnlocked("unlock_opal_balls") && this.IsMaxed("combo_timeout");
 	}
@@ -2055,7 +2055,7 @@ class BumperMachine extends PachinkoMachine {
 		}
 		return prev_unlocks;
 	}
-	
+
 	NumGemstoneBallsUnlocked() {
 		const kGemstoneBalls = [
 			kBumperMachineBallTypeIDs.RUBY,
