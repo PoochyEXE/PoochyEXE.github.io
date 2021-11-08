@@ -36,6 +36,19 @@ const kPrismaticSaturationOuter = 0.8;
 const kPrismaticSaturationInner = 0.25;
 const kPrismaticCycleDuration = 2000.0;
 
+// Cache Beach Ball colors.
+function InitBeachBallColors(saturation) {
+	const num_colors = kPrismaticCycleColors.length;
+	let colors = [];
+	for (let i = 0; i < num_colors; ++i) {
+		colors.push(GetPrismaticColor(i, num_colors, saturation, 1.0));
+	}
+	return colors;
+}
+
+const kBeachBallOuterColors = InitBeachBallColors(kPrismaticSaturationOuter);
+const kBeachBallInnerColors = InitBeachBallColors(kPrismaticSaturationInner);
+
 function GetPegColor() {
 	if (GetSetting("dark_mode") && !state.april_fools) {
 		return kPegColorDarkMode;
@@ -210,19 +223,15 @@ function DrawEightBallsNoGradient(balls, ctx) {
 }
 
 function DrawBeachBalls(balls, use_gradient, ctx) {
+	const kNumColors = kBeachBallOuterColors.length;
 	for (let i = 0; i < balls.length; ++i) {
-		let pos = balls[i].pos;
-		let rotation = balls[i].rotation;
-		for (let j = 0; j < kPrismaticCycleColors.length; ++j) {
-			let segment_rotation =
-				Math.PI * 2.0 * j / kPrismaticCycleColors.length - rotation;
-			outer_color = GetPrismaticColor(
-				j, 6.0, kPrismaticSaturationOuter, 1.0
-			);
+		const pos = balls[i].pos;
+		const rotation = balls[i].rotation;
+		for (let j = 0; j < kNumColors; ++j) {
+			const segment_rotation = Math.PI * 2.0 * j / kNumColors - rotation;
+			const outer_color = kBeachBallOuterColors[j];
 			if (use_gradient) {
-				inner_color = GetPrismaticColor(
-					j, 6.0, kPrismaticSaturationInner, 1.0
-				);
+				const inner_color = kBeachBallInnerColors[j];
 				ctx.fillStyle = CreateBallGradient(
 					ctx, pos, kBallRadius, inner_color, outer_color
 				);
@@ -245,19 +254,17 @@ function DrawBeachBalls(balls, use_gradient, ctx) {
 }
 
 function DrawRubberBandBalls(balls, use_gradient, ctx) {
+	const kNumColors = kRubberBandColorIndices.length;
 	for (let i = 0; i < balls.length; ++i) {
-		let pos = balls[i].pos;
-		let rotation = balls[i].rotation;
-		for (let j = 0; j < kRubberBandColorIndices.length; ++j) {
-			let segment_rotation =
-				Math.PI * kRubberBandLayerOrder[j] / kRubberBandColorIndices.length - rotation;
-			outer_color = GetPrismaticColor(
-				kRubberBandColorIndices[j], 6.0, kPrismaticSaturationOuter, 1.0
-			);
+		const pos = balls[i].pos;
+		const rotation = balls[i].rotation;
+		for (let j = 0; j < kNumColors; ++j) {
+			const segment_rotation =
+				Math.PI * kRubberBandLayerOrder[j] / kNumColors - rotation;
+			const color_index = kRubberBandColorIndices[j];
+			const outer_color = kBeachBallOuterColors[color_index];
 			if (use_gradient) {
-				inner_color = GetPrismaticColor(
-					kRubberBandColorIndices[j], 6.0, kPrismaticSaturationInner, 1.0
-				);
+				const inner_color = kBeachBallInnerColors[color_index];
 				ctx.fillStyle = CreateBallGradient(
 					ctx, pos, kBallRadius, inner_color, outer_color
 				);

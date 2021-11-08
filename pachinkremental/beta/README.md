@@ -44,6 +44,9 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
+### v1.15.1-beta (2021-11-08)
+* Optimize the code for rendering Beach Balls and Rubber Band Balls.
+
 ### v1.15.0-beta (2021-11-07)
 * 3 new Overdrive upgrades.
 * Spiral Balls now glow green when they generate Spiral Power. The more Spiral Power they're generating, the stronger the glow.
