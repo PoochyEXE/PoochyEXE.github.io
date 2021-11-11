@@ -44,6 +44,9 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
+### v2.0.2-beta (2021-11-11)
+* Fix a bug where save file corruption could cause an upgrade to display as "Unlocked!" when it hasn't been purchased yet.
+
 ### v2.0.1 (2021-11-11)
 * Adjust buttons for Rubber Band Balls and Spiral Balls to make the text more readable.
 

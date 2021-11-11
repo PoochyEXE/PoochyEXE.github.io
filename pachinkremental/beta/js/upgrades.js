@@ -270,10 +270,10 @@ class FeatureUnlockUpgrade extends Upgrade {
 
 	GetText(state) {
 		let result = "<b>" + this.name + "</b><br>";
-		if (this.GetLevel() == 0) {
-			return "<b>" + this.name + "</b><br>Cost: " + FormatNumberMedium(this.cost_func());
-		} else {
+		if (this.GetLevel() > 0) {
 			return "<b>" + this.unlocked_name + "</b><br>Unlocked!";
+		} else {
+			return "<b>" + this.name + "</b><br>Cost: " + FormatNumberMedium(this.cost_func());
 		}
 		return result;
 	}
