@@ -80,6 +80,9 @@ class Upgrade {
 		if (this.IsMaxed()) {
 			return false;
 		}
+		if (!save_data.upgrade_levels[this.id]) {
+			save_data.upgrade_levels[this.id] = 0;
+		}
 		let new_level = ++save_data.upgrade_levels[this.id];
 		save_data.points -= cost;
 		this.Update();

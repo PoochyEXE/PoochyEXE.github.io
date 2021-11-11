@@ -44,6 +44,9 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
+### v2.0.3 (2021-11-11)
+* Fix another bug where save file corruption could cause break an upgrade button, and clicking it would spend the points without actually buying the upgrade.
+
 ### v2.0.2 (2021-11-11)
 * Fix a bug where save file corruption could cause an upgrade to display as "Unlocked!" when it hasn't been purchased yet.
 
