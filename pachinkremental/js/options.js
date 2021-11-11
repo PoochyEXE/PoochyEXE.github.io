@@ -1,40 +1,7 @@
 const kQualityOptions = ["High", "Medium", "Low"];
-const kPopupTextOptions = [
-	"Enable All",
-	"Gold+ only",
-	"Gemstone+ only",
-	"8-Ball+ only",
-	"Disable All",
-];
-const kAprilFoolsOptions = [
-	"Disabled",
-	"Always On",
-	"Enabled",
-];
-const kIsLiveVersion = true;
-const kLiveSaveFileName = "save_file";
-const kBetaSaveFileName = "beta_save_file";
-const kSaveFileVersion = 4;
-const kSaveFileName = kIsLiveVersion ? kLiveSaveFileName : kBetaSaveFileName;
-
-const kPrevSaveFileVersions = [
-	// 0
-	// There was never a version 0, since 0 is falsey in JS and I want
-	// "!save_file.game_version" to imply a save file is corrupted.
-	null,
-
-	// 1
-	{
-		archive_id: null,
-		last_version: "v0.6.2 beta",
-	},
-
-	// 2
-	{
-		archive_id: "beta_0",
-		last_version: "v0.12.2 beta",
-	},
-];
+const kAprilFoolsOptions = ["Disabled", "Always On", "Enabled"];
+const kMaxedUpgradesOptions = ["Full Size", "Shrink"];
+const kNotationOptions = ["English", "Scientific", "Engineering", "漢字"];
 
 class ColorSchemeClassMapping {
 	constructor(base_class, light_class, dark_class) {
@@ -50,10 +17,12 @@ const kColorSchemeClasses = [
 	new ColorSchemeClassMapping("messageBox", "messageBoxLight", "messageBoxDark"),
 	new ColorSchemeClassMapping("upgradesContainer", "upgradesContainerLight", "upgradesContainerDark"),
 	new ColorSchemeClassMapping("upgradesSubContainer", "upgradesSubContainerLight", "upgradesSubContainerDark"),
+	new ColorSchemeClassMapping("machinesContainer", "machinesContainerLight", "machinesContainerDark"),
 	new ColorSchemeClassMapping("statsContainer", "statsContainerLight", "statsContainerDark"),
 	new ColorSchemeClassMapping("optionsContainer", "optionsContainerLight", "optionsContainerDark"),
 	new ColorSchemeClassMapping("upgradesHeader", "upgradesHeaderLight", "upgradesHeaderDark"),
 	new ColorSchemeClassMapping("upgradesSubHeader", "upgradesSubHeaderLight", "upgradesSubHeaderDark"),
+	new ColorSchemeClassMapping("machinesHeader", "machinesHeaderLight", "machinesHeaderDark"),
 	new ColorSchemeClassMapping("statsHeader", "statsHeaderLight", "statsHeaderDark"),
 	new ColorSchemeClassMapping("optionsHeader", "optionsHeaderLight", "optionsHeaderDark"),
 	new ColorSchemeClassMapping("upgradeButton", "upgradeButtonLight", "upgradeButtonDark"),
@@ -64,86 +33,115 @@ const kColorSchemeClasses = [
 	new ColorSchemeClassMapping("turquoiseUpgradeButton", "turquoiseUpgradeButtonLight", "turquoiseUpgradeButtonDark"),
 	new ColorSchemeClassMapping("amethystUpgradeButton", "amethystUpgradeButtonLight", "amethystUpgradeButtonDark"),
 	new ColorSchemeClassMapping("opalUpgradeButton", "opalUpgradeButtonLight", "opalUpgradeButtonDark"),
+	new ColorSchemeClassMapping("opalStaticUpgradeButton", "opalStaticUpgradeButtonLight", "opalStaticUpgradeButtonDark"),
 	new ColorSchemeClassMapping("eightBallUpgradeButton", "eightBallUpgradeButtonLight", "eightBallUpgradeButtonDark"),
 	new ColorSchemeClassMapping("beachBallUpgradeButton", "beachBallUpgradeButtonLight", "beachBallUpgradeButtonDark"),
+	new ColorSchemeClassMapping("rubberBandBallUpgradeButton", "rubberBandBallUpgradeButtonLight", "rubberBandBallUpgradeButtonDark"),
+	new ColorSchemeClassMapping("spiralBallUpgradeButton", "spiralBallUpgradeButtonLight", "spiralBallUpgradeButtonDark"),
+	new ColorSchemeClassMapping("machineButton", "machineButtonLight", "machineButtonDark"),
+	new ColorSchemeClassMapping("statsButton", "statsButtonLight", "statsButtonDark"),
 	new ColorSchemeClassMapping("optionButton", "optionButtonLight", "optionButtonDark"),
 	new ColorSchemeClassMapping("optionButtonRed", "optionButtonRedLight", "optionButtonRedDark"),
 	new ColorSchemeClassMapping("modalContent", "modalContentLight", "modalContentDark"),
 	new ColorSchemeClassMapping("modalCloseButton", "modalCloseButtonLight", "modalCloseButtonDark"),
 	new ColorSchemeClassMapping("prismaticText", "prismaticTextLight", "prismaticTextDark"),
 	new ColorSchemeClassMapping("speedrunTimerCompleted", "speedrunTimerCompletedLight", "speedrunTimerCompletedDark"),
+	new ColorSchemeClassMapping("speedrunTimerSplit", "speedrunTimerSplitLight", "speedrunTimerSplitDark"),
 	new ColorSchemeClassMapping("exportedSave", "exportedSaveLight", "exportedSaveDark"),
 ];
 
-function AutoPickFavicon() {
-	for (let i = kBallTypes.length - 1; i > 0; --i) {
-		if (IsUnlocked("unlock_" + kBallTypes[i].name + "_balls")) {
-			return kBallTypes[i].name;
-		}
+function GetSetting(id) {
+	if (!state) {
+		return undefined;
 	}
-	return kBallTypes[0].name;
+	return state.save_file.options[id];
 }
 
-function UpdateFavicon() {
-	let id = state.save_file.options.favicon;
-	let name = (id < 0) ? AutoPickFavicon() : kBallTypes[id].name;
+function AutoPickFavicon(state) {
+	const machine = ActiveMachine(state);
+	const ball_types = machine.BallTypes();
+	for (let i = ball_types.length - 1; i > 0; --i) {
+		if (machine.IsBallTypeUnlocked(ball_types[i])) {
+			return ball_types[i].name;
+		}
+	}
+	return ball_types[0].name;
+}
+
+function UpdateFavicon(state) {
+	const machine = ActiveMachine(state);
+	const id = machine.GetSetting("favicon");
+	const ball_types = machine.BallTypes();
+	const name = (id >= 0 && id < ball_types.length) ? ball_types[id].name : AutoPickFavicon(state);
 	document.getElementById("favicon").href = "favicon/" + name + ".png";
 }
 
 function UpdateFaviconChoice(elem) {
-	state.save_file.options.favicon = parseInt(elem.value);
-	UpdateFavicon();
+	ActiveMachine(state).GetSaveData().options.favicon = parseInt(elem.value);
+	UpdateFavicon(state);
 }
 
 function UpdateBallOpacity(elem) {
-	state.save_file.options[elem.id] = elem.value;
+	ActiveMachine(state).GetSaveData().options[elem.id] = elem.value;
 }
 
-function UpdateOpacitySlidersFromSaveFile(save_file) {
-	for (let i = 0; i < kBallTypes.length; ++i) {
-		let id = kBallTypes[i].name + "_ball_opacity";
+function UpdateOpacitySlidersFromSaveFile(state) {
+	const machine = ActiveMachine(state);
+	const ball_types = machine.BallTypes();
+	for (let i = 0; i < ball_types.length; ++i) {
+		let id = ball_types[i].name + "_ball_opacity";
 		let elem = document.getElementById(id);
-		elem.value = save_file.options[id];
+		elem.value = machine.GetSetting(id);
 	}
 }
 
-function UpdateFaviconChoiceFromSaveFile(save_file) {
-	let index = parseInt(save_file.options.favicon);
+function UpdateFaviconChoiceFromSaveFile(state) {
+	const machine = ActiveMachine(state);
+	const ball_types = machine.BallTypes();
+	let index = parseInt(machine.GetSetting("favicon"));
 	let id = "auto_favicon";
 	if (index >= 0) {
-		id = kBallTypes[index].name + "_favicon";
+		id = ball_types[index].name + "_favicon";
 	}
 	let elem = document.getElementById(id);
 	elem.checked = true;
 }
 
+function PopupTextOpacityForBallType(ball_type_index) {
+	if (GetSetting("apply_opacity_to_popup_text")) {
+		const machine = ActiveMachine(state);
+		const ball_type_name = machine.BallTypes()[ball_type_index].name;
+		return machine.GetSetting(ball_type_name + "_ball_opacity") / 100.0;
+	} else {
+		return 1.0;
+	}
+}
+
 function InitOptions(state) {
-	let opacity_div = document.getElementById("options_opacity");
+	const ball_types = ActiveMachine(state).BallTypes();
 	let html = "<b>Opacity:</b>";
-	for (let i = 0; i < kBallTypes.length; ++i) {
-		let id = kBallTypes[i].name + "_ball_opacity";
-		let display_name = kBallTypes[i].display_name + "Balls"
+	for (let i = 0; i < ball_types.length; ++i) {
+		let id = ball_types[i].name + "_ball_opacity";
+		let display_name = ball_types[i].display_name + "Balls"
 		let default_display = (i > 0) ? "none" : "block";
 		html += '<div id="' + id + '_wrapper" class="opacitySlider" ';
 		html += 'style="display: ' + default_display + ';">';
 		html += '<input type="range" min="0" max="100" step="5" ';
-		html += 'onchange="UpdateBallOpacity(this)" ';
-		html += 'value="' + state.save_file.options[id] + '" ';
+		html += 'onchange="UpdateBallOpacity(this)" value="100" ';
 		html += 'id="' + id + '" name="' + id + '">';
 		html += '<label for="' + id + '">' + display_name + '</label>';
-		if (kBallTypes[i].name == "opal") {
+		if (ball_types[i].name == "opal") {
 			html += '&nbsp;<button type="button" class="optionButton" id="button_classic_opal_balls" onclick="ToggleBooleanOption(\'classic_opal_balls\')">Opal Balls</button>'
 		}
 		html += '</div>';
 	}
-	opacity_div.innerHTML = html;
-	
-	let icon_div = document.getElementById("options_favicon");
+	UpdateInnerHTML("options_opacity", html);
+
 	html = "<b>Favicon:</b>";
-	for (let i = -1; i < kBallTypes.length; ++i) {
-		let id = (i < 0) ? "auto_favicon" : kBallTypes[i].name + "_favicon";
+	for (let i = -1; i < ball_types.length; ++i) {
+		let id = (i < 0) ? "auto_favicon" : ball_types[i].name + "_favicon";
 		let display_name =
-			(i < 0) ? "Auto" : kBallTypes[i].display_name + "Ball";
+			(i < 0) ? "Auto" : ball_types[i].display_name + "Ball";
 		let default_display = (i > 0) ? "none" : "block";
 		html += '<div id="' + id + '_wrapper" class="iconOption" ';
 		html += 'style="display: ' + default_display + ';">';
@@ -154,136 +152,7 @@ function InitOptions(state) {
 		html += '<label for="' + id + '">' + display_name + '</label>';
 		html += '</div>';
 	}
-	icon_div.innerHTML = html;
-}
-
-function SaveFileToString(state) {
-	let inner_data = JSON.stringify(state.save_file);
-	return btoa(JSON.stringify([inner_data, SaveFileChecksum(inner_data)]));
-}
-
-function SaveFileFromString(save_file_str) {
-	if (!save_file_str) {
-		return null;
-	}
-	try {
-		let outer_data = JSON.parse(atob(save_file_str));
-		if (SaveFileChecksum(outer_data[0]) != outer_data[1]) {
-			return null;
-		}
-		return JSON.parse(outer_data[0]);
-	} catch (error) {
-		console.error("Could not parse save file: " + save_file_str);
-		return null;
-	}
-}
-
-function SaveToLocalStorage() {
-	localStorage.setItem(kSaveFileName, SaveFileToString(state));
-	state.notifications.push(new Notification("Game saved", "#8F8"));
-}
-
-function LoadGame(save_file_str) {
-	let load_save = SaveFileFromString(save_file_str);
-	if (load_save && load_save.game_version) {
-		if (kIsLiveVersion && load_save.is_beta) {
-			state.notifications.push(
-				new Notification(
-					"Error: Beta version save files are incompatible with the live version.",
-					"#F88"
-				)
-			);
-			return;
-		}
-		if (load_save.game_version > kSaveFileVersion) {
-			state.notifications.push(
-				new Notification(
-					"Error: Save file appears to be from an incompatible future version.",
-					"#F88"
-				)
-			);
-			return;
-		}
-		if (load_save.game_version < 3) {
-			ArchiveSaveFile(2, save_file_str);
-			const kVer3UpgradeMessage =
-				"<b>Pachinkremental is out of beta!</b><br><br>Unfortunately, save files from the beta are not compatible with the new version, but you can continue playing v0.12.2 beta using your previous save file if you want. (You can also retrieve this archived save file from the Options menu.)"
-			ExportArchivedSave(2, kVer3UpgradeMessage);
-			return;
-		}
-		default_state = InitState();
-		state.save_file = { ...default_state.save_file, ...load_save };
-		state.save_file.stats = {
-			...default_state.save_file.stats,
-			...load_save.stats
-		};
-		state.save_file.upgrade_levels = {
-			...default_state.save_file.upgrade_levels,
-			...load_save.upgrade_levels
-		};
-		state.save_file.options = {
-			...default_state.save_file.options,
-			...load_save.options
-		};
-		state.save_file.game_version = kSaveFileVersion;
-		state.display_score = state.save_file.stats.total_score;
-		state.display_points = state.save_file.points;
-		state.update_upgrade_buttons = true;
-		state.update_buff_display = true;
-		state.bonus_wheel = default_state.bonus_wheel;
-		state.redraw_wheel = true;
-		for (let i = 0; i < state.balls_by_type.length; ++i) {
-			state.balls_by_type[i].length = 0;
-		}
-		for (let id in state.upgrades) {
-			state.upgrades[id].Update();
-		}
-		if (state.save_file.stats.total_score > 0) {
-			UpdateScoreDisplay(state, /*forceUpdate=*/ true);
-		}
-		if (state.save_file.stats.max_buff_multiplier < state.save_file.score_buff_multiplier) {
-			state.save_file.stats.max_buff_multiplier = state.save_file.score_buff_multiplier;
-		}
-		if (!kIsLiveVersion) {
-			state.save_file.is_beta = true;
-		}
-		UpdateBuffDisplay();
-		UpdateUpgradeButtons(state);
-		UpdateOptionsButtons();
-		UpdateAutoSaveInterval();
-		UpdateDarkMode();
-		UpdateFavicon();
-		UpdateOpacitySlidersFromSaveFile(state.save_file);
-		UpdateFaviconChoiceFromSaveFile(state.save_file);
-		state.notifications.push(new Notification("Game loaded", "#8F8"));
-	} else {
-		state.notifications.push(
-			new Notification(
-				"Error: Save file appears to be corrupted!",
-				"#F88"
-			)
-		);
-	}
-}
-
-function LoadFromLocalStorage() {
-	let save_file_str = localStorage.getItem(kSaveFileName);
-	if (save_file_str) {
-		LoadGame(save_file_str);
-	} else if (!kIsLiveVersion) {
-		DisplayBetaIntro();
-	}
-}
-
-function ImportSave() {
-	let save_file_str = prompt(
-		"Paste your save file below.\nCAUTION: This will overwrite your current save file!",
-		""
-	);
-
-	if (save_file_str != null && save_file_str != "") {
-		LoadGame(save_file_str);
-	}
+	UpdateInnerHTML("options_favicon", html);
 }
 
 function CloseModal(id) {
@@ -313,7 +182,7 @@ function ResizeModals() {
 		content_elem.style.maxWidth = content_width + "px";
 		content_elem.style.maxHeight = content_height + "px";
 	}
-	
+
 	// Save file export modal
 	let header_height = document.getElementById("export_message").offsetHeight;
 	let exported_save_elem = document.getElementById("exported_save");
@@ -322,102 +191,8 @@ function ResizeModals() {
 		(content_height - kPadding * 2 - header_height - 15) + "px";
 }
 
-function ArchiveSaveFile(save_file_ver, save_file_str) {
-	let ver_info = kPrevSaveFileVersions[save_file_ver];
-	let save_file_id = ver_info.archive_id + "_archived_save_file";
-	localStorage.setItem(save_file_id, save_file_str);
-}
-
-function ExportArchivedSave(save_file_ver, message_prefix) {
-	let ver_info = kPrevSaveFileVersions[save_file_ver];
-	let export_message = "";
-	if (message_prefix) {
-		export_message = message_prefix + "<br><br>";
-	}
-	export_message +=
-		"Your archived save file for <b>" + ver_info.last_version +
-		"</b> is below. Copy the text and keep it someplace safe."
-	export_message +=
-		'<br>You can import this save file into the corresponding archived version of the game. See the <a href="https://github.com/PoochyEXE/PoochyEXE.github.io/tree/main/pachinkremental#archived-versions" target="_blank" rel="noopener noreferrer">manual</a> for a list of archived versions.'
-	UpdateInnerHTML("export_message", export_message);
-	let export_textarea = document.getElementById("exported_save");
-	let save_file_id = ver_info.archive_id + "_archived_save_file";
-	export_textarea.innerHTML = localStorage.getItem(save_file_id);
-	export_textarea.focus();
-	export_textarea.select();
-	document.getElementById("export_save_modal").style.display = "block";
-	ResizeModals();
-}
-
-function DisplayBetaIntro() {
-	let message =
-		'<b>Welcome to the beta version of Pachinkremental!</b><br><br>' +
-		'Beta version save files are separate from the live version.<br><br>' +
-		'<span class="warning">CAUTION: Beta save files may occasionally be wiped or archived!</span><br><br>' +
-		'You can import a live version save into the beta, but <span class="warning">beta version saves cannot be imported back into the live version.</span><br><br>' +
-		'For your convenience, your save file from the live version is below.';
-	UpdateInnerHTML("export_message", message);
-	let export_textarea = document.getElementById("exported_save");
-	export_textarea.innerHTML = localStorage.getItem(kLiveSaveFileName);
-	export_textarea.focus();
-	export_textarea.select();
-	document.getElementById("export_save_modal").style.display = "block";
-	ResizeModals();
-}
-
-function DisplayArchivedSaveFileButtons() {
-	let html = ""
-	for (let i = 1; i < kPrevSaveFileVersions.length; ++i) {
-		let ver_info = kPrevSaveFileVersions[i];
-		if (!ver_info) {
-			continue;
-		}
-		if (!ver_info.archive_id) {
-			continue;
-		}
-		let save_file_id = ver_info.archive_id + "_archived_save_file";
-		if (!localStorage.getItem(save_file_id)) {
-			continue;
-		}
-		html += '<button type="button" class="optionButton" ';
-		html += 'id="button_export_archived_save_file_' + i + '" ';
-		html += 'onclick="ExportArchivedSave(' + i + ')">';
-		html += 'Export archived save file (' + ver_info.last_version + ')';
-		html += '</button>';
-	}
-	UpdateInnerHTML("options_archived_save_files", html);
-}
-
-function ExportSave() {
-	UpdateInnerHTML(
-		"export_message",
-		"Your save file is below. Copy the text and keep it someplace safe."
-	);
-	let export_textarea = document.getElementById("exported_save");
-	export_textarea.innerHTML = SaveFileToString(state);
-	export_textarea.focus();
-	export_textarea.select();
-	document.getElementById("export_save_modal").style.display = "block";
-	ResizeModals();
-}
-
-function EraseSave() {
-	const kCaution =
-		"\u26A0 CAUTION!! \u26A0 CAUTION!! \u26A0 CAUTION!! \u26A0 CAUTION!! \u26A0 CAUTION!! \u26A0\n\n";
-	let answer = prompt(
-		kCaution +
-			"This will erase all your progress and restart the game from scratch!\n\n" +
-			kCaution +
-			'\nIf you are really sure, type "DELETE" in all caps below, then click OK.',
-		""
-	);
-	if (answer == "DELETE") {
-		localStorage.removeItem(kSaveFileName);
-		location.reload();
-	}
-}
-
 function UpdateOptionsButtons() {
+	const machine = ActiveMachine(state);
 	UpdateInnerHTML("button_auto_save",
 		"Auto Save: " + (state.save_file.options.auto_save_enabled ? "ON" : "OFF"));
 	UpdateInnerHTML("button_quality",
@@ -425,15 +200,54 @@ function UpdateOptionsButtons() {
 	UpdateInnerHTML("button_dark_mode",
 		"Dark Mode: " + (state.save_file.options.dark_mode ? "ON" : "OFF"));
 	UpdateInnerHTML("button_popup_text",
-		"Pop-up text: " + kPopupTextOptions[state.save_file.options.display_popup_text]);
+		"Pop-up text: " + machine.CurrentPopupTextOptionName());
 	UpdateInnerHTML("button_upgrade_levels_bought",
 		"Upgrade levels bought: " + (state.save_file.options.show_upgrade_levels ? "Show" : "Hide"));
+	UpdateInnerHTML("button_maxed_upgrades",
+		"Maxed upgrades: " + kMaxedUpgradesOptions[state.save_file.options.maxed_upgrades]);
 	UpdateInnerHTML("button_april_fools",
-		"April Fools: " + kAprilFoolsOptions[state.save_file.options.april_fools_enabled]);
+		"April Fools: " + kAprilFoolsOptions[GetSetting("april_fools_enabled")]);
 	UpdateInnerHTML("button_classic_opal_balls",
 		"Style: " + (state.save_file.options.classic_opal_balls ? "Classic" : "Default"));
-	UpdateInnerHTML("button_scientific_notation",
-		"Scientific Notation: " + (state.save_file.options.scientific_notation ? "ON" : "OFF"));
+	UpdateDisplay("button_opal_balls_upgrades_style",
+		ActiveMachine(state).IsUpgradeVisible("unlock_opal_balls") ? "inline" : "none");
+	UpdateInnerHTML("button_opal_balls_upgrades_style",
+		"Opal ball upgrade button style: " + (state.save_file.options.static_opal_ball_upgrade_buttons ? "Static" : "Default"));
+	UpdateInnerHTML("button_notation",
+		"Notation: " + kNotationOptions[GetSetting("notation")]);
+	UpdateInnerHTML("button_apply_opacity_to_popup_text",
+		"Apply opacity settings to pop-up text: " + (state.save_file.options.apply_opacity_to_popup_text ? "ON" : "OFF"));
+	UpdateDisplay("button_show_combos",
+		ActiveMachine(state).IsUnlocked("unlock_combos") ? "inline" : "none");
+	UpdateInnerHTML("button_show_combos",
+		"Show combos: " + (state.save_file.options.show_combos ? "ON" : "OFF"));
+}
+
+function ToggleOpalBallUpgradesStyle() {
+	state.save_file.options.static_opal_ball_upgrade_buttons = !state.save_file.options.static_opal_ball_upgrade_buttons;
+	UpdateOpalBallUpgradesStyle();
+	UpdateOptionsButtons();
+}
+
+function UpdateOpalBallUpgradesStyle() {
+	const kClasses = [
+		["opalUpgradeButton", "opalStaticUpgradeButton"],
+		["opalUpgradeButtonLight", "opalStaticUpgradeButtonLight"],
+		["opalUpgradeButtonDark", "opalStaticUpgradeButtonDark"],
+	];
+
+	const from_index = state.save_file.options.static_opal_ball_upgrade_buttons ? 0 : 1;
+	const to_index = 1 - from_index;
+	for (let i = 0; i < kClasses.length; ++i) {
+		const from_class = kClasses[i][from_index];
+		const to_class = kClasses[i][to_index];
+		let elems = document.getElementsByClassName(from_class);
+		for (let j = elems.length - 1; j >= 0; --j) {
+			let elem = elems[j];
+			elem.classList.add(to_class);
+			elem.classList.remove(from_class);
+		}
+	}
 }
 
 function UpdateAutoSaveInterval() {
@@ -459,21 +273,7 @@ function ToggleAutoSave() {
 }
 
 function TogglePopupText() {
-	++state.save_file.options.display_popup_text;
-	if (
-		state.save_file.options.display_popup_text == 1 &&
-		!IsUnlocked("unlock_gold_balls")
-	) {
-		state.save_file.options.display_popup_text = kPopupTextOptions.length - 1;
-	} else if (
-		state.save_file.options.display_popup_text == 2 &&
-		!AnyTier1GemstoneBallsUnlocked()
-	) {
-		state.save_file.options.display_popup_text = kPopupTextOptions.length - 1;
-	}
-	if (state.save_file.options.display_popup_text >= kPopupTextOptions.length) {
-		state.save_file.options.display_popup_text = 0;
-	}
+	ActiveMachine(state).TogglePopupText();
 	UpdateOptionsButtons();
 }
 
@@ -493,16 +293,18 @@ function ToggleDarkMode() {
 	UpdateOptionsButtons();
 }
 
-function ToggleScientificNotation(id) {
-	state.save_file.options.scientific_notation =
-		!state.save_file.options.scientific_notation;
-	state.update_upgrade_buttons = true;
+function ToggleNotation() {
+	++state.save_file.options.notation;
+	if (state.save_file.options.notation >= kNotationOptions.length) {
+		state.save_file.options.notation = 0;
+	}
+	state.update_upgrade_buttons_text = true;
+	state.update_buff_display = true;
 	state.redraw_wheel = true;
+	state.reset_target_text = true;
 	state.redraw_targets = true;
 	state.update_stats_panel = true;
-	UpdateUpgradeButtons(state);
 	UpdateSpinCounter();
-	UpdateBuffDisplay();
 	UpdateOptionsButtons();
 }
 
@@ -511,11 +313,19 @@ function ToggleBooleanOption(id) {
 	UpdateOptionsButtons();
 }
 
-function ToggleShowUpgradeLevels(id) {
+function ToggleShowUpgradeLevels() {
 	state.save_file.options.show_upgrade_levels =
 		!state.save_file.options.show_upgrade_levels;
-	state.update_upgrade_buttons = true;
-	UpdateUpgradeButtons(state);
+	state.update_upgrade_buttons_text = true;
+	UpdateOptionsButtons();
+}
+
+function ToggleMaxedUpgrades() {
+	++state.save_file.options.maxed_upgrades;
+	if (state.save_file.options.maxed_upgrades >= kMaxedUpgradesOptions.length) {
+		state.save_file.options.maxed_upgrades = 0;
+	}
+	state.update_upgrade_buttons_enabled = true;
 	UpdateOptionsButtons();
 }
 
@@ -524,5 +334,6 @@ function ToggleAprilFools() {
 	if (state.save_file.options.april_fools_enabled >= kAprilFoolsOptions.length) {
 		state.save_file.options.april_fools_enabled = 0;
 	}
+	state.april_fools = IsAprilFoolsActive();
 	UpdateOptionsButtons();
 }

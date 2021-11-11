@@ -24,6 +24,10 @@ Once you upgrade your auto-drop delay, the drop zone will stop turning red, to a
 
 A: This is intentional, both to make sure the game won't softlock with too many balls clogging up the board and to avoid draining batteries by making the collision detection code too performance-intensive. If you really must, pretend this is a very deep board and the balls are passing in front of or behind each other.
 
+### Q: Will there be a Prestige/New Game+ mechanic?
+
+A: I'm not saying it'll never happen, but I currently have no plans to add a prestige mechanic. I designed this game around discovering new features and mechanics as the main fun factor, drawing inspiration from games like Candy Box. I've yet to come up with a way to fit a prestige mechanic into that vision. But if you have ideas, I'll gladly listen.
+
 ## Known issues
 
 * Making the window too narrow can break some CSS and make the menu UI ugly.
@@ -39,6 +43,41 @@ I plan to archive the last version before any update that significantly nerfs pr
 ## Changelog
 
 **Caution: Spoilers below!**
+
+### v2.0.0 (2021-11-11)
+* **Major new feature: A second machine!**
+* Minor nerf: Rate-limit manual drops so that hypertapping/mashing the mouse button doesn't become the optimal strategy.
+* QoL improvements:
+	* Hold Shift to buy as many levels of an upgrade as you can, in one click.
+	* Add alternate non-animated style for Opal ball upgrade buttons, toggleable in the options.
+	* Shrink buttons for maxed upgrades, with an option to revert to the old behavior and keep them at full size.
+	* Save file now saves which collapsible headers are collapsed, and will restore them to their previous state when loading or switching between machines.
+	* Adjust pop-up text color when buying Point Multiplier upgrade in dark mode.
+	* Add option to apply opacity settings to pop-up text.
+	* Add engineering and 漢字 (Japanese kanji) notations.
+	* Add extra protections against save file corruption.
+	* Minor improvements to the way the game handles a corrupted save file.
+* Stats panel improvements:
+	* Add stats to track points scored by each ball type, both all-time and in the last 5/15/60 seconds.
+	* Add toggle in stats panel to show how often each target or slot is hit.
+	* Show time since save file was started and time taken (since the save file was started) to max each machine.
+	* Add stats for longest-lasting Beach Ball and most rotations by a Beach Ball.
+* Massive under-the-hood refactor of the game engine, including plenty of performance optimizations:
+	* Optimize the physics engine to reduce memory churn there.
+	* Use object pooling to reduce memory churn further.
+	* Optimize the code for rendering Beach Balls, in particular caching the color palette.
+	* Improve performance by being smarter about what parts of upgrade buttons need to be updated, instead of re-rendering everything every time something changes.
+* Bug fixes:
+	* Require buying Better Ball Drops 2 before showing Better Ball Drops 3, and likewise buying 3 before showing 4.
+	* Fix Auto-Spin making the "Spin the wheel!" button flicker.
+	* Fix upgrade tooltips sometimes going partially off-screen.
+* Other minor adjustments:
+	* Add invisible walls above the sides of the board, so that if a ball bounces wildly off a bumper and over one of the top corner pegs, it'll bounce back into play instead of simply despawning due to going out of bounds.
+	* Keep the board on-screen when scrolling down, if enough headers are expanded to exceed the height of the screen.
+	* Move the Gold Balls upgrades above Bonus Wheel upgrades in the Basic machine, now that shrinking maxed upgrade buttons means Board, Auto-Drop and Gold Balls upgrades can fit neatly in one row on a standard HD display (1360x768 or 1366x768).
+	* Trim trailing zeros in significand in scientific notation.
+	* Change the look of the "Spin the wheel!" button.
+	* Add a modal for when you max out a machine, to make it a bit more clear that the next step is to move on to the next machine.
 
 ### v1.1.2 (2021-05-09)
 * Make bonus wheel pop-up text easier to read.

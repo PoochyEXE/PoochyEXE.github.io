@@ -4,7 +4,8 @@ const kBallRadius = 5.5;
 const kCellSize = 8.0;
 
 class Target {
-	constructor({ pos, draw_radius, hitbox_radius, color, text, id, active }) {
+	constructor({ machine, pos, draw_radius, hitbox_radius, color, text, id, active, pass_through }) {
+		this.machine = machine;
 		this.pos = pos;
 		this.draw_radius = draw_radius;
 		this.hitbox_radius = hitbox_radius;
@@ -13,11 +14,14 @@ class Target {
 		this.text = text;
 		this.id = id;
 		this.active = active;
+		this.pass_through = pass_through;
 	}
 
-	OnHit() {
-		console.log("Not implemented!");
+	OnHit(ball) {
+		console.error("Not implemented!");
 	}
+
+	ResetText() {}
 
 	CheckForHit(ball) {
 		if (!this.active) {
@@ -27,96 +31,46 @@ class Target {
 			return;
 		}
 		if (this.pos.DistanceSqrToPoint(ball.pos) < this.hitbox_radius_sqr) {
-			if (state.save_file.stats.target_hits[this.id]) {
-				++state.save_file.stats.target_hits[this.id];
+			let save_file = this.machine.GetSaveData();
+			if (save_file.stats.target_hits[this.id]) {
+				++save_file.stats.target_hits[this.id];
 			} else {
-				state.save_file.stats.target_hits[this.id] = 1;
+				save_file.stats.target_hits[this.id] = 1;
 			}
 
-			this.OnHit(ball);
 			ball.last_hit = this.id;
+			this.OnHit(ball);
 		}
 	}
-}
-
-function AwardPoints(base_value, ball) {
-	var total_value = base_value;
-	var color_rgb = "0,128,0";
-	if (IsScoreBuffActive()) {
-		total_value *= state.save_file.score_buff_multiplier;
-	}
-	let popup_text_level = 0;
-	if (ball.ball_type_index != kBallTypeIDs.NORMAL) {
-		if (HasEightBallSpecial(ball.ball_type_index)) {
-			popup_text_level = 3;
-			color_rgb = k8BallHighlightColor;
-			total_value *= Math.pow(
-				state.special_ball_multiplier, state.emerald_ball_exponent
-			);
-			total_value *= Math.pow(8, state.eight_ball_score_exponent);
-			if (ball.ball_type_index == kBallTypeIDs.BEACH_BALL) {
-				let multiplier = 2;
-				if (IsUnlocked("beach_ball_time_based_multiplier")) {
-					let sec_elapsed =
-						(state.current_time - ball.start_time) / 1000.0;
-					multiplier =
-						Math.pow(sec_elapsed, state.beach_ball_score_exponent);
-					multiplier = Math.max(multiplier, 2.0);
-				}
-				const k2Pi = Math.PI * 2;
-				if (
-					IsUnlocked("beach_ball_rotation_multiplier") &&
-					ball.total_rotations > k2Pi
-				) {
-					multiplier *= ball.total_rotations / k2Pi;
-				}
-				total_value *= multiplier;
-				color_rgb = kPrismatic;
-			}
-		} else if (HasEmeraldSpecial(ball.ball_type_index)) {
-			total_value *= Math.pow(
-				state.special_ball_multiplier, state.emerald_ball_exponent
-			);
-			popup_text_level = 2;
-			color_rgb =
-				state.save_file.options.dark_mode ? "0,255,0" : "0,192,0";
-		} else {
-			popup_text_level = 1;
-			total_value *= state.special_ball_multiplier;
-			color_rgb = "170,143,0";
-		}
-	}
-	AddScore(total_value);
-	MaybeAddScoreText({
-		level: popup_text_level,
-		text: `+${FormatNumberShort(total_value)}`,
-		pos: ball.pos,
-		color_rgb
-	});
 }
 
 class ScoreTarget extends Target {
-	constructor({ pos, draw_radius, hitbox_radius, color, id, active, value }) {
+	constructor({ machine, pos, draw_radius, hitbox_radius, color, id, active, value, pass_through }) {
 		super({
+			machine,
 			pos,
 			draw_radius,
 			hitbox_radius,
 			color,
 			text: FormatNumberShort(value),
 			id,
-			active
+			active,
+			pass_through
 		});
 		this.value = value;
 	}
 
 	OnHit(ball) {
-		ball.active = false;
-		AwardPoints(this.value, ball);
-		if (this.id == 4) {
-			OnCenterSlotHit(ball);
+		if (!this.pass_through) {
+			ball.active = false;
+		}
+		this.machine.AwardPoints(this.value, ball);
+		++ball.score_targets_hit;
+		if (GetSetting("show_hit_rates")) {
+			state.redraw_stats_overlay = true;
 		}
 	}
-	
+
 	ResetText() {
 		this.text = FormatNumberShort(this.value);
 	}
@@ -127,119 +81,115 @@ class ScoreTarget extends Target {
 	}
 }
 
-function AwardSpins(ball, text_pos) {
-	if (HasSapphireSpecial(ball.ball_type_index)) {
-		let value = Math.pow(
-			state.special_ball_multiplier, state.sapphire_ball_exponent
-		);
-		let color_rgb =
-			state.save_file.options.dark_mode ? "32,96,255" : "0,0,255";
-		let score_text_level = 2;
-		if (
-			HasAmethystSpecial(ball.ball_type_index) &&
-			IsUnlocked("amethyst_synergy") &&
-			IsScoreBuffActive()
-		) {
-			value *= state.save_file.score_buff_multiplier;
-			color_rgb = "255,0,255"
-		}
-		if (HasEightBallSpecial(ball.ball_type_index)) {
-			score_text_level = 3;
-			value *= Math.pow(8, state.eight_ball_spin_exponent);
-			color_rgb = k8BallHighlightColor;
-			if (ball.ball_type_index == kBallTypeIDs.BEACH_BALL) {
-				let multiplier = 2;
-				if (IsUnlocked("beach_ball_time_based_multiplier")) {
-					let sec_elapsed =
-						(state.current_time - ball.start_time) / 1000.0;
-					multiplier =
-						Math.pow(sec_elapsed, state.beach_ball_spin_exponent);
-					multiplier = Math.max(multiplier, 2.0);
-				}
-				value *= multiplier;
-				color_rgb = kPrismatic;
-			}
-		}
-		value = Math.floor(value);
-		state.save_file.spins += value;
-		UpdateSpinCounter();
-		MaybeAddScoreText({
-			level: score_text_level,
-			text: `+${FormatNumberShort(value)} Spins`,
-			pos: text_pos,
-			color_rgb: color_rgb
-		});
-	} else {
-		++state.save_file.spins;
-		UpdateSpinCounter();
-		MaybeAddScoreText({
-			level: 0,
-			text: "+1 Spin",
-			pos: text_pos,
-			color_rgb: "0,170,0"
-		});
-	}
-}
-
-class SpinTarget extends Target {
-	constructor({ pos, draw_radius, hitbox_radius, color, id }) {
-		super({
-			pos,
-			draw_radius,
-			hitbox_radius,
-			color,
-			text: "Spin",
-			id
-		});
-	}
-
-	OnHit(ball) {
-		let text_pos = new Point(ball.pos.x, ball.pos.y);
-		if (
-			HasTurquoiseSpecial(ball.ball_type_index) &&
-			IsUnlocked("turquoise_synergy")
-		) {
-			AwardPoints(GetSlotValue(4), ball);
-			text_pos.y -= 10;
-		}
-		AwardSpins(ball, text_pos);
-	}
-}
-
 class TargetSet {
 	constructor(targets) {
 		this.targets = targets;
+
 		let radius = targets[0].hitbox_radius;
-		this.min_x = targets[0].pos.x - radius;
-		this.max_x = targets[0].pos.x + radius;
-		this.min_y = targets[0].pos.y - radius;
-		this.max_y = targets[0].pos.y + radius;
+		let min_x = targets[0].pos.x - radius;
+		let max_x = targets[0].pos.x + radius;
+		let min_y = targets[0].pos.y - radius;
+		let max_y = targets[0].pos.y + radius;
 		for (let i = 1; i < targets.length; ++i) {
 			let radius = targets[i].hitbox_radius;
-			this.min_x = Math.min(this.min_x, targets[i].pos.x - radius);
-			this.max_x = Math.max(this.max_x, targets[i].pos.x + radius);
-			this.min_y = Math.min(this.min_y, targets[i].pos.y - radius);
-			this.max_y = Math.max(this.max_y, targets[i].pos.y + radius);
+			min_x = Math.min(min_x, targets[i].pos.x - radius);
+			max_x = Math.max(max_x, targets[i].pos.x + radius);
+			min_y = Math.min(min_y, targets[i].pos.y - radius);
+			max_y = Math.max(max_y, targets[i].pos.y + radius);
 		}
+		this.bounding_box = new Rectangle(min_x, max_x, min_y, max_y);
+	}
+
+	CheckForHit(ball) {
+		if (this.bounding_box.Contains(ball.pos)) {
+			for (let t = 0; t < this.targets.length; ++t) {
+				this.targets[t].CheckForHit(ball);
+			}
+		}
+	}
+}
+
+class Bumper extends Target {
+	constructor({ machine, pos, radius, strength, color, value, id, active }) {
+		super({
+			machine,
+			pos,
+			draw_radius: radius,
+			hitbox_radius: radius + kBallRadius,
+			color: kBumperColor,
+			text: "",
+			id,
+			active,
+			pass_through: true
+		});
+		this.value = value;
+		this.strength = strength;
+		this.hit_animation = 0;
+		this.ResetText();
+	}
+
+	OnHit(ball) {
+		this.hit_animation = kBumperHitExpandSizes.length - 1;
+		if (this.value) {
+			this.machine.AwardPoints(this.value, ball);
+		}
+		const ball_physics_params =
+			this.machine.BallTypes()[ball.ball_type_index].physics_params;
+
+		const kNoiseSigma = 0.01;
+		let noise = SampleGaussianNoise(0, kNoiseSigma);
+		let delta_norm = this.pos.DeltaToPoint(ball.pos);
+		delta_norm.MutateNormalize();
+		ball.vel.MutateMultiply(ball_physics_params.collision_elasticity);
+		ball.vel.MutateAdd(noise);
+		ball.vel.MutateAddNTimes(delta_norm, this.strength);
+		ball.pos.CopyFrom(this.pos);
+		ball.pos.MutateAddNTimes(delta_norm, this.hitbox_radius);
+		ball.last_hit = null;
+		++ball.bumpers_hit;
+		state.redraw_bumpers = true;
+		if (GetSetting("show_hit_rates")) {
+			state.redraw_stats_overlay = true;
+		}
+	}
+
+	ResetText() {
+		this.text = "";
+		/*
+		if (this.value) {
+			this.text = FormatNumberShort(this.value);
+		} else {
+			this.text = "";
+		}
+		*/
+	}
+
+	SetValue(new_value) {
+		this.value = new_value;
+		this.ResetText();
 	}
 }
 
 class PegBoard {
-	constructor(width, height, pegs) {
+	constructor(width, height, pegs, drop_zones, target_sets, bumper_sets) {
 		this.width = width;
 		this.height = height;
 		this.pegs = pegs;
+		this.drop_zones = drop_zones;
+		this.target_sets = target_sets;
+		if (bumper_sets) {
+			this.bumper_sets = bumper_sets;
+		} else {
+			this.bumper_sets = Array(0);
+		}
 		this.grid_cols = Math.ceil(width / kCellSize);
 		this.grid_rows = Math.ceil(height / kCellSize);
-		this.cache = [...Array(this.grid_rows * this.grid_cols)].map(_ =>
-			Array(0)
-		);
+		this.cache =
+			[...Array(this.grid_rows * this.grid_cols)].map(_ => Array(0));
 		for (let i = 0; i < pegs.length; ++i) {
 			const peg = pegs[i];
 			if (peg.x < 0 || peg.x > width || peg.y < 0 || peg.y > height) {
-				console.log(
-					`Skipping out-of-bounds peg at ${peg.DebugStr()}`
-				);
+				console.log(`Skipping out-of-bounds peg at ${peg.DebugStr()}`);
 				continue;
 			}
 			const row = Math.floor(peg.y / kCellSize);
@@ -301,135 +251,13 @@ class PegBoard {
 		}
 		return result;
 	}
-}
 
-const kHorizontalSpacing = 18;
-const kWallSpacing = 4;
-const kHalfWallSpace = kWallSpacing / 2;
-const kVerticalSpacing = (Math.sqrt(3) * kHorizontalSpacing) / 2;
-const kColumns = 9;
-const kRows = 13;
-const kBottomSlotRows = 5;
-const kWidth = kHorizontalSpacing * kColumns + kWallSpacing;
-const kHeight = 256;
-const kBaseSlotValues = [20, 100, 200, 1, 250, 1, 200, 100, 20];
-
-function DefaultBoard() {
-	let pegs = Array(0);
-	for (
-		let y = kHeight - kHalfWallSpace;
-		y >= kHalfWallSpace;
-		y -= kWallSpacing
-	) {
-		pegs.push(new Point(kHalfWallSpace, y));
-		pegs.push(new Point(kWidth - kHalfWallSpace, y));
-	}
-	var y = kHeight - kHalfWallSpace;
-	for (let col = 0; col < kColumns; ++col) {
-		const prev_x = col * kHorizontalSpacing + kHalfWallSpace;
-		const next_x = (col + 1) * kHorizontalSpacing + kHalfWallSpace;
-		const delta_x = next_x - prev_x;
-		const mid_pegs = Math.floor(delta_x / kWallSpacing);
-		for (let subcol = 1; subcol <= mid_pegs; ++subcol) {
-			const x = prev_x + (subcol * delta_x) / mid_pegs;
-			pegs.push(new Point(x, y));
-		}
-	}
-	y -= kWallSpacing;
-	for (let row = 1; row < kBottomSlotRows; ++row) {
-		for (let col = 1; col < kColumns; ++col) {
-			const x = col * kHorizontalSpacing + kHalfWallSpace;
-			pegs.push(new Point(x, y));
-		}
-		y -= kWallSpacing;
-	}
-	for (let row = 0; row < kRows; ++row) {
-		if (row % 2 == 0) {
-			for (let col = 1; col < kColumns; ++col) {
-				const x = col * kHorizontalSpacing + kHalfWallSpace;
-				pegs.push(new Point(x, y));
+	CanDropAt(pos) {
+		for (let i = 0; i < this.drop_zones.length; ++i) {
+			if (this.drop_zones[i].Contains(pos)) {
+				return true;
 			}
-		} else {
-			for (let col = 0; col < kColumns; ++col) {
-				const x = (col + 0.5) * kHorizontalSpacing + kHalfWallSpace;
-				pegs.push(new Point(x, y));
-			}
-			const y_above = y - kVerticalSpacing / 4;
-			const x_left = 0.25 * kHorizontalSpacing + kHalfWallSpace;
-			const x_right = kWidth - x_left;
-			pegs.push(new Point(x_left, y_above));
-			pegs.push(new Point(x_right, y_above));
 		}
-		y -= kVerticalSpacing;
+		return false;
 	}
-	max_drop_y = y;
-	min_drop_x = 10;
-	max_drop_x = kWidth - 10;
-	return new PegBoard(kWidth, kHeight, pegs);
-}
-
-function DefaultTargets() {
-	const kDrawRadius = (kHorizontalSpacing - kWallSpacing) / 2;
-	const kTargetColor = "#8FF";
-	const kHitboxRadius = Math.min(kDrawRadius * 1.5 - kBallRadius);
-
-	let target_sets = Array(0);
-
-	const kBottomTargetY = kHeight - kDrawRadius - kWallSpacing;
-	let bottom_targets = Array(0);
-	for (let col = 0; col < kBaseSlotValues.length; ++col) {
-		const x = (col + 0.5) * kHorizontalSpacing + kHalfWallSpace;
-		const pos = new Point(x, kBottomTargetY);
-		const value = kBaseSlotValues[col];
-		bottom_targets.push(
-			new ScoreTarget({
-				pos,
-				draw_radius: kDrawRadius,
-				hitbox_radius: kHitboxRadius,
-				color: kTargetColor,
-				id: col,
-				active: true,
-				value
-			})
-		);
-	}
-	target_sets.push(new TargetSet(bottom_targets));
-
-	const kSpinTargetColor = "rgba(0, 0, 255, 0.5)";
-	const kSpinTargetY =
-		kHeight - kWallSpacing * (kBottomSlotRows + 0.5) - kVerticalSpacing * 2;
-	let spin_targets = Array(0);
-	const left_x = 1.5 * kHorizontalSpacing + kHalfWallSpace;
-	const center_x = 4.5 * kHorizontalSpacing + kHalfWallSpace;
-	const right_x = 7.5 * kHorizontalSpacing + kHalfWallSpace;
-	spin_targets.push(
-		new SpinTarget({
-			pos: new Point(left_x, kSpinTargetY),
-			draw_radius: kDrawRadius,
-			hitbox_radius: kHitboxRadius,
-			color: kSpinTargetColor,
-			id: "spin_left"
-		})
-	);
-	spin_targets.push(
-		new SpinTarget({
-			pos: new Point(center_x, kSpinTargetY),
-			draw_radius: kDrawRadius,
-			hitbox_radius: kHitboxRadius,
-			color: kSpinTargetColor,
-			id: "spin_center"
-		})
-	);
-	spin_targets.push(
-		new SpinTarget({
-			pos: new Point(right_x, kSpinTargetY),
-			draw_radius: kDrawRadius,
-			hitbox_radius: kHitboxRadius,
-			color: kSpinTargetColor,
-			id: "spin_right"
-		})
-	);
-	target_sets.push(new TargetSet(spin_targets));
-
-	return target_sets;
 }

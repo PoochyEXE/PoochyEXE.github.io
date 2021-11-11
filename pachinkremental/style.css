@@ -1,5 +1,5 @@
 canvas.board {
-	position: absolute;
+	position: fixed;
 	left: 5px;
 	top: 5px;
 	font-family: sans-serif;
@@ -9,6 +9,97 @@ canvas.bonusWheel {
 	width: 250px;
 	height: 100px;
 	font-family: sans-serif;
+}
+
+canvas.spiralPowerMeter {
+	position: absolute;
+	left: 0px;
+	width: 100px;
+	height: 100px;
+	font-family: sans-serif;
+}
+
+button.bonusWheel {
+	border: 1px solid #0F0;
+	color: #0F0;
+	background: #050;
+	border-radius: 20px;
+	font-family: sans-serif;
+	font-size: 14px;
+	margin-top: 2.5px;
+	margin-bottom: 2.5px;
+	transition-duration: 250ms;
+}
+
+button.bonusWheel:disabled {
+	border: 1px solid #080;
+	color: #080;
+	background: #555;
+}
+
+div.hyperContainer {
+	border-radius: 15px;
+	padding: 5px;
+	margin: 2.5px;
+	width: 250px;
+	text-align: center;
+	border: 2px solid #880;
+	background: #220;
+	color: #FF0;
+	font-family: sans-serif;
+}
+
+div.hyperMeterBorder {
+	border: 2px solid #FF0;
+	height: 10px;
+}
+
+button.hyperSystem {
+	border: 1px solid #FF0;
+	color: #FF0;
+	background: #550;
+	border-radius: 20px;
+	font-family: sans-serif;
+	font-size: 14px;
+	margin-top: 2.5px;
+	margin-bottom: 2.5px;
+	transition-duration: 250ms;
+}
+
+button.hyperSystem:disabled {
+	border: 1px solid #880;
+	color: #880;
+	background: #555;
+}
+
+div.hyperMeterFill {
+	background: #FF0;
+	height: 10px;
+}
+
+div.overdrive {
+	color: #0FF;
+}
+
+div.spiralContainer {
+	border-radius: 15px;
+	padding: 5px;
+	margin: 2.5px;
+	text-align: center;
+	border: 2px solid #080;
+	background: #020;
+	color: #0F0;
+	font-family: sans-serif;
+}
+
+div.spiralMeterBorder {
+	border: 2px solid #0F0;
+	height: 10px;
+}
+
+div.spiralMeterFill {
+	background: #0F0;
+	height: 10px;
 }
 
 button.notification {
@@ -28,6 +119,14 @@ div.notifications {
 	font-family: sans-serif;
 }
 
+div.flavorText {
+	font-style: italic;
+}
+
+div.small {
+	font-size: 10px;
+}
+
 td.rightUI {
 	font-family: sans-serif;
 }
@@ -41,7 +140,7 @@ div.bonusWheel {
 	clear: both;
 }
 
-div.upgradesContainer, div.upgradesSubContainer, div.statsContainer, div.optionsContainer {
+div.upgradesContainer, div.upgradesSubContainer, div.machinesContainer, div.statsContainer, div.optionsContainer {
 	border-radius: 15px;
 	clear: both;
 	padding: 5px;
@@ -67,6 +166,16 @@ div.upgradesSubContainer {
 	display: inline-block;
 }
 
+div.machinesContainerLight {
+	border: 2px solid #088;
+	background: #CFF;
+}
+
+div.machinesContainerDark {
+	border: 2px solid #088;
+	background: #033;
+}
+
 div.statsContainerLight {
 	border: 2px solid #008;
 	background: #CCF;
@@ -75,6 +184,16 @@ div.statsContainerLight {
 div.statsContainerDark {
 	border: 2px solid #008;
 	background: #003;
+}
+
+div.statsSection {
+	padding-top: 5px;
+	padding-right: 5px;
+	display: inline-block;
+}
+
+div.statsRow {
+	display: block;
 }
 
 div.optionsContainerLight {
@@ -92,7 +211,7 @@ span.upgradeHeaderNew {
 	color: #F00;
 }
 
-button.upgradesHeader, button.upgradesSubHeader, button.statsHeader, button.optionsHeader {
+button.upgradesHeader, button.upgradesSubHeader, button.machinesHeader, button.statsHeader, button.optionsHeader {
 	width: 100%;
 	border: none;
 	text-align: center;
@@ -101,7 +220,7 @@ button.upgradesHeader, button.upgradesSubHeader, button.statsHeader, button.opti
 	font-family: sans-serif;
 }
 
-button.upgradesHeader, button.statsHeader, button.optionsHeader {
+button.upgradesHeader, button.machinesHeader, button.statsHeader, button.optionsHeader {
 	font-size: 20px;
 }
 
@@ -116,6 +235,16 @@ button.upgradesHeaderLight, button.upgradesSubHeaderLight {
 
 button.upgradesHeaderDark, button.upgradesSubHeaderDark {
 	background: #030;
+	color: #FFF;
+}
+
+button.machinesHeaderLight {
+	background: #CFF;
+	color: #000;
+}
+
+button.machinesHeaderDark {
+	background: #033;
 	color: #FFF;
 }
 
@@ -139,7 +268,7 @@ button.optionsHeaderDark {
 	color: #FFF;
 }
 
-div.upgradesContents, div.statsContents, div.optionsContents {
+div.upgradesContents, div.machinesContents, div.statsContents, div.optionsContents {
 	line-height: 16px;
 	font-family: sans-serif;
 	font-size: 14px;
@@ -151,13 +280,18 @@ div.upgradeButtonWrapper {
 	margin: 2.5px;
 }
 
-button.upgradeButton, button.rubyUpgradeButton, button.sapphireUpgradeButton, button.emeraldUpgradeButton, button.topazUpgradeButton, button.turquoiseUpgradeButton, button.amethystUpgradeButton, button.opalUpgradeButton, button.eightBallUpgradeButton, button.beachBallUpgradeButton {
+button.upgradeButton, button.rubyUpgradeButton, button.sapphireUpgradeButton, button.emeraldUpgradeButton, button.topazUpgradeButton, button.turquoiseUpgradeButton, button.amethystUpgradeButton, button.opalUpgradeButton, button.opalStaticUpgradeButton, button.eightBallUpgradeButton, button.beachBallUpgradeButton, button.rubberBandBallUpgradeButton, button.spiralBallUpgradeButton {
 	border: 1px solid #000;
 	border-radius: 10px;
 	font-family: sans-serif;
 	font-size: 14px;
 	padding: 5px;
 	transition-duration: 250ms;
+}
+
+button.upgradeButtonMaxedShrink {
+	transition-delay: 250ms;
+	font-size: 8.5px;
 }
 
 button.upgradeButtonLight {
@@ -315,7 +449,7 @@ button.eightBallUpgradeButtonDark:disabled {
 	color: #FFF;
 }
 
-@-webkit-keyframes opalUpgradeButtonLightColor {  
+@-webkit-keyframes opalUpgradeButtonLightColor {
   0% { background: #F88; }
   17% { background: #FF8; }
   33% { background: #8F8; }
@@ -325,7 +459,7 @@ button.eightBallUpgradeButtonDark:disabled {
   100% { background: #F88; }
 }
 
-@-webkit-keyframes opalUpgradeButtonDarkColor {  
+@-webkit-keyframes opalUpgradeButtonDarkColor {
   0% { background: #833; }
   17% { background: #883; }
   33% { background: #383; }
@@ -335,7 +469,7 @@ button.eightBallUpgradeButtonDark:disabled {
   100% { background: #833; }
 }
 
-@-webkit-keyframes opalUpgradeButtonLightDisabledColor {  
+@-webkit-keyframes opalUpgradeButtonLightDisabledColor {
   0% { background: #A77; }
   17% { background: #AA7; }
   33% { background: #7A7; }
@@ -345,7 +479,7 @@ button.eightBallUpgradeButtonDark:disabled {
   100% { background: #A77; }
 }
 
-@-webkit-keyframes opalUpgradeButtonDarkDisabledColor {  
+@-webkit-keyframes opalUpgradeButtonDarkDisabledColor {
   0% { background: #300; }
   17% { background: #330; }
   33% { background: #030; }
@@ -358,33 +492,89 @@ button.eightBallUpgradeButtonDark:disabled {
 button.opalUpgradeButtonLight {
     background: white;
 	color: #000;
-    -webkit-animation-name: opalUpgradeButtonLightColor;  
-    -webkit-animation-iteration-count: infinite;  
-    -webkit-animation-duration: 2s; 
+    -webkit-animation-name: opalUpgradeButtonLightColor;
+    -webkit-animation-iteration-count: infinite;
+    -webkit-animation-duration: 2s;
 }
 
 button.opalUpgradeButtonDark {
     background: black;
 	color: #FFF;
-    -webkit-animation-name: opalUpgradeButtonDarkColor;  
-    -webkit-animation-iteration-count: infinite;  
-    -webkit-animation-duration: 2s; 
+    -webkit-animation-name: opalUpgradeButtonDarkColor;
+    -webkit-animation-iteration-count: infinite;
+    -webkit-animation-duration: 2s;
 }
 
 button.opalUpgradeButtonLight:disabled {
     background: #AAA;
 	color: #000;
-    -webkit-animation-name: opalUpgradeButtonLightDisabledColor;  
-    -webkit-animation-iteration-count: infinite;  
-    -webkit-animation-duration: 2s; 
+    -webkit-animation-name: opalUpgradeButtonLightDisabledColor;
+    -webkit-animation-iteration-count: infinite;
+    -webkit-animation-duration: 2s;
 }
 
 button.opalUpgradeButtonDark:disabled {
     background: #333;
 	color: #FFF;
-    -webkit-animation-name: opalUpgradeButtonDarkDisabledColor;  
-    -webkit-animation-iteration-count: infinite;  
-    -webkit-animation-duration: 2s; 
+    -webkit-animation-name: opalUpgradeButtonDarkDisabledColor;
+    -webkit-animation-iteration-count: infinite;
+    -webkit-animation-duration: 2s;
+}
+
+button.opalStaticUpgradeButtonLight {
+	background: repeating-linear-gradient(
+	  135deg,
+	  #F88,
+	  #FF8 10px,
+	  #8F8 20px,
+	  #8FF 30px,
+	  #88F 40px,
+	  #F8F 50px,
+	  #F88 60px
+	);
+	color: #000;
+}
+
+button.opalStaticUpgradeButtonLight:disabled {
+	background: repeating-linear-gradient(
+	  135deg,
+	  #A77,
+	  #AA7 10px,
+	  #7A7 20px,
+	  #7AA 30px,
+	  #77A 40px,
+	  #A7A 50px,
+	  #A77 60px
+	);
+	color: #000;
+}
+
+button.opalStaticUpgradeButtonDark {
+	background: repeating-linear-gradient(
+	  135deg,
+	  #A33,
+	  #AA3 10px,
+	  #3A3 20px,
+	  #3AA 30px,
+	  #33A 40px,
+	  #A3A 50px,
+	  #A33 60px
+	);
+	color: #FFF;
+}
+
+button.opalStaticUpgradeButtonDark:disabled {
+	background: repeating-linear-gradient(
+	  135deg,
+	  #300,
+	  #330 10px,
+	  #030 20px,
+	  #033 30px,
+	  #003 40px,
+	  #303 50px,
+	  #300 60px
+	);
+	color: #FFF;
 }
 
 button.beachBallUpgradeButtonLight {
@@ -463,13 +653,172 @@ button.beachBallUpgradeButtonDark:disabled {
 	color: #FFF;
 }
 
-button.optionButton, button.optionButtonRed {
+button.rubberBandBallUpgradeButtonLight {
+	background: repeating-linear-gradient(
+	  120deg,
+	  #8E8,
+	  #8E8 3px,
+	  #E88 3px,
+	  #E88 6px,
+	  #88E 6px,
+	  #88E 9px,
+	  #EE8 9px,
+	  #EE8 12px,
+	  #8EE 12px,
+	  #8EE 15px,
+	  #E8E 15px,
+	  #E8E 18px
+	);
+	color: #000;
+}
+
+button.rubberBandBallUpgradeButtonLight:disabled {
+	background: repeating-linear-gradient(
+	  120deg,
+	  #7A7,
+	  #7A7 3px,
+	  #A77 3px,
+	  #A77 6px,
+	  #77A 6px,
+	  #77A 9px,
+	  #AA7 9px,
+	  #AA7 12px,
+	  #7AA 12px,
+	  #7AA 15px,
+	  #A7A 15px,
+	  #A7A 18px
+	);
+	color: #000;
+}
+
+button.rubberBandBallUpgradeButtonDark {
+	background: repeating-linear-gradient(
+	  120deg,
+	  #282,
+	  #282 3px,
+	  #822 3px,
+	  #822 6px,
+	  #228 6px,
+	  #228 9px,
+	  #882 9px,
+	  #882 12px,
+	  #288 12px,
+	  #288 15px,
+	  #828 15px,
+	  #828 18px
+	);
+	color: #FFF;
+}
+
+button.rubberBandBallUpgradeButtonDark:disabled {
+	background: repeating-linear-gradient(
+	  120deg,
+	  #030,
+	  #030 3px,
+	  #300 3px,
+	  #300 6px,
+	  #003 6px,
+	  #003 9px,
+	  #330 9px,
+	  #330 12px,
+	  #033 12px,
+	  #033 15px,
+	  #303 15px,
+	  #303 18px
+	);
+	color: #FFF;
+}
+
+button.spiralBallUpgradeButtonLight {
+	background: repeating-radial-gradient(
+	  circle at -3px,
+	  #2C2,
+	  #2C2 3px,
+	  #7F7 3px,
+	  #7F7 6px
+	);
+	color: #000;
+}
+
+button.spiralBallUpgradeButtonLight:disabled {
+	background: repeating-radial-gradient(
+	  circle at -3px,
+	  #8C8,
+	  #8C8 3px,
+	  #AFA 3px,
+	  #AFA 6px
+	);
+	color: #000;
+}
+
+button.spiralBallUpgradeButtonDark {
+	background: repeating-radial-gradient(
+	  circle at -3px,
+	  #282,
+	  #282 3px,
+	  #060 3px,
+	  #060 6px
+	);
+	color: #FFF;
+}
+
+button.spiralBallUpgradeButtonDark:disabled {
+	background: repeating-radial-gradient(
+	  circle at -3px,
+	  #030,
+	  #030 3px,
+	  #010 3px,
+	  #010 6px
+	);
+	color: #FFF;
+}
+
+button.machineButton {
+	border: 1px solid #000;
+	border-radius: 10px;
+	font-family: sans-serif;
+	font-size: 14px;
+	padding: 5px;
+	transition-duration: 250ms;
+}
+
+button.machineButtonLight {
+	background: #8CC;
+	color: #000;
+}
+
+button.machineButtonDark {
+	background: #388;
+	color: #FFF;
+}
+
+button.machineButtonLight:disabled {
+	background: #888;
+	color: #000;
+}
+
+button.machineButtonDark:disabled {
+	background: #555;
+	color: #FFF;
+}
+
+button.statsButton, button.optionButton, button.optionButtonRed {
 	border: 1px solid #000;
 	border-radius: 20px;
 	font-family: sans-serif;
 	font-size: 14px;
 	margin-top: 2.5px;
 	margin-bottom: 2.5px;
+}
+
+button.statsButtonLight {
+	background: #88C;
+	color: #000;
+}
+
+button.statsButtonDark {
+	background: #338;
+	color: #FFF;
 }
 
 button.optionButtonLight {
@@ -512,7 +861,7 @@ span.messageBoxLarge {
 
 button.dropZone {
 	border: 0px;
-	position: absolute;
+	position: fixed;
 	background: #0F0;
 	opacity: 0.25;
 	transition-duration: 200ms;
@@ -616,7 +965,11 @@ span.prismaticText {
 	color: transparent;
 }
 
-@-webkit-keyframes prismaticTextLightColor {  
+span.spellCard {
+	color: #F88;
+}
+
+@-webkit-keyframes prismaticTextLightColor {
   0% { color: #C00; }
   17% { color: #CC0; }
   33% { color: #0C0; }
@@ -626,7 +979,7 @@ span.prismaticText {
   100% { color: #C00; }
 }
 
-@-webkit-keyframes prismaticTextDarkColor {  
+@-webkit-keyframes prismaticTextDarkColor {
   0% { color: #F88; }
   17% { color: #FF8; }
   33% { color: #8F8; }
@@ -639,32 +992,37 @@ span.prismaticText {
 span.prismaticTextLight {
     background: #FFF;
 	color: #000;
-    -webkit-animation-name: prismaticTextLightColor;  
-    -webkit-animation-iteration-count: infinite;  
-    -webkit-animation-duration: 2s; 
+    -webkit-animation-name: prismaticTextLightColor;
+    -webkit-animation-iteration-count: infinite;
+    -webkit-animation-duration: 2s;
 }
 
 span.prismaticTextDark {
     background: #000;
 	color: #FFF;
-    -webkit-animation-name: prismaticTextDarkColor;  
-    -webkit-animation-iteration-count: infinite;  
-    -webkit-animation-duration: 2s; 
+    -webkit-animation-name: prismaticTextDarkColor;
+    -webkit-animation-iteration-count: infinite;
+    -webkit-animation-duration: 2s;
 }
 
-span.speedrunTimerCompleted {
+span.speedrunTimerCompleted, span.speedrunTimerSplit {
 	font-weight: bold;
 }
 
-span.speedrunTimerCompletedLight {
+span.speedrunTimerCompletedLight, span.speedrunTimerSplitLight {
 	color: #00F;
 }
 
-span.speedrunTimerCompletedDark {
+span.speedrunTimerCompletedDark, span.speedrunTimerSplitDark {
 	color: #0FF;
 }
 
 span.warning {
 	color: #F00;
 	font-weight: bold;
+}
+
+span.arrows {
+	font-weight: bolder;
+	font-family: monospace;
 }

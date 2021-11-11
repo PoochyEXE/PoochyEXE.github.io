@@ -12,6 +12,11 @@ const kPrismatic = "PRISMATIC";
 const k8Ball = "8-BALL";
 const k8BallHighlightColor = "246, 31,183";
 const kBeachBall = "BEACH";
+const kRubberBand = "RUBBER_BAND";
+const kSpiral = "SPIRAL";
+const kBumperColor = "BUMPER";
+
+const kBumperHitExpandSizes = [0, 1, 2, 3, 2, 1];
 
 const kPrismaticCycleColors = [
 	[0, 1, 0],
@@ -21,12 +26,31 @@ const kPrismaticCycleColors = [
 	[1, 0, 0],
 	[1, 1, 0]
 ];
+
+// The order to shuffle kPrismaticCycleColors into for rubber band balls.
+const kRubberBandColorIndices = [4, 5, 1, 2, 3, 0];
+// The order to draw the rubber bands.
+const kRubberBandLayerOrder = [0, 2, 3, 1, 4, 5];
+
 const kPrismaticSaturationOuter = 0.8;
 const kPrismaticSaturationInner = 0.25;
 const kPrismaticCycleDuration = 2000.0;
 
+// Cache Beach Ball colors.
+function InitBeachBallColors(saturation) {
+	const num_colors = kPrismaticCycleColors.length;
+	let colors = [];
+	for (let i = 0; i < num_colors; ++i) {
+		colors.push(GetPrismaticColor(i, num_colors, saturation, 1.0));
+	}
+	return colors;
+}
+
+const kBeachBallOuterColors = InitBeachBallColors(kPrismaticSaturationOuter);
+const kBeachBallInnerColors = InitBeachBallColors(kPrismaticSaturationInner);
+
 function GetPegColor() {
-	if (state.save_file.options.dark_mode && !state.april_fools) {
+	if (GetSetting("dark_mode") && !state.april_fools) {
 		return kPegColorDarkMode;
 	} else {
 		return kPegColor;
@@ -103,7 +127,7 @@ function DrawPrismaticBalls(balls, ctx) {
 		DrawGlow(
 			pos, glow_color, kGlowAlpha, kBallRadius, kBallRadius + kGlowSize, ctx
 		);
-		
+
 		let inner_x = pos.x - kBallRadius / 3;
 		let inner_y = pos.y - kBallRadius / 3;
 		let inner_r = kBallRadius / 10;
@@ -155,7 +179,7 @@ function DrawEightBalls(balls, ctx) {
 		DrawGlow(
 			pos, k8BallHighlightColor, kGlowAlpha, kBallRadius, kBallRadius + kGlowSize, ctx
 		);
-		
+
 		let inner_r = kBallRadius * kInnerRadiusFraction;
 		let outer_r = kBallRadius;
 		let gradient = ctx.createRadialGradient(
@@ -178,7 +202,7 @@ function DrawEightBallsNoGradient(balls, ctx) {
 	const kGlowAlpha = 0.5;
 	for (let i = 0; i < balls.length; ++i) {
 		let pos = balls[i].pos;
-		
+
 		// Draw highlight
 		ctx.beginPath();
 		ctx.strokeStyle = "rgba(" + k8BallHighlightColor + ", " + kGlowAlpha + ")";
@@ -186,7 +210,7 @@ function DrawEightBallsNoGradient(balls, ctx) {
 		ctx.arc(pos.x, pos.y, kBallRadius, 0, 2 * Math.PI);
 		ctx.lineWidth = 2;
 		ctx.stroke();
-		
+
 		// Draw the ball itself
 		ctx.beginPath();
 		ctx.strokeStyle = "#000";
@@ -198,21 +222,22 @@ function DrawEightBallsNoGradient(balls, ctx) {
 	}
 }
 
-function DrawBeachBalls(balls, ctx) {
+function DrawBeachBalls(balls, use_gradient, ctx) {
+	const kNumColors = kBeachBallOuterColors.length;
 	for (let i = 0; i < balls.length; ++i) {
-		let pos = balls[i].pos;
-		let rotation = balls[i].rotation;
-		for (let i = 0; i < kPrismaticCycleColors.length; ++i) {
-			let segment_rotation =
-				Math.PI * 2.0 * i / kPrismaticCycleColors.length - rotation;
-			outer_color = GetPrismaticColor(
-				i, 6.0, kPrismaticSaturationOuter, 1.0
-			);
-			inner_color = GetPrismaticColor(
-				i, 6.0, kPrismaticSaturationInner, 1.0
-			);
-			ctx.fillStyle =
-				CreateBallGradient(ctx, pos, kBallRadius, inner_color, outer_color);
+		const pos = balls[i].pos;
+		const rotation = balls[i].rotation;
+		for (let j = 0; j < kNumColors; ++j) {
+			const segment_rotation = Math.PI * 2.0 * j / kNumColors - rotation;
+			const outer_color = kBeachBallOuterColors[j];
+			if (use_gradient) {
+				const inner_color = kBeachBallInnerColors[j];
+				ctx.fillStyle = CreateBallGradient(
+					ctx, pos, kBallRadius, inner_color, outer_color
+				);
+			} else {
+				ctx.fillStyle = outer_color;
+			}
 			ctx.beginPath();
 			ctx.moveTo(pos.x, pos.y);
 			ctx.arc(
@@ -228,32 +253,127 @@ function DrawBeachBalls(balls, ctx) {
 	}
 }
 
-function DrawBeachBallsNoGradient(balls, ctx) {
+function DrawRubberBandBalls(balls, use_gradient, ctx) {
+	const kNumColors = kRubberBandColorIndices.length;
 	for (let i = 0; i < balls.length; ++i) {
-		let pos = balls[i].pos;
-		let rotation = balls[i].rotation;
-		for (let i = 0; i < kPrismaticCycleColors.length; ++i) {
-			let segment_rotation =
-				Math.PI * 2.0 * i / kPrismaticCycleColors.length - rotation;
-			ctx.fillStyle = GetPrismaticColor(
-				i, 6.0, kPrismaticSaturationOuter, 1.0
-			);
+		const pos = balls[i].pos;
+		const rotation = balls[i].rotation;
+		for (let j = 0; j < kNumColors; ++j) {
+			const segment_rotation =
+				Math.PI * kRubberBandLayerOrder[j] / kNumColors - rotation;
+			const color_index = kRubberBandColorIndices[j];
+			const outer_color = kBeachBallOuterColors[color_index];
+			if (use_gradient) {
+				const inner_color = kBeachBallInnerColors[color_index];
+				ctx.fillStyle = CreateBallGradient(
+					ctx, pos, kBallRadius, inner_color, outer_color
+				);
+			} else {
+				ctx.fillStyle = outer_color;
+			}
 			ctx.beginPath();
-			ctx.moveTo(pos.x, pos.y);
 			ctx.arc(
 				pos.x,
 				pos.y,
 				kBallRadius,
 				segment_rotation,
-				segment_rotation + Math.PI / 3.0
+				segment_rotation + Math.PI / 6.0
 			);
-			ctx.lineTo(pos.x, pos.y);
+			ctx.arc(
+				pos.x,
+				pos.y,
+				kBallRadius,
+				segment_rotation + Math.PI,
+				segment_rotation + Math.PI * 7.0 / 6.0
+			);
 			ctx.fill();
 		}
 	}
 }
 
-function CreateBallGradient(ctx, pos, radius, inner_color, outer_color) {
+function DrawSpiralOnBall(pos, rotation, inner_color, outer_color, ctx) {
+	const kTransparent = "rgba(0, 0, 0, 0)";
+	const kEpsilon = 1e-7;
+	const kLineWidth = 2;
+	let gradient = CreateRadialGradientForBall(ctx, pos, kBallRadius);
+
+	gradient.addColorStop(0.0, inner_color);
+	gradient.addColorStop(1.0 - kEpsilon, outer_color);
+	gradient.addColorStop(1, kTransparent);
+	ctx.strokeStyle = gradient;
+	ctx.lineCap = "round";
+	ctx.lineWidth = kLineWidth;
+	ctx.beginPath();
+	let shift_dist = kLineWidth / 2.0;
+	ctx.moveTo(
+		pos.x + Math.cos(rotation) * shift_dist,
+		pos.y + Math.sin(rotation) * shift_dist
+	);
+	const kStep = 8;
+	const kMaxIter = kStep * (Math.ceil(kBallRadius / kLineWidth));
+	for (let r = 0; r < kMaxIter; ++r) {
+		rotation += Math.PI / kStep;
+		shift_dist += kLineWidth / kStep;
+		ctx.lineTo(
+			pos.x + Math.cos(rotation) * shift_dist,
+			pos.y + Math.sin(rotation) * shift_dist
+		);
+	}
+	ctx.stroke();
+}
+
+function DrawSpiralBalls(balls, current_time, use_gradient, ctx) {
+	const kGlowSize = 3;
+	const kMaxGlowOmega = 50.0;
+	const kMaxGlowAlpha = 0.8;
+	const kGlowColor = "0,255,0";
+	for (let i = 0; i < balls.length; ++i) {
+		let pos = balls[i].pos;
+		let rotation = balls[i].rotation;
+
+		const kPrismaticCycleShift = kPrismaticCycleDuration / 2.0;
+		let color_1_outer = GetPrismaticColor(
+			current_time - balls[i].start_time,
+			kPrismaticCycleDuration,
+			/*saturation=*/ kPrismaticSaturationOuter,
+			/*alpha=*/1.0
+		);
+		let color_2_outer = GetPrismaticColor(
+			current_time + kPrismaticCycleShift - balls[i].start_time,
+			kPrismaticCycleDuration,
+			/*saturation=*/ kPrismaticSaturationOuter,
+			/*alpha=*/1.0
+		);
+		let rot2 = rotation + Math.PI;
+		if (use_gradient) {
+			let color_1_inner = GetPrismaticColor(
+				current_time - balls[i].start_time,
+				kPrismaticCycleDuration,
+				/*saturation=*/ kPrismaticSaturationInner,
+				/*alpha=*/1.0
+			);
+			let color_2_inner = GetPrismaticColor(
+				current_time + kPrismaticCycleShift - balls[i].start_time,
+				kPrismaticCycleDuration,
+				/*saturation=*/ kPrismaticSaturationInner,
+				/*alpha=*/1.0
+			);
+			let glow_fraction = Math.sqrt(Math.abs(balls[i].omega) / kMaxGlowOmega);
+			glow_fraction = Math.min(glow_fraction, 1.0);
+			let glow_alpha = kMaxGlowAlpha * glow_fraction;
+			DrawGlow(
+				pos, kGlowColor, glow_alpha, kBallRadius, kBallRadius + kGlowSize, ctx
+			);
+			DrawSpiralOnBall(pos, -rotation, color_1_inner, color_1_outer, ctx);
+			DrawSpiralOnBall(pos, -rot2, color_2_inner, color_2_outer, ctx);
+		} else {
+			DrawSpiralOnBall(pos, -rotation, color_1_outer, color_1_outer, ctx);
+			DrawSpiralOnBall(pos, -rot2, color_2_outer, color_2_outer, ctx);
+		}
+	}
+}
+
+function CreateRadialGradientForBall(ctx, pos, radius) {
 	let inner_x = pos.x - radius / 3;
 	let inner_y = pos.y - radius / 3;
 	let inner_r = radius / 10;
@@ -268,8 +388,28 @@ function CreateBallGradient(ctx, pos, radius, inner_color, outer_color) {
 		outer_y,
 		outer_r
 	);
+	return gradient;
+}
+
+function CreateBallGradient(ctx, pos, radius, inner_color, outer_color) {
+	let gradient = CreateRadialGradientForBall(ctx, pos, radius);
 	gradient.addColorStop(0, inner_color);
 	gradient.addColorStop(1, outer_color);
+	return gradient;
+}
+
+function CreateBumperGradient(ctx, pos, radius) {
+	const kOuterColor = "#080";
+	const kInnerColor = "#8F8";
+	const kTransparent = "rgba(0, 0, 0, 0)";
+	const kEpsilon = 1e-7;
+	let inner_r = radius / 3.0;
+	let gradient =
+		ctx.createRadialGradient(pos.x, pos.y, inner_r, pos.x, pos.y, radius);
+	gradient.addColorStop(0, kTransparent);
+	gradient.addColorStop(kEpsilon, kOuterColor);
+	gradient.addColorStop(0.5, kInnerColor);
+	gradient.addColorStop(1.0, kOuterColor);
 	return gradient;
 }
 
@@ -290,7 +430,7 @@ function DrawCircle(ctx, pos, radius, color) {
 }
 
 function GetCanvasLayer(layer_id) {
-	return document.getElementById("canvas" + layer_id);
+	return document.getElementById("canvas_" + layer_id);
 }
 
 function GetCanvasContext(layer_id) {
@@ -311,22 +451,23 @@ function ClearLayerAndReturnContext(layer_id) {
 }
 
 function ResizeCanvas() {
-	const aspect_ratio = state.board.width / state.board.height;
+	let board = ActiveMachine(state).board;
+	const aspect_ratio = board.width / board.height;
 	const max_height = window.innerHeight - 25;
 	const max_width = window.innerWidth - 300;
 	state.canvas_scale = Math.min(
-		max_height / state.board.height,
-		max_width / state.board.width
+		max_height / board.height,
+		max_width / board.width
 	);
-	const height = state.board.height * state.canvas_scale;
-	const width = state.board.width * state.canvas_scale;
+	const height = board.height * state.canvas_scale;
+	const width = board.width * state.canvas_scale;
 	let board_td = document.getElementById("board-td");
 	board_td.width = width;
 	board_td.height = height;
 	let canvasLayers = document.getElementsByClassName("board");
 	for (let i = 0; i < canvasLayers.length; ++i) {
 		let canvas = canvasLayers[i];
-		let aspect_ratio = state.board.width / state.board.height;
+		let aspect_ratio = board.width / board.height;
 		canvas.height = height;
 		canvas.width = width;
 	}
@@ -365,11 +506,19 @@ function DrawBalls(balls, inner_color, outer_color, ctx) {
 		return;
 	}
 	if (inner_color == kBeachBall && outer_color == kBeachBall) {
-		DrawBeachBalls(balls, ctx);
+		DrawBeachBalls(balls, true, ctx);
+		return;
+	}
+	if (inner_color == kRubberBand && outer_color == kRubberBand) {
+		DrawRubberBandBalls(balls, true, ctx);
+		return;
+	}
+	if (inner_color == kSpiral && outer_color == kSpiral) {
+		DrawSpiralBalls(balls, state.current_time, true, ctx);
 		return;
 	}
 	if (
-		!state.save_file.options.classic_opal_balls &&
+		!GetSetting("classic_opal_balls") &&
 		inner_color == kPrismatic &&
 		outer_color == kPrismatic
 	) {
@@ -412,7 +561,13 @@ function DrawBallsNoGradient(balls, color, ctx) {
 		DrawEightBallsNoGradient(balls, ctx);
 		return;
 	} else if (color == kBeachBall) {
-		DrawBeachBallsNoGradient(balls, ctx);
+		DrawBeachBalls(balls, false, ctx);
+		return;
+	} else if (color == kRubberBand) {
+		DrawRubberBandBalls(balls, false, ctx);
+		return;
+	} else if (color == kSpiral) {
+		DrawSpiralBalls(balls, state.current_time, false, ctx);
 		return;
 	}
 	const kPrismaticSaturation = 0.8;
@@ -442,9 +597,10 @@ function DrawTargets(target_sets, ctx) {
 				continue;
 			}
 			const pos = target.pos;
+			let radius = target.draw_radius;
 			ctx.fillStyle = target.color;
 			ctx.beginPath();
-			ctx.arc(pos.x, pos.y, target.draw_radius, 0, 2 * Math.PI);
+			ctx.arc(pos.x, pos.y, radius, 0, 2 * Math.PI);
 			ctx.fill();
 
 			ctx.textAlign = "center";
@@ -452,6 +608,100 @@ function DrawTargets(target_sets, ctx) {
 			ctx.font = font_size + "px sans-serif";
 			let text_width = target.draw_radius * 1.5;
 			ctx.fillText(target.text, pos.x, pos.y + font_size / 3, text_width);
+		}
+	}
+}
+
+function DrawBumpers(bumper_sets, ctx) {
+	let font_size = 8;
+	for (let i = 0; i < bumper_sets.length; ++i) {
+		const bumpers = bumper_sets[i].targets;
+		for (let j = 0; j < bumpers.length; ++j) {
+			const bumper = bumpers[j];
+			if (!bumper.active) {
+				continue;
+			}
+			const pos = bumper.pos;
+			let radius = bumper.draw_radius;
+			if (bumper.hit_animation > 0) {
+				radius += kBumperHitExpandSizes[bumper.hit_animation];
+				bumper.hit_animation -= 1;
+				state.redraw_bumpers = true;
+			}
+			ctx.fillStyle = CreateBumperGradient(ctx, pos, radius);
+			ctx.beginPath();
+			ctx.arc(pos.x, pos.y, radius, 0, 2 * Math.PI);
+			ctx.fill();
+
+			if (bumper.text) {
+				ctx.textAlign = "center";
+				ctx.fillStyle = "#000";
+				ctx.font = font_size + "px sans-serif";
+				let text_width = bumper.draw_radius * 1.5;
+				ctx.fillText(bumper.text, pos.x, pos.y + font_size / 3, text_width);
+			}
+		}
+	}
+}
+
+function DrawHitRates(stats, target_sets, bumper_sets, ctx) {
+	let total_balls = 0;
+	for (let i = 0; i < target_sets.length; ++i) {
+		const targets = target_sets[i].targets;
+		for (let j = 0; j < targets.length; ++j) {
+			const target = targets[j];
+			if (!target.pass_through) {
+				total_balls += stats.target_hits[target.id];
+			}
+		}
+	}
+	if (!IsCollapsed("stats")) {
+		let total_balls_text = FormatNumberLong(total_balls);
+		UpdateInnerHTML("stats_hit_rates_balls_counted", total_balls_text);
+	}
+
+	const kFontSize = 8;
+	const dark_mode = GetSetting("dark_mode");
+	ctx.textAlign = "center";
+	ctx.fillStyle = dark_mode ? "#FFF" : "#000";
+	ctx.strokeStyle = dark_mode ? "#000" : "#FFF";
+	ctx.font = "bold " + kFontSize + "px sans-serif";
+	for (let i = 0; i < target_sets.length; ++i) {
+		const targets = target_sets[i].targets;
+		for (let j = 0; j < targets.length; ++j) {
+			const target = targets[j];
+			if (!target.active) {
+				continue;
+			}
+			let target_hits = stats.target_hits[target.id];
+			let rate_text = "--";
+			if (total_balls > 0) {
+				let rate = Math.round(100 * target_hits / total_balls)
+				rate_text = rate.toLocaleString();
+			}
+			let x = target.pos.x;
+			let y = target.pos.y - target.draw_radius - 2;
+			ctx.strokeText(rate_text, x, y);
+			ctx.fillText(rate_text, x, y);
+		}
+	}
+	for (let i = 0; i < bumper_sets.length; ++i) {
+		const bumpers = bumper_sets[i].targets;
+		for (let j = 0; j < bumpers.length; ++j) {
+			const bumper = bumpers[j];
+			if (!bumper.active) {
+				continue;
+			}
+			let bumper_hits = stats.target_hits[bumper.id];
+			let rate_text = "--";
+			if (total_balls > 0) {
+				let rate = Math.round(100 * bumper_hits / total_balls)
+				rate_text = rate.toLocaleString();
+			}
+			let x = bumper.pos.x;
+			let y = bumper.pos.y - bumper.draw_radius - 4;
+			ctx.strokeText(rate_text, x, y);
+			ctx.fillText(rate_text, x, y);
 		}
 	}
 }
@@ -466,25 +716,27 @@ function DrawScoreText(score_text, font_size, duration, rise, stroke_color_rgb, 
 		let curr_text = score_text[i];
 		let elapsed = state.current_time - curr_text.start_time;
 		if (elapsed > duration) {
+			object_pool.ReleaseRisingText(curr_text)
 			continue;
 		}
 		let fraction = elapsed / duration;
+		let alpha = curr_text.opacity * (1 - fraction);
 		let color_rgba = "";
 		if (curr_text.color_rgb == kPrismatic) {
 			color_rgba = GetPrismaticColor(
 				elapsed,
 				duration / 2,
 				/*saturation=*/ kPrismaticSaturation,
-				/*alpha=*/ 1 - fraction
+				alpha,
 			);
 		} else {
 			color_rgba =
-				"rgba(" + curr_text.color_rgb + ", " + (1 - fraction) + ")";
+				"rgba(" + curr_text.color_rgb + ", " + alpha + ")";
 		}
-		
+
 		if (stroke_color_rgb) {
-			stroke_color_rgba = 
-				"rgba(" + stroke_color_rgb + ", " + (1 - fraction) + ")";
+			stroke_color_rgba =
+				"rgba(" + stroke_color_rgb + ", " + alpha + ")";
 			ctx.strokeStyle = stroke_color_rgba;
 			ctx.strokeText(
 				curr_text.text,
@@ -492,7 +744,7 @@ function DrawScoreText(score_text, font_size, duration, rise, stroke_color_rgb, 
 				curr_text.pos.y - fraction * rise
 			);
 		}
-		
+
 		ctx.fillStyle = color_rgba;
 		ctx.fillText(
 			curr_text.text,
@@ -516,11 +768,12 @@ function DrawRipples(ripples, duration, expand, ctx) {
 		let curr_ripples = ripples[i];
 		let elapsed = state.current_time - curr_ripples.start_time;
 		if (elapsed > duration) {
+			object_pool.ReleaseRipple(curr_ripples);
 			continue;
 		}
 		let fraction = elapsed / duration;
 		let radius = curr_ripples.start_radius + expand * fraction;
-		
+
 		if (curr_ripples.color_rgb == kBeachBall) {
 			let rotation = 4.0 * Math.PI * elapsed / duration;
 			for (let i = 0; i < kPrismaticCycleColors.length; ++i) {
@@ -540,6 +793,65 @@ function DrawRipples(ripples, duration, expand, ctx) {
 					radius,
 					segment_rotation,
 					segment_rotation + Math.PI / 3.0
+				);
+				ctx.stroke();
+			}
+		} else if (curr_ripples.color_rgb == kRubberBand) {
+			let rotation = 4.0 * Math.PI * elapsed / duration;
+			for (let i = 0; i < kRubberBandColorIndices.length; ++i) {
+				let segment_rotation =
+					rotation + Math.PI * i / kRubberBandColorIndices.length;
+				color_rgba = GetPrismaticColor(
+					kRubberBandColorIndices[i],
+					6.0,
+					/*saturation=*/ kPrismaticSaturation,
+					/*alpha=*/ 1 - fraction
+				);
+				ctx.strokeStyle = color_rgba;
+				ctx.beginPath();
+				ctx.arc(
+					curr_ripples.pos.x,
+					curr_ripples.pos.y,
+					radius,
+					segment_rotation,
+					segment_rotation + Math.PI / 6.0
+				);
+				ctx.stroke();
+				ctx.beginPath();
+				ctx.arc(
+					curr_ripples.pos.x,
+					curr_ripples.pos.y,
+					radius,
+					segment_rotation + Math.PI,
+					segment_rotation + Math.PI * 7.0 / 6.0
+				);
+				ctx.stroke();
+			}
+		} else if (curr_ripples.color_rgb == kSpiral) {
+			let rotation = Math.PI * elapsed / duration;
+			let color1 = GetPrismaticColor(
+				elapsed,
+				duration / 2,
+				/*saturation=*/ kPrismaticSaturation,
+				/*alpha=*/ 1 - fraction
+			);
+			let color2 = GetPrismaticColor(
+				elapsed + duration / 4,
+				duration / 2,
+				/*saturation=*/ kPrismaticSaturation,
+				/*alpha=*/ 1 - fraction
+			);
+			const kRepetitions = 6;
+			for (let i = 0; i < kRepetitions * 2; ++i) {
+				let segment_rotation = rotation + Math.PI * i / kRepetitions;
+				ctx.strokeStyle = (i & 1) ? color1 : color2;
+				ctx.beginPath();
+				ctx.arc(
+					curr_ripples.pos.x,
+					curr_ripples.pos.y,
+					radius,
+					segment_rotation,
+					segment_rotation + Math.PI / kRepetitions
 				);
 				ctx.stroke();
 			}
@@ -625,7 +937,7 @@ function DrawWheelSpace(space, is_active, left_x, top_y, ctx) {
 }
 
 function DrawWheel(wheel) {
-	let canvas = GetCanvasLayer("BonusWheel");
+	let canvas = GetCanvasLayer("bonus_wheel");
 	let ctx = canvas.getContext("2d");
 	ctx.setTransform(1, 0, 0, 1, 0, 0);
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -681,102 +993,138 @@ function DrawWheel(wheel) {
 }
 
 function Draw(state) {
-	// Layer 0: Drop Zone
+	const machine = ActiveMachine(state);
+	const board = machine.board;
+	// Drop Zone
 	const can_drop =
 		CanDrop(state) ||
-		(AutoDropOn() && state.auto_drop_cooldown < kMinCooldownToDraw);
+		(machine.AutoDropOn() && state.auto_drop_cooldown < kMinCooldownToDraw);
 	if (state.redraw_all || state.last_drawn.can_drop != can_drop) {
-		let drop_zone_elem = document.getElementById("drop_zone");
-		if (drop_zone_elem.disabled == can_drop) {
-			drop_zone_elem.disabled = !can_drop;
+		const drop_zones = machine.board.drop_zones;
+		for (let i = 0; i < drop_zones.length; ++i) {
+			let drop_zone_elem = document.getElementById("drop_zone" + i);
+			if (drop_zone_elem.disabled == can_drop) {
+				drop_zone_elem.disabled = !can_drop;
+			}
 		}
 		if (state.redraw_all) {
-			const kLeftOffset = 5;
-			const kTopOffset = 5;
-			let width_px = (max_drop_x - min_drop_x) * state.canvas_scale;
-			let height_px = max_drop_y * state.canvas_scale;
-			drop_zone_elem.style.width = width_px + "px";
-			drop_zone_elem.style.height = height_px + "px";
-			if (state.april_fools) {
-				let top_px = kTopOffset + state.board.height * state.canvas_scale - height_px
-				let left_px = kLeftOffset + (state.board.width - max_drop_x) * state.canvas_scale;
-				drop_zone_elem.style.top = top_px + "px";
-				drop_zone_elem.style.left = left_px + "px";
-			} else {
-				let left_px = kLeftOffset + min_drop_x * state.canvas_scale;
-				drop_zone_elem.style.top = kTopOffset + "px";
-				drop_zone_elem.style.left = left_px + "px";
+			for (let i = 0; i < drop_zones.length; ++i) {
+				let drop_zone_elem = document.getElementById("drop_zone" + i);
+				let rect = drop_zones[i];
+				const kLeftOffset = 5;
+				const kTopOffset = 5;
+				let width_px = (rect.max_x - rect.min_x) * state.canvas_scale;
+				let height_px = (rect.max_y - rect.min_y) * state.canvas_scale;
+				drop_zone_elem.style.width = width_px + "px";
+				drop_zone_elem.style.height = height_px + "px";
+				if (state.april_fools) {
+					let top_px = kTopOffset + (board.height - rect.min_y) * state.canvas_scale - height_px;
+					let left_px = kLeftOffset + (board.width - rect.max_x) * state.canvas_scale;
+					drop_zone_elem.style.top = top_px + "px";
+					drop_zone_elem.style.left = left_px + "px";
+				} else {
+					let top_px = kTopOffset + rect.min_y * state.canvas_scale;
+					let left_px = kLeftOffset + rect.min_x * state.canvas_scale;
+					drop_zone_elem.style.top = kTopOffset + "px";
+					drop_zone_elem.style.left = left_px + "px";
+				}
 			}
 		}
 		state.last_drawn.can_drop = can_drop;
 	}
-	// Layer 1: Board
+	// Board
 	if (state.redraw_all) {
-		let ctx = ClearLayerAndReturnContext(1);
-		if (state.save_file.options.quality <= 1) {
-			DrawPegs(state.board.pegs, ctx);
+		let ctx = ClearLayerAndReturnContext("board");
+		if (GetSetting("quality") <= 1) {
+			DrawPegs(board.pegs, ctx);
 		} else {
-			DrawPegsNoGradient(state.board.pegs, ctx);
+			DrawPegsNoGradient(board.pegs, ctx);
 		}
 	}
-	// Layer 2: Balls
+	// Balls
 	let total_balls = TotalBalls(state);
 	if (state.redraw_all || total_balls > 0 || state.last_drawn.num_balls > 0) {
-		let ctx = ClearLayerAndReturnContext(2);
+		const ball_types = machine.BallTypes();
+		let ctx = ClearLayerAndReturnContext("balls");
 		for (let i = 0; i < state.balls_by_type.length; ++i) {
-			let opacity_id = kBallTypes[i].name + "_ball_opacity";
-			let opacity_pct = state.save_file.options[opacity_id];
+			let opacity_id = ball_types[i].name + "_ball_opacity";
+			let opacity_pct = machine.GetSetting(opacity_id);
 			if (opacity_pct <= 0) {
 				continue;
 			}
 			ctx.globalAlpha = opacity_pct / 100.0;
-			if (state.save_file.options.quality == 0) {
+			if (GetSetting("quality") == 0) {
 				DrawBalls(
 					state.balls_by_type[i],
-					kBallTypes[i].inner_color,
-					kBallTypes[i].outer_color,
+					ball_types[i].inner_color,
+					ball_types[i].outer_color,
 					ctx
 				);
 			} else {
 				DrawBallsNoGradient(
 					state.balls_by_type[i],
-					kBallTypes[i].outer_color,
+					ball_types[i].outer_color,
 					ctx
 				);
 			}
 		}
 		state.last_drawn.num_balls = total_balls;
 	}
-	// Layer 3: Targets
-	if (state.redraw_all || state.redraw_targets) {
-		let ctx = ClearLayerAndReturnContext(3);
-		let bottom_targets = state.target_sets[0].targets;
-		for (let i = 0; i < bottom_targets.length; ++i) {
-			bottom_targets[i].ResetText();
-		}
-		DrawTargets(state.target_sets, ctx);
-		state.redraw_targets = false;
+	// Bumpers
+	if (state.redraw_all || state.redraw_bumpers) {
+		let ctx = ClearLayerAndReturnContext("bumpers");
+		state.redraw_bumpers = false;
+		DrawBumpers(machine.board.bumper_sets, ctx);
 	}
-	// Layer 4: Auto-Drop position
+	// Targets
+	if (state.reset_target_text) {
+		state.reset_target_text = false;
+		let target_sets = machine.board.target_sets;
+		for (let i = 0; i < target_sets.length; ++i) {
+			const targets = target_sets[i].targets;
+			for (let j = 0; j < targets.length; ++j) {
+				targets[j].ResetText();
+			}
+		}
+	}
+	if (state.redraw_all || state.redraw_targets) {
+		let ctx = ClearLayerAndReturnContext("targets");
+		state.redraw_targets = false;
+		DrawTargets(machine.board.target_sets, ctx);
+	}
+	// Stats
+	if (state.redraw_all || state.redraw_stats_overlay) {
+		let ctx = ClearLayerAndReturnContext("stats");
+		state.redraw_stats_overlay = false;
+		if (GetSetting("show_hit_rates")) {
+			DrawHitRates(
+				machine.GetSaveData().stats,
+				machine.board.target_sets,
+				machine.board.bumper_sets,
+				ctx
+			);
+		}
+	}
+	// Auto-Drop position
 	if (state.redraw_all || state.redraw_auto_drop) {
-		let ctx = ClearLayerAndReturnContext(4);
-		if (AutoDropOn()) {
+		let ctx = ClearLayerAndReturnContext("auto_drop");
+		if (machine.AutoDropOn()) {
 			let cooldown = 0;
 			if (state.auto_drop_cooldown >= kMinCooldownToDraw) {
 				cooldown =
 					state.auto_drop_cooldown_left / state.auto_drop_cooldown;
 			}
-			DrawAutoDropPosition(state.save_file.auto_drop_pos, cooldown, ctx);
+			DrawAutoDropPosition(machine.GetSaveData().auto_drop_pos, cooldown, ctx);
 		}
 		state.redraw_auto_drop = false;
 	}
-	// Layer 5: Score text
+	// Score text
 	if (
 		state.redraw_all ||
 		state.score_text.length > 0 ||
 		state.last_drawn.num_score_text > 0
 	) {
-		let ctx = ClearLayerAndReturnContext(5);
+		let ctx = ClearLayerAndReturnContext("score_text");
 		DrawScoreText(
 			state.score_text,
 			/*font_size=*/ 8,
@@ -787,26 +1135,29 @@ function Draw(state) {
 		);
 		state.last_drawn.num_score_texts = state.score_text.length;
 	}
-	// Layer 6: Ripple effects
+	// Ripple effects
 	if (
 		state.redraw_all ||
 		state.ripples.length > 0 ||
 		state.last_drawn.num_ripples > 0
 	) {
-		let ctx = ClearLayerAndReturnContext(6);
+		let ctx = ClearLayerAndReturnContext("ripples");
 		DrawRipples(state.ripples, /*duration=*/ 1000.0, /*expand=*/ 20.0, ctx);
 		state.last_drawn.num_ripples = state.ripples.length;
 	}
 
 	// Bonus wheel
 	if (
-		state.redraw_all ||
-		state.redraw_wheel ||
-		state.wheel_popup_text.length > 0 ||
-		state.last_drawn.num_wheel_popup_texts > 0
+		machine.bonus_wheel &&
+		(
+			state.redraw_all ||
+			state.redraw_wheel ||
+			state.wheel_popup_text.length > 0 ||
+			state.last_drawn.num_wheel_popup_texts > 0
+		)
 	) {
 		state.redraw_wheel = false;
-		DrawWheel(state.bonus_wheel);
+		DrawWheel(machine.bonus_wheel);
 		state.last_drawn.num_wheel_popup_texts = state.wheel_popup_text.length;
 	}
 
@@ -814,6 +1165,7 @@ function Draw(state) {
 		UpdateAutoSaveInterval();
 		UpdateOptionsButtons();
 		UpdateSpinCounter();
+		machine.UpdateHyperSystemDisplay(state);
 	}
 
 	UpdateNotifications(state);

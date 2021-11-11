@@ -2,49 +2,96 @@
 <head>
 	<title>Pachinkremental</title>
 
+	<meta charset="UTF-8">
+
 	<link rel="icon" id="favicon" type="image/png" href="favicon/normal.png">
 	<link rel="stylesheet" type="text/css" href="style.css" />
 	<link rel="preconnect" href="https://fonts.gstatic.com">
-	<link rel="preload" type="font/ttf" href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&display=swap" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&display=swap" rel="stylesheet">
 	<script type="text/javascript" src="js/board.js"></script>
 	<script type="text/javascript" src="js/canvas.js"></script>
 	<script type="text/javascript" src="js/notifications.js"></script>
 	<script type="text/javascript" src="js/options.js"></script>
 	<script type="text/javascript" src="js/physics.js"></script>
+	<script type="text/javascript" src="js/stats.js"></script>
+	<script type="text/javascript" src="js/save_file.js"></script>
+	<script type="text/javascript" src="js/text_format.js"></script>
 	<script type="text/javascript" src="js/upgrades.js"></script>
 	<script type="text/javascript" src="js/util.js"></script>
 	<script type="text/javascript" src="js/wheel.js"></script>
 
+	<script type="text/javascript" src="js/machine.js"></script>
+	<script type="text/javascript" src="js/machine01.js"></script>
+	<script type="text/javascript" src="js/machine02.js"></script>
+
+	<!-- <script type="text/javascript" src="js/debug.js"></script> -->
+
 	<script type="text/javascript" src="js/game.js"></script>
 
 </head>
-<body onload="Load()">
+<body onload="Load()" onkeydown="OnKeyDown(event)" onkeyup="OnKeyUp(event)">
 	<table id="outer_table">
 		<tr>
 			<td id="board-td" rowspan="2">
-				<button type="button" class="dropZone" id="drop_zone"
-						style="z-index: 0; left: 15px; top: 5px; width: 140px; height: 30px;"></button>
-				<canvas id="canvas1" class="board" style="z-index: 1;"></canvas>
-				<canvas id="canvas2" class="board" style="z-index: 2;"></canvas>
-				<canvas id="canvas3" class="board" style="z-index: 3;"></canvas>
-				<canvas id="canvas4" class="board" style="z-index: 4;"></canvas>
-				<canvas id="canvas5" class="board" style="z-index: 5;"></canvas>
-				<canvas id="canvas6" class="board" style="z-index: 6;"></canvas>
+				<span id="drop_zones">
+					<button type="button" class="dropZone" id="drop_zone"
+							style="z-index: 0; left: 15px; top: 5px; width: 140px; height: 30px;"></button>
+				</span>
+				<canvas id="canvas_board"      class="board" style="z-index: 1;"></canvas>
+				<canvas id="canvas_balls"      class="board" style="z-index: 2;"></canvas>
+				<canvas id="canvas_bumpers"    class="board" style="z-index: 3;"></canvas>
+				<canvas id="canvas_targets"    class="board" style="z-index: 4;"></canvas>
+				<canvas id="canvas_stats"      class="board" style="z-index: 5;"></canvas>
+				<canvas id="canvas_auto_drop"  class="board" style="z-index: 6;"></canvas>
+				<canvas id="canvas_score_text" class="board" style="z-index: 7;"></canvas>
+				<canvas id="canvas_ripples"    class="board" style="z-index: 8;"></canvas>
 			</td>
 			<td class="rightUI" style="vertical-align: top;">
 				<div id="message_box" class="messageBox">
 					<span class="messageBoxLarge">Loading...</div>
 				</div>
-				<div id="buff" class="messageBox"> </div>
-				<div id="bonus_wheel" class="bonusWheel" style="display: none;">
-					<div id="spin_counter" class="messageBox">
-						<button type="button" class="bonusWheel" id="button_spin" onclick="SpinBonusWheel()">Spin the wheel!</button>
-						Spins:&nbsp;<span id="spin_count">0</span>
-						<span id="multi_spin">
-							| Multi&#x2011;Spin:&nbsp;&#xD7;<span id="multi_spin_count">1</span>
-						</span>
+				<div style="display: inline-block;">
+					<div id="hyper_system" class="hyperContainer" style="display: none;">
+						<button type="button" class="hyperSystem" id="button_hyper" onclick="ActivateHyper()">Activate Hyper System</button>
+						<div class="menuPadding"></div>
+						<div id="hyper_meter" class="hyperMeterBorder">
+							<div id="hyper_meter_fill" class="hyperMeterFill"></div>
+						</div>
+						<div class="menuPadding"></div>
+						<div id="hyper_status"></div>
 					</div>
-					<canvas id="canvasBonusWheel" class="bonusWheel" style="display: block; z-index: 1; margin: 5px"></canvas>
+					<div id="buff" class="messageBox"> </div>
+					<div id="bonus_wheel" class="bonusWheel" style="display: none;">
+						<div id="spin_counter" class="messageBox">
+							<button type="button" class="bonusWheel" id="button_spin" onclick="SpinBonusWheel()">Spin the wheel!</button>
+							Spins:&nbsp;<span id="spin_count">0</span>
+							<span id="multi_spin">
+								| Multi&#x2011;Spin:&nbsp;&#xD7;<span id="multi_spin_count">1</span>
+							</span>
+						</div>
+						<canvas id="canvas_bonus_wheel" class="bonusWheel" style="display: block; z-index: 1; margin: 5px"></canvas>
+					</div>
+					<div id="debug" style="display: none;">
+						<canvas id="favicon_canvas" width="64" height="64" style="height: 64px; width: 64px;"></canvas>
+						<a id="favicon_link">Save</a>
+					</div>
+				</div>
+				<div id="spiral_power" class="spiralContainer" style="display: none;">
+					<table id="spiral_power_table">
+						<tr>
+							<td id="spiral_power_meter_td" style="width: 100px; height: 100px;">
+								<div style="position: relative; width: 100px; height: 100px;">
+									<canvas id="canvas_spiral1" class="spiralPowerMeter" style="z-index: 1;"></canvas>
+									<canvas id="canvas_spiral2" class="spiralPowerMeter" style="z-index: 2;"></canvas>
+								</div>
+							</td>
+							<td id="spiral_power_status_td" style="text-align: right;">
+								<div id="spiral_power_header">Spiral Power:<br> <span id="spiral_power_percent"></span></div>
+								<div class="menuPadding"></div>
+								<div id="spiral_power_status">Multiplier:<br>&#xD7;<span id="spiral_multiplier"></span></div>
+							</td>
+						</tr>
+					</table>
 				</div>
 			</td>
 		</tr>
@@ -58,10 +105,23 @@
 					</button>
 					<div id="upgrades_contents" class="upgradesContents">
 						<div class="menuPadding"></div>
-						<div class="messageBox">Hover over an upgrade to see what it does.</div>
+						<div class="messageBox">Hover over an upgrade to see what it does. Hold Shift to buy as many levels as you can, in one click.</div>
 						<div class="messageBox">Next upgrade reveal at: <span id="next_upgrade_hint"></span></div>
 						<div class="menuPadding"></div>
 						<div id="upgrade_headers" class="upgradesContents"></div>
+					</div>
+				</div>
+				<div id="machines_container" class="machinesContainer" style="display: none;">
+					<button type="button" class="machinesHeader"
+							id="button_machines_header" onclick="ToggleVisibility('machines')">
+						<span id="machines_collapsed">[&ndash;]</span> Machines
+						<span id="machines_header_new" class="machineHeaderNew" style="display: none;"><sup>New!</sup></span>
+					</button>
+					<div id="machines_contents" class="machinesContents">
+						<div class="menuPadding"></div>
+						<div class="messageBox">You can switch machines here whenever you like. Each machine has its own separate points, upgrades, and stats. You can only play one machine at a time, but you can always return to a previous machine and pick up where you left off.</div>
+						<div class="menuPadding"></div>
+						<div id="machine_buttons" class="machinesContents"></div>
 					</div>
 				</div>
 				<div id="stats_container" class="statsContainer">
@@ -71,30 +131,94 @@
 					</button>
 					<div id="stats_contents" class="statsContents messageBox" style="height: 0px;">
 						<div class="menuPadding"></div>
-						<div id="stats_container_total_score" class="statsRow" style="display: block;">
+						<div id="stats_container_total_score" class="statsRow">
 							<b>Total points earned: </b><span id="stats_total_score" class="statsEntry"></span>
 						</div>
-						<div id="stats_container_total_last5s" class="statsRow" style="display: block;">
+						<div id="stats_container_total_last5s" class="statsRow">
 							<b>Points earned in last 5 seconds: </b><span id="stats_score_last5s" class="statsEntry"></span>
 						</div>
-						<div id="stats_container_total_last15s" class="statsRow" style="display: block;">
+						<div id="stats_container_total_last15s" class="statsRow">
 							<b>Points earned in last 15 seconds: </b><span id="stats_score_last15s" class="statsEntry"></span>
 						</div>
-						<div id="stats_container_total_last60s" class="statsRow" style="display: block;">
+						<div id="stats_container_total_last60s" class="statsRow">
 							<b>Points earned in last 60 seconds: </b><span id="stats_score_last60s" class="statsEntry"></span>
 						</div>
 						<div class="menuPadding"></div>
-						<div id="stats_container_max_buff_multiplier" class="statsRow" style="display: none;">
+						<div id="stats_container_max_buff_multiplier" class="statsRowUnlockable">
 							<b>Highest buff multiplier: </b>&#xD7;<span id="stats_max_buff_multiplier" class="statsEntry"></span>
 						</div>
+						<div id="stats_container_longest_lasting_beach_ball" class="statsRowUnlockable">
+							<b>Longest-lasting Beach Ball: </b><span id="stats_longest_lasting_beach_ball" class="statsEntry"></span> seconds
+						</div>
+						<div id="stats_container_max_beach_ball_rotated_degrees" class="statsRowUnlockable">
+							<b>Most rotations by a Beach Ball: </b><span id="stats_max_beach_ball_rotated_degrees" class="statsEntry"></span>&deg;
+						</div>
+						<div id="stats_container_max_combo" class="statsRowUnlockable">
+							<b>Highest combo: </b>&#xD7;<span id="stats_max_combo" class="statsEntry"></span>
+						</div>
+						<div id="stats_container_hyper_activations" class="statsRowUnlockable">
+							<b>Hyper System activations: </b><span id="stats_hyper_activations" class="statsEntry"></span>
+						</div>
+						<div id="stats_container_max_hyper_combo" class="statsRowUnlockable">
+							<b>Highest Hyper Combo: </b><span id="stats_max_hyper_combo" class="statsEntry"></span> hits
+						</div>
+						<div id="stats_container_longest_lasting_ruby_ball" class="statsRowUnlockable">
+							<b>Longest-lasting ball with the Ruby Ball bonus: </b><span id="stats_longest_lasting_ruby_ball" class="statsEntry"></span> seconds
+						</div>
+						<div id="stats_container_sapphire_ball_most_target_hits" class="statsRowUnlockable">
+							<b>Most target hits by a ball with the Sapphire Ball bonus: </b><span id="stats_sapphire_ball_most_target_hits" class="statsEntry"></span>
+						</div>
+						<div id="stats_container_emerald_ball_most_bumper_hits" class="statsRowUnlockable">
+							<b>Most bumper hits by a ball with the Emerald Ball bonus: </b><span id="stats_emerald_ball_most_bumper_hits" class="statsEntry"></span>
+						</div>
+						<div id="stats_container_rubberband_ball_most_bounces" class="statsRowUnlockable">
+							<b>Most bounces by a Rubber Band Ball: </b><span id="stats_rubberband_ball_most_bounces" class="statsEntry"></span>
+						</div>
+						<div id="stats_container_max_spiral_ball_rotated_degrees" class="statsRowUnlockable">
+							<b>Most rotations by a Spiral Ball: </b><span id="stats_max_spiral_ball_rotated_degrees" class="statsEntry"></span>&deg;
+						</div>
+						<div id="stats_container_max_spiral_power_percent" class="statsRowUnlockable">
+							<b>Highest Spiral Power: </b><span id="stats_max_spiral_power_percent" class="statsEntry"></span>%
+						</div>
 						<div class="menuPadding"></div>
-						<div id="stats_container_balls_dropped" class="statsRow" style="display: block;">
+						<div id="stats_container_balls_dropped" class="statsRow">
 							<b>Total balls dropped: </b><span id="stats_balls_dropped" class="statsEntry"></span>
 						</div>
-						<div id="stats_container_balls_dropped_manual" class="statsRow" style="display: none;">
+						<div id="stats_container_balls_dropped_manual" class="statsRowUnlockable">
 							<b>Balls dropped manually: </b><span id="stats_balls_dropped_manual" class="statsEntry"></span>
 						</div>
-						<div id="stats_balls_dropped_by_type"></div>
+						<div id="stats_container_stats_by_ball_type" class="statsSection">
+							<label for="stats_by_ball_type_select"><b>Stats by ball type:</b></label>
+							<select name="stats_by_ball_type_select" id="stats_by_ball_type_select"
+									onchange="UpdateStatsByBallType()">
+								<option value="balls_dropped">Total balls dropped</option>
+								<option value="total_points">Total points scored</option>
+								<option value="last5s_points">Points scored in last 5 seconds</option>
+								<option value="last15s_points">Points scored in last 15 seconds</option>
+								<option value="last60s_points">Points scored in last 60 seconds</option>
+							</select>
+							<div id="stats_by_ball_type" style="clear: both;"></div>
+						</div>
+						<div class="menuPadding"></div>
+						<button type="button" class="statsButton"
+								id="button_stats_hit_rates" onclick="ToggleHitRates()"
+								onmouseenter="ShowHitRatesTooltip(this)" onmouseleave="HideButtonTooltip(this)">
+									Show hit rates: OFF
+						</button>
+						<button type="button" class="statsButton"
+								id="button_stats_reset_hit_rates" onclick="ResetHitRates()">
+									Reset hit rates
+						</button>
+						<div id="stats_container_hit_rates_balls_counted" class="statsRow" style="display: none;">
+							<b>Balls counted: </b><span id="stats_hit_rates_balls_counted" class="statsEntry"></span>
+						</div>
+						<div class="menuPadding"></div>
+						<b>Save file started: </b><span id="stats_save_file_started" class="statsEntry"></span> ago
+						<div class="menuPadding"></div>
+						<div id="stats_container_milestones" style="display: none;">
+							<b>Time taken to reach milestones:</b>
+							<div id="stats_section_milestones"></div>
+						</div>
 						<div class="menuPadding"></div>
 					</div>
 				</div>
@@ -118,13 +242,23 @@
 						<button type="button" class="optionButton"
 								id="button_dark_mode" onclick="ToggleDarkMode()">Dark Mode</button>
 						<button type="button" class="optionButton"
-								id="button_scientific_notation" onclick="ToggleScientificNotation()">Scientific Notation</button>
+								id="button_notation" onclick="ToggleNotation()">Notation</button>
 						<button type="button" class="optionButton"
 								id="button_quality" onclick="ToggleQuality()">Quality</button>
 						<button type="button" class="optionButton"
 								id="button_popup_text" onclick="TogglePopupText()">Popup text</button>
 						<button type="button" class="optionButton"
+								id="button_apply_opacity_to_popup_text"
+								onclick="ToggleBooleanOption('apply_opacity_to_popup_text')">
+								Apply opacity settings to pop-up text</button>
+						<button type="button" class="optionButton"
+								id="button_show_combos" onclick="ToggleBooleanOption('show_combos')">Show combos</button>
+						<button type="button" class="optionButton"
 								id="button_upgrade_levels_bought" onclick="ToggleShowUpgradeLevels()">Upgrade levels bought</button>
+						<button type="button" class="optionButton"
+								id="button_opal_balls_upgrades_style" onclick="ToggleOpalBallUpgradesStyle()">Opal ball upgrade button style</button>
+						<button type="button" class="optionButton"
+								id="button_maxed_upgrades" onclick="ToggleMaxedUpgrades()">Maxed upgrades</button>
 						<button type="button" class="optionButton"
 								id="button_april_fools" onclick="ToggleAprilFools()">April Fools</button>
 						<br>
@@ -163,6 +297,20 @@
 			<div id="export_message">Your save file is below. Copy the text and keep it someplace safe.</div>
 			<br>
 			<textarea id="exported_save" class="exportedSave" onclick="this.select()" readonly></textarea>
+		</div>
+	</div>
+	<div id="machine_maxed_modal" class="modal">
+		<div id="machine_maxed_modal_content" class="modalContent">
+			<span class="modalCloseButton" onmousedown="CloseModal('machine_maxed_modal')">&#xD7</span>
+			<span style="text-align: center; vertical-align: middle;">
+				<span class="prismaticText"><b>Excellent!</b></span>
+				<br><br>
+				You've maxed all the upgrades that can be maxed on the <span id="maxed_machine_name"></span> machine!
+				<br><br>
+				As a reward, you've unlocked a new machine! Check it out in the Machines menu, between Upgrades and Stats.
+				<br><br>
+				By the way, it's been <span id="machine_maxed_time" class="speedrunTimerSplit"></span> since you started playing on this save file. You can check how long it took you to reach this milestone, as well as any other milestones you've reached, in the Stats menu.
+			</span>
 		</div>
 	</div>
 	<div id="ending_modal" class="modal">
