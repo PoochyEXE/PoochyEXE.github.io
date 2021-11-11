@@ -685,7 +685,7 @@ class BumperMachine extends PachinkoMachine {
 	}
 
 	InitUpgrades() {
-		const kTimesSymbol = "&times;";
+		const kTimesSymbol = "\u00D7";
 		let upgrades_list = new Array();
 		upgrades_list.push(
 			new Upgrade({
