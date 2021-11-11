@@ -656,18 +656,18 @@ button.beachBallUpgradeButtonDark:disabled {
 button.rubberBandBallUpgradeButtonLight {
 	background: repeating-linear-gradient(
 	  120deg,
-	  #8E8,
-	  #8E8 3px,
-	  #E88 3px,
-	  #E88 6px,
-	  #88E 6px,
-	  #88E 9px,
-	  #EE8 9px,
-	  #EE8 12px,
-	  #8EE 12px,
-	  #8EE 15px,
-	  #E8E 15px,
-	  #E8E 18px
+	  #AFA,
+	  #AFA 5px,
+	  #FAA 5px,
+	  #FAA 10px,
+	  #AAF 10px,
+	  #AAF 15px,
+	  #FFA 15px,
+	  #FFA 20px,
+	  #AFF 20px,
+	  #AFF 25px,
+	  #FAF 25px,
+	  #FAF 30px
 	);
 	color: #000;
 }
@@ -675,18 +675,18 @@ button.rubberBandBallUpgradeButtonLight {
 button.rubberBandBallUpgradeButtonLight:disabled {
 	background: repeating-linear-gradient(
 	  120deg,
-	  #7A7,
-	  #7A7 3px,
-	  #A77 3px,
-	  #A77 6px,
-	  #77A 6px,
-	  #77A 9px,
-	  #AA7 9px,
-	  #AA7 12px,
-	  #7AA 12px,
-	  #7AA 15px,
-	  #A7A 15px,
-	  #A7A 18px
+	  #8A8,
+	  #8A8 5px,
+	  #A88 5px,
+	  #A88 10px,
+	  #88A 10px,
+	  #88A 15px,
+	  #AA8 15px,
+	  #AA8 20px,
+	  #8AA 20px,
+	  #8AA 25px,
+	  #A8A 25px,
+	  #A8A 30px
 	);
 	color: #000;
 }
@@ -695,17 +695,17 @@ button.rubberBandBallUpgradeButtonDark {
 	background: repeating-linear-gradient(
 	  120deg,
 	  #282,
-	  #282 3px,
-	  #822 3px,
-	  #822 6px,
-	  #228 6px,
-	  #228 9px,
-	  #882 9px,
-	  #882 12px,
-	  #288 12px,
-	  #288 15px,
-	  #828 15px,
-	  #828 18px
+	  #282 5px,
+	  #822 5px,
+	  #822 10px,
+	  #228 10px,
+	  #228 15px,
+	  #882 15px,
+	  #882 20px,
+	  #288 20px,
+	  #288 25px,
+	  #828 25px,
+	  #828 30px
 	);
 	color: #FFF;
 }
@@ -714,61 +714,61 @@ button.rubberBandBallUpgradeButtonDark:disabled {
 	background: repeating-linear-gradient(
 	  120deg,
 	  #030,
-	  #030 3px,
-	  #300 3px,
-	  #300 6px,
-	  #003 6px,
-	  #003 9px,
-	  #330 9px,
-	  #330 12px,
-	  #033 12px,
-	  #033 15px,
-	  #303 15px,
-	  #303 18px
+	  #030 5px,
+	  #300 5px,
+	  #300 10px,
+	  #003 10px,
+	  #003 15px,
+	  #330 15px,
+	  #330 20px,
+	  #033 20px,
+	  #033 25px,
+	  #303 25px,
+	  #303 30px
 	);
 	color: #FFF;
 }
 
 button.spiralBallUpgradeButtonLight {
 	background: repeating-radial-gradient(
-	  circle at -3px,
-	  #2C2,
-	  #2C2 3px,
-	  #7F7 3px,
-	  #7F7 6px
+	  circle at -5px,
+	  #7D7,
+	  #7D7 5px,
+	  #8F8 5px,
+	  #8F8 10px
 	);
 	color: #000;
 }
 
 button.spiralBallUpgradeButtonLight:disabled {
 	background: repeating-radial-gradient(
-	  circle at -3px,
-	  #8C8,
-	  #8C8 3px,
-	  #AFA 3px,
-	  #AFA 6px
+	  circle at -5px,
+	  #787,
+	  #787 5px,
+	  #898 5px,
+	  #898 10px
 	);
 	color: #000;
 }
 
 button.spiralBallUpgradeButtonDark {
 	background: repeating-radial-gradient(
-	  circle at -3px,
+	  circle at -5px,
 	  #282,
-	  #282 3px,
-	  #060 3px,
-	  #060 6px
+	  #282 5px,
+	  #060 5px,
+	  #060 10px
 	);
 	color: #FFF;
 }
 
 button.spiralBallUpgradeButtonDark:disabled {
 	background: repeating-radial-gradient(
-	  circle at -3px,
+	  circle at -5px,
 	  #030,
-	  #030 3px,
-	  #010 3px,
-	  #010 6px
+	  #030 5px,
+	  #010 5px,
+	  #010 10px
 	);
 	color: #FFF;
 }

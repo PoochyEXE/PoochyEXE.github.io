@@ -44,6 +44,9 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
+### v2.0.1-beta (2021-11-11)
+* Adjust buttons for Rubber Band Balls and Spiral Balls to make the text more readable.
+
 ### v1.15.2-beta (2021-11-11)
 * Fix pop-up text for board upgrades.
 

@@ -44,6 +44,9 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
+### v2.0.1 (2021-11-11)
+* Adjust buttons for Rubber Band Balls and Spiral Balls to make the text more readable.
+
 ### v2.0.0 (2021-11-11)
 * **Major new feature: A second machine!**
 * Minor nerf: Rate-limit manual drops so that hypertapping/mashing the mouse button doesn't become the optimal strategy.
