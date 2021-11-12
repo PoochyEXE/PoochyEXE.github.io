@@ -650,8 +650,9 @@ function DrawHitRates(stats, target_sets, bumper_sets, ctx) {
 		const targets = target_sets[i].targets;
 		for (let j = 0; j < targets.length; ++j) {
 			const target = targets[j];
-			if (!target.pass_through) {
-				total_balls += stats.target_hits[target.id];
+			const hits = stats.target_hits[target.id];
+			if (hits && !target.pass_through) {
+				total_balls += hits;
 			}
 		}
 	}
@@ -674,6 +675,9 @@ function DrawHitRates(stats, target_sets, bumper_sets, ctx) {
 				continue;
 			}
 			let target_hits = stats.target_hits[target.id];
+			if (!target_hits) {
+				target_hits = 0;
+			}
 			let rate_text = "--";
 			if (total_balls > 0) {
 				let rate = Math.round(100 * target_hits / total_balls)
