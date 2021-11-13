@@ -56,6 +56,7 @@ class BumperMachine extends PachinkoMachine {
 		this.spiral_power = 0.0;
 		this.spiral_multiplier = 1.0;
 		this.last_drawn_spiral_meter_ticks = 0;
+		this.max_spiral_power = 5000;
 	}
 
 	OnActivate() {
@@ -1653,14 +1654,10 @@ class BumperMachine extends PachinkoMachine {
 		}
 	}
 
-	UpdateOneFrame() {
+	UpdateOneFrame(state) {
 		let save_data = this.GetSaveData();
 
-		if (!this.IsUnlocked("unlock_spiral_balls")) {
-			UpdateDisplay("spiral_power", "none");
-		} else {
-			UpdateDisplay("spiral_power", "inline-block");
-			const kMaxSpiralPower = 5000;
+		if (this.IsUnlocked("unlock_spiral_balls")) {
 			const kMaxSpiralMultiplier = 10;
 			if (this.overdrive && this.IsUnlocked("overdrive_fight_the_power")) {
 				save_data.spiral_power *= 0.995;
@@ -1672,26 +1669,41 @@ class BumperMachine extends PachinkoMachine {
 			for (let i = 0; i < spiral_balls.length; ++i) {
 				save_data.spiral_power += Math.abs(spiral_balls[i].omega);
 			}
-			let meter_fraction = save_data.spiral_power / kMaxSpiralPower;
+			let meter_fraction = save_data.spiral_power / this.max_spiral_power;
 			if (!this.IsUnlocked("pierce_the_heavens")) {
-				if (save_data.spiral_power > kMaxSpiralPower) {
+				if (save_data.spiral_power > this.max_spiral_power) {
 					state.update_upgrade_buttons_visible = true;
 				}
 				// Allow an extra hidden 2% to be stored to offset future
 				// decay, but still cap the buff at 100%.
 				save_data.spiral_power =
-					Math.min(save_data.spiral_power, 1.02 * kMaxSpiralPower);
+					Math.min(save_data.spiral_power, 1.02 * this.max_spiral_power);
 				meter_fraction = Math.min(meter_fraction, 1.0);
 			}
 			let multiplier_fraction = meter_fraction;
+			let meter_percent = 100.0 * meter_fraction;
+			save_data.stats.max_spiral_power_percent =
+				Math.max(save_data.stats.max_spiral_power_percent, meter_percent);
 			if (multiplier_fraction > 1.0) {
 				multiplier_fraction = Math.sqrt(multiplier_fraction);
 			}
 			this.spiral_multiplier =
 				1.0 + multiplier_fraction * (kMaxSpiralMultiplier - 1);
+		}
+	}
+	
+	Draw(state) {
+		const save_data = this.GetSaveData();
+		this.UpdateHyperSystemDisplay(state);
+		if (!this.IsUnlocked("unlock_spiral_balls")) {
+			UpdateDisplay("spiral_power", "none");
+		} else {
+			UpdateDisplay("spiral_power", "inline-block");
+			let meter_fraction = save_data.spiral_power / this.max_spiral_power;
+			if (!this.IsUnlocked("pierce_the_heavens")) {
+				meter_fraction = Math.min(meter_fraction, 1.0);
+			}
 			let meter_percent = 100.0 * meter_fraction;
-			save_data.stats.max_spiral_power_percent =
-				Math.max(save_data.stats.max_spiral_power_percent, meter_percent);
 			if (meter_percent < 0.0) {
 				meter_percent = 0.0;
 			}

@@ -183,7 +183,6 @@ function LoadGame(save_file_str) {
 		state.save_file.game_version = kSaveFileVersion;
 		state.update_upgrade_buttons_all = true;
 		state.update_buff_display = true;
-		state.bonus_wheel = default_state.bonus_wheel;
 		state.redraw_wheel = true;
 		if (!kIsLiveVersion) {
 			state.save_file.is_beta = true;

@@ -1,4 +1,4 @@
-const kVersion = "v2.0.4-beta";
+const kVersion = "v2.0.5";
 const kTitleAndVersion = "Pachinkremental " + kVersion;
 
 const kFrameInterval = 1000.0 / kFPS;
@@ -398,14 +398,7 @@ function UpdateOneFrame(state) {
 		}
 	}
 
-	if (machine.bonus_wheel && machine.bonus_wheel.IsSpinning()) {
-		state.redraw_wheel = true;
-		machine.bonus_wheel.UpdateOneFrame();
-	} else if (machine.AutoSpinOn() && save_data.spins > 0) {
-		SpinBonusWheel();
-	}
-
-	machine.UpdateOneFrame();
+	machine.UpdateOneFrame(state);
 
 	if (state.last_score_history_update + 5000.0 <= state.current_time) {
 		UpdateScoreHistory(state);
@@ -485,7 +478,6 @@ function Update() {
 	}
 	if (state.update_buff_display) {
 		UpdateBuffDisplay(state);
-		ActiveMachine(state).UpdateHyperSystemDisplay(state);
 	}
 	if (state.update_upgrades) {
 		UpdateUpgrades(state);

@@ -1086,6 +1086,28 @@ class FirstMachine extends PachinkoMachine {
 		return upgrades_map;
 	}
 
+	UpdateOneFrame(state) {
+		if (this.bonus_wheel.IsSpinning()) {
+			state.redraw_wheel = true;
+			this.bonus_wheel.UpdateOneFrame();
+		} else if (this.AutoSpinOn() && this.GetSaveData().spins > 0) {
+			SpinBonusWheel();
+		}
+	}
+
+	Draw(state) {
+		if (
+			state.redraw_all ||
+			state.redraw_wheel ||
+			state.wheel_popup_text.length > 0 ||
+			state.last_drawn.num_wheel_popup_texts > 0
+		) {
+			state.redraw_wheel = false;
+			DrawWheel(this.bonus_wheel);
+			state.last_drawn.num_wheel_popup_texts = state.wheel_popup_text.length;
+		}
+	}
+
 	NextUpgradeHint() {
 		if (!this.IsUpgradeVisible("auto_drop")) {
 			return "1K Center Slot Value";

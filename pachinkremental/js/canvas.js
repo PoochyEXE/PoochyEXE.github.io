@@ -998,6 +998,7 @@ function DrawWheel(wheel) {
 
 function Draw(state) {
 	const machine = ActiveMachine(state);
+	machine.Draw(state);
 	const board = machine.board;
 	// Drop Zone
 	const can_drop =
@@ -1150,26 +1151,10 @@ function Draw(state) {
 		state.last_drawn.num_ripples = state.ripples.length;
 	}
 
-	// Bonus wheel
-	if (
-		machine.bonus_wheel &&
-		(
-			state.redraw_all ||
-			state.redraw_wheel ||
-			state.wheel_popup_text.length > 0 ||
-			state.last_drawn.num_wheel_popup_texts > 0
-		)
-	) {
-		state.redraw_wheel = false;
-		DrawWheel(machine.bonus_wheel);
-		state.last_drawn.num_wheel_popup_texts = state.wheel_popup_text.length;
-	}
-
 	if (state.redraw_all) {
 		UpdateAutoSaveInterval();
 		UpdateOptionsButtons();
 		UpdateSpinCounter();
-		machine.UpdateHyperSystemDisplay(state);
 	}
 
 	UpdateNotifications(state);

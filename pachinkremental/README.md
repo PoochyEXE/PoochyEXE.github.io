@@ -44,7 +44,12 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
-### v2.0.4-beta (2021-11-12)
+### v2.0.5 (2021-11-12)
+* Fix a bug where the game has a CPU spike and freezes for a bit when script execution resumes after being paused for a while (e.g. switching back to the tab).
+* Refactor some of the machine-specific feature code (Bonus Wheel, Hyper System, and Spiral Power) to make it easier to add new machines in the future.
+* Optimize compression on the Rubber Band and Spiral Ball favicons. (Which only saves 1.5 KB of loading, but whatever.)
+
+### v2.0.4 (2021-11-12)
 * Fix bug where hit rates are broken if a target has never been hit.
 
 ### v2.0.3 (2021-11-11)

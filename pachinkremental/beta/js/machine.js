@@ -7,7 +7,6 @@ class PachinkoMachine {
 		this.ball_types = ball_types;
 		this.board = this.InitBoard();
 		this.upgrades = this.InitUpgrades();
-		this.bonus_wheel = null;
 		this.max_balls = 1;
 		this.ball_type_rates = [1.0];
 		for (let i = 1; i < ball_types.length; ++i) {
@@ -21,7 +20,9 @@ class PachinkoMachine {
 
 	OnBuffTimeout(state) {}
 
-	UpdateOneFrame() {}
+	UpdateOneFrame(state) {}
+
+	Draw(state) {}
 
 	InitBoard() {
 		console.error("Not implemented!");
@@ -42,8 +43,6 @@ class PachinkoMachine {
 	ActivateHyperSystem() {
 		console.error("Not implemented!");
 	}
-
-	UpdateHyperSystemDisplay(state) {}
 
 	TogglePopupText() {
 		let options = this.GetSaveData().options;
