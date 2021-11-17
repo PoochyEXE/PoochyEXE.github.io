@@ -44,6 +44,10 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
+### v2.0.6 (2021-11-16)
+* Bumpers machine: Add "Opal+ only" and "Ultimate only" pop-up text options.
+* Optimize Spiral Power meter drawing code by caching individual cell colors.
+
 ### v2.0.5 (2021-11-12)
 * Fix a bug where the game has a CPU spike and freezes for a bit when script execution resumes after being paused for a while (e.g. switching back to the tab).
 * Refactor some of the machine-specific feature code (Bonus Wheel, Hyper System, and Spiral Power) to make it easier to add new machines in the future.

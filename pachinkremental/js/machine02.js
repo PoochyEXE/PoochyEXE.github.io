@@ -35,6 +35,8 @@ const kBumperMachinePopupTextOptions = [
 	"Enable All",
 	"Gold+ only",
 	"Gemstone+ only",
+	"Opal+ only",
+	"Ultimate only",
 	"Disable All",
 ];
 
@@ -106,20 +108,31 @@ class BumperMachine extends PachinkoMachine {
 	}
 
 	TogglePopupText() {
+		const kDisableAll = kBumperMachinePopupTextOptions.length - 1;
 		let options = this.GetSaveData().options;
 		++options.display_popup_text;
 		if (
 			options.display_popup_text == 1 &&
 			!this.IsUnlocked("unlock_gold_balls")
 		) {
-			options.display_popup_text = kBumperMachinePopupTextOptions.length - 1;
+			options.display_popup_text = kDisableAll;
 		} else if (
 			options.display_popup_text == 2 &&
 			!this.AnyTier1GemstoneBallsUnlocked()
 		) {
-			options.display_popup_text = kFirstMachinePopupTextOptions.length - 1;
+			options.display_popup_text = kDisableAll;
+		} else if (
+			options.display_popup_text == 3 &&
+			!this.IsUnlocked("unlock_opal_balls")
+		) {
+			options.display_popup_text = kDisableAll;
+		} else if (
+			options.display_popup_text == 4 &&
+			!this.AnyUltimateBallsUnlocked()
+		) {
+			options.display_popup_text = kDisableAll;
 		}
-		if (options.display_popup_text >= kBumperMachinePopupTextOptions.length) {
+		if (options.display_popup_text > kDisableAll) {
 			options.display_popup_text = 0;
 		}
 	}
@@ -161,12 +174,25 @@ class BumperMachine extends PachinkoMachine {
 	}
 
 	PopupTextLevelForBallType(ball_type_index) {
-		if (ball_type_index == kBumperMachineBallTypeIDs.NORMAL) {
-			return 0;
-		} else if (ball_type_index == kBumperMachineBallTypeIDs.GOLD) {
-			return 1;
-		} else {
-			return 2;
+		switch(ball_type_index) {
+			case kBumperMachineBallTypeIDs.NORMAL:
+				return 0;
+			case kBumperMachineBallTypeIDs.GOLD:
+				return 1;
+			case kBumperMachineBallTypeIDs.RUBY:
+			case kBumperMachineBallTypeIDs.SAPPHIRE:
+			case kBumperMachineBallTypeIDs.EMERALD:
+			case kBumperMachineBallTypeIDs.TOPAZ:
+			case kBumperMachineBallTypeIDs.TURQUOISE:
+			case kBumperMachineBallTypeIDs.AMETHYST:
+				return 2;
+			case kBumperMachineBallTypeIDs.OPAL:
+				return 3;
+			case kBumperMachineBallTypeIDs.BEACH_BALL:
+			case kBumperMachineBallTypeIDs.RUBBER_BAND:
+			case kBumperMachineBallTypeIDs.SPIRAL:
+			default:
+				return 4;
 		}
 	}
 
@@ -1815,6 +1841,16 @@ class BumperMachine extends PachinkoMachine {
 			}
 		}
 
+		this.spiral_meter_fill_colors = Array(this.spiral_meter_num_ticks);
+		for (let i = 0; i < this.spiral_meter_num_ticks; ++i) {
+			this.spiral_meter_fill_colors[i] = GetPrismaticColor(
+				2 + 7 * (i / this.spiral_meter_num_ticks),
+				12.0,
+				/*saturation=*/0.8,
+				/*alpha=*/1.0
+			);
+		}
+
 		let canvas1 = GetCanvasLayer("spiral1");
 		canvas1.width  = kSpiralMeterSize;
 		canvas1.height = kSpiralMeterSize;
@@ -1848,12 +1884,7 @@ class BumperMachine extends PachinkoMachine {
 			ctx.lineTo(inner_next.x, inner_next.y);
 			if (this.spiral_meter_ticks[i]) {
 				if (ticks_left > num_meter_ticks) {
-					ctx.fillStyle = GetPrismaticColor(
-						2 + 7 * (ticks_drawn / num_meter_ticks),
-						12.0,
-						/*saturation=*/0.8,
-						/*alpha=*/1.0
-					);
+					ctx.fillStyle = this.spiral_meter_fill_colors[ticks_drawn];
 				} else {
 					ctx.fillStyle = "#AFA";
 				}
@@ -2157,6 +2188,14 @@ class BumperMachine extends PachinkoMachine {
 
 	UltimateBallRateValueFunc(level) {
 		return (level + 1) / 2.0;
+	}
+
+	AnyUltimateBallsUnlocked() {
+		return (
+			this.IsUnlocked("unlock_beach_balls") ||
+			this.IsUnlocked("unlock_rubberband_balls") ||
+			this.IsUnlocked("unlock_spiral_balls")
+		);
 	}
 
 	HasBeachBallSpecial(ball_type_index) {
