@@ -1846,8 +1846,7 @@ class BumperMachine extends PachinkoMachine {
 			this.spiral_meter_fill_colors[i] = GetPrismaticColor(
 				2 + 7 * (i / this.spiral_meter_num_ticks),
 				12.0,
-				/*saturation=*/0.8,
-				/*alpha=*/1.0
+				/*lightness=*/60
 			);
 		}
 

@@ -44,6 +44,9 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
+### v2.0.7 (2021-11-20)
+* Refactor and optimize code for rendering Opal and Ultimate balls and use HSL color space for them.
+
 ### v2.0.6 (2021-11-16)
 * Bumpers machine: Add "Opal+ only" and "Ultimate only" pop-up text options.
 * Optimize Spiral Power meter drawing code by caching individual cell colors.
