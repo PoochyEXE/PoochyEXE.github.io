@@ -987,6 +987,50 @@ function DrawWheel(wheel) {
 	}
 }
 
+function DrawBoardGlow(state) {
+	state.redraw_board_glow = false;
+	const glow = state.board_glow;
+	let ctx = ClearLayerAndReturnContext("glow");
+	let glow_active =
+		glow.color && glow.size > 0 && GetSetting("board_glow_enabled");
+	if (!glow_active) {
+		return;
+	}
+	const board = ActiveMachine(state).board;
+	const width = board.width;
+	const height = board.height;
+	const size = glow.size;
+	const kTransparent = "rgba(0,0,0,0)";
+
+	// Top
+	let gradient = ctx.createLinearGradient(0, 0, 0, size);
+	gradient.addColorStop(0, glow.color);
+	gradient.addColorStop(1, kTransparent);
+	ctx.fillStyle = gradient;
+	ctx.fillRect(0, 0, width, size);
+
+	// Bottom
+	gradient = ctx.createLinearGradient(0, height, 0, height - size);
+	gradient.addColorStop(0, glow.color);
+	gradient.addColorStop(1, kTransparent);
+	ctx.fillStyle = gradient;
+	ctx.fillRect(0, height - size, width, size);
+
+	// Left
+	gradient = ctx.createLinearGradient(0, 0, size, 0);
+	gradient.addColorStop(0, glow.color);
+	gradient.addColorStop(1, kTransparent);
+	ctx.fillStyle = gradient;
+	ctx.fillRect(0, 0, size, height);
+
+	// Right
+	gradient = ctx.createLinearGradient(width, 0, width - size, 0);
+	gradient.addColorStop(0, glow.color);
+	gradient.addColorStop(1, kTransparent);
+	ctx.fillStyle = gradient;
+	ctx.fillRect(width - size, 0, size, height);
+}
+
 function Draw(state) {
 	const machine = ActiveMachine(state);
 	machine.Draw(state);
@@ -1140,6 +1184,10 @@ function Draw(state) {
 		let ctx = ClearLayerAndReturnContext("ripples");
 		DrawRipples(state.ripples, /*duration=*/ 1000.0, /*expand=*/ 20.0, ctx);
 		state.last_drawn.num_ripples = state.ripples.length;
+	}
+	// Board glow
+	if (state.redraw_all || state.redraw_board_glow) {
+		DrawBoardGlow(state);
 	}
 
 	if (state.redraw_all) {

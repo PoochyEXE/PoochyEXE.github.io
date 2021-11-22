@@ -221,6 +221,8 @@ function UpdateOptionsButtons() {
 		ActiveMachine(state).IsUnlocked("unlock_combos") ? "inline" : "none");
 	UpdateInnerHTML("button_show_combos",
 		"Show combos: " + (state.save_file.options.show_combos ? "ON" : "OFF"));
+	UpdateInnerHTML("button_board_glow",
+		"Board glow: " + (state.save_file.options.board_glow_enabled ? "Enabled" : "Disabled"));
 }
 
 function ToggleOpalBallUpgradesStyle() {
@@ -333,6 +335,13 @@ function ToggleMaxedUpgrades() {
 		state.save_file.options.maxed_upgrades = 0;
 	}
 	state.update_upgrade_buttons_enabled = true;
+	UpdateOptionsButtons();
+}
+
+function ToggleBoardGlow() {
+	state.save_file.options.board_glow_enabled =
+		!state.save_file.options.board_glow_enabled;
+	state.redraw_board_glow = true;
 	UpdateOptionsButtons();
 }
 

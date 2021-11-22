@@ -64,11 +64,19 @@ class BumperMachine extends PachinkoMachine {
 	OnActivate() {
 		this.InitSpiralMeter();
 		this.CheckOverdrive();
+		if (this.overdrive) {
+			this.SetOverdriveGlow();
+		} else if (this.IsHyperActive()) {
+			this.SetHyperGlow();
+		}
 	}
 
 	OnBuffTimeout(state) {
 		this.DeactivateOverdrive();
 		this.last_hyper_end_time = state.current_time;
+		state.board_glow.color = null;
+		state.board_glow.size = null;
+		state.redraw_board_glow = true;
 	}
 
 	BallTypes() {
@@ -1507,7 +1515,7 @@ class BumperMachine extends PachinkoMachine {
 
 	BuffDisplayText() {
 		let save_data = this.GetSaveData();
-		if (save_data.score_buff_duration > 0) {
+		if (this.IsHyperActive()) {
 			let duration_sec = save_data.score_buff_duration / 1000.0;
 			let hyper_combo_value =
 				this.HyperComboValue(save_data.hyper_combo);
@@ -1545,6 +1553,7 @@ class BumperMachine extends PachinkoMachine {
 			save_data.hyper_charge = 0;
 			++save_data.stats.hyper_activations;
 			save_data.hyper_combo = 0;
+			this.SetHyperGlow();
 		}
 		state.update_buff_display = true;
 		state.update_upgrade_buttons_visible = true;
@@ -1567,6 +1576,16 @@ class BumperMachine extends PachinkoMachine {
 			this.GetSaveData().options.auto_hyper_enabled;
 	}
 
+	IsHyperActive() {
+		return this.GetSaveData().score_buff_duration > 0;
+	}
+
+	SetHyperGlow() {
+		state.board_glow.color = "rgba(255,255,0,0.25)";
+		state.board_glow.size = 10;
+		state.redraw_board_glow = true;
+	}
+
 	UpdateHyperSystemDisplay(state) {
 		if (!this.IsUnlocked("unlock_hyper_system")) {
 			UpdateDisplay("hyper_system", "none");
@@ -1577,7 +1596,7 @@ class BumperMachine extends PachinkoMachine {
 		let button_elem = document.getElementById("button_hyper");
 		let status_elem = document.getElementById("hyper_status");
 		let meter_fraction = 0;
-		if (save_data.score_buff_duration > 0) {
+		if (this.IsHyperActive()) {
 			status_elem.style.opacity = 1.0;
 			meter_fraction =
 				save_data.score_buff_duration / this.hyper_duration;
@@ -1629,8 +1648,15 @@ class BumperMachine extends PachinkoMachine {
 			meter_percent + "%";
 	}
 
+	SetOverdriveGlow() {
+		state.board_glow.color = "rgba(0,255,255,0.5)";
+		state.board_glow.size = 10;
+		state.redraw_board_glow = true;
+	}
+
 	ActivateOverdrive() {
 		this.overdrive = true;
+		this.SetOverdriveGlow();
 		document.getElementById("hyper_status").classList.add("overdrive");
 
 		if (this.IsUnlocked("overdrive_midas")) {
@@ -1671,7 +1697,7 @@ class BumperMachine extends PachinkoMachine {
 		let save_data = this.GetSaveData();
 		if (save_data.hyper_combo >= 1000) {
 			if (this.IsUnlocked("unlock_overdrive")) {
-				if (save_data.score_buff_duration > 0 && !this.overdrive) {
+				if (this.IsHyperActive() && !this.overdrive) {
 					this.ActivateOverdrive();
 				}
 			} else {
@@ -1717,7 +1743,7 @@ class BumperMachine extends PachinkoMachine {
 				1.0 + multiplier_fraction * (kMaxSpiralMultiplier - 1);
 		}
 	}
-	
+
 	Draw(state) {
 		const save_data = this.GetSaveData();
 		this.UpdateHyperSystemDisplay(state);
@@ -1947,7 +1973,7 @@ class BumperMachine extends PachinkoMachine {
 			ball.last_hit_time = state.current_time;
 
 			if (this.IsUnlocked("unlock_hyper_system")) {
-				if (save_data.score_buff_duration > 0) {
+				if (this.IsHyperActive()) {
 					total_value *= this.hyper_multiplier;
 					if (this.IsUnlocked("hyper_combo")) {
 						save_data.hyper_combo += combo_increment;

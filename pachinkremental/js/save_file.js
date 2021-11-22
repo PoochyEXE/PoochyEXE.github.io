@@ -193,13 +193,6 @@ function LoadGame(save_file_str) {
 		}
 		UpdateOptionsButtons();
 		UpdateAutoSaveInterval();
-		UpdateDarkMode();
-		UpdateOpalBallUpgradesStyle();
-		UpdateMachinesHeader(state);
-		UpdateFavicon(state);
-		UpdateOpacitySlidersFromSaveFile(state);
-		UpdateFaviconChoiceFromSaveFile(state);
-		UpdateCollapsibles(state.save_file.options.collapsed);
 		state.notifications.push(new Notification("Game loaded", "#8F8"));
 		return true;
 	} else {

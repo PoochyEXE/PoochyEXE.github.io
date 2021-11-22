@@ -41,10 +41,11 @@
 				<canvas id="canvas_balls"      class="board" style="z-index: 2;"></canvas>
 				<canvas id="canvas_bumpers"    class="board" style="z-index: 3;"></canvas>
 				<canvas id="canvas_targets"    class="board" style="z-index: 4;"></canvas>
-				<canvas id="canvas_stats"      class="board" style="z-index: 5;"></canvas>
-				<canvas id="canvas_auto_drop"  class="board" style="z-index: 6;"></canvas>
-				<canvas id="canvas_score_text" class="board" style="z-index: 7;"></canvas>
-				<canvas id="canvas_ripples"    class="board" style="z-index: 8;"></canvas>
+				<canvas id="canvas_glow"       class="board" style="z-index: 5;"></canvas>
+				<canvas id="canvas_stats"      class="board" style="z-index: 6;"></canvas>
+				<canvas id="canvas_auto_drop"  class="board" style="z-index: 7;"></canvas>
+				<canvas id="canvas_score_text" class="board" style="z-index: 8;"></canvas>
+				<canvas id="canvas_ripples"    class="board" style="z-index: 9;"></canvas>
 			</td>
 			<td class="rightUI" style="vertical-align: top;">
 				<div id="message_box" class="messageBox">
@@ -231,37 +232,13 @@
 						<div class="menuPadding"></div>
 						<button type="button" class="optionButton"
 								id="button_save" onclick="SaveToLocalStorage()">Save</button>
-						<button type="button" class="optionButton"
-								id="button_auto_save" onclick="ToggleAutoSave()">Auto Save</button>
+						<span id="options_auto_save"></span>
 						<br>
 						<button type="button" class="optionButton"
 								id="button_export_save" onclick="ExportSave()">Export save file</button>
 						<button type="button" class="optionButton"
 								id="button_import_save" onclick="ImportSave()">Import save file</button>
-						<br>
-						<button type="button" class="optionButton"
-								id="button_dark_mode" onclick="ToggleDarkMode()">Dark Mode</button>
-						<button type="button" class="optionButton"
-								id="button_notation" onclick="ToggleNotation()">Notation</button>
-						<button type="button" class="optionButton"
-								id="button_quality" onclick="ToggleQuality()">Quality</button>
-						<button type="button" class="optionButton"
-								id="button_popup_text" onclick="TogglePopupText()">Popup text</button>
-						<button type="button" class="optionButton"
-								id="button_apply_opacity_to_popup_text"
-								onclick="ToggleBooleanOption('apply_opacity_to_popup_text')">
-								Apply opacity settings to pop-up text</button>
-						<button type="button" class="optionButton"
-								id="button_show_combos" onclick="ToggleBooleanOption('show_combos')">Show combos</button>
-						<button type="button" class="optionButton"
-								id="button_upgrade_levels_bought" onclick="ToggleShowUpgradeLevels()">Upgrade levels bought</button>
-						<button type="button" class="optionButton"
-								id="button_opal_balls_upgrades_style" onclick="ToggleOpalBallUpgradesStyle()">Opal ball upgrade button style</button>
-						<button type="button" class="optionButton"
-								id="button_maxed_upgrades" onclick="ToggleMaxedUpgrades()">Maxed upgrades</button>
-						<button type="button" class="optionButton"
-								id="button_april_fools" onclick="ToggleAprilFools()">April Fools</button>
-						<br>
+						<div id="options_misc" class="optionsContents"></div>
 						<div id="options_opacity" class="optionsContents messageBox" style="display: inline-block;"></div>
 						<div id="options_favicon" class="optionsContents messageBox" style="display: inline-block;"></div>
 						<div id="options_archived_save_files"></div>

@@ -44,6 +44,10 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
+### v2.0.9 (2021-11-22)
+* Make the board glow based on Hyper System and Overdrive status. This can be turned off in the options.
+* Refactor the code and remove some redundant operations to make the game slightly faster at loading, switching machines, and loading save files.
+
 ### v2.0.8 (2021-11-22)
 * When starting a new save file, try to guess whether the player prefers light or dark mode based on system settings and automatically turn dark mode on/off accordingly.
 

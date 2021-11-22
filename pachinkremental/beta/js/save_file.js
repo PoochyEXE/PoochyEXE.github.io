@@ -1,7 +1,7 @@
 const kIsLiveVersion = false;
 const kLiveSaveFileName = "save_file";
 const kBetaSaveFileName = "beta_save_file";
-const kSaveFileVersion = 6;
+const kSaveFileVersion = 7;
 const kSaveFileName = kIsLiveVersion ? kLiveSaveFileName : kBetaSaveFileName;
 
 const kPrevSaveFileVersions = [
@@ -38,6 +38,12 @@ const kPrevSaveFileVersions = [
 	{
 		archive_id: null,
 		last_version: "v1.7.1-beta",
+	},
+
+	// 6
+	{
+		archive_id: null,
+		last_version: "v2.0.8",
 	},
 ];
 
@@ -118,6 +124,9 @@ function LoadGame(save_file_str) {
 				load_save.options.scientific_notation ? 1 : 0;
 			delete state.save_file.options.scientific_notation;
 		}
+		if (load_save.game_version < 7) {
+			delete state.save_file.options.display_popup_text;
+		}
 		if (load_save.game_version < 5) {
 			let first_machine_save = state.save_file.machines[kFirstMachineID];
 			for (let key in first_machine_save) {
@@ -193,13 +202,6 @@ function LoadGame(save_file_str) {
 		}
 		UpdateOptionsButtons();
 		UpdateAutoSaveInterval();
-		UpdateDarkMode();
-		UpdateOpalBallUpgradesStyle();
-		UpdateMachinesHeader(state);
-		UpdateFavicon(state);
-		UpdateOpacitySlidersFromSaveFile(state);
-		UpdateFaviconChoiceFromSaveFile(state);
-		UpdateCollapsibles(state.save_file.options.collapsed);
 		state.notifications.push(new Notification("Game loaded", "#8F8"));
 		return true;
 	} else {

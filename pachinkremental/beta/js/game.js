@@ -1,4 +1,4 @@
-const kVersion = "v2.0.8";
+const kVersion = "v2.0.10";
 const kTitleAndVersion = "Pachinkremental " + kVersion;
 
 const kFrameInterval = 1000.0 / kFPS;
@@ -94,6 +94,9 @@ function LoadActiveMachine(state) {
 	state.update_buff_display = true;
 	state.redraw_all = true;
 
+	state.board_glow.color = null;
+	state.board_glow.size = null;
+
 	UpdateDisplay("hyper_system", "none");
 	UpdateDisplay("spiral_power", "none");
 
@@ -103,6 +106,10 @@ function LoadActiveMachine(state) {
 	machine.OnActivate();
 	state.display_points = save_data.points;
 	state.balls_by_type = [...Array(num_ball_types)].map(_ => new Array(0));
+	state.wheel_popup_text.length = 0;
+	state.score_text.length = 0;
+	state.ripples.length = 0;
+
 	state.upgrade_headers = machine.UpgradeHeaders();
 	for (let i = 0; i < state.upgrade_headers.length; ++i) {
 		let header = state.upgrade_headers[i];
@@ -136,6 +143,10 @@ function LoadActiveMachine(state) {
 	UpdateFaviconChoiceFromSaveFile(state);
 	UpdateCollapsibles(save_data.options.collapsed);
 	UpdateHitRatesDisplay(state);
+	UpdateMachinesHeader(state);
+	UpdateDarkMode();
+	UpdateOpalBallUpgradesStyle();
+	ResizeCanvas();
 	OnResize();
 }
 
@@ -158,6 +169,10 @@ function InitState() {
 		},
 		last_score_history_update: Date.now(),
 		last_ball_drop: 0,
+		board_glow: {
+			color: null,
+			size: null,
+		},
 		notifications: new Array(0),
 		upgrade_headers: null,
 		upgrade_category_to_header_map: {},
@@ -168,6 +183,7 @@ function InitState() {
 		redraw_auto_drop: false,
 		redraw_stats_overlay: false,
 		redraw_wheel: false,
+		redraw_board_glow: false,
 		reset_target_text: false,
 		update_stats_panel: true,
 		update_upgrades: true,
@@ -211,28 +227,7 @@ function InitState() {
 				machine_maxed_times: {}
 			},
 			machines: {},
-			options: {
-				auto_save_enabled: true,
-				dark_mode: ShouldDefaultToDarkMode(),
-				classic_opal_balls: false,
-				static_opal_ball_upgrade_buttons: false,
-				show_upgrade_levels: false,
-				apply_opacity_to_popup_text: true,
-				show_combos: true,
-				show_hit_rates: false,
-				notation: 0,
-				favicon: -1,
-				april_fools_enabled: 2,
-				quality: 0,
-				display_popup_text: 0,
-				maxed_upgrades: 1,
-				collapsed: {
-					upgrades: false,
-					machines: false,
-					stats: true,
-					options: true,
-				},
-			},
+			options: DefaultGlobalSettings(),
 		}
 	};
 	for (let i = 0; i < state.machines.length; ++i) {
@@ -334,25 +329,8 @@ function SwitchMachine(index) {
 	state.active_machine_index = index;
 	const new_active_machine = state.machines[index];
 	state.save_file.active_machine = new_active_machine.id;
-	state.redraw_all = true;
-	state.update_stats_panel = true;
-	state.update_upgrades = true;
-	state.update_upgrade_buttons_all = true;
-	state.update_buff_display = true;
-	state.display_points = new_active_machine.GetSaveData().points;
-	state.wheel_popup_text.length = 0;
-	state.score_text.length = 0;
-	state.ripples.length = 0;
 	LoadActiveMachine(state);
 	UpdateScoreDisplay(state, /*force_update=*/true);
-	UpdateMachinesHeader(state);
-	UpdateDarkMode();
-	UpdateOpalBallUpgradesStyle();
-	ResizeCanvas();
-
-	for (let i = 0; i < state.score_history.length; ++i) {
-		state.score_history[i] = 0;
-	}
 }
 
 function UpdateOneFrame(state) {
@@ -564,7 +542,9 @@ function OnResize() {
 function Load() {
 	InitMachinesHeader(state);
 	let loaded_save = LoadFromLocalStorage();
-	LoadActiveMachine(state);
+	if (!loaded_save) {
+		LoadActiveMachine(state);
+	}
 	document.getElementById(kTopCanvasLayer).addEventListener("click", OnClick);
 	document.title = kTitleAndVersion;
 	document.getElementById("title_version").innerHTML = kTitleAndVersion;
