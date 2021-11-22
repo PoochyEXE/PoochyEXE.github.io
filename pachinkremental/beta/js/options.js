@@ -293,6 +293,13 @@ function ToggleDarkMode() {
 	UpdateOptionsButtons();
 }
 
+function ShouldDefaultToDarkMode() {
+	if (!window.matchMedia) {
+		return false;
+	}
+	return window.matchMedia('(prefers-color-scheme: dark)').matches;
+}
+
 function ToggleNotation() {
 	++state.save_file.options.notation;
 	if (state.save_file.options.notation >= kNotationOptions.length) {

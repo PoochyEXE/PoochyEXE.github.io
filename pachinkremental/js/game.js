@@ -1,4 +1,4 @@
-const kVersion = "v2.0.7";
+const kVersion = "v2.0.8";
 const kTitleAndVersion = "Pachinkremental " + kVersion;
 
 const kFrameInterval = 1000.0 / kFPS;
@@ -213,7 +213,7 @@ function InitState() {
 			machines: {},
 			options: {
 				auto_save_enabled: true,
-				dark_mode: false,
+				dark_mode: ShouldDefaultToDarkMode(),
 				classic_opal_balls: false,
 				static_opal_ball_upgrade_buttons: false,
 				show_upgrade_levels: false,

@@ -44,6 +44,9 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
+### v2.0.8 (2021-11-22)
+* When starting a new save file, try to guess whether the player prefers light or dark mode based on system settings and automatically turn dark mode on/off accordingly.
+
 ### v2.0.7 (2021-11-20)
 * Refactor and optimize code for rendering Opal and Ultimate balls and use HSL color space for them.
 
