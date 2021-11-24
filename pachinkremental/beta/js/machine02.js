@@ -1859,7 +1859,6 @@ class BumperMachine extends PachinkoMachine {
 		this.spiral_meter_ticks = Array(num_vertices).fill(false);
 		this.spiral_meter_ticks[num_vertices - 1] = true;
 		let last_tick = 0;
-		let total_ticks = 1;
 		for (let i = 1; i < num_vertices; ++i) {
 			const outer_prev_pt = this.spiral_meter_outer_vertices[i - 1];
 			const outer_next_pt = this.spiral_meter_outer_vertices[i];
@@ -1870,14 +1869,20 @@ class BumperMachine extends PachinkoMachine {
 			if (dist > kMinTickDist) {
 				this.spiral_meter_ticks[i] = true;
 				last_tick = i;
-				++total_ticks;
 				last_dist = dist;
 				dist = 0;
 			}
 		}
 		if (dist < kMinTickDist / 2 && last_tick != num_vertices - 1) {
-			--total_ticks;
 			this.spiral_meter_ticks[last_tick] = false;
+		}
+		let total_ticks = 0;
+		this.spiral_meter_tick_indices = [0];
+		for (let i = 1; i < num_vertices; ++i) {
+			if (this.spiral_meter_ticks[i]) {
+				this.spiral_meter_tick_indices.push(i);
+				++total_ticks;
+			}
 		}
 		this.spiral_meter_num_ticks = total_ticks;
 
@@ -1920,51 +1925,74 @@ class BumperMachine extends PachinkoMachine {
 		canvas1.height = kSpiralMeterSize;
 	}
 
+	FillSpiralMeter(start_index, end_index, ctx) {
+		ctx.beginPath();
+		const first_pt = this.spiral_meter_outer_vertices[start_index];
+		ctx.moveTo(first_pt.x, first_pt.y);
+		for (let i = start_index + 1; i <= end_index; ++i) {
+			const outer_next = this.spiral_meter_outer_vertices[i];
+			ctx.lineTo(outer_next.x, outer_next.y);
+		}
+		for (let i = end_index; i >= start_index; --i) {
+			const inner_next = this.spiral_meter_inner_vertices[i];
+			ctx.lineTo(inner_next.x, inner_next.y);
+		}
+		ctx.fill();
+	}
+
 	UpdateSpiralMeterFill(meter_fraction) {
-		let draw_fraction = Math.min(2.0, meter_fraction);
+		const draw_fraction = Math.min(2.0, meter_fraction);
 		const num_meter_ticks = this.spiral_meter_num_ticks;
-		let ticks_left = Math.floor(draw_fraction * num_meter_ticks);
-		if (ticks_left == this.last_drawn_spiral_meter_ticks) {
+		const current_ticks = Math.floor(draw_fraction * num_meter_ticks);
+		const prev_ticks = this.last_drawn_spiral_meter_ticks;
+		if (current_ticks == prev_ticks) {
 			return;
 		}
-		this.last_drawn_spiral_meter_ticks = ticks_left;
 
 		let canvas = GetCanvasLayer("spiral1");
 		let ctx = canvas.getContext("2d");
 		ctx.setTransform(1, 0, 0, 1, 0, 0);
-		ctx.clearRect(0, 0, canvas.width, canvas.height);
-		if (ticks_left == 0) {
-			return;
+		ctx.fillStyle = "#AFA";
+
+		if (prev_ticks > current_ticks) {
+			if (current_ticks < num_meter_ticks) {
+				// Meter decreased, < 100%. Clear canvas and redraw.
+				ctx.clearRect(0, 0, canvas.width, canvas.height);
+				if (current_ticks == 0) {
+					return;
+				}
+				let end_index = this.spiral_meter_tick_indices[current_ticks];
+				this.FillSpiralMeter(0, end_index, ctx);
+			} else {
+				// Meter decreased, >= 100%. Change rainbow cells to light.
+				let start_tick = Math.max(0, current_ticks - num_meter_ticks);
+				let end_tick = prev_ticks - num_meter_ticks;
+				let start_index = this.spiral_meter_tick_indices[start_tick];
+				let end_index = this.spiral_meter_tick_indices[end_tick];
+				this.FillSpiralMeter(start_index, end_index, ctx);
+			}
+		} else {
+			if (prev_ticks < num_meter_ticks) {
+				// Meter increased, previously < 100%. Fill in empty cells.
+				let start_index = this.spiral_meter_tick_indices[prev_ticks];
+				let end_tick = Math.min(current_ticks, num_meter_ticks);
+				let end_index = this.spiral_meter_tick_indices[end_tick];
+				this.FillSpiralMeter(start_index, end_index, ctx);
+			}
+			if (current_ticks > num_meter_ticks) {
+				// Meter increased, currently > 100%. Fill in rainbow cells.
+				let start_tick = Math.max(0, prev_ticks - num_meter_ticks);
+				let end_tick = current_ticks - num_meter_ticks;
+				for (let t = start_tick; t < end_tick; ++t) {
+					let start_index = this.spiral_meter_tick_indices[t];
+					let end_index = this.spiral_meter_tick_indices[t + 1];
+					ctx.fillStyle = this.spiral_meter_fill_colors[t];
+					this.FillSpiralMeter(start_index, end_index, ctx);
+				}
+			}
 		}
 
-		let i = 1;
-		let prev_i = 0;
-		let ticks_drawn = 0;
-		ctx.beginPath();
-		const first_pt = this.spiral_meter_inner_vertices[0];
-		ctx.moveTo(first_pt.x, first_pt.y);
-		while (ticks_left > 0 && i < this.spiral_meter_ticks.length) {
-			const inner_next = this.spiral_meter_inner_vertices[i];
-			ctx.lineTo(inner_next.x, inner_next.y);
-			if (this.spiral_meter_ticks[i]) {
-				if (ticks_left > num_meter_ticks) {
-					ctx.fillStyle = this.spiral_meter_fill_colors[ticks_drawn];
-				} else {
-					ctx.fillStyle = "#AFA";
-				}
-				for (let j = i; j >= prev_i; --j) {
-					const outer_next = this.spiral_meter_outer_vertices[j];
-					ctx.lineTo(outer_next.x, outer_next.y);
-				}
-				ctx.fill();
-				ctx.beginPath();
-				ctx.moveTo(inner_next.x, inner_next.y);
-				prev_i = i;
-				--ticks_left;
-				++ticks_drawn;
-			}
-			++i;
-		}
+		this.last_drawn_spiral_meter_ticks = current_ticks;
 	}
 
 	AwardPoints(base_value, ball) {

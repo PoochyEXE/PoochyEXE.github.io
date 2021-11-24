@@ -44,6 +44,10 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
+### v2.0.13 (2021-11-24)
+* Optimize code that renders the Spiral Power meter.
+* Fix an off-by-one bug when computing how many cells of the Spiral Power meter should be lit.
+
 ### v2.0.12 (2021-11-24)
 * Refactor code for machine-specific stats to make it easier to add new ones.
 * Add stat for points earned by the Bonus Wheel in the Basic machine.
