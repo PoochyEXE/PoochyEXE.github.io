@@ -75,7 +75,7 @@ class OptionButton {
 			this.visible_func = () => true;
 		}
 	}
-	
+
 	GetSetting() {
 		return GetSetting(this.id);
 	}
@@ -83,7 +83,7 @@ class OptionButton {
 	DisplayValue() {
 		return this.display_value_func(this.GetSetting());
 	}
-	
+
 	UpdateButton() {
 		let button_id = "button_" + this.id;
 		UpdateInnerHTML(button_id, this.display_name + ": " + this.DisplayValue());
