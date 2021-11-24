@@ -40,6 +40,50 @@ const kBumperMachinePopupTextOptions = [
 	"Disable All",
 ];
 
+const kBumpersMachineStatsEntries = [
+	new StatsEntry({
+		id: "max_combo",
+		display_name: "Highest combo",
+		prefix: "&#xD7;",
+	}),
+	new StatsEntry({
+		id: "hyper_activations",
+		display_name: "Hyper System activations",
+	}),
+	new StatsEntry({
+		id: "max_hyper_combo",
+		display_name: "Highest Hyper Combo",
+		suffix: " hits",
+	}),
+	new StatsEntry({
+		id: "longest_lasting_ruby_ball",
+		display_name: "Longest-lasting ball with the Ruby Ball bonus",
+		suffix: " seconds",
+	}),
+	new StatsEntry({
+		id: "emerald_ball_most_bumper_hits",
+		display_name: "Most bumper hits by a ball with the Emerald Ball bonus",
+	}),
+	new StatsEntry({
+		id: "sapphire_ball_most_target_hits",
+		display_name: "Most target hits by a ball with the Sapphire Ball bonus",
+	}),
+	new StatsEntry({
+		id: "rubberband_ball_most_bounces",
+		display_name: "Most bounces by a Rubber Band Ball",
+	}),
+	new StatsEntry({
+		id: "max_spiral_ball_rotated_degrees",
+		display_name: "Most rotations by a Spiral Ball",
+		suffix: "&deg;",
+	}),
+	new StatsEntry({
+		id: "max_spiral_power_percent",
+		display_name: "Highest Spiral Power",
+		suffix: "%",
+	}),
+];
+
 class BumperMachine extends PachinkoMachine {
 	constructor(id, display_name) {
 		super(id, display_name, kBumperMachineBallTypes);
@@ -103,16 +147,11 @@ class BumperMachine extends PachinkoMachine {
 		save_data.spiral_power = 0;
 		save_data.score_buff_duration = 0;
 		save_data.score_buff_time_dilation = 1.0;
-		save_data.stats.hyper_activations = 0;
-		save_data.stats.max_combo = 0;
-		save_data.stats.max_hyper_combo = 0;
-		save_data.stats.longest_lasting_ruby_ball = 0;
-		save_data.stats.emerald_ball_most_bumper_hits = 0;
-		save_data.stats.sapphire_ball_most_target_hits = 0;
-		save_data.stats.rubberband_ball_most_bounces = 0;
-		save_data.stats.max_spiral_ball_rotated_degrees = 0;
-		save_data.stats.max_spiral_power_percent = 0;
 		return save_data;
+	}
+
+	InitStatsEntries() {
+		return kBumpersMachineStatsEntries;
 	}
 
 	TogglePopupText() {

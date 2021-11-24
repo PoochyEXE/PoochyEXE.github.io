@@ -37,6 +37,27 @@ const kFirstMachinePopupTextOptions = [
 	"Disable All",
 ];
 
+const kFirstMachineStatsEntries = [
+	new StatsEntry({
+		id: "max_buff_multiplier",
+		display_name: "Highest buff multiplier",
+	}),
+	new StatsEntry({
+		id: "bonus_wheel_points_scored",
+		display_name: "Points scored by Bonus Wheel",
+	}),
+	new StatsEntry({
+		id: "longest_lasting_beach_ball",
+		display_name: "Longest-lasting Beach Ball",
+		suffix: " seconds",
+	}),
+	new StatsEntry({
+		id: "max_beach_ball_rotated_degrees",
+		display_name: "Most rotations by a Beach Ball",
+		suffix: "&deg;",
+	}),
+]
+
 class CenterSlotTarget extends ScoreTarget {
 	constructor({ machine, pos, draw_radius, hitbox_radius, color, id, active, value }) {
 		super({
@@ -114,13 +135,13 @@ class FirstMachine extends PachinkoMachine {
 		save_data.score_buff_multiplier = 0;
 		save_data.score_buff_duration = 0;
 		save_data.score_buff_time_dilation = 1.0;
-		save_data.stats.max_buff_multiplier = 0;
-		save_data.stats.bonus_wheel_points_scored = 0;
-		save_data.stats.longest_lasting_beach_ball = 0;
-		save_data.stats.max_beach_ball_rotated_degrees = 0;
 		save_data.options.auto_spin_enabled = false;
 		save_data.options.multi_spin_enabled = false;
 		return save_data;
+	}
+
+	InitStatsEntries() {
+		return kFirstMachineStatsEntries;
 	}
 
 	TogglePopupText() {

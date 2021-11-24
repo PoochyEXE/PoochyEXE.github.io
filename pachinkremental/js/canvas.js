@@ -650,6 +650,19 @@ function DrawBumpers(bumper_sets, ctx) {
 	}
 }
 
+function DrawHitRateText(x, y, hits, total_balls, ctx) {
+	let rate_text = "--";
+	if (total_balls > 0) {
+		if (!hits) {
+			hits = 0;
+		}
+		let rate = Math.round(100 * hits / total_balls);
+		rate_text = rate.toLocaleString();
+	}
+	ctx.strokeText(rate_text, x, y);
+	ctx.fillText(rate_text, x, y);
+}
+
 function DrawHitRates(stats, target_sets, bumper_sets, ctx) {
 	let total_balls = 0;
 	for (let i = 0; i < target_sets.length; ++i) {
@@ -677,41 +690,30 @@ function DrawHitRates(stats, target_sets, bumper_sets, ctx) {
 		const targets = target_sets[i].targets;
 		for (let j = 0; j < targets.length; ++j) {
 			const target = targets[j];
-			if (!target.active) {
-				continue;
+			if (target.active) {
+				DrawHitRateText(
+					target.pos.x,
+					target.pos.y - target.draw_radius - 2,
+					stats.target_hits[target.id],
+					total_balls,
+					ctx
+				);
 			}
-			let target_hits = stats.target_hits[target.id];
-			if (!target_hits) {
-				target_hits = 0;
-			}
-			let rate_text = "--";
-			if (total_balls > 0) {
-				let rate = Math.round(100 * target_hits / total_balls)
-				rate_text = rate.toLocaleString();
-			}
-			let x = target.pos.x;
-			let y = target.pos.y - target.draw_radius - 2;
-			ctx.strokeText(rate_text, x, y);
-			ctx.fillText(rate_text, x, y);
 		}
 	}
 	for (let i = 0; i < bumper_sets.length; ++i) {
 		const bumpers = bumper_sets[i].targets;
 		for (let j = 0; j < bumpers.length; ++j) {
 			const bumper = bumpers[j];
-			if (!bumper.active) {
-				continue;
+			if (bumper.active) {
+				DrawHitRateText(
+					bumper.pos.x,
+					bumper.pos.y - bumper.draw_radius - 4,
+					stats.target_hits[bumper.id],
+					total_balls,
+					ctx
+				);
 			}
-			let bumper_hits = stats.target_hits[bumper.id];
-			let rate_text = "--";
-			if (total_balls > 0) {
-				let rate = Math.round(100 * bumper_hits / total_balls)
-				rate_text = rate.toLocaleString();
-			}
-			let x = bumper.pos.x;
-			let y = bumper.pos.y - bumper.draw_radius - 4;
-			ctx.strokeText(rate_text, x, y);
-			ctx.fillText(rate_text, x, y);
 		}
 	}
 }

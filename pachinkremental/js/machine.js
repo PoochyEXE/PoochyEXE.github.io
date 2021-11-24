@@ -14,6 +14,7 @@ class PachinkoMachine {
 			let rate_upgrade = this.upgrades[name + "_ball_rate"];
 			this.ball_type_rates.push(rate_upgrade.value_func(0) / 100.0);
 		}
+		this.stats_entries = this.InitStatsEntries();
 	}
 
 	OnActivate() {}
@@ -93,6 +94,11 @@ class PachinkoMachine {
 			save_data.options[name + "_ball_opacity"] = 100;
 		}
 
+		for (let i = 0; i < this.stats_entries.length; ++i) {
+			const stats_entry = this.stats_entries[i];
+			save_data.stats[stats_entry.id] = stats_entry.default_value;
+		}
+
 		return save_data;
 	}
 
@@ -102,6 +108,14 @@ class PachinkoMachine {
 
 	BallType(id) {
 		return this.BallTypes()[id];
+	}
+
+	InitStatsEntries() {
+		return [];
+	}
+
+	StatsEntries() {
+		return this.stats_entries;
 	}
 
 	GetSaveData() {

@@ -31,7 +31,7 @@ A: I'm not saying it'll never happen, but I currently have no plans to add a pre
 ## Known issues
 
 * Making the window too narrow can break some CSS and make the menu UI ugly.
-* The ball opacity options don't work in Firefox.
+* The ball opacity options don't work in Firefox, due to [a known bug with Firefox's implementation of the Canvas 2D API](https://bugzilla.mozilla.org/show_bug.cgi?id=1164912).
 * Firefox seems to occasionally delete the save file upon closing the tab. If you're playing in Firefox, export your save frequently!
 
 ## Archived versions
@@ -43,6 +43,14 @@ I plan to archive the last version before any update that significantly nerfs pr
 ## Changelog
 
 **Caution: Spoilers below!**
+
+### v2.0.12 (2021-11-24)
+* Refactor code for options and machine-specific stats to make it easier to add new ones.
+* Add stat for points earned by the Bonus Wheel in the Basic machine.
+* Reorder the Gemstone ball stats in the Bumpers machine to match the order of the balls in the upgrades menu.
+* Fix a bug where some stats took a while to re-appear in the Stats panel after switching back to a previously played machine.
+* Fix a hit rate of 0 showing as "NaN" for bumpers.
+* Fix top-level collapsible headers (Upgrades, Machines, Stats, and Options) not restoring to their saved collapsed/open states when loading a save file.
 
 ### v2.0.9 (2021-11-22)
 * Make the board glow based on Hyper System and Overdrive status. This can be turned off in the options.

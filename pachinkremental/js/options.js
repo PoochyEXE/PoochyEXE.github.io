@@ -1,8 +1,3 @@
-const kQualityOptions = ["High", "Medium", "Low"];
-const kAprilFoolsOptions = ["Disabled", "Always On", "Enabled"];
-const kMaxedUpgradesOptions = ["Full Size", "Shrink"];
-const kNotationOptions = ["English", "Scientific", "Engineering", "漢字"];
-
 class ColorSchemeClassMapping {
 	constructor(base_class, light_class, dark_class) {
 		this.base = base_class;
@@ -55,6 +50,250 @@ function GetSetting(id) {
 		return undefined;
 	}
 	return state.save_file.options[id];
+}
+
+class OptionButton {
+	constructor({id, category, display_name, default_value, display_value_func, on_update_func, visible_func}) {
+		this.id = id;
+		if (category) {
+			this.category = category;
+		} else {
+			this.category = "misc";
+		}
+		this.display_name = display_name;
+		this.default_value = default_value;
+		this.display_value_func = display_value_func;
+		const kNoop = () => {};
+		if (on_update_func) {
+			this.on_update_func = on_update_func;
+		} else {
+			this.on_update_func = kNoop;
+		}
+		if (visible_func) {
+			this.visible_func = visible_func;
+		} else {
+			this.visible_func = () => true;
+		}
+	}
+	
+	GetSetting() {
+		return GetSetting(this.id);
+	}
+
+	DisplayValue() {
+		return this.display_value_func(this.GetSetting());
+	}
+	
+	UpdateButton() {
+		let button_id = "button_" + this.id;
+		UpdateInnerHTML(button_id, this.display_name + ": " + this.DisplayValue());
+		UpdateDisplay(button_id, this.visible_func() ? "inline" : "none");
+	}
+
+	OnClick() {
+		this.on_update_func();
+		this.UpdateButton();
+	}
+}
+
+
+class BooleanOptionButton extends OptionButton {
+	constructor({id, category, display_name, default_value, text_on, text_off, on_update_func, visible_func}) {
+		super({
+			id,
+			category,
+			display_name,
+			default_value,
+			display_value_func: (value) => value ? text_on : text_off,
+			on_update_func,
+			visible_func,
+		});
+	}
+
+	OnClick() {
+		state.save_file.options[this.id] = !state.save_file.options[this.id];
+		super.OnClick();
+	}
+}
+
+class ListOptionButton extends OptionButton {
+	constructor({id, category, display_name, default_value, values, on_update_func, visible_func}) {
+		super({
+			id,
+			category,
+			display_name,
+			default_value: default_value ? default_value : 0,
+			display_value_func: (value) => this.values[value],
+			on_update_func,
+			visible_func,
+		});
+		this.values = values;
+	}
+
+	OnClick() {
+		++state.save_file.options[this.id];
+		if (state.save_file.options[this.id] >= this.values.length) {
+			state.save_file.options[this.id] = 0;
+		}
+		super.OnClick();
+	}
+}
+
+function InitOptionButtons() {
+	return [
+		new BooleanOptionButton({
+			id: "dark_mode",
+			display_name: "Dark Mode",
+			default_value: ShouldDefaultToDarkMode(),
+			text_on: "ON",
+			text_off: "OFF",
+			on_update_func: () => {
+				state.redraw_all = true;
+				UpdateDarkMode();
+			},
+		}),
+		new ListOptionButton({
+			id: "notation",
+			display_name: "Notation",
+			values: ["English", "Scientific", "Engineering", "漢字"],
+			default_value: 0,
+			on_update_func: OnNotationToggle,
+		}),
+		new ListOptionButton({
+			id: "quality",
+			display_name: "Quality",
+			values: ["High", "Medium", "Low"],
+			default_value: 0,
+			on_update_func: () => {
+				state.redraw_all = true;
+			},
+		}),
+		new OptionButton({
+			id: "popup_text",
+			display_name: "Pop-up text",
+			display_value_func: () =>
+				ActiveMachine(state).CurrentPopupTextOptionName(),
+			on_update_func: () =>
+				ActiveMachine(state).TogglePopupText(),
+		}),
+		new BooleanOptionButton({
+			id: "apply_opacity_to_popup_text",
+			display_name: "Apply opacity settings to pop-up text",
+			text_on: "ON",
+			text_off: "OFF",
+			default_value: true,
+		}),
+		new BooleanOptionButton({
+			id: "show_combos",
+			display_name: "Combos",
+			text_on: "Show",
+			text_off: "Hide",
+			default_value: true,
+			visible_func: () =>
+				ActiveMachine(state).IsUnlocked("unlock_combos"),
+		}),
+		new BooleanOptionButton({
+			id: "show_upgrade_levels",
+			display_name: "Upgrade levels bought",
+			text_on: "Show",
+			text_off: "Hide",
+			default_value: false,
+			on_update_func: () => {
+				state.update_upgrade_buttons_text = true;
+			},
+		}),
+		new BooleanOptionButton({
+			id: "static_opal_ball_upgrade_buttons",
+			display_name: "Opal ball upgrade button style",
+			text_on: "Static",
+			text_off: "Default",
+			default_value: false,
+			on_update_func: UpdateOpalBallUpgradesStyle,
+			visible_func: () =>
+				ActiveMachine(state).IsUpgradeVisible("unlock_opal_balls"),
+		}),
+		new ListOptionButton({
+			id: "maxed_upgrades",
+			display_name: "Maxed upgrades",
+			values: ["Full Size", "Shrink"],
+			default_value: 1,
+			on_update_func: () => {
+				state.update_upgrade_buttons_enabled = true;
+			},
+		}),
+		new BooleanOptionButton({
+			id: "board_glow_enabled",
+			display_name: "Board glow",
+			text_on: "Enabled",
+			text_off: "Disabled",
+			default_value: true,
+			on_update_func: () => {
+				state.redraw_board_glow = true;
+			},
+		}),
+		new ListOptionButton({
+			id: "april_fools_enabled",
+			display_name: "April Fools",
+			values: ["Disabled", "Always On", "Enabled"],
+			default_value: 2,
+			on_update_func: () => {
+				state.april_fools = IsAprilFoolsActive();
+			},
+		}),
+		new BooleanOptionButton({
+			id: "classic_opal_balls",
+			category: "opal_balls",
+			display_name: "Style",
+			text_on: "Classic",
+			text_off: "Default",
+			default_value: false,
+		}),
+		new BooleanOptionButton({
+			id: "auto_save_enabled",
+			category: "auto_save",
+			display_name: "Auto Save",
+			text_on: "ON",
+			text_off: "OFF",
+			default_value: true,
+			on_update_func: UpdateAutoSaveInterval,
+		}),
+	];
+}
+
+function BuildOptionsMap(options_list) {
+	let options_map = {};
+	for (let i = 0; i < options_list.length; ++i) {
+		const opt = options_list[i];
+		options_map[opt.id] = opt;
+	}
+	return options_map;
+}
+
+const kOptionButtons = InitOptionButtons();
+const kOptionButtonsMap = BuildOptionsMap(kOptionButtons);
+
+function OnOptionButtonClick(id) {
+	kOptionButtonsMap[id].OnClick();
+}
+
+function DefaultGlobalSettings() {
+	settings = {
+		show_hit_rates: false,
+		favicon: -1,
+		collapsed: {
+			upgrades: false,
+			machines: false,
+			stats: true,
+			options: true,
+		},
+	};
+	for (let i = 0; i < kOptionButtons.length; ++i) {
+		const opt = kOptionButtons[i];
+		if (isFinite(opt.default_value)) {
+			settings[opt.id] = opt.default_value;
+		}
+	}
+	return settings;
 }
 
 function AutoPickFavicon(state) {
@@ -118,6 +357,7 @@ function PopupTextOpacityForBallType(ball_type_index) {
 }
 
 function InitOptions(state) {
+	let category_html = {};
 	const ball_types = ActiveMachine(state).BallTypes();
 	let html = "<b>Opacity:</b>";
 	for (let i = 0; i < ball_types.length; ++i) {
@@ -131,11 +371,11 @@ function InitOptions(state) {
 		html += 'id="' + id + '" name="' + id + '">';
 		html += '<label for="' + id + '">' + display_name + '</label>';
 		if (ball_types[i].name == "opal") {
-			html += '&nbsp;<button type="button" class="optionButton" id="button_classic_opal_balls" onclick="ToggleBooleanOption(\'classic_opal_balls\')">Opal Balls</button>'
+			html += '&nbsp;<span id="options_opal_balls"></span>'
 		}
 		html += '</div>';
 	}
-	UpdateInnerHTML("options_opacity", html);
+	category_html["opacity"] = html;
 
 	html = "<b>Favicon:</b>";
 	for (let i = -1; i < ball_types.length; ++i) {
@@ -152,7 +392,24 @@ function InitOptions(state) {
 		html += '<label for="' + id + '">' + display_name + '</label>';
 		html += '</div>';
 	}
-	UpdateInnerHTML("options_favicon", html);
+	category_html["favicon"] = html;
+
+	for (let i = 0; i < kOptionButtons.length; ++i) {
+		let id = kOptionButtons[i].id;
+		let category = kOptionButtons[i].category;
+		let button_html =
+			'<button type="button" class="optionButton" id="button_' + id +
+			'" onclick="OnOptionButtonClick(\'' + id + '\')"></button> '
+		if (category_html[category]) {
+			category_html[category] += button_html;
+		} else {
+			category_html[category] = button_html;
+		}
+	}
+
+	for (let category_id in category_html) {
+		UpdateInnerHTML("options_" + category_id, category_html[category_id]);
+	}
 }
 
 function CloseModal(id) {
@@ -192,43 +449,9 @@ function ResizeModals() {
 }
 
 function UpdateOptionsButtons() {
-	const machine = ActiveMachine(state);
-	UpdateInnerHTML("button_auto_save",
-		"Auto Save: " + (state.save_file.options.auto_save_enabled ? "ON" : "OFF"));
-	UpdateInnerHTML("button_quality",
-		"Quality: " + kQualityOptions[state.save_file.options.quality]);
-	UpdateInnerHTML("button_dark_mode",
-		"Dark Mode: " + (state.save_file.options.dark_mode ? "ON" : "OFF"));
-	UpdateInnerHTML("button_popup_text",
-		"Pop-up text: " + machine.CurrentPopupTextOptionName());
-	UpdateInnerHTML("button_upgrade_levels_bought",
-		"Upgrade levels bought: " + (state.save_file.options.show_upgrade_levels ? "Show" : "Hide"));
-	UpdateInnerHTML("button_maxed_upgrades",
-		"Maxed upgrades: " + kMaxedUpgradesOptions[state.save_file.options.maxed_upgrades]);
-	UpdateInnerHTML("button_april_fools",
-		"April Fools: " + kAprilFoolsOptions[GetSetting("april_fools_enabled")]);
-	UpdateInnerHTML("button_classic_opal_balls",
-		"Style: " + (state.save_file.options.classic_opal_balls ? "Classic" : "Default"));
-	UpdateDisplay("button_opal_balls_upgrades_style",
-		ActiveMachine(state).IsUpgradeVisible("unlock_opal_balls") ? "inline" : "none");
-	UpdateInnerHTML("button_opal_balls_upgrades_style",
-		"Opal ball upgrade button style: " + (state.save_file.options.static_opal_ball_upgrade_buttons ? "Static" : "Default"));
-	UpdateInnerHTML("button_notation",
-		"Notation: " + kNotationOptions[GetSetting("notation")]);
-	UpdateInnerHTML("button_apply_opacity_to_popup_text",
-		"Apply opacity settings to pop-up text: " + (state.save_file.options.apply_opacity_to_popup_text ? "ON" : "OFF"));
-	UpdateDisplay("button_show_combos",
-		ActiveMachine(state).IsUnlocked("unlock_combos") ? "inline" : "none");
-	UpdateInnerHTML("button_show_combos",
-		"Show combos: " + (state.save_file.options.show_combos ? "ON" : "OFF"));
-	UpdateInnerHTML("button_board_glow",
-		"Board glow: " + (state.save_file.options.board_glow_enabled ? "Enabled" : "Disabled"));
-}
-
-function ToggleOpalBallUpgradesStyle() {
-	state.save_file.options.static_opal_ball_upgrade_buttons = !state.save_file.options.static_opal_ball_upgrade_buttons;
-	UpdateOpalBallUpgradesStyle();
-	UpdateOptionsButtons();
+	for (let i = 0; i < kOptionButtons.length; ++i) {
+		kOptionButtons[i].UpdateButton();
+	}
 }
 
 function UpdateOpalBallUpgradesStyle() {
@@ -257,42 +480,12 @@ function UpdateAutoSaveInterval() {
 		if (!state.intervals.auto_save) {
 			state.intervals.auto_save = setInterval(SaveToLocalStorage, 60000);
 		}
-		document.getElementById("button_auto_save").innerHTML = "Auto Save: ON";
 	} else {
 		if (state.intervals.auto_save) {
 			clearInterval(state.intervals.auto_save);
 			state.intervals.auto_save = null;
 		}
-		document.getElementById("button_auto_save").innerHTML =
-			"Auto Save: OFF";
 	}
-}
-
-function ToggleAutoSave() {
-	state.save_file.options.auto_save_enabled = !state.save_file.options.auto_save_enabled;
-	UpdateAutoSaveInterval();
-	UpdateOptionsButtons();
-}
-
-function TogglePopupText() {
-	ActiveMachine(state).TogglePopupText();
-	UpdateOptionsButtons();
-}
-
-function ToggleQuality() {
-	++state.save_file.options.quality;
-	if (state.save_file.options.quality >= kQualityOptions.length) {
-		state.save_file.options.quality = 0;
-	}
-	state.redraw_all = true;
-	UpdateOptionsButtons();
-}
-
-function ToggleDarkMode() {
-	state.save_file.options.dark_mode = !state.save_file.options.dark_mode;
-	state.redraw_all = true;
-	UpdateDarkMode();
-	UpdateOptionsButtons();
 }
 
 function ShouldDefaultToDarkMode() {
@@ -302,11 +495,7 @@ function ShouldDefaultToDarkMode() {
 	return window.matchMedia('(prefers-color-scheme: dark)').matches;
 }
 
-function ToggleNotation() {
-	++state.save_file.options.notation;
-	if (state.save_file.options.notation >= kNotationOptions.length) {
-		state.save_file.options.notation = 0;
-	}
+function OnNotationToggle() {
 	state.update_upgrade_buttons_text = true;
 	state.update_buff_display = true;
 	state.redraw_wheel = true;
@@ -314,42 +503,4 @@ function ToggleNotation() {
 	state.redraw_targets = true;
 	state.update_stats_panel = true;
 	UpdateSpinCounter();
-	UpdateOptionsButtons();
-}
-
-function ToggleBooleanOption(id) {
-	state.save_file.options[id] = !state.save_file.options[id];
-	UpdateOptionsButtons();
-}
-
-function ToggleShowUpgradeLevels() {
-	state.save_file.options.show_upgrade_levels =
-		!state.save_file.options.show_upgrade_levels;
-	state.update_upgrade_buttons_text = true;
-	UpdateOptionsButtons();
-}
-
-function ToggleMaxedUpgrades() {
-	++state.save_file.options.maxed_upgrades;
-	if (state.save_file.options.maxed_upgrades >= kMaxedUpgradesOptions.length) {
-		state.save_file.options.maxed_upgrades = 0;
-	}
-	state.update_upgrade_buttons_enabled = true;
-	UpdateOptionsButtons();
-}
-
-function ToggleBoardGlow() {
-	state.save_file.options.board_glow_enabled =
-		!state.save_file.options.board_glow_enabled;
-	state.redraw_board_glow = true;
-	UpdateOptionsButtons();
-}
-
-function ToggleAprilFools() {
-	++state.save_file.options.april_fools_enabled;
-	if (state.save_file.options.april_fools_enabled >= kAprilFoolsOptions.length) {
-		state.save_file.options.april_fools_enabled = 0;
-	}
-	state.april_fools = IsAprilFoolsActive();
-	UpdateOptionsButtons();
 }

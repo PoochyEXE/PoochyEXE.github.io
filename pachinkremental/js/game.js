@@ -1,4 +1,4 @@
-const kVersion = "v2.0.9";
+const kVersion = "v2.0.12";
 const kTitleAndVersion = "Pachinkremental " + kVersion;
 
 const kFrameInterval = 1000.0 / kFPS;
@@ -227,29 +227,7 @@ function InitState() {
 				machine_maxed_times: {}
 			},
 			machines: {},
-			options: {
-				auto_save_enabled: true,
-				dark_mode: ShouldDefaultToDarkMode(),
-				classic_opal_balls: false,
-				static_opal_ball_upgrade_buttons: false,
-				show_upgrade_levels: false,
-				apply_opacity_to_popup_text: true,
-				show_combos: true,
-				show_hit_rates: false,
-				board_glow_enabled: true,
-				notation: 0,
-				favicon: -1,
-				april_fools_enabled: 2,
-				quality: 0,
-				display_popup_text: 0,
-				maxed_upgrades: 1,
-				collapsed: {
-					upgrades: false,
-					machines: false,
-					stats: true,
-					options: true,
-				},
-			},
+			options: DefaultGlobalSettings(),
 		}
 	};
 	for (let i = 0; i < state.machines.length; ++i) {

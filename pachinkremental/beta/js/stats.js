@@ -1,6 +1,42 @@
+class StatsEntry {
+	constructor({id, display_name, prefix, suffix, default_value}) {
+		this.id = id;
+		this.display_name = display_name;
+		if (prefix) {
+			this.prefix = prefix;
+		} else {
+			this.prefix = "";
+		}
+		if (suffix) {
+			this.suffix = suffix;
+		} else {
+			this.suffix = "";
+		}
+		if (default_value) {
+			this.default_value = default_value;
+		} else {
+			this.default_value = 0;
+		}
+	}
+}
+
 function InitStatsPanel(state) {
-	const ball_types = ActiveMachine(state).BallTypes();
+	const machine = ActiveMachine(state);
+	const machine_stats = machine.StatsEntries();
+
 	let html = '';
+	for (let i = 0; i < machine_stats.length; ++i) {
+		const stat = machine_stats[i];
+		html +=
+			'<div id="stats_container_' + stat.id +
+			'" class="statsRowUnlockable"><b>' + stat.display_name +
+			': </b>' + stat.prefix + '<span id="stats_' + stat.id +
+			'" class="statsEntry"></span>' + stat.suffix + '</div>';
+	}
+	UpdateInnerHTML("stats_active_machine", html);
+
+	const ball_types = machine.BallTypes();
+	html = '';
 	for (let id = 0; id < ball_types.length; ++id) {
 		let type_name = ball_types[id].name + "_balls";
 		html +=
@@ -28,6 +64,8 @@ function InitStatsPanel(state) {
 	for (let i = 0; i < unlockable_stats.length; ++i) {
 		unlockable_stats[i].style.display = "none";
 	}
+
+	UpdateStatsPanel(state);
 }
 
 function UpdateStatsEntry(state, key, val) {
