@@ -137,7 +137,7 @@ I plan to archive the last version before any update that significantly nerfs pr
 * Tweaked a couple pop-up text colors in dark mode to make them easier to read.
 * Fixed 2.4x wheel speed being displayed as "2.40x".
 
-### v1.0.0-RC1 (2021-04-11)
+### v1.0.0-RC1 (2021-04-13)
 * Pachinkremental is out of beta!
 * Lots of rebalancing. In order by game progression:
 	* Nerf: Lower the max Gold ball rate to 15%.
