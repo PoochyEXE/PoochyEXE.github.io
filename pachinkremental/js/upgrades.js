@@ -683,7 +683,7 @@ function ShowUpgradeTooltip(elem) {
 }
 
 function CurrentPlayTime() {
-	return Date.now() - state.save_file.stats.start_time;
+	return Date.now() - state.save_file.stats.start_time;;
 }
 
 function ShowEndingIfAllMachinesMaxed() {

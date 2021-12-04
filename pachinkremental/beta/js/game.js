@@ -1,4 +1,4 @@
-const kVersion = "v2.0.14";
+const kVersion = "v2.0.13";
 const kTitleAndVersion = "Pachinkremental " + kVersion;
 
 const kFrameInterval = 1000.0 / kFPS;
@@ -152,7 +152,7 @@ function LoadActiveMachine(state) {
 
 function InitState() {
 	let state = {
-		current_time: performance.now(),
+		current_time: Date.now(),
 		machines: [
 			new FirstMachine(kFirstMachineID, "Basic"),
 			new BumperMachine(kBumperMachineID, "Bumpers"),
@@ -167,7 +167,7 @@ function InitState() {
 			last_15s: [],
 			last_60s: [],
 		},
-		last_score_history_update: performance.now(),
+		last_score_history_update: Date.now(),
 		last_ball_drop: 0,
 		board_glow: {
 			color: null,
@@ -429,11 +429,10 @@ function OnKeyDown(event) {
 
 function Update() {
 	const num_frames = Math.floor(
-		(performance.now() - state.current_time) / kFrameInterval
+		(Date.now() - state.current_time) / kFrameInterval
 	);
 	const elapsed = num_frames * kFrameInterval;
 	if (num_frames <= 0) {
-		requestAnimationFrame(Update);
 		return;
 	}
 	for (let i = 0; i < num_frames; ++i) {
@@ -475,8 +474,6 @@ function Update() {
 			UpdateUpgradeButtonsVisible(state);
 		}
 	}
-
-	requestAnimationFrame(Update);
 }
 
 function OnClick(event) {
@@ -569,7 +566,7 @@ function Load() {
 
 	Draw(state);
 
-	requestAnimationFrame(Update);
+	state.intervals.update = setInterval(Update, kFrameInterval);
 	CheckEvents();
 
 	console.log("Hi there! I don't mind if people hack/cheat, but if you make any screenshots, save files, videos, etc. that way, I'd appreciate it if you clearly label them as hacked. Thanks! --Poochy.EXE");

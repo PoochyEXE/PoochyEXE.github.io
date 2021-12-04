@@ -62,20 +62,20 @@
 						<div id="hyper_status"></div>
 					</div>
 					<div id="buff" class="messageBox"> </div>
-				</div>
-				<div id="bonus_wheel" class="bonusWheel" style="display: none;">
-					<div id="spin_counter" class="messageBox">
-						<button type="button" class="bonusWheel" id="button_spin" onclick="SpinBonusWheel()">Spin the wheel!</button>
-						Spins:&nbsp;<span id="spin_count">0</span>
-						<span id="multi_spin">
-							| Multi&#x2011;Spin:&nbsp;&#xD7;<span id="multi_spin_count">1</span>
-						</span>
+					<div id="bonus_wheel" class="bonusWheel" style="display: none;">
+						<div id="spin_counter" class="messageBox">
+							<button type="button" class="bonusWheel" id="button_spin" onclick="SpinBonusWheel()">Spin the wheel!</button>
+							Spins:&nbsp;<span id="spin_count">0</span>
+							<span id="multi_spin">
+								| Multi&#x2011;Spin:&nbsp;&#xD7;<span id="multi_spin_count">1</span>
+							</span>
+						</div>
+						<canvas id="canvas_bonus_wheel" class="bonusWheel" style="display: block; z-index: 1; margin: 5px"></canvas>
 					</div>
-					<canvas id="canvas_bonus_wheel" class="bonusWheel" style="display: block; z-index: 1; margin: 5px"></canvas>
-				</div>
-				<div id="debug" style="display: none;">
-					<canvas id="favicon_canvas" width="64" height="64" style="height: 64px; width: 64px;"></canvas>
-					<a id="favicon_link">Save</a>
+					<div id="debug" style="display: none;">
+						<canvas id="favicon_canvas" width="64" height="64" style="height: 64px; width: 64px;"></canvas>
+						<a id="favicon_link">Save</a>
+					</div>
 				</div>
 				<div id="spiral_power" class="spiralContainer" style="display: none;">
 					<table id="spiral_power_table">
@@ -87,11 +87,9 @@
 								</div>
 							</td>
 							<td id="spiral_power_status_td" style="text-align: right;">
-								<div id="spiral_power_header">Spiral Power:</div>
-								<div id="spiral_power_percent"></div>
+								<div id="spiral_power_header">Spiral Power:<br> <span id="spiral_power_percent"></span></div>
 								<div class="menuPadding"></div>
-								<div id="spiral_power_status">Multiplier:</div>
-								<div>&#xD7;<span id="spiral_multiplier"></span></div>
+								<div id="spiral_power_status">Multiplier:<br>&#xD7;<span id="spiral_multiplier"></span></div>
 							</td>
 						</tr>
 					</table>

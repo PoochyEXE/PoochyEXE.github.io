@@ -44,10 +44,6 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
-### v2.0.14 (2021-12-03)
-* More performance optimizations to reduce the amount of repainting the browser has to do.
-* Migrate to `requestAnimationFrame` and `performance.now()` for timing. I've been procrastinating on this one for way too long as well.
-
 ### v2.0.13 (2021-11-24)
 * Optimize code that renders the Spiral Power meter.
 * Fix an off-by-one bug when computing how many cells of the Spiral Power meter should be lit.

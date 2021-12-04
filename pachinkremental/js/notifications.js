@@ -2,7 +2,7 @@ class Notification {
 	constructor(text, bgcolor) {
 		this.text = text;
 		this.bgcolor = bgcolor;
-		this.start_time = performance.now();
+		this.start_time = Date.now();
 	}
 }
 
@@ -13,7 +13,7 @@ const kNotificationHeight = 30;
 
 function CloseNotification(index) {
 	state.notifications[index].start_time =
-		performance.now() - kNotificationDuration + kNotificationFadeOutTime;
+		Date.now() - kNotificationDuration + kNotificationFadeOutTime;
 }
 
 function UpdateNotifications(state) {
@@ -21,7 +21,7 @@ function UpdateNotifications(state) {
 		return;
 	}
 	const kSpacing = 5;
-	const time_now = performance.now();
+	const time_now = Date.now();
 	state.notifications = state.notifications.filter(
 		notif => notif.start_time + kNotificationDuration >= time_now
 	);
