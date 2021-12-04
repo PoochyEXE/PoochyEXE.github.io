@@ -1669,11 +1669,11 @@ class FirstMachine extends PachinkoMachine {
 		if (save_data.score_buff_duration > 0) {
 			let duration_sec =
 				Math.round(save_data.score_buff_duration / 1000.0);
-			return "All scoring &times;" +
+			return "All scoring ×" +
 				FormatNumberMedium(save_data.score_buff_multiplier) +
 				" for " + duration_sec + " seconds!";
 		} else if (this.IsUnlocked("unlock_ruby_balls")) {
-			return 'Score multiplier: &times;1';
+			return 'Score multiplier: ×1';
 		} else {
 			return "";
 		}

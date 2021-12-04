@@ -97,7 +97,7 @@ class BumperMachine extends PachinkoMachine {
 		this.max_hyper_charge = 50000;
 		this.hyper_charge_rate = 1.0;
 		this.hyper_duration = 15000;
-		this.last_hyper_end_time = 0;
+		this.last_hyper_end_time = performance.now() - 10000;
 		this.overdrive = false;
 		this.spiral_power = 0.0;
 		this.spiral_multiplier = 1.0;
@@ -1105,7 +1105,7 @@ class BumperMachine extends PachinkoMachine {
 			new FixedCostFeatureUnlockUpgrade({
 				machine: this,
 				id: "overdrive_secret_code",
-				name: 'OD <span class="arrows">&uarr;&uarr;&darr;&darr;&larr;&rarr;&larr;&rarr;</span>BA',
+				name: 'OD <span class="arrows">↑↑↓↓←→←→</span>BA',
 				category: "overdrive_basic",
 				description: "+30 base Hyper Multiplier during Overdrive.",
 				cost: 573e24,
@@ -1575,10 +1575,10 @@ class BumperMachine extends PachinkoMachine {
 			} else {
 				multiplier_text = FormatNumberMedium(hyper_mult);
 			}
-			return "All scoring &times;" + multiplier_text + " for " +
+			return "All scoring ×" + multiplier_text + " for " +
 				duration_sec.toFixed(1) + " seconds!";
 		} else if (this.IsUnlocked("unlock_hyper_system")) {
-			return 'Score multiplier: &times;1';
+			return 'Score multiplier: ×1';
 		} else {
 			return "";
 		}
