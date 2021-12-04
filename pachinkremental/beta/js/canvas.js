@@ -721,7 +721,7 @@ function DrawHitRates(stats, target_sets, bumper_sets, ctx) {
 function DrawScoreText(score_text, font_size, duration, rise, stroke_color_rgb, ctx) {
 	const kPrismaticLightness = kPrismaticLightnessDefault;
 	let next_index = 0;
-	const time = Date.now();
+	const time = performance.now();
 	ctx.textAlign = "center";
 	ctx.font = "bold " + font_size + "px sans-serif";
 	for (let i = 0; i < score_text.length; ++i) {

@@ -1,4 +1,4 @@
-const kVersion = "v2.0.13";
+const kVersion = "v2.0.14";
 const kTitleAndVersion = "Pachinkremental " + kVersion;
 
 const kFrameInterval = 1000.0 / kFPS;
@@ -152,7 +152,7 @@ function LoadActiveMachine(state) {
 
 function InitState() {
 	let state = {
-		current_time: Date.now(),
+		current_time: performance.now(),
 		machines: [
 			new FirstMachine(kFirstMachineID, "Basic"),
 			new BumperMachine(kBumperMachineID, "Bumpers"),
@@ -167,7 +167,7 @@ function InitState() {
 			last_15s: [],
 			last_60s: [],
 		},
-		last_score_history_update: Date.now(),
+		last_score_history_update: performance.now(),
 		last_ball_drop: 0,
 		board_glow: {
 			color: null,
@@ -178,6 +178,7 @@ function InitState() {
 		upgrade_category_to_header_map: {},
 		display_points: 0,
 		canvas_scale: 2.0,
+		frames_since_redraw: 0,
 		redraw_all: true,
 		redraw_targets: false,
 		redraw_auto_drop: false,
@@ -429,16 +430,22 @@ function OnKeyDown(event) {
 
 function Update() {
 	const num_frames = Math.floor(
-		(Date.now() - state.current_time) / kFrameInterval
+		(performance.now() - state.current_time) / kFrameInterval
 	);
-	const elapsed = num_frames * kFrameInterval;
-	if (num_frames <= 0) {
-		return;
-	}
 	for (let i = 0; i < num_frames; ++i) {
-		state.enable_score_text = num_frames - i < 60;
+		state.enable_score_text = (num_frames - i) < 60;
 		UpdateOneFrame(state);
 	}
+	state.frames_since_redraw += num_frames;
+}
+
+function OnAnimationFrame() {
+	Update();
+	if (state.frames_since_redraw <= 0) {
+		requestAnimationFrame(OnAnimationFrame);
+		return;
+	}
+	state.frames_since_redraw = 0;
 
 	UpdateScoreDisplay(state, /*force_update=*/false);
 
@@ -474,6 +481,8 @@ function Update() {
 			UpdateUpgradeButtonsVisible(state);
 		}
 	}
+
+	requestAnimationFrame(OnAnimationFrame);
 }
 
 function OnClick(event) {
@@ -566,7 +575,13 @@ function Load() {
 
 	Draw(state);
 
-	state.intervals.update = setInterval(Update, kFrameInterval);
+	requestAnimationFrame(OnAnimationFrame);
+
+	// Additional update once per second for when the tab is inactive, to avoid
+	// a giant lag spike trying to catch up when regaining focus after being
+	// inactive for several minutes.
+	state.intervals.update = setInterval(Update, 1000);
+
 	CheckEvents();
 
 	console.log("Hi there! I don't mind if people hack/cheat, but if you make any screenshots, save files, videos, etc. that way, I'd appreciate it if you clearly label them as hacked. Thanks! --Poochy.EXE");
