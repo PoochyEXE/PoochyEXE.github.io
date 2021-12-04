@@ -759,7 +759,7 @@ class BumperMachine extends PachinkoMachine {
 	}
 
 	InitUpgrades() {
-		const kTimesSymbol = "\u00D7";
+		const kTimesSymbol = "×";
 		let upgrades_list = new Array();
 		upgrades_list.push(
 			new Upgrade({
@@ -927,7 +927,7 @@ class BumperMachine extends PachinkoMachine {
 				name: "Unlock Combos",
 				category: "combos",
 				description:
-					"Unlocks combos. A ball that hits multiple bumpers and/or score targets in quick succession starts a combo, which multiplies the point values of everything hit in the combo. The 2nd hit is worth 2&times; points, the 3rd thing hit is 3&times;, and so on.",
+					"Unlocks combos. A ball that hits multiple bumpers and/or score targets in quick succession starts a combo, which multiplies the point values of everything hit in the combo. The 2nd hit is worth 2× points, the 3rd thing hit is 3×, and so on.",
 				cost: 10000,
 				visible_func: () => this.GetUpgradeLevel("bumper_value") > 0,
 				on_buy: UpdateOptionsButtons
@@ -958,7 +958,7 @@ class BumperMachine extends PachinkoMachine {
 				category: "combos",
 				description:
 					'The base value of each bumper or target hit is added to the base value of all subsequent hits in the combo.' +
-					'<div class="small">Example: Hitting a 1000-point target, a 100-point bumper, then a 500-point target in a combo awards 1000 points for the 1st hit, (1000+100)&times;2 points for the 2nd hit, and (1000+100+500)&times;3 points for the 3rd hit.</div><div>「死ぬがよい」</div>',
+					'<div class="small">Example: Hitting a 1000-point target, a 100-point bumper, then a 500-point target in a combo awards 1000 points for the 1st hit, (1000+100)×2 points for the 2nd hit, and (1000+100+500)×3 points for the 3rd hit.</div><div>「死ぬがよい」</div>',
 				cost: 8e8,
 				visible_func: () => this.IsUnlocked("unlock_combos"),
 			})
@@ -970,7 +970,7 @@ class BumperMachine extends PachinkoMachine {
 				name: "Hyper System",
 				category: "hyper",
 				description:
-					"Unlock the Hyper System, which is charged by combos. The more hits in a combo, the more charge it's worth. When it's fully charged, activate the Hyper System to gain 10&times; scoring for 15 seconds!",
+					"Unlock the Hyper System, which is charged by combos. The more hits in a combo, the more charge it's worth. When it's fully charged, activate the Hyper System to gain 10× scoring for 15 seconds!",
 				cost: 8e9,
 				visible_func: () => this.IsUnlocked("unlock_combos"),
 				on_buy: () => {
@@ -1119,7 +1119,7 @@ class BumperMachine extends PachinkoMachine {
 				name: "OD Lunatic Red Eyes",
 				category: "overdrive_gemstone",
 				button_class: "rubyUpgradeButton",
-				description: '<span class="spellCard">「幻朧月睨(ルナティックレッドアイズ)」</span><br>2&times; Ruby Ball Value during Overdrive.',
+				description: '<span class="spellCard">「幻朧月睨(ルナティックレッドアイズ)」</span><br>2× Ruby Ball Value during Overdrive.',
 				cost: 8e24,
 				visible_func: () =>
 					this.IsUnlocked("unlock_overdrive") &&
@@ -1134,7 +1134,7 @@ class BumperMachine extends PachinkoMachine {
 				name: "OD Green-Eyed Monster",
 				category: "overdrive_gemstone",
 				button_class: "emeraldUpgradeButton",
-				description: '<span class="spellCard">嫉妬「緑色の眼をした見えない怪物」</span><br>2&times; Emerald Ball Value during Overdrive.',
+				description: '<span class="spellCard">嫉妬「緑色の眼をした見えない怪物」</span><br>2× Emerald Ball Value during Overdrive.',
 				cost: 11e24,
 				visible_func: () =>
 					this.IsUnlocked("unlock_overdrive") &&
@@ -1149,7 +1149,7 @@ class BumperMachine extends PachinkoMachine {
 				name: "OD Perfect Freeze",
 				category: "overdrive_gemstone",
 				button_class: "sapphireUpgradeButton",
-				description: '<span class="spellCard">凍符「パーフェクトフリーズ」</span><br>2&times; Sapphire Ball Value during Overdrive.<br>⑨',
+				description: '<span class="spellCard">凍符「パーフェクトフリーズ」</span><br>2× Sapphire Ball Value during Overdrive.<br>⑨',
 				cost: 9e24,
 				visible_func: () =>
 					this.IsUnlocked("unlock_overdrive") &&
@@ -1196,7 +1196,7 @@ class BumperMachine extends PachinkoMachine {
 				name: "OD Bouncer Rabbit",
 				category: "overdrive_ultimate",
 				button_class: "rubberBandBallUpgradeButton",
-				description: '2&times; Rubber Band Ball Value during Overdrive.',
+				description: '2× Rubber Band Ball Value during Overdrive.',
 				cost: 175e24,
 				visible_func: () =>
 					this.IsUnlocked("unlock_overdrive") &&
@@ -1647,8 +1647,7 @@ class BumperMachine extends PachinkoMachine {
 				}
 				let hyper_combo_value =
 					this.HyperComboValue(save_data.hyper_combo);
-				status_text += "! Multiplier &times;" +
-					hyper_combo_value.toFixed(2);
+				status_text += "! Multiplier ×" + hyper_combo_value.toFixed(2);
 				UpdateInnerHTML("hyper_status", status_text);
 			} else {
 				UpdateInnerHTML("hyper_status", "Hyper System active!");

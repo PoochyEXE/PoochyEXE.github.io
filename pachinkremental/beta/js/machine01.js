@@ -369,7 +369,7 @@ class FirstMachine extends PachinkoMachine {
 	}
 
 	InitUpgrades() {
-		const kTimesSymbol = "\u00D7";
+		const kTimesSymbol = "×";
 		let upgrades_list = new Array();
 		upgrades_list.push(
 			new Upgrade({
@@ -385,14 +385,15 @@ class FirstMachine extends PachinkoMachine {
 				visible_func: null,
 				on_update: () => this.UpdateBottomTargets(),
 				on_buy: (level) => {
+					let color_rgb =
+						GetSetting("dark_mode") ? "48,96,255" : "0,0,255"
 					let bottom_targets = this.board.target_sets[0].targets;
-					let popup_text = kTimesSymbol + "5";
 					for (let i = 0; i < bottom_targets.length; ++i) {
 						MaybeAddScoreText({
 							level: 3,
-							text: popup_text,
+							text: "×5",
 							pos: bottom_targets[i].pos,
-							color_rgb: "0,0,255",
+							color_rgb: color_rgb,
 							opacity: 1.0,
 						});
 					}
@@ -414,13 +415,14 @@ class FirstMachine extends PachinkoMachine {
 				visible_func: null,
 				on_update: () => this.UpdateBottomTargets(),
 				on_buy: (level) => {
+					let color_rgb =
+						GetSetting("dark_mode") ? "48,96,255" : "0,0,255"
 					let pos = this.board.target_sets[0].targets[4].pos;
-					let popup_text = kTimesSymbol + "2";
 					MaybeAddScoreText({
 						level: 3,
-						text: popup_text,
+						text: "×2",
 						pos: pos,
-						color_rgb: "0,0,255",
+						color_rgb: color_rgb,
 						opacity: 1.0,
 					});
 					this.bonus_wheel.UpdateAllSpaces();
