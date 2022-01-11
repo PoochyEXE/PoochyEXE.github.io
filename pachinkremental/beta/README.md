@@ -44,6 +44,9 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
+### v2.0.15 (2022-01-11)
+* Add option to automatically reset hit rate stats when changing the Auto-Drop location.
+
 ### v2.0.14 (2021-12-03)
 * More performance optimizations to reduce the amount of repainting the browser has to do.
 * Migrate to `requestAnimationFrame` and `performance.now()` for timing. I've been procrastinating on this one for way too long as well.

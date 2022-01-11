@@ -510,6 +510,9 @@ function OnClick(event) {
 		if (machine.AutoDropOn()) {
 			save_data.auto_drop_pos = pos;
 			state.redraw_auto_drop = true;
+			if (GetSetting("auto_reset_hit_rates")) {
+				ResetHitRates();
+			}
 		}
 	}
 }

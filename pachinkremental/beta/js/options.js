@@ -53,12 +53,17 @@ function GetSetting(id) {
 }
 
 class OptionButton {
-	constructor({id, category, display_name, default_value, display_value_func, on_update_func, visible_func}) {
+	constructor({id, category, class_name, display_name, default_value, display_value_func, on_update_func, visible_func}) {
 		this.id = id;
 		if (category) {
 			this.category = category;
 		} else {
 			this.category = "misc";
+		}
+		if (class_name) {
+			this.class_name = class_name;
+		} else {
+			this.class_name = "optionButton";
 		}
 		this.display_name = display_name;
 		this.default_value = default_value;
@@ -98,10 +103,11 @@ class OptionButton {
 
 
 class BooleanOptionButton extends OptionButton {
-	constructor({id, category, display_name, default_value, text_on, text_off, on_update_func, visible_func}) {
+	constructor({id, category, class_name, display_name, default_value, text_on, text_off, on_update_func, visible_func}) {
 		super({
 			id,
 			category,
+			class_name,
 			display_name,
 			default_value,
 			display_value_func: (value) => value ? text_on : text_off,
@@ -117,10 +123,11 @@ class BooleanOptionButton extends OptionButton {
 }
 
 class ListOptionButton extends OptionButton {
-	constructor({id, category, display_name, default_value, values, on_update_func, visible_func}) {
+	constructor({id, category, class_name, display_name, default_value, values, on_update_func, visible_func}) {
 		super({
 			id,
 			category,
+			class_name,
 			display_name,
 			default_value: default_value ? default_value : 0,
 			display_value_func: (value) => this.values[value],
@@ -230,6 +237,15 @@ function InitOptionButtons() {
 			on_update_func: () => {
 				state.redraw_board_glow = true;
 			},
+		}),
+		new BooleanOptionButton({
+			id: "auto_reset_hit_rates",
+			category: "stats_hit_rates",
+			class_name: "statsButton",
+			display_name: "Auto reset hit rates when changing Auto-Drop location",
+			text_on: "ON",
+			text_off: "OFF",
+			default_value: false,
 		}),
 		new ListOptionButton({
 			id: "april_fools_enabled",
@@ -398,8 +414,9 @@ function InitOptions(state) {
 		let id = kOptionButtons[i].id;
 		let category = kOptionButtons[i].category;
 		let button_html =
-			'<button type="button" class="optionButton" id="button_' + id +
-			'" onclick="OnOptionButtonClick(\'' + id + '\')"></button> '
+			'<button type="button" class="' + kOptionButtons[i].class_name +
+			'" id="button_' + id + '" onclick="OnOptionButtonClick(\'' + id +
+			'\')"></button> '
 		if (category_html[category]) {
 			category_html[category] += button_html;
 		} else {
