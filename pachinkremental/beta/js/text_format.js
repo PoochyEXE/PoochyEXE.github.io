@@ -61,7 +61,11 @@ function FormatNumberShortKanji(num) {
 function FormatNumberMediumKanji(num) {
 	let suffix_index = Math.floor(Math.log10(num) / 4);
 	if (suffix_index == 0) {
-		return FormatSmallNumberShort(num);
+		if (num < 1000) {
+			return FormatSmallNumberShort(num);
+		} else {
+			return num.toFixed(0);
+		}
 	} else if (suffix_index >= kKanji.length) {
 		return FormatNumberScientificNotation(num, /*trim_zeros=*/true);
 	}
