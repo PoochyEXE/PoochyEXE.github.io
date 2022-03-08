@@ -69,6 +69,9 @@ function SaveFileFromString(save_file_str) {
 }
 
 function SaveToLocalStorage() {
+	if (!state.game_started) {
+		return;
+	}
 	localStorage.setItem(kSaveFileName, SaveFileToString(state));
 	state.notifications.push(new Notification("Game saved", "#8F8"));
 }
@@ -203,7 +206,9 @@ function LoadGame(save_file_str) {
 		UpdateOptionsButtons();
 		UpdateAutoSaveInterval();
 		UpdateCollapsibles(state.save_file.options.collapsed);
+		CheckAllMachinesMaxed(state);
 		state.notifications.push(new Notification("Game loaded", "#8F8"));
+		state.game_started = true;
 		return true;
 	} else {
 		state.notifications.push(

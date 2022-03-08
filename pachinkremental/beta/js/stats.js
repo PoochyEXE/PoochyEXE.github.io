@@ -152,6 +152,38 @@ function UpdateMilestoneStats() {
 	}
 }
 
+function UpdateSpeedrunTimer(state) {
+	if (!this.GetSetting("speedrun_timer")) {
+		UpdateDisplay("speedrun_timer_container", "none");
+		return;
+	}
+	UpdateDisplay("speedrun_timer_container", "block");
+	if (state.all_maxed) {
+		return;
+	}
+	let play_time = FormatSpeedrunTimer(CurrentPlayTime(), /*show_ms=*/true);
+	UpdateInnerHTML("speedrun_timer", play_time);
+}
+
+function StopSpeedrunTimer(state) {
+	let elem = document.getElementById("speedrun_timer");
+	elem.classList.add("speedrunTimerCompleted");
+	elem.classList.remove("speedrunTimerActive");
+	let machine_maxed_times = state.save_file.stats.machine_maxed_times;
+	let time_to_max_all = 0;
+	const start_time = state.save_file.stats.start_time;
+	for (let machine_id in machine_maxed_times) {
+		if (!machine_maxed_times[machine_id]) {
+			continue;
+		}
+		let time_to_max = machine_maxed_times[machine_id] - start_time;
+		time_to_max_all = Math.max(time_to_max, time_to_max_all);
+	}
+	let play_time = FormatSpeedrunTimer(time_to_max_all, /*show_ms=*/true);
+	UpdateInnerHTML("speedrun_timer", play_time);
+	UpdateDarkMode();
+}
+
 function UpdateStatsPanel(state) {
 	state.update_stats_panel = false;
 	for (key in state.save_file.stats) {

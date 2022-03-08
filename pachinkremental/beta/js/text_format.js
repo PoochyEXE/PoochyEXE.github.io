@@ -278,8 +278,36 @@ function FormatNumberLong(num) {
 	}
 }
 
+function FormatSpeedrunTimer(duration_ms, show_ms) {
+	console.assert(duration_ms >= 0);
+	let x = Math.round(duration_ms);
+	let result = "";
+	if (show_ms) {
+		let ms = x % 1000;
+		result = "." + ZeroPad(ms, 3);
+	}
+	x = Math.floor(x / 1000);
+	let secs = x % 60;
+	x = Math.floor(x / 60);
+	result = ZeroPad(secs, 2) + result;
+	let mins = x % 60;
+	x = Math.floor(x / 60);
+	result = ZeroPad(mins, 2) + ":" + result;
+	if (x <= 0) {
+		return result;
+	}
+	let hours = x % 24;
+	x = Math.floor(x / 24);
+	result = ZeroPad(hours, 2) + ":" + result;
+	if (x <= 0) {
+		return result;
+	}
+	result = x + "d " + result;
+	return result;
+}
+
 function FormatDurationLong(duration_ms, show_ms) {
-	console.assert(duration_ms > 0);
+	console.assert(duration_ms >= 0);
 	let x = Math.round(duration_ms);
 	let result = "";
 	if (show_ms) {

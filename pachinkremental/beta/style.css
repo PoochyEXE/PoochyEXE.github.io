@@ -1005,6 +1005,27 @@ span.prismaticTextDark {
     -webkit-animation-duration: 2s;
 }
 
+div.speedrunTimerContainer {
+	text-align: center;
+	position: fixed;
+	left: 5px;
+	bottom: 5px;
+}
+
+span.speedrunTimer {
+	font-family: monospace;
+	font-size: 18px;
+	font-weight: bolder;
+}
+	
+span.speedrunTimerActiveLight {
+	color: #080;
+}
+
+span.speedrunTimerActiveDark {
+	color: #0F0;
+}
+
 span.speedrunTimerCompleted, span.speedrunTimerSplit {
 	font-weight: bold;
 }

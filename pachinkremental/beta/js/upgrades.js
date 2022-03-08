@@ -683,14 +683,26 @@ function ShowUpgradeTooltip(elem) {
 }
 
 function CurrentPlayTime() {
+	if (!state.game_started) {
+		return 0;
+	}
 	return Date.now() - state.save_file.stats.start_time;
 }
 
-function ShowEndingIfAllMachinesMaxed() {
+function CheckAllMachinesMaxed(state) {
 	for (let i = 0; i < state.machines.length; ++i) {
 		if (!state.machines[i].AreAllUpgradesMaxed()) {
 			return false;
 		}
+	}
+	state.all_maxed = true;
+	StopSpeedrunTimer(state);
+	return true;
+}
+
+function ShowEndingIfAllMachinesMaxed() {
+	if (!CheckAllMachinesMaxed(state)) {
+		return false;
 	}
 
 	let play_time = FormatDurationLong(CurrentPlayTime(), /*show_ms=*/true);

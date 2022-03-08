@@ -1,4 +1,4 @@
-const kVersion = "v2.0.16";
+const kVersion = "v2.1.0-beta";
 const kTitleAndVersion = "Pachinkremental " + kVersion;
 
 const kFrameInterval = 1000.0 / kFPS;
@@ -152,6 +152,8 @@ function LoadActiveMachine(state) {
 
 function InitState() {
 	let state = {
+		game_started: false,
+		all_maxed: false,
 		current_time: performance.now(),
 		machines: [
 			new FirstMachine(kFirstMachineID, "Basic"),
@@ -481,6 +483,7 @@ function OnAnimationFrame() {
 			UpdateUpgradeButtonsVisible(state);
 		}
 	}
+	UpdateSpeedrunTimer(state);
 
 	requestAnimationFrame(OnAnimationFrame);
 }
@@ -504,6 +507,10 @@ function OnClick(event) {
 		let save_data = machine.GetSaveData();
 		let time_since_prev_drop = state.current_time - state.last_ball_drop;
 		if (time_since_prev_drop >= kManualDropCooldown && CanDrop(state)) {
+			if (!state.game_started) {
+				state.game_started = true;
+				state.save_file.stats.start_time = Date.now();
+			}
 			DropBall(board_x, board_y);
 			++save_data.stats.balls_dropped_manual;
 		}

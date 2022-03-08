@@ -463,7 +463,7 @@ function ClearLayerAndReturnContext(layer_id) {
 function ResizeCanvas() {
 	let board = ActiveMachine(state).board;
 	const aspect_ratio = board.width / board.height;
-	const max_height = window.innerHeight - 25;
+	const max_height = window.innerHeight - 35;
 	const max_width = window.innerWidth - 300;
 	state.canvas_scale = Math.min(
 		max_height / board.height,
@@ -482,6 +482,7 @@ function ResizeCanvas() {
 		canvas.width = width;
 	}
 	document.getElementById("outer_table").style.height = height + "px";
+	document.getElementById("speedrun_timer_container").style.width = width + "px";
 
 	const right_ui_width = window.innerWidth - width - 30;
 	let right_ui_cells = document.getElementsByClassName("rightUI");
