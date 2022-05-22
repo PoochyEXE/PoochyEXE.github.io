@@ -44,6 +44,10 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
+### v2.1.1-beta (2022-05-22)
+* Fix a bug where the ending modal might add a few milliseconds to your final time.
+* Fix a bug where the game crashes when trying to load a machine that doesn't have Opal balls as an unlockable upgrade.
+
 ### v2.1.0-beta (2022-03-08)
 * Add a speedrun timer.
 * For stats and speedrun timer purposes, new save files don't count as started until you drop your first ball.

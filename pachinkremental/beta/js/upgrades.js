@@ -700,12 +700,13 @@ function CheckAllMachinesMaxed(state) {
 	return true;
 }
 
-function ShowEndingIfAllMachinesMaxed() {
+function ShowEndingIfAllMachinesMaxed(timestamp) {
 	if (!CheckAllMachinesMaxed(state)) {
 		return false;
 	}
 
-	let play_time = FormatDurationLong(CurrentPlayTime(), /*show_ms=*/true);
+	let time_elapsed_ms = timestamp - state.save_file.stats.start_time;
+	let play_time = FormatDurationLong(time_elapsed_ms, /*show_ms=*/true);
 	UpdateInnerHTML("ending_play_time", play_time);
 	document.getElementById("ending_modal").style.display = "block";
 	return true;

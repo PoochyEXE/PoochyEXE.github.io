@@ -191,7 +191,11 @@ class PachinkoMachine {
 	}
 
 	IsUpgradeVisible(upgrade_id) {
-		return this.upgrades[upgrade_id].visible_func();
+		const upgrade = this.upgrades[upgrade_id];
+		if (!upgrade) {
+			return false;
+		}
+		return upgrade.visible_func();
 	}
 
 	AreAllUpgradesMaxed() {
@@ -210,10 +214,11 @@ class PachinkoMachine {
 		let stats = state.save_file.stats;
 		if (this.AreAllUpgradesMaxed()) {
 			if (!stats.machine_maxed_times[this.id]) {
-				stats.machine_maxed_times[this.id] = Date.now();
+				const timestamp = Date.now();
+				stats.machine_maxed_times[this.id] = timestamp;
 				state.update_stats_panel = true;
-				if (!ShowEndingIfAllMachinesMaxed()) {
-					this.ShowMachineMaxedModal();
+				if (!ShowEndingIfAllMachinesMaxed(timestamp)) {
+					this.ShowMachineMaxedModal(timestamp);
 				}
 			}
 			UpdateMachinesHeader(state);
@@ -222,8 +227,9 @@ class PachinkoMachine {
 		}
 	}
 
-	ShowMachineMaxedModal() {
-		let play_time = FormatDurationLong(CurrentPlayTime(), /*show_ms=*/true);
+	ShowMachineMaxedModal(timestamp) {
+		let time_elapsed_ms = timestamp - state.save_file.stats.start_time;
+		let play_time = FormatDurationLong(time_elapsed_ms, /*show_ms=*/true);
 		UpdateInnerHTML("machine_maxed_time", play_time);
 		UpdateInnerHTML("maxed_machine_name", this.display_name);
 		document.getElementById("machine_maxed_modal").style.display = "block";
