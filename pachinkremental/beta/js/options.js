@@ -513,6 +513,32 @@ function UpdateAutoSaveInterval() {
 	}
 }
 
+function UpdateDarkMode() {
+	var color_scheme;
+	if (GetSetting("dark_mode")) {
+		document.body.style.backgroundColor = "#000";
+		color_scheme = "dark";
+	} else {
+		document.body.style.backgroundColor = "#FFF";
+		color_scheme = "light";
+	}
+
+	for (let i = 0; i < kColorSchemeClasses.length; ++i) {
+		let class_mapping = kColorSchemeClasses[i];
+		let elems = document.getElementsByClassName(class_mapping.base);
+		for (let j = elems.length - 1; j >= 0; --j) {
+			let elem = elems[j];
+			for (let k = 0; k < kColorSchemes.length; ++k) {
+				if (kColorSchemes[k] == color_scheme) {
+					elem.classList.add(class_mapping[kColorSchemes[k]]);
+				} else {
+					elem.classList.remove(class_mapping[kColorSchemes[k]]);
+				}
+			}
+		}
+	}
+}
+
 function ShouldDefaultToDarkMode() {
 	if (!window.matchMedia) {
 		return false;

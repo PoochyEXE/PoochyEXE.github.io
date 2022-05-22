@@ -235,3 +235,41 @@ function ResetHitRates() {
 	}
 	state.redraw_stats_overlay = true;
 }
+
+function UpdateScoreHistory(state) {
+	let total = 0;
+	for (let i = 0; i < state.score_history.length; ++i) {
+		total += state.score_history[i];
+		if (i == 0) {
+			state.save_file.stats.score_last5s = total;
+		} else if (i == 2) {
+			state.save_file.stats.score_last15s = total;
+		} else if (i == 11) {
+			state.save_file.stats.score_last60s = total;
+		}
+	}
+	for (let i = state.score_history.length - 1; i > 0; --i) {
+		state.score_history[i] = state.score_history[i - 1];
+	}
+	state.score_history[0] = 0;
+
+	const ball_types = ActiveMachine(state).BallTypes();
+	for (let i = 0; i < ball_types.length; ++i) {
+		let total = 0;
+		let ball_type_history = state.score_history_by_ball_type.per_5s[i];
+		for (let j = 0; j < ball_type_history.length; ++j) {
+			total += ball_type_history[j];
+			if (j == 0) {
+				state.score_history_by_ball_type.last_5s[i] = total;
+			} else if (j == 2) {
+				state.score_history_by_ball_type.last_15s[i] = total;
+			} else if (j == 11) {
+				state.score_history_by_ball_type.last_60s[i] = total;
+			}
+		}
+		for (let j = ball_type_history.length - 1; j > 0; --j) {
+			ball_type_history[j] = ball_type_history[j - 1];
+		}
+		ball_type_history[0] = 0;
+	}
+}

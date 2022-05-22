@@ -336,3 +336,17 @@ function EraseSave() {
 		location.reload();
 	}
 }
+
+// Lightweight checksum. Not meant to be cryptographically secure.
+// If anyone else is reading this, I don't care if people edit their save
+// files. I just want to prevent crazy bugs caused by loading
+// unintentionally corrupted save files. --Poochy.EXE
+function SaveFileChecksum(save_file) {
+	let result = 0;
+	for (let i = 0; i < save_file.length; ++i) {
+		result = (result >>> 1) | (result << 63);
+		result ^= save_file.charCodeAt(i);
+		result &= 0xffffffff;
+	}
+	return result;
+}

@@ -47,6 +47,7 @@ I plan to archive the last version before any update that significantly nerfs pr
 ### v2.1.1-beta (2022-05-22)
 * Fix a bug where the ending modal might add a few milliseconds to your final time.
 * Fix a bug where the game crashes when trying to load a machine that doesn't have Opal balls as an unlockable upgrade.
+* Move some code around between .js files to be better organized, especially to make game.js less of a random mishmash of utility functions.
 
 ### v2.1.0-beta (2022-03-08)
 * Add a speedrun timer.

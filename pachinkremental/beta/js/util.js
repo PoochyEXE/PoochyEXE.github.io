@@ -194,32 +194,6 @@ class Rectangle {
 	}
 }
 
-class Ball {
-	constructor(x, y, dx, dy, ball_type_index, rotation, omega) {
-		this.pos = new Point(x, y);
-		this.vel = new Vector(dx, dy);
-		this.Reset(x, y, dx, dy, ball_type_index, rotation, omega);
-	}
-
-	Reset(x, y, dx, dy, ball_type_index, rotation, omega) {
-		this.pos.Reset(x, y);
-		this.vel.Reset(dx, dy);
-		this.ball_type_index = ball_type_index;
-		this.active = true;
-		this.last_hit = null;
-		this.last_hit_time = null;
-		this.combo = 0;
-		this.combo_bonus = 0;
-		this.start_time = state.current_time;
-		this.rotation = rotation;  // Counterclockwise in radians
-		this.omega = omega;  // Angular velocity in radians/second
-		this.total_rotations = 0.0;  // Total radians rotated.
-		this.score_targets_hit = 0;
-		this.bumpers_hit = 0;
-		this.bounces = 0;
-	}
-}
-
 class RisingText {
 	constructor(text, pos, color_rgb, opacity) {
 		this.pos = new Point(pos.x, pos.y);
@@ -283,30 +257,6 @@ function AppendInterpolatedArc(points_array, center, radius, start_radians, end_
 
 function ActiveMachine(state) {
 	return state.machines[state.active_machine_index];
-}
-
-function UpdateInnerHTML(elem_id, html) {
-	let elem = document.getElementById(elem_id);
-	if (!elem) {
-		return false;
-	} else if (elem.innerHTML != html) {
-		elem.innerHTML = html;
-		return true;
-	} else {
-		return false;
-	}
-}
-
-function UpdateDisplay(elem_id, display) {
-	let elem = document.getElementById(elem_id);
-	if (!elem) {
-		return false;
-	} else if (elem.style.display != display) {
-		elem.style.display = display;
-		return true;
-	} else {
-		return false;
-	}
 }
 
 function MaybeAddScoreText({ level, text, pos, color_rgb, opacity }) {
@@ -391,20 +341,6 @@ function ShuffleArray(array) {
 		let temp = result[i];
 		result[i] = result[j];
 		result[j] = temp;
-	}
-	return result;
-}
-
-// Lightweight checksum. Not meant to be cryptographically secure.
-// If anyone else is reading this, I don't care if people edit their save
-// files. I just want to prevent crazy bugs caused by loading
-// unintentionally corrupted save files. --Poochy.EXE
-function SaveFileChecksum(save_file) {
-	let result = 0;
-	for (let i = 0; i < save_file.length; ++i) {
-		result = (result >>> 1) | (result << 63);
-		result ^= save_file.charCodeAt(i);
-		result &= 0xffffffff;
 	}
 	return result;
 }

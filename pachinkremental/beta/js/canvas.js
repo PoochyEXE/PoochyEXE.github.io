@@ -8,6 +8,10 @@ const kPegColorDarkMode = {
 	outer: "#333"
 };
 
+// To avoid ugly flashing/flickering, only draw the auto-drop cooldown timer if
+// the cooldown is at least this long, in milliseconds.
+const kMinCooldownToDraw = 300.0;
+
 const kPrismatic = "PRISMATIC";
 const k8Ball = "8-BALL";
 const k8BallHighlightColor = "246, 31,183";
