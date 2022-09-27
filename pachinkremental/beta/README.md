@@ -40,9 +40,16 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 * [v0.12.2 beta](https://poochyexe.github.io/pachinkremental/archive/beta_0/pachinkremental.html)
 
+## Acknowledgements
+
+This game uses the [LZString library](https://github.com/pieroxy/lz-string/) to compress save files, licensed under the WTFPL license.
+
 ## Changelog
 
 **Caution: Spoilers below!**
+
+### v2.1.2-beta (2022-09-27)
+* Much more efficient (and less hacky) compressed save file format. Old saves are still compatible, and will be automatically converted to the new format when loaded. Thanks to the [LZString library](https://github.com/pieroxy/lz-string/)!
 
 ### v2.1.1-beta (2022-05-22)
 * Fix a bug where the ending modal might add a few milliseconds to your final time.

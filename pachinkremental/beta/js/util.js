@@ -311,26 +311,6 @@ function SampleGaussianNoise(mu, sigma) {
 	return new Vector(z0, z1);
 }
 
-class BallType {
-	constructor(
-		id,
-		name,
-		display_name,
-		physics_params,
-		inner_color,
-		outer_color,
-		ripple_color_rgb
-	) {
-		this.id = id;
-		this.name = name;
-		this.display_name = display_name;
-		this.physics_params = physics_params;
-		this.inner_color = inner_color;
-		this.outer_color = outer_color;
-		this.ripple_color_rgb = ripple_color_rgb;
-	}
-}
-
 // Fisher-Yates shuffle.
 // Implemented from psuedocode at
 // https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle#The_modern_algorithm

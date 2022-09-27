@@ -47,9 +47,44 @@ const kPrevSaveFileVersions = [
 	},
 ];
 
-function SaveFileToString(state) {
+// Deprecated.
+function SaveFileToStringV1(state) {
 	let inner_data = JSON.stringify(state.save_file);
 	return btoa(JSON.stringify([inner_data, SaveFileChecksum(inner_data)]));
+}
+
+// Only used for backwards compatibility with old save files
+// (v2.1.1-beta and older)
+function SaveFileFromStringV1(save_file_str) {
+	let outer_data = JSON.parse(atob(save_file_str));
+	if (SaveFileChecksum(outer_data[0]) != outer_data[1]) {
+		return null;
+	}
+	return JSON.parse(outer_data[0]);
+}
+
+function SaveFileToStringV2(state) {
+	let inner_data = JSON.stringify(state.save_file);
+	let outer_data = LZString.compressToBase64(
+		inner_data + "|" + SaveFileChecksum(inner_data)
+	);
+	return "2|" + outer_data;
+}
+
+function SaveFileFromStringV2(save_file_str) {
+	let outer_data = save_file_str.split("|");
+	let inner_data = LZString.decompressFromBase64(outer_data[1]).split("|");
+	let checksum = SaveFileChecksum(inner_data[0]);
+	if (checksum != inner_data[1]) {
+		console.error(
+			"Incorrect save file checksum!" +
+			"\nExpected: " + inner_data[1] +
+			"\nActual: " + checksum +
+			"\nSave file: " + save_file_str
+		);
+		return null;
+	}
+	return JSON.parse(inner_data[0]);
 }
 
 function SaveFileFromString(save_file_str) {
@@ -57,11 +92,11 @@ function SaveFileFromString(save_file_str) {
 		return null;
 	}
 	try {
-		let outer_data = JSON.parse(atob(save_file_str));
-		if (SaveFileChecksum(outer_data[0]) != outer_data[1]) {
-			return null;
+		if (save_file_str.startsWith("2|")) {
+			return SaveFileFromStringV2(save_file_str);
+		} else {
+			return SaveFileFromStringV1(save_file_str);
 		}
-		return JSON.parse(outer_data[0]);
 	} catch (error) {
 		console.error("Could not parse save file: " + save_file_str);
 		return null;
@@ -72,7 +107,7 @@ function SaveToLocalStorage() {
 	if (!state.game_started) {
 		return;
 	}
-	localStorage.setItem(kSaveFileName, SaveFileToString(state));
+	localStorage.setItem(kSaveFileName, SaveFileToStringV2(state));
 	state.notifications.push(new Notification("Game saved", "#8F8"));
 }
 
@@ -314,7 +349,7 @@ function ExportSave() {
 		"Your save file is below. Copy the text and keep it someplace safe."
 	);
 	let export_textarea = document.getElementById("exported_save");
-	export_textarea.innerHTML = SaveFileToString(state);
+	export_textarea.innerHTML = SaveFileToStringV2(state);
 	export_textarea.focus();
 	export_textarea.select();
 	document.getElementById("export_save_modal").style.display = "block";

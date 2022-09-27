@@ -1,4 +1,4 @@
-const kVersion = "v2.1.1-beta";
+const kVersion = "v2.1.2-beta";
 const kTitleAndVersion = "Pachinkremental " + kVersion;
 
 const kFrameInterval = 1000.0 / kFPS;
@@ -65,7 +65,7 @@ function LoadActiveMachine(state) {
 	UpdateMachinesHeader(state);
 	UpdateDarkMode();
 	UpdateOpalBallUpgradesStyle();
-	ResizeCanvas();
+	ResizeCanvas(state, machine.board);
 	OnResize();
 }
 
@@ -405,7 +405,7 @@ var state = InitState();
 
 function OnResize() {
 	state.redraw_all = true;
-	ResizeCanvas();
+	ResizeCanvas(state, ActiveMachine(state).board);
 	ResizeModals();
 }
 

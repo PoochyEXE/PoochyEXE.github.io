@@ -24,6 +24,26 @@ class Ball {
 	}
 }
 
+class BallType {
+	constructor(
+		id,
+		name,
+		display_name,
+		physics_params,
+		inner_color,
+		outer_color,
+		ripple_color_rgb
+	) {
+		this.id = id;
+		this.name = name;
+		this.display_name = display_name;
+		this.physics_params = physics_params;
+		this.inner_color = inner_color;
+		this.outer_color = outer_color;
+		this.ripple_color_rgb = ripple_color_rgb;
+	}
+}
+
 function CreateBallWithNoise(x, y, dx, dy, ball_type_index) {
 	let dNoise = SampleGaussianNoise(0.0, 20.0);
 	let angleNoise = SampleGaussianNoise(0.0, 0.1);

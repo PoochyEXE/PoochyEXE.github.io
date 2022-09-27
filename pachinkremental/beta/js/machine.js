@@ -144,7 +144,7 @@ class PachinkoMachine {
 
 	AddPointsForBallToStats(points, ball_type_index) {
 		if (!points) {
-			console.error("AddPointsForBallToStats() called without a valid point amount.");
+			console.error("AddPointsForBallToStats() called without a valid point amount. points = " + points + ", ball_type_index = " + ball_type_index);
 			return;
 		}
 		let id = this.BallType(ball_type_index).name + "_balls_points_scored";

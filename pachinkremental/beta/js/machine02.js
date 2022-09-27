@@ -88,6 +88,7 @@ class BumperMachine extends PachinkoMachine {
 	constructor(id, display_name) {
 		super(id, display_name, kBumperMachineBallTypes);
 
+		this.special_ball_multiplier = 2;
 		this.ruby_ball_value_percent = 10;
 		this.sapphire_ball_value_percent = 10;
 		this.emerald_ball_value_percent = 50;

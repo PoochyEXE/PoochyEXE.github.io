@@ -464,8 +464,7 @@ function ClearLayerAndReturnContext(layer_id) {
 	return ctx;
 }
 
-function ResizeCanvas() {
-	let board = ActiveMachine(state).board;
+function ResizeCanvas(state, board) {
 	const aspect_ratio = board.width / board.height;
 	const max_height = window.innerHeight - 35;
 	const max_width = window.innerWidth - 300;
