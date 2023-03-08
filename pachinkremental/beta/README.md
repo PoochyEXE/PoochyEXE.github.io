@@ -48,6 +48,10 @@ This game uses the [LZString library](https://github.com/pieroxy/lz-string/) to 
 
 **Caution: Spoilers below!**
 
+### v2.1.3-beta (2023-03-08)
+* Fix anotther bug where non-integer values between 1,000 and 10,000 would be displayed in scientific notation when Notation is set to 漢字.
+* New under-the-hood features, meant to be used in a future board.
+
 ### v2.1.2-beta (2022-09-27)
 * Much more efficient (and less hacky) compressed save file format. Old saves are still compatible, and will be automatically converted to the new format when loaded. Thanks to the [LZString library](https://github.com/pieroxy/lz-string/)!
 

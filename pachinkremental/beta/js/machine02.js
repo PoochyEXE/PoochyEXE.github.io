@@ -717,7 +717,14 @@ class BumperMachine extends PachinkoMachine {
 			new Rectangle(min_drop_x, max_drop_x, min_drop_y, max_drop_y)
 		];
 
-		return new PegBoard(kWidth, kHeight, pegs, drop_zones, target_sets, bumper_sets);
+		return new PegBoard({
+			width: kWidth,
+			height: kHeight,
+			pegs: pegs,
+			drop_zones: drop_zones,
+			target_sets: target_sets,
+			bumper_sets: bumper_sets,
+		});
 	}
 
 	UpdateScoreTargetSet(target_set, base_values, multiplier) {
