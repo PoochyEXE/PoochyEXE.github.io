@@ -350,7 +350,13 @@ class FirstMachine extends PachinkoMachine {
 		);
 		target_sets.push(new TargetSet(spin_targets));
 
-		return new PegBoard(kWidth, kHeight, pegs, drop_zones, target_sets);
+		return new PegBoard({
+			width: kWidth,
+			height: kHeight,
+			pegs: pegs,
+			drop_zones: drop_zones,
+			target_sets: target_sets
+		});
 	}
 
 	UpdateBottomTargets() {

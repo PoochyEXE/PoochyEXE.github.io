@@ -19,8 +19,11 @@ const kBeachBall = "BEACH";
 const kRubberBand = "RUBBER_BAND";
 const kSpiral = "SPIRAL";
 const kBumperColor = "BUMPER";
+const kWhirlpoolColor = "WHIRLPOOL";
 
 const kBumperHitExpandSizes = [0, 1, 2, 3, 2, 1];
+const kBumperOuterColor = "#080";
+const kBumperInnerColor = "#8F8";
 
 const kNumBeachBallColors = 6;
 // The order to shuffle beach ball colors into for rubber band balls.
@@ -421,9 +424,59 @@ function CreateBumperGradient(ctx, pos, radius) {
 	let gradient =
 		ctx.createRadialGradient(pos.x, pos.y, inner_r, pos.x, pos.y, radius);
 	gradient.addColorStop(0, kTransparent);
-	gradient.addColorStop(kEpsilon, kOuterColor);
-	gradient.addColorStop(0.5, kInnerColor);
-	gradient.addColorStop(1.0, kOuterColor);
+	gradient.addColorStop(kEpsilon, kBumperOuterColor);
+	gradient.addColorStop(0.5, kBumperInnerColor);
+	gradient.addColorStop(1.0, kBumperOuterColor);
+	return gradient;
+}
+
+function DrawLongBumperEnd(ctx, pos, radius) {
+	DrawGradientCircle(ctx, pos, radius, kBumperInnerColor, kBumperOuterColor);
+}
+
+function DrawLongBumperMiddle(ctx, bumper, thickness) {
+	let norm = bumper.normal_vector.Multiply(thickness);
+	let gradient = ctx.createLinearGradient(
+		bumper.pos.x + norm.x,
+		bumper.pos.y + norm.y,
+		bumper.pos.x - norm.x,
+		bumper.pos.y - norm.y,
+	);
+	gradient.addColorStop(0.0, kBumperOuterColor);
+	gradient.addColorStop(0.5, kBumperInnerColor);
+	gradient.addColorStop(1.0, kBumperOuterColor);
+	ctx.fillStyle = gradient;
+	
+	let region = new Path2D();
+	region.moveTo(
+		bumper.left_endpoint.x + norm.x,
+		bumper.left_endpoint.y + norm.y,
+	);
+	region.lineTo(
+		bumper.left_endpoint.x - norm.x,
+		bumper.left_endpoint.y - norm.y,
+	);
+	region.lineTo(
+		bumper.right_endpoint.x - norm.x,
+		bumper.right_endpoint.y - norm.y,
+	);
+	region.lineTo(
+		bumper.right_endpoint.x + norm.x,
+		bumper.right_endpoint.y + norm.y,
+	);
+	region.closePath();
+	ctx.fill(region);
+}
+
+function CreateWhirlpoolGradient(ctx, pos, radius) {
+	const kOuterColor = "rgba(0, 127, 255, 0.5)";
+	const kInnerColor = "rgba(0, 127, 255, 0)";
+	const kEpsilon = 1e-7;
+	let inner_r = radius / 3.0;
+	let gradient =
+		ctx.createRadialGradient(pos.x, pos.y, inner_r, pos.x, pos.y, radius);
+	gradient.addColorStop(1.0, kInnerColor);
+	gradient.addColorStop(0.0, kOuterColor);
 	return gradient;
 }
 
@@ -649,6 +702,66 @@ function DrawBumpers(bumper_sets, ctx) {
 				ctx.font = font_size + "px sans-serif";
 				let text_width = bumper.draw_radius * 1.5;
 				ctx.fillText(bumper.text, pos.x, pos.y + font_size / 3, text_width);
+			}
+		}
+	}
+}
+
+function DrawLongBumpers(bumper_sets, ctx) {
+	let font_size = 8;
+	for (let i = 0; i < bumper_sets.length; ++i) {
+		const bumpers = bumper_sets[i].targets;
+		for (let j = 0; j < bumpers.length; ++j) {
+			const bumper = bumpers[j];
+			if (!bumper.active) {
+				continue;
+			}
+			let thickness = bumper.thickness;
+			let half_length = bumper.length;
+			console.assert(half_length >= thickness);
+			if (bumper.hit_animation > 0) {
+				thickness += kBumperHitExpandSizes[bumper.hit_animation];
+				half_length += kBumperHitExpandSizes[bumper.hit_animation];
+				bumper.hit_animation -= 1;
+				state.redraw_bumpers = true;
+			}
+			DrawLongBumperEnd(ctx, bumper.left_endpoint, thickness);
+			DrawLongBumperEnd(ctx, bumper.right_endpoint, thickness);
+			DrawLongBumperMiddle(ctx, bumper, thickness, half_length);
+
+			if (bumper.text) {
+				ctx.textAlign = "center";
+				ctx.fillStyle = "#000";
+				ctx.font = font_size + "px sans-serif";
+				let text_width = bumper.draw_radius * 1.5;
+				ctx.fillText(bumper.text, pos.x, pos.y + font_size / 3, text_width);
+			}
+		}
+	}
+}
+
+function DrawWhirlpools(whirlpool_sets, ctx) {
+	let font_size = 8;
+	for (let i = 0; i < whirlpool_sets.length; ++i) {
+		const whirlpools = whirlpool_sets[i].targets;
+		for (let j = 0; j < whirlpools.length; ++j) {
+			const whirlpool = whirlpools[j];
+			if (!whirlpool.active) {
+				continue;
+			}
+			const pos = whirlpool.pos;
+			let radius = whirlpool.draw_radius;
+			ctx.fillStyle = CreateWhirlpoolGradient(ctx, pos, radius);
+			ctx.beginPath();
+			ctx.arc(pos.x, pos.y, radius, 0, 2 * Math.PI);
+			ctx.fill();
+
+			if (whirlpool.text) {
+				ctx.textAlign = "center";
+				ctx.fillStyle = "#000";
+				ctx.font = font_size + "px sans-serif";
+				let text_width = whirlpool.draw_radius * 1.5;
+				ctx.fillText(whirlpool.text, pos.x, pos.y + font_size / 3, text_width);
 			}
 		}
 	}
@@ -1087,6 +1200,12 @@ function Draw(state) {
 			DrawPegsNoGradient(board.pegs, ctx);
 		}
 	}
+	// Whirlpools
+	if (state.redraw_all || state.redraw_whirlpool) {
+		let ctx = ClearLayerAndReturnContext("whirlpools");
+		state.redraw_whirlpools = false;
+		DrawWhirlpools(machine.board.whirlpool_sets, ctx);
+	}
 	// Balls
 	let total_balls = TotalBalls(state);
 	if (state.redraw_all || total_balls > 0 || state.last_drawn.num_balls > 0) {
@@ -1121,6 +1240,7 @@ function Draw(state) {
 		let ctx = ClearLayerAndReturnContext("bumpers");
 		state.redraw_bumpers = false;
 		DrawBumpers(machine.board.bumper_sets, ctx);
+		DrawLongBumpers(machine.board.long_bumper_sets, ctx);
 	}
 	// Targets
 	if (state.reset_target_text) {

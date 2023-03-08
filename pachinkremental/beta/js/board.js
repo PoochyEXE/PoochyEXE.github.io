@@ -170,8 +170,130 @@ class Bumper extends Target {
 	}
 }
 
+class LongBumper extends Target {
+	constructor({ machine, pos, length, thickness, normal_vector, strength, value, id, active }) {
+		super({
+			machine,
+			pos,
+			draw_radius: length / 2.0,
+			hitbox_radius: (length / 2.0) + kBallRadius,
+			color: kBumperColor,
+			text: "",
+			id,
+			active,
+			pass_through: true
+		});
+		this.value = value;
+		this.length = length;
+		this.thickness = thickness;
+		console.assert(length >= thickness * 2.0);
+		this.thickness_sqr = thickness * thickness;
+		this.normal_vector = normal_vector.Normalize();
+		this.parallel_vector = this.normal_vector.Perpendicular();
+		let endpoint_delta = this.parallel_vector.Multiply(length / 2.0 - thickness);
+		this.left_endpoint = this.pos.Add(endpoint_delta);
+		this.right_endpoint = this.pos.Add(endpoint_delta.Multiply(-1));
+		this.strength = strength;
+		this.hit_animation = 0;
+		this.ResetText();
+	}
+
+	CheckForHit(ball) {
+		if (!this.active) {
+			return;
+		}
+		if (this.pos.DistanceSqrToPoint(ball.pos) >= this.hitbox_radius_sqr) {
+			return;
+		}
+		let delta = this.pos.DeltaToPoint(ball.pos);
+		let delta_normal = delta.DotProduct(this.normal_vector);
+		if (Math.abs(delta_normal) >= this.thickness + kBallRadius) {
+			return;
+		}
+
+		let save_file = this.machine.GetSaveData();
+		if (save_file.stats.target_hits[this.id]) {
+			++save_file.stats.target_hits[this.id];
+		} else {
+			save_file.stats.target_hits[this.id] = 1;
+		}
+
+		this.OnHit(ball);
+	}
+
+	OnHit(ball) {
+		this.hit_animation = kBumperHitExpandSizes.length - 1;
+		if (this.value) {
+			this.machine.AwardPoints(this.value, ball);
+		}
+		const ball_physics_params =
+			this.machine.BallTypes()[ball.ball_type_index].physics_params;
+
+		const kNoiseSigma = 0.01;
+		let noise = SampleGaussianNoise(0, kNoiseSigma);
+		
+		let delta = this.pos.DeltaToPoint(ball.pos);
+		let delta_norm = delta.DotProduct(this.normal_vector);
+		let dir_mult = delta_norm >= 0 ? 1 : -1;
+		let pos_adjust = this.thickness + kBallRadius - Math.abs(delta_norm);
+		ball.vel.MutateMultiply(ball_physics_params.collision_elasticity);
+		ball.vel.MutateAdd(noise);
+		ball.vel.MutateAddNTimes(this.normal_vector, dir_mult * this.strength);
+		ball.pos.MutateAddNTimes(this.normal_vector, dir_mult * pos_adjust);
+		ball.last_hit = null;
+		++ball.bumpers_hit;
+		state.redraw_bumpers = true;
+		if (GetSetting("show_hit_rates")) {
+			state.redraw_stats_overlay = true;
+		}
+	}
+
+	ResetText() {
+		this.text = "";
+	}
+
+	SetValue(new_value) {
+		this.value = new_value;
+		this.ResetText();
+	}
+}
+
+class Whirlpool extends Target {
+	constructor({ machine, pos, radius, strength, damping_ratio, max_speed, value, id, active }) {
+		super({
+			machine,
+			pos,
+			draw_radius: radius,
+			hitbox_radius: radius + kBallRadius,
+			color: kWhirlpoolColor,
+			text: "",
+			id,
+			active,
+			pass_through: true
+		});
+		this.strength = strength;
+		this.damping_ratio = damping_ratio;
+		this.max_speed = max_speed;
+		this.max_speed_sqr = max_speed * max_speed;
+		this.ResetText();
+	}
+
+	OnHit(ball) {
+		let delta = ball.pos.DeltaToPoint(this.pos);
+		let dist = delta.Magnitude();
+		delta.MutateNormalize();
+		ball.vel.MutateMultiply(this.damping_ratio);
+		ball.vel.MutateAddNTimes(delta, this.strength / Math.max(1.0, dist));
+		if (ball.vel.MagnitudeSqr() > this.max_speed_sqr) {
+			ball.vel.MutateNormalize();
+			ball.vel.MutateMultiply(this.max_speed);
+		}
+		ball.last_hit = null;
+	}
+}
+
 class PegBoard {
-	constructor(width, height, pegs, drop_zones, target_sets, bumper_sets) {
+	constructor({ width, height, pegs, drop_zones, target_sets, bumper_sets, long_bumper_sets, whirlpool_sets }) {
 		this.width = width;
 		this.height = height;
 		this.pegs = pegs;
@@ -181,6 +303,16 @@ class PegBoard {
 			this.bumper_sets = bumper_sets;
 		} else {
 			this.bumper_sets = Array(0);
+		}
+		if (long_bumper_sets) {
+			this.long_bumper_sets = long_bumper_sets;
+		} else {
+			this.long_bumper_sets = Array(0);
+		}
+		if (whirlpool_sets) {
+			this.whirlpool_sets = whirlpool_sets;
+		} else {
+			this.whirlpool_sets = Array(0);
 		}
 		this.grid_cols = Math.ceil(width / kCellSize);
 		this.grid_rows = Math.ceil(height / kCellSize);

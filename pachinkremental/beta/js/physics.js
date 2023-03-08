@@ -111,6 +111,12 @@ function UpdateBalls(balls, board, params) {
 		for (let s = 0; s < board.bumper_sets.length; ++s) {
 			board.bumper_sets[s].CheckForHit(balls[b]);
 		}
+		for (let s = 0; s < board.long_bumper_sets.length; ++s) {
+			board.long_bumper_sets[s].CheckForHit(balls[b]);
+		}
+		for (let s = 0; s < board.whirlpool_sets.length; ++s) {
+			board.whirlpool_sets[s].CheckForHit(balls[b]);
+		}
 	}
 
 	// Remove balls that are inactive or have fallen outside the board.
