@@ -106,6 +106,8 @@ function InitState() {
 		redraw_stats_overlay: false,
 		redraw_wheel: false,
 		redraw_board_glow: false,
+		redraw_whirlpools: false,
+		redraw_portals: false,
 		reset_target_text: false,
 		update_stats_panel: true,
 		update_upgrades: true,

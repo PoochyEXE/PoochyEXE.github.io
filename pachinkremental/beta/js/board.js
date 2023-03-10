@@ -292,8 +292,40 @@ class Whirlpool extends Target {
 	}
 }
 
+
+class Portal extends Target {
+	constructor({ machine, pos, draw_radius, hitbox_radius, color, id, active }) {
+		super({
+			machine,
+			pos,
+			draw_radius,
+			hitbox_radius,
+			color,
+			text: "",
+			id,
+			active,
+			pass_through: true
+		});
+		this.dest_id = undefined;
+		this.dest_pos = undefined;
+	}
+	
+	SetDestination(dest) {
+		this.dest_id = dest.id;
+		this.dest_pos = dest.pos;
+	}
+
+	OnHit(ball) {
+		if (!this.dest_id || !this.dest_pos) {
+			return;
+		}
+		ball.pos.CopyFrom(this.dest_pos);
+		ball.last_hit = this.dest_id;
+	}
+}
+
 class PegBoard {
-	constructor({ width, height, pegs, drop_zones, target_sets, bumper_sets, long_bumper_sets, whirlpool_sets }) {
+	constructor({ width, height, pegs, drop_zones, target_sets, bumper_sets, long_bumper_sets, whirlpool_sets, portal_sets }) {
 		this.width = width;
 		this.height = height;
 		this.pegs = pegs;
@@ -313,6 +345,11 @@ class PegBoard {
 			this.whirlpool_sets = whirlpool_sets;
 		} else {
 			this.whirlpool_sets = Array(0);
+		}
+		if (portal_sets) {
+			this.portal_sets = portal_sets;
+		} else {
+			this.portal_sets = Array(0);
 		}
 		this.grid_cols = Math.ceil(width / kCellSize);
 		this.grid_rows = Math.ceil(height / kCellSize);

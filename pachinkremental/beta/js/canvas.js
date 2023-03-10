@@ -767,6 +767,34 @@ function DrawWhirlpools(whirlpool_sets, ctx) {
 	}
 }
 
+function DrawPortals(portal_sets, ctx) {
+	const kPortalLineThickness = 3.0;
+	let font_size = 8;
+	for (let i = 0; i < portal_sets.length; ++i) {
+		const portals = portal_sets[i].targets;
+		for (let j = 0; j < portals.length; ++j) {
+			const portal = portals[j];
+			if (!portal.active) {
+				continue;
+			}
+			const pos = portal.pos;
+			const radius = portal.draw_radius;
+			let outer_color = AddAlphaToColorRGB(portal.color, 1.0)
+			let inner_color = AddAlphaToColorRGB(portal.color, 0.0)
+			let inner_r = radius - kPortalLineThickness;
+			let gradient =
+				ctx.createRadialGradient(pos.x, pos.y, inner_r, pos.x, pos.y, radius);
+			gradient.addColorStop(0.0, inner_color);
+			gradient.addColorStop(1.0, outer_color);
+			ctx.fillStyle = gradient;
+			ctx.beginPath();
+			ctx.arc(pos.x, pos.y, radius, 0, 2 * Math.PI);
+			ctx.fill();
+		}
+	}
+}
+
+
 function DrawHitRateText(x, y, hits, total_balls, ctx) {
 	let rate_text = "--";
 	if (total_balls > 0) {
@@ -1201,10 +1229,16 @@ function Draw(state) {
 		}
 	}
 	// Whirlpools
-	if (state.redraw_all || state.redraw_whirlpool) {
+	if (state.redraw_all || state.redraw_whirlpools) {
 		let ctx = ClearLayerAndReturnContext("whirlpools");
 		state.redraw_whirlpools = false;
 		DrawWhirlpools(machine.board.whirlpool_sets, ctx);
+	}
+	// Portals
+	if (state.redraw_all || state.redraw_portals) {
+		let ctx = ClearLayerAndReturnContext("portals");
+		state.redraw_portals = false;
+		DrawPortals(machine.board.portal_sets, ctx);
 	}
 	// Balls
 	let total_balls = TotalBalls(state);
