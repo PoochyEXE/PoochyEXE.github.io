@@ -826,7 +826,6 @@ function DrawPortalInsides(portal_sets) {
 				pos.x = source_canvas.width - pos.x;
 				pos.y = source_canvas.height - pos.y;
 			}
-			// TODO: Fix for April Fools mode.
 			const radius = portal.draw_radius * scale;
 			const diameter = radius * 2;
 			temp_canvas.height = diameter;
