@@ -42,17 +42,18 @@
 					<button type="button" class="dropZone" id="drop_zone"
 							style="z-index: 0; left: 15px; top: 5px; width: 140px; height: 30px;"></button>
 				</span>
-				<canvas id="canvas_board"      class="board" style="z-index:  1;"></canvas>
-				<canvas id="canvas_whirlpools" class="board" style="z-index:  2;"></canvas>
-				<canvas id="canvas_portals"    class="board" style="z-index:  3;"></canvas>
-				<canvas id="canvas_balls"      class="board" style="z-index:  4;"></canvas>
-				<canvas id="canvas_bumpers"    class="board" style="z-index:  5;"></canvas>
-				<canvas id="canvas_targets"    class="board" style="z-index:  6;"></canvas>
-				<canvas id="canvas_glow"       class="board" style="z-index:  7;"></canvas>
-				<canvas id="canvas_stats"      class="board" style="z-index:  8;"></canvas>
-				<canvas id="canvas_auto_drop"  class="board" style="z-index:  9;"></canvas>
-				<canvas id="canvas_score_text" class="board" style="z-index: 10;"></canvas>
-				<canvas id="canvas_ripples"    class="board" style="z-index: 11;"></canvas>
+				<canvas id="canvas_board"         class="board" style="z-index:  1;"></canvas>
+				<canvas id="canvas_whirlpools"    class="board" style="z-index:  2;"></canvas>
+				<canvas id="canvas_portal_inside" class="board" style="z-index:  3;"></canvas>
+				<canvas id="canvas_portals"       class="board" style="z-index:  4;"></canvas>
+				<canvas id="canvas_balls"         class="board" style="z-index:  5;"></canvas>
+				<canvas id="canvas_bumpers"       class="board" style="z-index:  6;"></canvas>
+				<canvas id="canvas_targets"       class="board" style="z-index:  7;"></canvas>
+				<canvas id="canvas_glow"          class="board" style="z-index:  8;"></canvas>
+				<canvas id="canvas_stats"         class="board" style="z-index:  9;"></canvas>
+				<canvas id="canvas_auto_drop"     class="board" style="z-index: 10;"></canvas>
+				<canvas id="canvas_score_text"    class="board" style="z-index: 11;"></canvas>
+				<canvas id="canvas_ripples"       class="board" style="z-index: 12;"></canvas>
 				<div id="speedrun_timer_container" class="speedrunTimerContainer">
 					<span id="speedrun_timer" class="speedrunTimer speedrunTimerActive">00:00:00.000</span>
 				</div>
@@ -86,6 +87,7 @@
 				<div id="debug" style="display: none;">
 					<canvas id="favicon_canvas" width="64" height="64" style="height: 64px; width: 64px;"></canvas>
 					<a id="favicon_link">Save</a>
+					<canvas id="portal_inside_temp" width="64" height="64"></canvas>
 				</div>
 				<div id="spiral_power" class="spiralContainer" style="display: none;">
 					<table id="spiral_power_table">

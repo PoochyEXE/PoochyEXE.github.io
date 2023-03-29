@@ -794,6 +794,65 @@ function DrawPortals(portal_sets, ctx) {
 	}
 }
 
+function DrawPortalInsides(portal_sets) {
+	let canvas = document.getElementById("canvas_portal_inside");
+	let ctx = canvas.getContext("2d");
+	ctx.setTransform(1, 0, 0, 1, 0, 0);
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
+	
+	const scale = state.canvas_scale;
+	const source_canvas = document.getElementById("canvas_balls");
+	
+	let temp_canvas = document.getElementById("portal_inside_temp");
+	let temp_ctx = temp_canvas.getContext("2d");
+	
+	let pos = new Vector(0, 0);
+
+	for (let i = 0; i < portal_sets.length; ++i) {
+		const portals = portal_sets[i].targets;
+		for (let j = 0; j < portals.length; ++j) {
+			const portal = portals[j];
+			if (!portal.active) {
+				continue;
+			}
+			if (!portal.dest_id || !portal.dest_pos || !portal.dest_delta) {
+				console.log("Invalid portal: " + portal.id);
+				continue;
+			}
+			pos.x = portal.pos.x;
+			pos.y = portal.pos.y;
+			pos.MutateMultiply(scale);
+			if (state.april_fools) {
+				pos.x = source_canvas.width - pos.x;
+				pos.y = source_canvas.height - pos.y;
+			}
+			const radius = portal.draw_radius * scale;
+			const diameter = radius * 2;
+			temp_canvas.height = diameter;
+			temp_canvas.width = diameter;
+			temp_ctx.clearRect(0, 0, diameter, diameter);
+			temp_ctx.drawImage(
+				source_canvas,
+				pos.x - radius, pos.y - radius, diameter, diameter,
+				0, 0, diameter, diameter
+			);
+			temp_ctx.globalCompositeOperation='destination-in';
+			temp_ctx.beginPath();
+			temp_ctx.arc(radius, radius, radius, 0, Math.PI*2);
+			temp_ctx.closePath();
+			temp_ctx.fill();
+			
+			pos.x = portal.dest_pos.x;
+			pos.y = portal.dest_pos.y;
+			pos.MutateMultiply(scale);
+			if (state.april_fools) {
+				pos.x = source_canvas.width - pos.x;
+				pos.y = source_canvas.height - pos.y;
+			}
+			ctx.drawImage(temp_canvas, pos.x - radius, pos.y - radius);
+		}
+	}
+}
 
 function DrawHitRateText(x, y, hits, total_balls, ctx) {
 	let rate_text = "--";
@@ -1267,6 +1326,11 @@ function Draw(state) {
 				);
 			}
 		}
+		
+		if (machine.board.portal_sets.length > 0) {
+			DrawPortalInsides(machine.board.portal_sets);
+		}
+		
 		state.last_drawn.num_balls = total_balls;
 	}
 	// Bumpers

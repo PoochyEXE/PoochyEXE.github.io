@@ -308,18 +308,20 @@ class Portal extends Target {
 		});
 		this.dest_id = undefined;
 		this.dest_pos = undefined;
+		this.dest_delta = undefined;
 	}
 	
 	SetDestination(dest) {
 		this.dest_id = dest.id;
 		this.dest_pos = dest.pos;
+		this.dest_delta = this.pos.DeltaToPoint(dest.pos);
 	}
 
 	OnHit(ball) {
-		if (!this.dest_id || !this.dest_pos) {
+		if (!this.dest_id || !this.dest_pos || !this.dest_delta) {
 			return;
 		}
-		ball.pos.CopyFrom(this.dest_pos);
+		ball.pos.MutateAdd(this.dest_delta);
 		ball.last_hit = this.dest_id;
 	}
 }
