@@ -867,10 +867,28 @@ function DrawHitRateText(x, y, hits, total_balls, ctx) {
 	ctx.fillText(rate_text, x, y);
 }
 
-function DrawHitRates(stats, target_sets, bumper_sets, ctx) {
-	let total_balls = 0;
+function DrawHitRatesForTargetSets(stats, target_sets, vertical_offset, total_balls, ctx) {
 	for (let i = 0; i < target_sets.length; ++i) {
 		const targets = target_sets[i].targets;
+		for (let j = 0; j < targets.length; ++j) {
+			const target = targets[j];
+			if (target.active) {
+				DrawHitRateText(
+					target.pos.x,
+					target.pos.y - target.draw_radius - vertical_offset,
+					stats.target_hits[target.id],
+					total_balls,
+					ctx
+				);
+			}
+		}
+	}
+}
+
+function DrawHitRates(stats, board, ctx) {
+	let total_balls = 0;
+	for (let i = 0; i < board.target_sets.length; ++i) {
+		const targets = board.target_sets[i].targets;
 		for (let j = 0; j < targets.length; ++j) {
 			const target = targets[j];
 			const hits = stats.target_hits[target.id];
@@ -890,36 +908,9 @@ function DrawHitRates(stats, target_sets, bumper_sets, ctx) {
 	ctx.fillStyle = dark_mode ? "#FFF" : "#000";
 	ctx.strokeStyle = dark_mode ? "#000" : "#FFF";
 	ctx.font = "bold " + kFontSize + "px sans-serif";
-	for (let i = 0; i < target_sets.length; ++i) {
-		const targets = target_sets[i].targets;
-		for (let j = 0; j < targets.length; ++j) {
-			const target = targets[j];
-			if (target.active) {
-				DrawHitRateText(
-					target.pos.x,
-					target.pos.y - target.draw_radius - 2,
-					stats.target_hits[target.id],
-					total_balls,
-					ctx
-				);
-			}
-		}
-	}
-	for (let i = 0; i < bumper_sets.length; ++i) {
-		const bumpers = bumper_sets[i].targets;
-		for (let j = 0; j < bumpers.length; ++j) {
-			const bumper = bumpers[j];
-			if (bumper.active) {
-				DrawHitRateText(
-					bumper.pos.x,
-					bumper.pos.y - bumper.draw_radius - 4,
-					stats.target_hits[bumper.id],
-					total_balls,
-					ctx
-				);
-			}
-		}
-	}
+	DrawHitRatesForTargetSets(stats, board.target_sets, 2, total_balls, ctx);
+	DrawHitRatesForTargetSets(stats, board.bumper_sets, 4, total_balls, ctx);
+	DrawHitRatesForTargetSets(stats, board.portal_sets, 2, total_balls, ctx);
 }
 
 function DrawScoreText(score_text, font_size, duration, rise, stroke_color_rgb, ctx) {
@@ -1363,8 +1354,7 @@ function Draw(state) {
 		if (GetSetting("show_hit_rates")) {
 			DrawHitRates(
 				machine.GetSaveData().stats,
-				machine.board.target_sets,
-				machine.board.bumper_sets,
+				machine.board,
 				ctx
 			);
 		}
