@@ -296,14 +296,14 @@ class Whirlpool extends Target {
 class Portal extends Target {
 	constructor({ machine, pos, draw_radius, hitbox_radius, color, id, active }) {
 		super({
-			machine,
-			pos,
-			draw_radius,
-			hitbox_radius,
-			color,
+			machine: machine,
+			pos: pos,
+			draw_radius: draw_radius,
+			hitbox_radius: hitbox_radius ? hitbox_radius : draw_radius - kBallRadius,
+			color: color,
 			text: "",
-			id,
-			active,
+			id: id,
+			active: active,
 			pass_through: true
 		});
 		this.dest_id = undefined;
@@ -323,6 +323,10 @@ class Portal extends Target {
 		}
 		ball.pos.MutateAdd(this.dest_delta);
 		ball.last_hit = this.dest_id;
+
+		if (GetSetting("show_hit_rates")) {
+			state.redraw_stats_overlay = true;
+		}
 	}
 }
 
