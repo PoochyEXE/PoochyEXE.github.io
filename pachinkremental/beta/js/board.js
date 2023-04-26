@@ -42,6 +42,15 @@ class Target {
 			this.OnHit(ball);
 		}
 	}
+
+	HitboxBoundingBox() {
+		return {
+			x_lo: this.pos.x - this.hitbox_radius,
+			x_hi: this.pos.x + this.hitbox_radius,
+			y_lo: this.pos.y - this.hitbox_radius,
+			y_hi: this.pos.y + this.hitbox_radius,
+		};
+	}
 }
 
 class ScoreTarget extends Target {
@@ -85,17 +94,16 @@ class TargetSet {
 	constructor(targets) {
 		this.targets = targets;
 
-		let radius = targets[0].hitbox_radius;
-		let min_x = targets[0].pos.x - radius;
-		let max_x = targets[0].pos.x + radius;
-		let min_y = targets[0].pos.y - radius;
-		let max_y = targets[0].pos.y + radius;
-		for (let i = 1; i < targets.length; ++i) {
-			let radius = targets[i].hitbox_radius;
-			min_x = Math.min(min_x, targets[i].pos.x - radius);
-			max_x = Math.max(max_x, targets[i].pos.x + radius);
-			min_y = Math.min(min_y, targets[i].pos.y - radius);
-			max_y = Math.max(max_y, targets[i].pos.y + radius);
+		let min_x = targets[0].pos.x;
+		let max_x = targets[0].pos.x;
+		let min_y = targets[0].pos.y;
+		let max_y = targets[0].pos.y;
+		for (let i = 0; i < targets.length; ++i) {
+			let bbox = targets[i].HitboxBoundingBox();
+			min_x = Math.min(min_x, bbox.x_lo);
+			max_x = Math.max(max_x, bbox.x_hi);
+			min_y = Math.min(min_y, bbox.y_lo);
+			max_y = Math.max(max_y, bbox.y_hi);
 		}
 		this.bounding_box = new Rectangle(min_x, max_x, min_y, max_y);
 	}
@@ -110,7 +118,7 @@ class TargetSet {
 }
 
 class Bumper extends Target {
-	constructor({ machine, pos, radius, strength, color, value, id, active }) {
+	constructor({ machine, pos, radius, strength, value, id, active }) {
 		super({
 			machine,
 			pos,
@@ -133,23 +141,35 @@ class Bumper extends Target {
 		if (this.value) {
 			this.machine.AwardPoints(this.value, ball);
 		}
-		const ball_physics_params =
-			this.machine.BallTypes()[ball.ball_type_index].physics_params;
 
-		const kNoiseSigma = 0.01;
-		let noise = SampleGaussianNoise(0, kNoiseSigma);
-		let delta_norm = this.pos.DeltaToPoint(ball.pos);
-		delta_norm.MutateNormalize();
-		ball.vel.MutateMultiply(ball_physics_params.collision_elasticity);
-		ball.vel.MutateAdd(noise);
-		ball.vel.MutateAddNTimes(delta_norm, this.strength);
-		ball.pos.CopyFrom(this.pos);
-		ball.pos.MutateAddNTimes(delta_norm, this.hitbox_radius);
+		this.BounceBall(ball);
+		
 		ball.last_hit = null;
 		++ball.bumpers_hit;
 		state.redraw_bumpers = true;
 		if (GetSetting("show_hit_rates")) {
 			state.redraw_stats_overlay = true;
+		}
+	}
+	
+	BounceBall(ball) {
+		const ball_physics_params =
+			this.machine.BallTypes()[ball.ball_type_index].physics_params;
+		let delta_norm = this.pos.DeltaToPoint(ball.pos);
+		delta_norm.MutateNormalize();
+		ball.vel.MutateMultiply(ball_physics_params.collision_elasticity);
+		ball.vel.MutateAddNTimes(delta_norm, this.strength);
+		ball.pos.CopyFrom(this.pos);
+		ball.pos.MutateAddNTimes(delta_norm, this.hitbox_radius);
+
+		const kNoiseSigma = 0.01;
+		this.AddBounceNoise(ball, kNoiseSigma);
+	}
+
+	AddBounceNoise(ball, sigma) {
+		if (sigma > 0) {
+			let noise = SampleGaussianNoise(0, sigma);
+			ball.vel.MutateAdd(noise);
 		}
 	}
 
@@ -170,22 +190,20 @@ class Bumper extends Target {
 	}
 }
 
-class LongBumper extends Target {
-	constructor({ machine, pos, length, thickness, normal_vector, strength, value, id, active }) {
+class LongBumper extends Bumper {
+	constructor({ machine, pos, length, thickness, normal_vector, strength, value, id, active, bounce_noise_sigma }) {
 		super({
 			machine,
 			pos,
-			draw_radius: length / 2.0,
-			hitbox_radius: (length / 2.0) + kBallRadius,
-			color: kBumperColor,
-			text: "",
+			radius: length / 2.0,
+			strength,
+			value,
 			id,
-			active,
-			pass_through: true
+			active
 		});
-		this.value = value;
 		this.length = length;
 		this.thickness = thickness;
+		console.assert(thickness > 0);
 		console.assert(length >= thickness * 2.0);
 		this.thickness_sqr = thickness * thickness;
 		this.normal_vector = normal_vector.Normalize();
@@ -194,6 +212,11 @@ class LongBumper extends Target {
 		this.left_endpoint = this.pos.Add(endpoint_delta);
 		this.right_endpoint = this.pos.Add(endpoint_delta.Multiply(-1));
 		this.strength = strength;
+		if (bounce_noise_sigma) {
+			this.bounce_noise_sigma = bounce_noise_sigma;
+		} else {
+			this.bounce_noise_sigma = 0;
+		}
 		this.hit_animation = 0;
 		this.ResetText();
 	}
@@ -221,31 +244,22 @@ class LongBumper extends Target {
 		this.OnHit(ball);
 	}
 
-	OnHit(ball) {
-		this.hit_animation = kBumperHitExpandSizes.length - 1;
-		if (this.value) {
-			this.machine.AwardPoints(this.value, ball);
-		}
+	BounceBall(ball) {
 		const ball_physics_params =
 			this.machine.BallTypes()[ball.ball_type_index].physics_params;
 
-		const kNoiseSigma = 0.01;
-		let noise = SampleGaussianNoise(0, kNoiseSigma);
-		
+		let norm = ball.vel.ProjectionOnto(this.normal_vector);
+		let speed_norm = norm.Magnitude();
+		norm.MutateMultiply(-1.0);
+		norm.MutateNormalize();
+		ball.vel.MutateAddNTimes(norm, this.strength + speed_norm * (1.0 - ball_physics_params.collision_elasticity));
+
 		let delta = this.pos.DeltaToPoint(ball.pos);
 		let delta_norm = delta.DotProduct(this.normal_vector);
-		let dir_mult = delta_norm >= 0 ? 1 : -1;
 		let pos_adjust = this.thickness + kBallRadius - Math.abs(delta_norm);
-		ball.vel.MutateMultiply(ball_physics_params.collision_elasticity);
-		ball.vel.MutateAdd(noise);
-		ball.vel.MutateAddNTimes(this.normal_vector, dir_mult * this.strength);
-		ball.pos.MutateAddNTimes(this.normal_vector, dir_mult * pos_adjust);
-		ball.last_hit = null;
-		++ball.bumpers_hit;
-		state.redraw_bumpers = true;
-		if (GetSetting("show_hit_rates")) {
-			state.redraw_stats_overlay = true;
-		}
+		ball.pos.MutateAddNTimes(norm, pos_adjust);
+
+		this.AddBounceNoise(ball, this.bounce_noise_sigma);
 	}
 
 	ResetText() {
@@ -255,6 +269,133 @@ class LongBumper extends Target {
 	SetValue(new_value) {
 		this.value = new_value;
 		this.ResetText();
+	}
+
+	HitboxBoundingBox() {
+		const hitbox_delta = this.thickness + kBallRadius;
+		return {
+			x_lo: Math.min(this.left_endpoint.x, this.right_endpoint.x) - hitbox_delta,
+			x_hi: Math.max(this.left_endpoint.x, this.right_endpoint.x) + hitbox_delta,
+			y_lo: Math.min(this.left_endpoint.y, this.right_endpoint.y) - hitbox_delta,
+			y_hi: Math.max(this.left_endpoint.y, this.right_endpoint.y) + hitbox_delta,
+		};
+	}
+}
+
+// TODO: Hit rate displays too far above the bumper, based on its length.
+class HorizontalLongBumper extends LongBumper {
+	constructor({ machine, pos, length, thickness, strength, value, id, active, bounce_noise_sigma }) {
+		super({
+			machine,
+			pos,
+			length,
+			thickness,
+			normal_vector: new Vector(0, 1),
+			strength, value,
+			id,
+			active,
+			bounce_noise_sigma
+		});
+	}
+
+	CheckForHit(ball) {
+		if (!this.active) {
+			return;
+		}
+		if (Math.abs(ball.pos.y - this.pos.y) >= this.thickness + kBallRadius) {
+			return;
+		}
+		if (Math.abs(ball.pos.x - this.pos.x) >= this.length + kBallRadius) {
+			return;
+		}
+
+		let save_file = this.machine.GetSaveData();
+		if (save_file.stats.target_hits[this.id]) {
+			++save_file.stats.target_hits[this.id];
+		} else {
+			save_file.stats.target_hits[this.id] = 1;
+		}
+
+		this.OnHit(ball);
+	}
+
+	BounceBall(ball) {
+		const ball_physics_params =
+			this.machine.BallTypes()[ball.ball_type_index].physics_params;
+
+		let dir_mult = ball.vel.y < 0 ? 1 : -1;
+		ball.vel.y *= ball_physics_params.collision_elasticity;
+		ball.vel.y += dir_mult * this.strength;
+		ball.pos.y = this.pos.y + dir_mult * (this.thickness + kBallRadius);
+		this.AddBounceNoise(ball, this.bounce_noise_sigma);
+	}
+
+	HitboxBoundingBox() {
+		const hitbox_delta = this.thickness + kBallRadius;
+		return {
+			x_lo: this.left_endpoint.x - hitbox_delta,
+			x_hi: this.right_endpoint.x + hitbox_delta,
+			y_lo: this.pos.y - hitbox_delta,
+			y_hi: this.pos.y + hitbox_delta,
+		};
+	}
+}
+
+class VerticalLongBumper extends LongBumper {
+	constructor({ machine, pos, length, thickness, strength, value, id, active, bounce_noise_sigma }) {
+		super({
+			machine,
+			pos,
+			length,
+			thickness,
+			normal_vector: new Vector(1, 0),
+			strength, value,
+			id,
+			active,
+			bounce_noise_sigma
+		});
+	}
+
+	CheckForHit(ball) {
+		if (!this.active) {
+			return;
+		}
+		if (Math.abs(ball.pos.x - this.pos.x) >= this.thickness + kBallRadius) {
+			return;
+		}
+		if (Math.abs(ball.pos.y - this.pos.y) >= this.length + kBallRadius) {
+			return;
+		}
+
+		let save_file = this.machine.GetSaveData();
+		if (save_file.stats.target_hits[this.id]) {
+			++save_file.stats.target_hits[this.id];
+		} else {
+			save_file.stats.target_hits[this.id] = 1;
+		}
+
+		this.OnHit(ball);
+	}
+
+	BounceBall(ball) {
+		const ball_physics_params =
+			this.machine.BallTypes()[ball.ball_type_index].physics_params;
+
+		let dir_mult = ball.vel.x < 0 ? 1 : -1;
+		ball.vel.x *= ball_physics_params.collision_elasticity;
+		ball.vel.x += dir_mult * this.strength;
+		ball.pos.x = this.pos.x + dir_mult * (this.thickness + kBallRadius);
+		this.AddBounceNoise(ball, this.bounce_noise_sigma);
+	}
+
+	HitboxBoundingBox() {
+		const hitbox_delta = this.thickness + kBallRadius;
+		return {
+			x_lo: this.pos.x - hitbox_delta,
+			x_hi: this.pos.x + hitbox_delta,
+			y_lo: this.right_endpoint.y + hitbox_delta,
+			y_hi: this.left_endpoint.y - hitbox_delta,
+		};
 	}
 }
 
