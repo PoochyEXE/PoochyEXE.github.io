@@ -910,6 +910,7 @@ function DrawHitRates(stats, board, ctx) {
 	ctx.font = "bold " + kFontSize + "px sans-serif";
 	DrawHitRatesForTargetSets(stats, board.target_sets, 2, total_balls, ctx);
 	DrawHitRatesForTargetSets(stats, board.bumper_sets, 4, total_balls, ctx);
+	DrawHitRatesForTargetSets(stats, board.long_bumper_sets, 4, total_balls, ctx);
 	DrawHitRatesForTargetSets(stats, board.portal_sets, 2, total_balls, ctx);
 }
 
