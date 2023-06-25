@@ -21,6 +21,7 @@ class Ball {
 		this.score_targets_hit = 0;
 		this.bumpers_hit = 0;
 		this.bounces = 0;
+		this.rand_seed = Math.random();
 	}
 }
 
