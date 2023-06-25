@@ -273,6 +273,14 @@ function InitOptionButtons() {
 			default_value: false,
 		}),
 		new BooleanOptionButton({
+			id: "random_rubberband_ball_colors",
+			category: "rubberband_balls",
+			display_name: "Colors",
+			text_on: "Random",
+			text_off: "Static",
+			default_value: true,
+		}),
+		new BooleanOptionButton({
 			id: "auto_save_enabled",
 			category: "auto_save",
 			display_name: "Auto Save",
@@ -396,6 +404,8 @@ function InitOptions(state) {
 		html += '<label for="' + id + '">' + display_name + '</label>';
 		if (ball_types[i].name == "opal") {
 			html += '&nbsp;<span id="options_opal_balls"></span>'
+		} else if (ball_types[i].name == "rubberband") {
+			html += '&nbsp;<span id="options_rubberband_balls"></span>'
 		}
 		html += '</div>';
 	}

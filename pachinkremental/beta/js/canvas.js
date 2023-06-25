@@ -276,13 +276,42 @@ function DrawBeachBalls(balls, use_gradient, ctx) {
 
 function DrawRubberBandBalls(balls, use_gradient, ctx) {
 	const kNumColors = kRubberBandColorIndices.length;
+	const randomize = GetSetting("random_rubberband_ball_colors");
+	let layer_order = [...kRubberBandLayerOrder];
+	let color_indices = [...kRubberBandColorIndices];
 	for (let i = 0; i < balls.length; ++i) {
 		const pos = balls[i].pos;
 		const rotation = balls[i].rotation;
+		if (randomize) {
+			// Modify the array in place to avoid unnecessary memory churn.
+			for (let j = 0; j < kNumColors; ++j) {
+				layer_order[j] = j;
+				color_indices[j] = j;
+			}
+			let x = Math.floor(balls[i].rand_seed * 720 * 720);
+			for (let j = 1; j < kNumColors; ++j) {
+				let k = x % (j + 1);
+				x = (x - k) / (j + 1);
+				// Use XOR swap algorithm to minimize memory churn.
+				// https://en.wikipedia.org/wiki/XOR_swap_algorithm
+				if (j != k) {
+					layer_order[j] ^= layer_order[k];
+					layer_order[k] ^= layer_order[j];
+					layer_order[j] ^= layer_order[k];
+				}
+				k = x % (j + 1);
+				x = (x - k) / (j + 1);
+				if (j != k) {
+					color_indices[j] ^= color_indices[k];
+					color_indices[k] ^= color_indices[j];
+					color_indices[j] ^= color_indices[k];
+				}
+			}
+		}
 		for (let j = 0; j < kNumColors; ++j) {
 			const segment_rotation =
-				Math.PI * kRubberBandLayerOrder[j] / kNumColors - rotation;
-			const color_index = kRubberBandColorIndices[j];
+				Math.PI * layer_order[j] / kNumColors - rotation;
+			const color_index = color_indices[j];
 			const outer_color = kBeachBallOuterColors[color_index];
 			if (use_gradient) {
 				const inner_color = kBeachBallInnerColors[color_index];

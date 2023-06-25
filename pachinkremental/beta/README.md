@@ -48,6 +48,9 @@ This game uses the [LZString library](https://github.com/pieroxy/lz-string/) to 
 
 **Caution: Spoilers below!**
 
+### v2.1.4-beta (2023-06-25)
+* Add an option to randomize the order and colors of the rubber bands on each individual rubber band ball.
+
 ### v2.1.3-beta (2023-03-08)
 * Fix anotther bug where non-integer values between 1,000 and 10,000 would be displayed in scientific notation when Notation is set to 漢字.
 * New under-the-hood features, meant to be used in a future board.
