@@ -48,6 +48,9 @@ This game uses the [LZString library](https://github.com/pieroxy/lz-string/) to 
 
 **Caution: Spoilers below!**
 
+### v2.1.5-beta (2023-07-20)
+* Adjusted physics engine to make it much less likely for a ball traveling at high speed to clip through a non-peg hitbox.
+
 ### v2.1.4-beta (2023-06-25)
 * Add an option to randomize the order and colors of the rubber bands on each individual rubber band ball.
 

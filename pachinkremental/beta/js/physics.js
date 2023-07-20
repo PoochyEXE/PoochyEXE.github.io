@@ -80,6 +80,22 @@ function UpdateBalls(balls, board, params) {
 					vel.MutateAdd(SampleGaussianNoise(0, 1e-5));
 				}
 			}
+
+			for (let s = 0; s < board.target_sets.length; ++s) {
+				board.target_sets[s].CheckForHit(balls[b]);
+			}
+			for (let s = 0; s < board.bumper_sets.length; ++s) {
+				board.bumper_sets[s].CheckForHit(balls[b]);
+			}
+			for (let s = 0; s < board.long_bumper_sets.length; ++s) {
+				board.long_bumper_sets[s].CheckForHit(balls[b]);
+			}
+			for (let s = 0; s < board.whirlpool_sets.length; ++s) {
+				board.whirlpool_sets[s].CheckForHit(balls[b]);
+			}
+			for (let s = 0; s < board.portal_sets.length; ++s) {
+				board.portal_sets[s].CheckForHit(balls[b]);
+			}
 		}
 
 		// Invisible wall above the sides of the board to keep balls in play if they
@@ -97,29 +113,10 @@ function UpdateBalls(balls, board, params) {
 			}
 		}
 
-		balls[b].pos = pos;
-		balls[b].vel = vel;
-		balls[b].omega = omega;
 		balls[b].vel.y += params.accel / kFPS;
 		balls[b].rotation += omega / kFPS;
 		balls[b].rotation %= k2Pi;
 		balls[b].total_rotations += Math.abs(omega) / kFPS;
-
-		for (let s = 0; s < board.target_sets.length; ++s) {
-			board.target_sets[s].CheckForHit(balls[b]);
-		}
-		for (let s = 0; s < board.bumper_sets.length; ++s) {
-			board.bumper_sets[s].CheckForHit(balls[b]);
-		}
-		for (let s = 0; s < board.long_bumper_sets.length; ++s) {
-			board.long_bumper_sets[s].CheckForHit(balls[b]);
-		}
-		for (let s = 0; s < board.whirlpool_sets.length; ++s) {
-			board.whirlpool_sets[s].CheckForHit(balls[b]);
-		}
-		for (let s = 0; s < board.portal_sets.length; ++s) {
-			board.portal_sets[s].CheckForHit(balls[b]);
-		}
 	}
 
 	// Remove balls that are inactive or have fallen outside the board.
