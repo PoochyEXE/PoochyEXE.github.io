@@ -848,10 +848,16 @@ div.messageBox {
 
 div.messageBoxLight {
 	color: #000;
+	a:link { color: #00E; }
+	a:visited { color: #551A8B; }
+	a:link:active, :visited:active { color: #F00; }
 }
 
 div.messageBoxDark {
 	color: #FFF;
+	a:link { color: #08E; }
+	a:visited { color: #A3F; }
+	a:link:active, :visited:active { color: #F00; }
 }
 
 span.messageBoxLarge {

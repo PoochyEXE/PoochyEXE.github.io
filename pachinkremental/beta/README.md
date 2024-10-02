@@ -50,7 +50,8 @@ This game uses the [LZString library](https://github.com/pieroxy/lz-string/) to 
 
 ### v2.1.6-beta (2024-10-02)
 * Adjusted gold ball color to be easier to differentiate from topaz balls.
-* Changed description for Unlock Combos to be more concise.
+* Slightly changed description for Unlock Combos to be more concise.
+* Set CSS colors for the links at the bottom to ensure they're readable, particularly when using dark mode in-game but not dark mode in the browser preferences.
 
 ### v2.1.5-beta (2023-07-20)
 * Adjusted physics engine to make it much less likely for a ball traveling at high speed to clip through a non-peg hitbox.
