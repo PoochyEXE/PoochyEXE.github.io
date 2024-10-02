@@ -3,7 +3,7 @@ const kBumperMachineID = "bumper";
 const kBumperMachineBallTypes = [
 	//          | id |    name     | display_name  |      physics_params      | inner_color | outer_color | ripple_color_rgb |
 	kNormalBallType,
-	new BallType(1,   "gold",       "Gold ",        kPhysicsParams.normal,     "#FFD700",    "#AA8F00",    "170,143,  0"    ),
+	new BallType(1,   "gold",       "Gold ",        kPhysicsParams.normal,     "#FFC400",    "#775B00",    "170,130,  0"    ),
 	new BallType(2,   "ruby",       "Ruby ",        kPhysicsParams.normal,     "#FBB",       "#F33",       "255, 48, 48"    ),
 	new BallType(3,   "sapphire",   "Sapphire ",    kPhysicsParams.normal,     "#BBF",       "#33F",       " 48, 48,255"    ),
 	new BallType(4,   "emerald",    "Emerald ",     kPhysicsParams.normal,     "#BFB",       "#3F3",       " 48,255, 48"    ),
@@ -962,7 +962,7 @@ class BumperMachine extends PachinkoMachine {
 				name: "Unlock Combos",
 				category: "combos",
 				description:
-					"Unlocks combos. A ball that hits multiple bumpers and/or score targets in quick succession starts a combo, which multiplies the point values of everything hit in the combo. The 2nd hit is worth 2× points, the 3rd thing hit is 3×, and so on.",
+					"Unlocks combos. A ball that hits multiple bumpers and/or score targets in quick succession starts a combo, which multiplies the point values of each hit in the combo. The 2nd hit is worth 2× points, the 3rd hit is 3×, and so on.",
 				cost: 10000,
 				visible_func: () => this.GetUpgradeLevel("bumper_value") > 0,
 				on_buy: UpdateOptionsButtons
