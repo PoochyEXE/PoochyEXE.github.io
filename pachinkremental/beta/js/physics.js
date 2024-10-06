@@ -14,22 +14,17 @@ const kPhysicsParams = {
 	},
 };
 
-function CheckForTargetHits(board, ball) {
-	for (let s = 0; s < board.target_sets.length; ++s) {
-		board.target_sets[s].CheckForHit(ball);
+function CheckObjectSetsForHits(object_sets, ball) {
+	for (let s = 0; s < object_sets.length; ++s) {
+		object_sets[s].CheckForHit(ball);
 	}
-	for (let s = 0; s < board.bumper_sets.length; ++s) {
-		board.bumper_sets[s].CheckForHit(ball);
-	}
-	for (let s = 0; s < board.long_bumper_sets.length; ++s) {
-		board.long_bumper_sets[s].CheckForHit(ball);
-	}
-	for (let s = 0; s < board.whirlpool_sets.length; ++s) {
-		board.whirlpool_sets[s].CheckForHit(ball);
-	}
-	for (let s = 0; s < board.portal_sets.length; ++s) {
-		board.portal_sets[s].CheckForHit(ball);
-	}
+}
+
+function CheckForHits(board, ball) {
+	CheckObjectSetsForHits(board.target_sets, ball);
+	CheckObjectSetsForHits(board.bumper_sets, ball);
+	CheckObjectSetsForHits(board.whirlpool_sets, ball);
+	CheckObjectSetsForHits(board.portal_sets, ball);
 }
 
 function UpdateBalls(balls, board, params) {
@@ -55,7 +50,7 @@ function UpdateBalls(balls, board, params) {
 			if (collide_peg == null) {
 				pos.CopyFrom(new_pos);
 				time_to_sim -= time_step;
-				CheckForTargetHits(board, balls[b]);
+				CheckForHits(board, balls[b]);
 				continue;
 			}
 			while (time_step >= kEpsilon) {
@@ -99,7 +94,7 @@ function UpdateBalls(balls, board, params) {
 					vel.MutateAdd(SampleGaussianNoise(0, 1e-5));
 				}
 			}
-			CheckForTargetHits(board, balls[b]);
+			CheckForHits(board, balls[b]);
 		}
 
 		// Invisible wall above the sides of the board to keep balls in play if they

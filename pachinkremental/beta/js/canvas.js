@@ -21,7 +21,6 @@ const kSpiral = "SPIRAL";
 const kBumperColor = "BUMPER";
 const kWhirlpoolColor = "WHIRLPOOL";
 
-const kBumperHitExpandSizes = [0, 1, 2, 3, 2, 1];
 const kBumperOuterColor = "#080";
 const kBumperInnerColor = "#8F8";
 
@@ -445,8 +444,6 @@ function CreateBallGradient(ctx, pos, radius, inner_color, outer_color) {
 }
 
 function CreateBumperGradient(ctx, pos, radius) {
-	const kOuterColor = "#080";
-	const kInnerColor = "#8F8";
 	const kTransparent = "rgba(0, 0, 0, 0)";
 	const kEpsilon = 1e-7;
 	let inner_r = radius / 3.0;
@@ -680,125 +677,18 @@ function DrawBallsNoGradient(balls, color, ctx) {
 }
 
 function DrawTargets(target_sets, ctx) {
-	let font_size = 8;
 	for (let i = 0; i < target_sets.length; ++i) {
 		const targets = target_sets[i].targets;
 		for (let j = 0; j < targets.length; ++j) {
 			const target = targets[j];
-			if (!target.active) {
-				continue;
-			}
-			const pos = target.pos;
-			let radius = target.draw_radius;
-			ctx.fillStyle = target.color;
-			ctx.beginPath();
-			ctx.arc(pos.x, pos.y, radius, 0, 2 * Math.PI);
-			ctx.fill();
-
-			ctx.textAlign = "center";
-			ctx.fillStyle = "#000";
-			ctx.font = font_size + "px sans-serif";
-			let text_width = target.draw_radius * 1.5;
-			ctx.fillText(target.text, pos.x, pos.y + font_size / 3, text_width);
-		}
-	}
-}
-
-function DrawBumpers(bumper_sets, ctx) {
-	let font_size = 8;
-	for (let i = 0; i < bumper_sets.length; ++i) {
-		const bumpers = bumper_sets[i].targets;
-		for (let j = 0; j < bumpers.length; ++j) {
-			const bumper = bumpers[j];
-			if (!bumper.active) {
-				continue;
-			}
-			const pos = bumper.pos;
-			let radius = bumper.draw_radius;
-			if (bumper.hit_animation > 0) {
-				radius += kBumperHitExpandSizes[bumper.hit_animation];
-				bumper.hit_animation -= 1;
-				state.redraw_bumpers = true;
-			}
-			ctx.fillStyle = CreateBumperGradient(ctx, pos, radius);
-			ctx.beginPath();
-			ctx.arc(pos.x, pos.y, radius, 0, 2 * Math.PI);
-			ctx.fill();
-
-			if (bumper.text) {
-				ctx.textAlign = "center";
-				ctx.fillStyle = "#000";
-				ctx.font = font_size + "px sans-serif";
-				let text_width = bumper.draw_radius * 1.5;
-				ctx.fillText(bumper.text, pos.x, pos.y + font_size / 3, text_width);
-			}
-		}
-	}
-}
-
-function DrawLongBumpers(bumper_sets, ctx) {
-	let font_size = 8;
-	for (let i = 0; i < bumper_sets.length; ++i) {
-		const bumpers = bumper_sets[i].targets;
-		for (let j = 0; j < bumpers.length; ++j) {
-			const bumper = bumpers[j];
-			if (!bumper.active) {
-				continue;
-			}
-			let thickness = bumper.thickness;
-			let half_length = bumper.length;
-			console.assert(half_length >= thickness);
-			if (bumper.hit_animation > 0) {
-				thickness += kBumperHitExpandSizes[bumper.hit_animation];
-				half_length += kBumperHitExpandSizes[bumper.hit_animation];
-				bumper.hit_animation -= 1;
-				state.redraw_bumpers = true;
-			}
-			DrawLongBumperEnd(ctx, bumper.left_endpoint, thickness);
-			DrawLongBumperEnd(ctx, bumper.right_endpoint, thickness);
-			DrawLongBumperMiddle(ctx, bumper, thickness, half_length);
-
-			if (bumper.text) {
-				ctx.textAlign = "center";
-				ctx.fillStyle = "#000";
-				ctx.font = font_size + "px sans-serif";
-				let text_width = bumper.draw_radius * 1.5;
-				ctx.fillText(bumper.text, pos.x, pos.y + font_size / 3, text_width);
-			}
-		}
-	}
-}
-
-function DrawWhirlpools(whirlpool_sets, ctx) {
-	let font_size = 8;
-	for (let i = 0; i < whirlpool_sets.length; ++i) {
-		const whirlpools = whirlpool_sets[i].targets;
-		for (let j = 0; j < whirlpools.length; ++j) {
-			const whirlpool = whirlpools[j];
-			if (!whirlpool.active) {
-				continue;
-			}
-			const pos = whirlpool.pos;
-			let radius = whirlpool.draw_radius;
-			ctx.fillStyle = CreateWhirlpoolGradient(ctx, pos, radius);
-			ctx.beginPath();
-			ctx.arc(pos.x, pos.y, radius, 0, 2 * Math.PI);
-			ctx.fill();
-
-			if (whirlpool.text) {
-				ctx.textAlign = "center";
-				ctx.fillStyle = "#000";
-				ctx.font = font_size + "px sans-serif";
-				let text_width = whirlpool.draw_radius * 1.5;
-				ctx.fillText(whirlpool.text, pos.x, pos.y + font_size / 3, text_width);
-			}
+			target.Draw(state, ctx);
+			target.DrawText(ctx);
 		}
 	}
 }
 
 function DrawPortals(portal_sets, ctx) {
 	const kPortalLineThickness = 3.0;
-	let font_size = 8;
 	for (let i = 0; i < portal_sets.length; ++i) {
 		const portals = portal_sets[i].targets;
 		for (let j = 0; j < portals.length; ++j) {
@@ -939,7 +829,6 @@ function DrawHitRates(stats, board, ctx) {
 	ctx.font = "bold " + kFontSize + "px sans-serif";
 	DrawHitRatesForTargetSets(stats, board.target_sets, 2, total_balls, ctx);
 	DrawHitRatesForTargetSets(stats, board.bumper_sets, 4, total_balls, ctx);
-	DrawHitRatesForTargetSets(stats, board.long_bumper_sets, 4, total_balls, ctx);
 	DrawHitRatesForTargetSets(stats, board.portal_sets, 2, total_balls, ctx);
 }
 
@@ -1310,9 +1199,11 @@ function Draw(state) {
 	}
 	// Whirlpools
 	if (state.redraw_all || state.redraw_whirlpools) {
+		// These are on a different layer than targets because they should be
+		// drawn behind the balls.
 		let ctx = ClearLayerAndReturnContext("whirlpools");
 		state.redraw_whirlpools = false;
-		DrawWhirlpools(machine.board.whirlpool_sets, ctx);
+		DrawTargets(machine.board.whirlpool_sets, ctx);
 	}
 	// Portals
 	if (state.redraw_all || state.redraw_portals) {
@@ -1356,10 +1247,11 @@ function Draw(state) {
 	}
 	// Bumpers
 	if (state.redraw_all || state.redraw_bumpers) {
+		// Keep bumpers on a seperate layer because they have to be redrawn
+		// much more frequently than vanilla score targets.
 		let ctx = ClearLayerAndReturnContext("bumpers");
 		state.redraw_bumpers = false;
-		DrawBumpers(machine.board.bumper_sets, ctx);
-		DrawLongBumpers(machine.board.long_bumper_sets, ctx);
+		DrawTargets(machine.board.bumper_sets, ctx);
 	}
 	// Targets
 	if (state.reset_target_text) {

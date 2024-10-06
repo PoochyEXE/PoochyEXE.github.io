@@ -3,6 +3,8 @@ const kBallRadius = 5.5;
 
 const kCellSize = 8.0;
 
+const kBumperHitExpandSizes = [0, 1, 2, 3, 2, 1];
+
 class Target {
 	constructor({ machine, pos, draw_radius, hitbox_radius, color, text, id, active, pass_through }) {
 		this.machine = machine;
@@ -19,6 +21,24 @@ class Target {
 
 	OnHit(ball) {
 		console.error("Not implemented!");
+	}
+
+	Draw(state, ctx) {
+		if (!this.active) {
+			return;
+		}
+		DrawCircle(ctx, this.pos, this.draw_radius, this.color);
+	}
+
+	DrawText(ctx) {
+		if (this.text) {
+			const kFontSize = 8;
+			ctx.textAlign = "center";
+			ctx.fillStyle = "#000";
+			ctx.font = kFontSize + "px sans-serif";
+			let text_width = this.draw_radius * 1.5;
+			ctx.fillText(this.text, this.pos.x, this.pos.y + kFontSize / 3, text_width);
+		}
 	}
 
 	ResetText() {}
@@ -136,6 +156,20 @@ class Bumper extends Target {
 		this.ResetText();
 	}
 
+	Draw(state, ctx) {
+		if (!this.active) {
+			return;
+		}
+		let radius = this.draw_radius;
+		if (this.hit_animation > 0) {
+			radius += kBumperHitExpandSizes[this.hit_animation];
+			this.hit_animation -= 1;
+			state.redraw_bumpers = true;
+		}
+		let fill_style = CreateBumperGradient(ctx, this.pos, radius);
+		DrawCircle(ctx, this.pos, radius, fill_style);
+	}
+
 	OnHit(ball) {
 		this.hit_animation = kBumperHitExpandSizes.length - 1;
 		if (this.value) {
@@ -219,6 +253,24 @@ class LongBumper extends Bumper {
 		}
 		this.hit_animation = 0;
 		this.ResetText();
+	}
+	
+	Draw(state, ctx) {
+		if (!this.active) {
+			return;
+		}
+		let thickness = this.thickness;
+		let half_length = this.length;
+		console.assert(half_length >= thickness);
+		if (this.hit_animation > 0) {
+			thickness += kBumperHitExpandSizes[this.hit_animation];
+			half_length += kBumperHitExpandSizes[this.hit_animation];
+			this.hit_animation -= 1;
+			state.redraw_bumpers = true;
+		}
+		DrawLongBumperEnd(ctx, this.left_endpoint, thickness);
+		DrawLongBumperEnd(ctx, this.right_endpoint, thickness);
+		DrawLongBumperMiddle(ctx, this, thickness, half_length);
 	}
 
 	CheckForHit(ball) {
@@ -418,6 +470,14 @@ class Whirlpool extends Target {
 		this.max_speed_sqr = max_speed * max_speed;
 		this.ResetText();
 	}
+	
+	Draw(state, ctx) {
+		if (!this.active) {
+			return;
+		}
+		let fill_style = CreateWhirlpoolGradient(ctx, this.pos, this.draw_radius);
+		DrawCircle(ctx, this.pos, this.draw_radius, fill_style);
+	}
 
 	OnHit(ball) {
 		let delta = ball.pos.DeltaToPoint(this.pos);
@@ -472,7 +532,7 @@ class Portal extends Target {
 }
 
 class PegBoard {
-	constructor({ width, height, pegs, drop_zones, target_sets, bumper_sets, long_bumper_sets, whirlpool_sets, portal_sets }) {
+	constructor({ width, height, pegs, drop_zones, target_sets, bumper_sets, whirlpool_sets, portal_sets }) {
 		this.width = width;
 		this.height = height;
 		this.pegs = pegs;
@@ -482,11 +542,6 @@ class PegBoard {
 			this.bumper_sets = bumper_sets;
 		} else {
 			this.bumper_sets = Array(0);
-		}
-		if (long_bumper_sets) {
-			this.long_bumper_sets = long_bumper_sets;
-		} else {
-			this.long_bumper_sets = Array(0);
 		}
 		if (whirlpool_sets) {
 			this.whirlpool_sets = whirlpool_sets;
