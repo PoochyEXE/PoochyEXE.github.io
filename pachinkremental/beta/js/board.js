@@ -177,7 +177,7 @@ class Bumper extends Target {
 		}
 
 		this.BounceBall(ball);
-		
+
 		ball.last_hit = null;
 		++ball.bumpers_hit;
 		state.redraw_bumpers = true;
@@ -185,7 +185,7 @@ class Bumper extends Target {
 			state.redraw_stats_overlay = true;
 		}
 	}
-	
+
 	BounceBall(ball) {
 		const ball_physics_params =
 			this.machine.BallTypes()[ball.ball_type_index].physics_params;
@@ -254,7 +254,7 @@ class LongBumper extends Bumper {
 		this.hit_animation = 0;
 		this.ResetText();
 	}
-	
+
 	Draw(state, ctx) {
 		if (!this.active) {
 			return;
@@ -470,7 +470,7 @@ class Whirlpool extends Target {
 		this.max_speed_sqr = max_speed * max_speed;
 		this.ResetText();
 	}
-	
+
 	Draw(state, ctx) {
 		if (!this.active) {
 			return;
@@ -511,7 +511,7 @@ class Portal extends Target {
 		this.dest_pos = undefined;
 		this.dest_delta = undefined;
 	}
-	
+
 	SetDestination(dest) {
 		this.dest_id = dest.id;
 		this.dest_pos = dest.pos;

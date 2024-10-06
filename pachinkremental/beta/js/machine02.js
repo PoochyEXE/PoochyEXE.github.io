@@ -1844,7 +1844,7 @@ class BumperMachine extends PachinkoMachine {
 		const kCenterXY = kSpiralMeterSize / 2;
 		const kLineWidth = 2;
 		let canvas = GetCanvasLayer("spiral2");
-		canvas.width  = kSpiralMeterSize;
+		canvas.width = kSpiralMeterSize;
 		canvas.height = kSpiralMeterSize;
 		let ctx = canvas.getContext("2d");
 		ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -1955,7 +1955,7 @@ class BumperMachine extends PachinkoMachine {
 		}
 
 		let canvas1 = GetCanvasLayer("spiral1");
-		canvas1.width  = kSpiralMeterSize;
+		canvas1.width = kSpiralMeterSize;
 		canvas1.height = kSpiralMeterSize;
 	}
 

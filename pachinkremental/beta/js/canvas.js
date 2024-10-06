@@ -472,7 +472,7 @@ function DrawLongBumperMiddle(ctx, bumper, thickness) {
 	gradient.addColorStop(0.5, kBumperInnerColor);
 	gradient.addColorStop(1.0, kBumperOuterColor);
 	ctx.fillStyle = gradient;
-	
+
 	let region = new Path2D();
 	region.moveTo(
 		bumper.left_endpoint.x + norm.x,
@@ -718,13 +718,13 @@ function DrawPortalInsides(portal_sets) {
 	let ctx = canvas.getContext("2d");
 	ctx.setTransform(1, 0, 0, 1, 0, 0);
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
-	
+
 	const scale = state.canvas_scale;
 	const source_canvas = document.getElementById("canvas_balls");
-	
+
 	let temp_canvas = document.getElementById("portal_inside_temp");
 	let temp_ctx = temp_canvas.getContext("2d");
-	
+
 	let pos = new Vector(0, 0);
 
 	for (let i = 0; i < portal_sets.length; ++i) {
@@ -760,7 +760,7 @@ function DrawPortalInsides(portal_sets) {
 			temp_ctx.arc(radius, radius, radius, 0, Math.PI*2);
 			temp_ctx.closePath();
 			temp_ctx.fill();
-			
+
 			pos.x = portal.dest_pos.x;
 			pos.y = portal.dest_pos.y;
 			pos.MutateMultiply(scale);
@@ -1238,11 +1238,11 @@ function Draw(state) {
 				);
 			}
 		}
-		
+
 		if (machine.board.portal_sets.length > 0) {
 			DrawPortalInsides(machine.board.portal_sets);
 		}
-		
+
 		state.last_drawn.num_balls = total_balls;
 	}
 	// Bumpers

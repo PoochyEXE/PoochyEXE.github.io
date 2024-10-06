@@ -36,7 +36,7 @@ class PlaybackPositionNode extends AudioBufferSourceNode {
       sampleRate: audioBuffer.sampleRate,
       numberOfChannels: audioBuffer.numberOfChannels + 1,
     });
-	
+
 	this._length_sec = audioBuffer.length / audioBuffer.sampleRate;
 
     // copy data from the audioBuffer arg to our new AudioBuffer
@@ -56,7 +56,7 @@ class PlaybackPositionNode extends AudioBufferSourceNode {
 
     // split the channels
     this._bufferSource.connect(this._splitter);
-    
+
     // connect all the audio channels to the line out
     for (let index = 0; index < audioBuffer.numberOfChannels; index++) {
       this._splitter.connect(this._out, index, index);
@@ -92,7 +92,7 @@ class PlaybackPositionNode extends AudioBufferSourceNode {
   set loopEnd(val) {
     this._bufferSource.loopEnd = val;
   }
-			
+
   get playbackRate() {
     return this._bufferSource.playbackRate;
   }

@@ -283,10 +283,10 @@ function IsAprilFoolsActive() {
 }
 
 function MillisecondsToMidnight() {
-  var now = new Date();
-  var midnight = new Date(now);
-  midnight.setHours(24, 0, 0, 0);
-  return (midnight - now);
+	var now = new Date();
+	var midnight = new Date(now);
+	midnight.setHours(24, 0, 0, 0);
+	return (midnight - now);
 }
 
 function CheckEvents() {
