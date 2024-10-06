@@ -318,6 +318,10 @@ function DefaultGlobalSettings() {
 			stats: true,
 			options: true,
 		},
+		bgm: {
+			volume: 50,
+			mute: false,
+		},
 	};
 	for (let i = 0; i < kOptionButtons.length; ++i) {
 		const opt = kOptionButtons[i];
@@ -481,6 +485,52 @@ function ResizeModals() {
 	exported_save_elem.style.width = (content_width - kPadding) + "px";
 	exported_save_elem.style.height =
 		(content_height - kPadding * 2 - header_height - 15) + "px";
+}
+
+function ShowMusicPromptModal() {
+	document.getElementById("music_prompt_modal").style.display = "block";
+	ResizeModals();
+}
+
+function ShowMusicOptions() {
+	document.getElementById("options_sounds").style.display = "inline-block";
+	ResizeModals();
+}
+
+function OnBGMSettingChange(state) {
+	let slider_elem = document.getElementById("bgm_volume");
+	if (state.save_file.options.bgm.muted) {
+		state.bgm_gain_node.gain.value = 0;
+		slider_elem.value = 0;
+		UpdateInnerHTML("button_mute_bgm", "🔇");
+	} else {
+		let volume_percent = state.save_file.options.bgm.volume;
+		state.bgm_gain_node.gain.value = volume_percent / 100.0;
+		slider_elem.value = volume_percent;
+		UpdateInnerHTML("button_mute_bgm", "🔊");
+	}
+}
+
+function UpdateBGMVolume(elem) {
+	let new_volume = parseInt(elem.value);
+	if (new_volume < 1) {
+		state.save_file.options.bgm.muted = true;
+	} else {
+		state.save_file.options.bgm.volume = new_volume;
+	}
+	OnBGMSettingChange(state);
+}
+
+function MusicPromptChoice(enable_bgm) {
+	state.save_file.options.bgm.muted = !enable_bgm
+	ActiveMachine(state).OnMusicChoice(state);
+	CloseModal("music_prompt_modal");
+	OnBGMSettingChange(state);
+}
+
+function ToggleMuteBGM() {
+	state.save_file.options.bgm.muted = !state.save_file.options.bgm.muted;
+	OnBGMSettingChange(state);
 }
 
 function UpdateOptionsButtons() {

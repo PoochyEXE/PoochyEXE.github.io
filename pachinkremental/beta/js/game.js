@@ -70,6 +70,8 @@ function LoadActiveMachine(state) {
 }
 
 function InitState() {
+	let bgm_gain_node = kAudioCtx.createGain();
+	bgm_gain_node.connect(kAudioCtx.destination);
 	let state = {
 		game_started: false,
 		all_maxed: false,
@@ -78,6 +80,7 @@ function InitState() {
 			new FirstMachine(kFirstMachineID, "Basic"),
 			new BumperMachine(kBumperMachineID, "Bumpers"),
 		],
+		bgm_gain_node: bgm_gain_node,
 		active_machine_index: 0,
 		balls_by_type: [],
 		score_text: new Array(0),
@@ -208,6 +211,7 @@ function CanDrop(state) {
 }
 
 function SwitchMachine(index) {
+	ActiveMachine(state).OnDeactivate();
 	state.active_machine_index = index;
 	const new_active_machine = state.machines[index];
 	state.save_file.active_machine = new_active_machine.id;

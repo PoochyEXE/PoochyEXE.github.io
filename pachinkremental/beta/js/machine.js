@@ -19,7 +19,11 @@ class PachinkoMachine {
 
 	OnActivate() {}
 
+	OnDeactivate() {}
+
 	OnBuffTimeout(state) {}
+
+	OnMusicChoice(state) {}
 
 	UpdateOneFrame(state) {}
 

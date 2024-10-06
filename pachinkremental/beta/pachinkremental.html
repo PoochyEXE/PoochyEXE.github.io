@@ -10,7 +10,9 @@
 	<link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&display=swap" rel="stylesheet">
 
 	<script type="text/javascript" src="js/lib/lz-string.js"></script>
+	<script type="text/javascript" src="js/lib/PlaybackPositionNode.js"></script>
 
+	<script type="text/javascript" src="js/audio.js"></script>
 	<script type="text/javascript" src="js/ball.js"></script>
 	<script type="text/javascript" src="js/board.js"></script>
 	<script type="text/javascript" src="js/canvas.js"></script>
@@ -88,6 +90,8 @@
 					<canvas id="favicon_canvas" width="64" height="64" style="height: 64px; width: 64px;"></canvas>
 					<a id="favicon_link">Save</a>
 					<canvas id="portal_inside_temp" width="64" height="64"></canvas>
+					<div class="messageBox">BGM timestamp: <span id="bgm_timestamp" class="speedrunTimer"></span></div>
+					<div class="messageBox">BGM measure: <span id="bgm_measure" class="speedrunTimer"></span></div>
 				</div>
 				<div id="spiral_power" class="spiralContainer" style="display: none;">
 					<table id="spiral_power_table">
@@ -218,6 +222,17 @@
 						<button type="button" class="optionButton"
 								id="button_import_save" onclick="ImportSave()">Import save file</button>
 						<div id="options_misc" class="optionsContents"></div>
+						<div id="options_sounds" class="optionsContents messageBox" style="display: none;">
+							<b>Volume:</b>
+							<div id="bgm_volume_wrapper" class="opacitySlider" style="display: block;">
+								<input type="range" min="0" max="100" step="5" onchange="UpdateBGMVolume(this)" value="50" id="bgm_volume" name="bgm_volume">
+								<label for="bgm_volume" id="bgm_volume_label">
+									<button type="button" class="optionButton"
+										id="button_mute_bgm" onclick="ToggleMuteBGM()">🔊</button>
+									BGM
+								</label>
+							</div>
+						</div>
 						<div id="options_opacity" class="optionsContents messageBox" style="display: inline-block;"></div>
 						<div id="options_favicon" class="optionsContents messageBox" style="display: inline-block;"></div>
 						<div id="options_archived_save_files"></div>
@@ -266,6 +281,24 @@
 				As a reward, you've unlocked a new machine! Check it out in the Machines menu, between Upgrades and Stats.
 				<br><br>
 				By the way, it's been <span id="machine_maxed_time" class="speedrunTimerSplit"></span> since you started playing on this save file. You can check how long it took you to reach this milestone, as well as any other milestones you've reached, in the Stats menu.
+			</span>
+		</div>
+	</div>
+	<div id="music_prompt_modal" class="modal">
+		<div id="music_prompt_modal_content" class="modalContent">
+			<span style="text-align: center; vertical-align: middle;">
+				<span class="prismaticText messageBoxLarge">𝄞 ♩ ♫</span>
+				<br><br>
+				This machine has music! Do you want to enable sounds?
+				<br><br>
+				You can adjust the volume or change this setting later in the Options pane.
+				<br><br>
+				(Unfortunately, this prompt will come up every time you load the game, since this is also a hacky workaround for browsers disallowing autoplaying sounds.)
+				<br><br>
+				<button type="button" class="optionButton"
+						id="button_toggle_music" onclick="MusicPromptChoice(false)">🔇 No, mute it.</button>
+				<button type="button" class="optionButton"
+						id="button_toggle_music" onclick="MusicPromptChoice(true)">🔊 Yes, let's hear it!</button>
 			</span>
 		</div>
 	</div>
