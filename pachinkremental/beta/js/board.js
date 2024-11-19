@@ -543,10 +543,10 @@ class Portal extends Target {
 function TimeToNearestNote(current_time, prev_note, note_queue) {
 	let time_delta = Infinity;
 	if (prev_note != null) {
-		time_delta = Math.min(time_delta, current_time - prev_note);
+		time_delta = Math.min(time_delta, current_time - prev_note.time);
 	}
 	if (note_queue.length >= 1) {
-		time_delta = Math.min(time_delta, note_queue[0] - current_time);
+		time_delta = Math.min(time_delta, note_queue[0].time - current_time);
 	}
 	return time_delta;
 }
@@ -573,16 +573,19 @@ class MusicalScoreTarget extends ScoreTarget {
 	}
 
 	UpdateNoteQueue(state) {
-		while (this.note_queue.length >= 1 && state.current_time > this.note_queue[0]) {
+		while (this.note_queue.length >= 1 && state.current_time > this.note_queue[0].time) {
 			this.prev_note = this.note_queue.shift();
 		}
 	}
 
-	EnqueueNote(next_note_time) {
-		this.note_queue.push(next_note_time);
+	EnqueueNote(next_note) {
+		this.note_queue.push(next_note);
 	}
 	
 	TimeToNearestNote(current_time) {
+		if (this.prev_note && this.prev_note.hold) {
+			return 0.0;
+		}
 		return TimeToNearestNote(state.current_time, this.prev_note, this.note_queue);
 	}
 
@@ -621,19 +624,23 @@ class MusicalBumper extends Bumper {
 		
 		this.prev_note = null;
 		this.note_queue = [];
+		this.hold = false;
 	}
 
 	UpdateNoteQueue(state) {
-		while (this.note_queue.length >= 1 && state.current_time > this.note_queue[0]) {
+		while (this.note_queue.length >= 1 && state.current_time > this.note_queue[0].time) {
 			this.prev_note = this.note_queue.shift();
 		}
 	}
 
-	EnqueueNote(next_note_time) {
-		this.note_queue.push(next_note_time);
+	EnqueueNote(next_note) {
+		this.note_queue.push(next_note);
 	}
 	
 	TimeToNearestNote(current_time) {
+		if (this.prev_note && this.prev_note.hold) {
+			return 0.0;
+		}
 		return TimeToNearestNote(state.current_time, this.prev_note, this.note_queue);
 	}
 
