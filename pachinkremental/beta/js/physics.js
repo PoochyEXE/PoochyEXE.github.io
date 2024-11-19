@@ -14,25 +14,26 @@ const kPhysicsParams = {
 	},
 };
 
-function CheckObjectSetsForHits(object_sets, ball) {
+function CheckObjectSetsForHits(object_sets, ball, timestamp) {
 	for (let s = 0; s < object_sets.length; ++s) {
-		object_sets[s].CheckForHit(ball);
+		object_sets[s].CheckForHit(ball, timestamp);
 	}
 }
 
-function CheckForHits(board, ball) {
-	CheckObjectSetsForHits(board.target_sets, ball);
-	CheckObjectSetsForHits(board.bumper_sets, ball);
-	CheckObjectSetsForHits(board.whirlpool_sets, ball);
-	CheckObjectSetsForHits(board.portal_sets, ball);
+function CheckForHits(board, ball, timestamp) {
+	CheckObjectSetsForHits(board.target_sets, ball, timestamp);
+	CheckObjectSetsForHits(board.bumper_sets, ball, timestamp);
+	CheckObjectSetsForHits(board.whirlpool_sets, ball, timestamp);
+	CheckObjectSetsForHits(board.portal_sets, ball, timestamp);
 }
 
-function UpdateBalls(balls, board, params) {
+function UpdateBalls(balls, board, params, start_time) {
 	const kEpsilon = 1e-3 / kPhysicsFPS;
 	const k2Pi = Math.PI * 2;
 	const kPegSearchRadius = kPegRadius + kBallRadius;
 	let new_pos = new Point(0, 0);
 	for (let b = 0; b < balls.length; ++b) {
+		let current_time = start_time;
 		let time_to_sim = 1.0 / kPhysicsFPS;
 		let pos = balls[b].pos;
 		let vel = balls[b].vel;
@@ -50,7 +51,8 @@ function UpdateBalls(balls, board, params) {
 			if (collide_peg == null) {
 				pos.CopyFrom(new_pos);
 				time_to_sim -= time_step;
-				CheckForHits(board, balls[b]);
+				current_time += time_step;
+				CheckForHits(board, balls[b], current_time);
 				continue;
 			}
 			while (time_step >= kEpsilon) {
@@ -64,6 +66,7 @@ function UpdateBalls(balls, board, params) {
 				if (collide_peg == null) {
 					pos.CopyFrom(new_pos);
 					time_to_sim -= time_step;
+					current_time += time_step;
 				}
 			}
 			new_pos.CopyFrom(pos);
@@ -71,6 +74,7 @@ function UpdateBalls(balls, board, params) {
 			collide_peg = board.FindNearestPeg(new_pos, kPegSearchRadius);
 			if (collide_peg == null) {
 				time_to_sim -= time_step;
+				current_time += time_step;
 				pos.CopyFrom(new_pos);
 			} else {
 				let delta = pos.DeltaToPoint(collide_peg);
@@ -94,7 +98,7 @@ function UpdateBalls(balls, board, params) {
 					vel.MutateAdd(SampleGaussianNoise(0, 1e-5));
 				}
 			}
-			CheckForHits(board, balls[b]);
+			CheckForHits(board, balls[b], current_time);
 		}
 
 		// Invisible wall above the sides of the board to keep balls in play if they

@@ -230,7 +230,8 @@ function UpdateOneFrame(state) {
 			UpdateBalls(
 				state.balls_by_type[i],
 				machine.board,
-				ball_types[i].physics_params
+				ball_types[i].physics_params,
+				state.current_time,
 			);
 		}
 	}

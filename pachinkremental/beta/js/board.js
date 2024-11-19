@@ -19,7 +19,7 @@ class Target {
 		this.pass_through = pass_through;
 	}
 
-	OnHit(ball) {
+	OnHit(ball, timestamp) {
 		console.error("Not implemented!");
 	}
 
@@ -43,7 +43,7 @@ class Target {
 
 	ResetText() {}
 
-	CheckForHit(ball) {
+	CheckForHit(ball, timestamp) {
 		if (!this.active) {
 			return;
 		}
@@ -59,7 +59,7 @@ class Target {
 			}
 
 			ball.last_hit = this.id;
-			this.OnHit(ball);
+			this.OnHit(ball, timestamp);
 		}
 	}
 
@@ -89,7 +89,7 @@ class ScoreTarget extends Target {
 		this.value = value;
 	}
 
-	OnHit(ball) {
+	OnHit(ball, timestamp) {
 		if (!this.pass_through) {
 			ball.active = false;
 		}
@@ -128,10 +128,10 @@ class TargetSet {
 		this.bounding_box = new Rectangle(min_x, max_x, min_y, max_y);
 	}
 
-	CheckForHit(ball) {
+	CheckForHit(ball, timestamp) {
 		if (this.bounding_box.Contains(ball.pos)) {
 			for (let t = 0; t < this.targets.length; ++t) {
-				this.targets[t].CheckForHit(ball);
+				this.targets[t].CheckForHit(ball, timestamp);
 			}
 		}
 	}
@@ -170,7 +170,7 @@ class Bumper extends Target {
 		DrawCircle(ctx, this.pos, radius, fill_style);
 	}
 
-	OnHit(ball) {
+	OnHit(ball, timestamp) {
 		this.hit_animation = kBumperHitExpandSizes.length - 1;
 		if (this.value) {
 			this.machine.AwardPoints(this.value, ball);
@@ -273,7 +273,7 @@ class LongBumper extends Bumper {
 		DrawLongBumperMiddle(ctx, this, thickness, half_length);
 	}
 
-	CheckForHit(ball) {
+	CheckForHit(ball, timestamp) {
 		if (!this.active) {
 			return;
 		}
@@ -293,7 +293,7 @@ class LongBumper extends Bumper {
 			save_file.stats.target_hits[this.id] = 1;
 		}
 
-		this.OnHit(ball);
+		this.OnHit(ball, timestamp);
 	}
 
 	BounceBall(ball) {
@@ -350,7 +350,7 @@ class HorizontalLongBumper extends LongBumper {
 		});
 	}
 
-	CheckForHit(ball) {
+	CheckForHit(ball, timestamp) {
 		if (!this.active) {
 			return;
 		}
@@ -368,7 +368,7 @@ class HorizontalLongBumper extends LongBumper {
 			save_file.stats.target_hits[this.id] = 1;
 		}
 
-		this.OnHit(ball);
+		this.OnHit(ball, timestamp);
 	}
 
 	BounceBall(ball) {
@@ -408,7 +408,7 @@ class VerticalLongBumper extends LongBumper {
 		});
 	}
 
-	CheckForHit(ball) {
+	CheckForHit(ball, timestamp) {
 		if (!this.active) {
 			return;
 		}
@@ -426,7 +426,7 @@ class VerticalLongBumper extends LongBumper {
 			save_file.stats.target_hits[this.id] = 1;
 		}
 
-		this.OnHit(ball);
+		this.OnHit(ball, timestamp);
 	}
 
 	BounceBall(ball) {
@@ -479,7 +479,7 @@ class Whirlpool extends Target {
 		DrawCircle(ctx, this.pos, this.draw_radius, fill_style);
 	}
 
-	OnHit(ball) {
+	OnHit(ball, timestamp) {
 		let delta = ball.pos.DeltaToPoint(this.pos);
 		let dist = delta.Magnitude();
 		delta.MutateNormalize();
@@ -492,7 +492,6 @@ class Whirlpool extends Target {
 		ball.last_hit = null;
 	}
 }
-
 
 class Portal extends Target {
 	constructor({ machine, pos, draw_radius, hitbox_radius, color, id, active }) {
@@ -518,7 +517,7 @@ class Portal extends Target {
 		this.dest_delta = this.pos.DeltaToPoint(dest.pos);
 	}
 
-	OnHit(ball) {
+	OnHit(ball, timestamp) {
 		if (!this.dest_id || !this.dest_pos || !this.dest_delta) {
 			return;
 		}
@@ -528,6 +527,96 @@ class Portal extends Target {
 		if (GetSetting("show_hit_rates")) {
 			state.redraw_stats_overlay = true;
 		}
+	}
+}
+
+// Util functions for musical targets and bumpers.
+// A rare instance where multiple inheritance would've been useful, but JS doesn't have it.
+function TimeToNearestNote(current_time, prev_note, note_queue) {
+	let time_delta = Infinity;
+	if (prev_note != null) {
+		time_delta = Math.min(time_delta, current_time - prev_note);
+	}
+	if (note_queue.length >= 1) {
+		time_delta = Math.min(time_delta, note_queue[0] - current_time);
+	}
+	return time_delta;
+}
+
+function GlowStrengthForTimeDelta(time_delta, timing_windows) {
+	let glow_strength = 0.0;
+	if (time_delta <= timing_windows.critical) {
+		return 1.0;
+	} else if (time_delta < timing_windows.hit) {
+		return 1.0 -
+				(time_delta - timing_windows.critical) /
+				(timing_windows.hit - timing_windows.critical);
+	} else {
+		return 0.0;
+	}
+}
+
+class MusicalScoreTarget extends ScoreTarget {
+	constructor({ machine, pos, draw_radius, hitbox_radius, color, id, active, value, pass_through }) {
+		super({ machine, pos, draw_radius, hitbox_radius, color, id, active, value, pass_through });
+		
+		this.prev_note = null;
+		this.note_queue = [];
+	}
+
+	UpdateNoteQueue(state) {
+		while (this.note_queue.length >= 1 && state.current_time > this.note_queue[0]) {
+			this.prev_note = this.note_queue.shift();
+		}
+	}
+
+	EnqueueNote(next_note_time) {
+		this.note_queue.push(next_note_time);
+	}
+	
+	Draw(state, ctx) {
+		this.UpdateNoteQueue(state);
+		if (!this.active) {
+			return;
+		}
+		let time_delta = TimeToNearestNote(state.current_time, this.prev_note, this.note_queue);
+		let glow_strength = GlowStrengthForTimeDelta(time_delta, this.machine.timing_windows);
+		if (glow_strength > 0.0) {
+			DrawGlowRGB(this.pos, "255,255,0", glow_strength, this.draw_radius, this.draw_radius + 5.0, ctx);
+		}
+		super.Draw(state, ctx);
+	}
+}
+
+class MusicalBumper extends Bumper {
+	constructor({ machine, pos, radius, strength, value, id, active }) {
+		super({ machine, pos, radius, strength, value, id, active });
+		
+		this.prev_note = null;
+		this.note_queue = [];
+	}
+
+	UpdateNoteQueue(state) {
+		while (this.note_queue.length >= 1 && state.current_time > this.note_queue[0]) {
+			this.prev_note = this.note_queue.shift();
+		}
+	}
+
+	EnqueueNote(next_note_time) {
+		this.note_queue.push(next_note_time);
+	}
+	
+	Draw(state, ctx) {
+		this.UpdateNoteQueue(state);
+		if (!this.active) {
+			return;
+		}
+		let time_delta = TimeToNearestNote(state.current_time, this.prev_note, this.note_queue);
+		let glow_strength = GlowStrengthForTimeDelta(time_delta, this.machine.timing_windows);
+		if (glow_strength > 0.0) {
+			DrawGlowRGB(this.pos, "255,255,0", glow_strength, this.draw_radius, this.draw_radius + 5.0, ctx);
+		}
+		super.Draw(state, ctx);
 	}
 }
 

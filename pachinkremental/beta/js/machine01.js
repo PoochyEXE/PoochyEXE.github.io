@@ -73,8 +73,8 @@ class CenterSlotTarget extends ScoreTarget {
 		});
 	}
 
-	OnHit(ball) {
-		super.OnHit(ball);
+	OnHit(ball, timestamp) {
+		super.OnHit(ball, timestamp);
 		this.machine.OnCenterSlotHit(ball);
 	}
 }
@@ -93,7 +93,7 @@ class SpinTarget extends Target {
 		});
 	}
 
-	OnHit(ball) {
+	OnHit(ball, timestamp) {
 		let text_pos = new Point(ball.pos.x, ball.pos.y);
 		if (
 			this.machine.HasTurquoiseSpecial(ball.ball_type_index) &&
