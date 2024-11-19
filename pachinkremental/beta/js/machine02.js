@@ -2032,7 +2032,7 @@ class BumperMachine extends PachinkoMachine {
 		this.last_drawn_spiral_meter_ticks = current_ticks;
 	}
 
-	AwardPoints(base_value, ball) {
+	AwardPoints(base_value, ball, machine_specific_params) {
 		let color_rgb = this.PopupTextColorForBallType(ball.ball_type_index);
 		let popup_text_level = this.PopupTextLevelForBallType(ball.ball_type_index);
 		let popup_text_opacity =

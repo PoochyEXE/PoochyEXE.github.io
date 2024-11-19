@@ -99,7 +99,7 @@ class SpinTarget extends Target {
 			this.machine.HasTurquoiseSpecial(ball.ball_type_index) &&
 			this.machine.IsUnlocked("turquoise_synergy")
 		) {
-			this.machine.AwardPoints(this.machine.CenterSlotValue(), ball);
+			this.machine.AwardPoints(this.machine.CenterSlotValue(), ball, null);
 			text_pos.y -= 10;
 		}
 		this.machine.AwardSpins(ball, text_pos);
@@ -1371,7 +1371,7 @@ class FirstMachine extends PachinkoMachine {
 		return new BonusWheel(this, spaces);
 	}
 
-	AwardPoints(base_value, ball) {
+	AwardPoints(base_value, ball, machine_specific_params) {
 		let total_value = base_value;
 		let color_rgb = "0,128,0";
 		if (this.IsScoreBuffActive()) {

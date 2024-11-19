@@ -254,7 +254,7 @@ class PachinkoMachine {
 			this.GetSaveData().options.multi_spin_enabled;
 	}
 
-	AwardPoints(base_value, ball) {
+	AwardPoints(base_value, ball, machine_specific_params) {
 		this.AddScore(base_value);
 		this.AddPointsForBallToStats(base_value, ball.ball_type_index);
 		MaybeAddScoreText({

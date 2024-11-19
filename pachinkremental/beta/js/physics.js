@@ -51,7 +51,7 @@ function UpdateBalls(balls, board, params, start_time) {
 			if (collide_peg == null) {
 				pos.CopyFrom(new_pos);
 				time_to_sim -= time_step;
-				current_time += time_step;
+				current_time += time_step * 1000.0;
 				CheckForHits(board, balls[b], current_time);
 				continue;
 			}
@@ -66,7 +66,7 @@ function UpdateBalls(balls, board, params, start_time) {
 				if (collide_peg == null) {
 					pos.CopyFrom(new_pos);
 					time_to_sim -= time_step;
-					current_time += time_step;
+					current_time += time_step * 1000.0;
 				}
 			}
 			new_pos.CopyFrom(pos);
@@ -74,7 +74,7 @@ function UpdateBalls(balls, board, params, start_time) {
 			collide_peg = board.FindNearestPeg(new_pos, kPegSearchRadius);
 			if (collide_peg == null) {
 				time_to_sim -= time_step;
-				current_time += time_step;
+				current_time += time_step * 1000.0;
 				pos.CopyFrom(new_pos);
 			} else {
 				let delta = pos.DeltaToPoint(collide_peg);

@@ -89,11 +89,15 @@ class ScoreTarget extends Target {
 		this.value = value;
 	}
 
+	AwardPointsForHit(ball, timestamp) {
+		this.machine.AwardPoints(this.value, ball, null);
+	}
+
 	OnHit(ball, timestamp) {
 		if (!this.pass_through) {
 			ball.active = false;
 		}
-		this.machine.AwardPoints(this.value, ball);
+		this.AwardPointsForHit(ball, timestamp);
 		++ball.score_targets_hit;
 		if (GetSetting("show_hit_rates")) {
 			state.redraw_stats_overlay = true;
@@ -170,10 +174,14 @@ class Bumper extends Target {
 		DrawCircle(ctx, this.pos, radius, fill_style);
 	}
 
+	AwardPointsForHit(ball, timestamp) {
+		this.machine.AwardPoints(this.value, ball, null);
+	}
+
 	OnHit(ball, timestamp) {
 		this.hit_animation = kBumperHitExpandSizes.length - 1;
 		if (this.value) {
-			this.machine.AwardPoints(this.value, ball);
+			this.AwardPointsForHit(ball, timestamp);
 		}
 
 		this.BounceBall(ball);
@@ -574,15 +582,34 @@ class MusicalScoreTarget extends ScoreTarget {
 		this.note_queue.push(next_note_time);
 	}
 	
+	TimeToNearestNote(current_time) {
+		return TimeToNearestNote(state.current_time, this.prev_note, this.note_queue);
+	}
+
+	AwardPointsForHit(ball, timestamp) {
+		this.machine.AwardPoints(
+			this.value,
+			ball,
+			{ time_delta: this.TimeToNearestNote(timestamp) }
+		);
+	}
+
 	Draw(state, ctx) {
 		this.UpdateNoteQueue(state);
 		if (!this.active) {
 			return;
 		}
-		let time_delta = TimeToNearestNote(state.current_time, this.prev_note, this.note_queue);
+		let time_delta = this.TimeToNearestNote(state.current_time);
 		let glow_strength = GlowStrengthForTimeDelta(time_delta, this.machine.timing_windows);
 		if (glow_strength > 0.0) {
-			DrawGlowRGB(this.pos, "255,255,0", glow_strength, this.draw_radius, this.draw_radius + 5.0, ctx);
+			DrawGlowRGB(
+				this.pos, 
+				"255,255,0",
+				glow_strength,
+				this.draw_radius,
+				this.draw_radius + 5.0,
+				ctx
+			);
 		}
 		super.Draw(state, ctx);
 	}
@@ -606,15 +633,34 @@ class MusicalBumper extends Bumper {
 		this.note_queue.push(next_note_time);
 	}
 	
+	TimeToNearestNote(current_time) {
+		return TimeToNearestNote(state.current_time, this.prev_note, this.note_queue);
+	}
+
+	AwardPointsForHit(ball, timestamp) {
+		this.machine.AwardPoints(
+			this.value,
+			ball,
+			{ time_delta: this.TimeToNearestNote(timestamp) }
+		);
+	}
+
 	Draw(state, ctx) {
 		this.UpdateNoteQueue(state);
 		if (!this.active) {
 			return;
 		}
-		let time_delta = TimeToNearestNote(state.current_time, this.prev_note, this.note_queue);
+		let time_delta = this.TimeToNearestNote(state.current_time);
 		let glow_strength = GlowStrengthForTimeDelta(time_delta, this.machine.timing_windows);
 		if (glow_strength > 0.0) {
-			DrawGlowRGB(this.pos, "255,255,0", glow_strength, this.draw_radius, this.draw_radius + 5.0, ctx);
+			DrawGlowRGB(
+				this.pos, 
+				"255,255,0",
+				glow_strength,
+				this.draw_radius,
+				this.draw_radius + 5.0,
+				ctx
+			);
 		}
 		super.Draw(state, ctx);
 	}
