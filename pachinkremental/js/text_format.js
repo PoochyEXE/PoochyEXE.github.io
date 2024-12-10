@@ -50,7 +50,11 @@ const kKanji =
 function FormatNumberShortKanji(num) {
 	let suffix_index = Math.floor(Math.log10(num) / 4);
 	if (suffix_index == 0) {
-		return FormatSmallNumberShort(num);
+		if (num < 1000) {
+			return FormatSmallNumberShort(num);
+		} else {
+			return num.toFixed(0);
+		}
 	} else if (suffix_index >= kKanji.length) {
 		return FormatNumberScientificNotation(num, /*trim_zeros=*/true);
 	}
@@ -278,8 +282,36 @@ function FormatNumberLong(num) {
 	}
 }
 
+function FormatSpeedrunTimer(duration_ms, show_ms) {
+	console.assert(duration_ms >= 0);
+	let x = Math.round(duration_ms);
+	let result = "";
+	if (show_ms) {
+		let ms = x % 1000;
+		result = "." + ZeroPad(ms, 3);
+	}
+	x = Math.floor(x / 1000);
+	let secs = x % 60;
+	x = Math.floor(x / 60);
+	result = ZeroPad(secs, 2) + result;
+	let mins = x % 60;
+	x = Math.floor(x / 60);
+	result = ZeroPad(mins, 2) + ":" + result;
+	if (x <= 0) {
+		return result;
+	}
+	let hours = x % 24;
+	x = Math.floor(x / 24);
+	result = ZeroPad(hours, 2) + ":" + result;
+	if (x <= 0) {
+		return result;
+	}
+	result = x + "d " + result;
+	return result;
+}
+
 function FormatDurationLong(duration_ms, show_ms) {
-	console.assert(duration_ms > 0);
+	console.assert(duration_ms >= 0);
 	let x = Math.round(duration_ms);
 	let result = "";
 	if (show_ms) {

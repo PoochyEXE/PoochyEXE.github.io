@@ -3,7 +3,7 @@ const kFirstMachineID = "first";
 const kFirstMachineBallTypes = [
 	//          | id |    name    | display_name |      physics_params       | inner_color | outer_color | ripple_color_rgb |
 	kNormalBallType,
-	new BallType(1,   "gold",      "Gold ",       kPhysicsParams.normal,     "#FFD700",    "#AA8F00",    "170,143,  0"    ),
+	new BallType(1,   "gold",      "Gold ",       kPhysicsParams.normal,     "#FFC400",    "#775B00",    "170,130,  0"    ),
 	new BallType(2,   "ruby",      "Ruby ",       kPhysicsParams.normal,     "#FBB",       "#F33",       "255, 48, 48"    ),
 	new BallType(3,   "sapphire",  "Sapphire ",   kPhysicsParams.normal,     "#BBF",       "#33F",       " 48, 48,255"    ),
 	new BallType(4,   "emerald",   "Emerald ",    kPhysicsParams.normal,     "#BFB",       "#3F3",       " 48,255, 48"    ),
@@ -350,7 +350,13 @@ class FirstMachine extends PachinkoMachine {
 		);
 		target_sets.push(new TargetSet(spin_targets));
 
-		return new PegBoard(kWidth, kHeight, pegs, drop_zones, target_sets);
+		return new PegBoard({
+			width: kWidth,
+			height: kHeight,
+			pegs: pegs,
+			drop_zones: drop_zones,
+			target_sets: target_sets
+		});
 	}
 
 	UpdateBottomTargets() {

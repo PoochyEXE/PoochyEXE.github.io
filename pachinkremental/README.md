@@ -44,6 +44,22 @@ I plan to archive the last version before any update that significantly nerfs pr
 
 **Caution: Spoilers below!**
 
+### v2.1.6 (2024-12-10)
+* Adjusted gold ball color to be easier to differentiate from topaz balls.
+* Slightly changed description for Unlock Combos to be more concise.
+* Set CSS colors for the links at the bottom to ensure they're readable, particularly when using dark mode in-game but not dark mode in the browser preferences.
+* Adjusted physics engine to make it much less likely for a ball traveling at high speed to clip through a non-peg hitbox.
+* Add an option to randomize the order and colors of the rubber bands on each individual rubber band ball.
+* Fix anotther bug where non-integer values between 1,000 and 10,000 would be displayed in scientific notation when Notation is set to 漢字.
+* New under-the-hood features, meant to be used in a future board.
+* Much more efficient (and less hacky) compressed save file format. Old saves are still compatible, and will be automatically converted to the new format when loaded. Thanks to the [LZString library](https://github.com/pieroxy/lz-string/)!
+* Fix a bug where the ending modal might add a few milliseconds to your final time.
+* Fix a bug where the game crashes when trying to load a machine that doesn't have Opal balls as an unlockable upgrade.
+* Move some code around between .js files to be better organized, especially to make game.js less of a random mishmash of utility functions.
+* Add a speedrun timer.
+* For stats and speedrun timer purposes, new save files don't count as started until you drop your first ball.
+* Fix a bug where saving before dropping your first ball then reloading causes the welcome message to disappear prematurely.
+
 ### v2.0.16 (2022-01-18)
 * Fix non-integer values between 1,000 and 10,000 being displayed in scientific notation when Notation is set to 漢字.
 

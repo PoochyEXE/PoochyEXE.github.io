@@ -8,6 +8,10 @@ const kPegColorDarkMode = {
 	outer: "#333"
 };
 
+// To avoid ugly flashing/flickering, only draw the auto-drop cooldown timer if
+// the cooldown is at least this long, in milliseconds.
+const kMinCooldownToDraw = 300.0;
+
 const kPrismatic = "PRISMATIC";
 const k8Ball = "8-BALL";
 const k8BallHighlightColor = "246, 31,183";
@@ -15,8 +19,11 @@ const kBeachBall = "BEACH";
 const kRubberBand = "RUBBER_BAND";
 const kSpiral = "SPIRAL";
 const kBumperColor = "BUMPER";
+const kWhirlpoolColor = "WHIRLPOOL";
 
 const kBumperHitExpandSizes = [0, 1, 2, 3, 2, 1];
+const kBumperOuterColor = "#080";
+const kBumperInnerColor = "#8F8";
 
 const kNumBeachBallColors = 6;
 // The order to shuffle beach ball colors into for rubber band balls.
@@ -269,13 +276,42 @@ function DrawBeachBalls(balls, use_gradient, ctx) {
 
 function DrawRubberBandBalls(balls, use_gradient, ctx) {
 	const kNumColors = kRubberBandColorIndices.length;
+	const randomize = GetSetting("random_rubberband_ball_colors");
+	let layer_order = [...kRubberBandLayerOrder];
+	let color_indices = [...kRubberBandColorIndices];
 	for (let i = 0; i < balls.length; ++i) {
 		const pos = balls[i].pos;
 		const rotation = balls[i].rotation;
+		if (randomize) {
+			// Modify the array in place to avoid unnecessary memory churn.
+			for (let j = 0; j < kNumColors; ++j) {
+				layer_order[j] = j;
+				color_indices[j] = j;
+			}
+			let x = Math.floor(balls[i].rand_seed * 720 * 720);
+			for (let j = 1; j < kNumColors; ++j) {
+				let k = x % (j + 1);
+				x = (x - k) / (j + 1);
+				// Use XOR swap algorithm to minimize memory churn.
+				// https://en.wikipedia.org/wiki/XOR_swap_algorithm
+				if (j != k) {
+					layer_order[j] ^= layer_order[k];
+					layer_order[k] ^= layer_order[j];
+					layer_order[j] ^= layer_order[k];
+				}
+				k = x % (j + 1);
+				x = (x - k) / (j + 1);
+				if (j != k) {
+					color_indices[j] ^= color_indices[k];
+					color_indices[k] ^= color_indices[j];
+					color_indices[j] ^= color_indices[k];
+				}
+			}
+		}
 		for (let j = 0; j < kNumColors; ++j) {
 			const segment_rotation =
-				Math.PI * kRubberBandLayerOrder[j] / kNumColors - rotation;
-			const color_index = kRubberBandColorIndices[j];
+				Math.PI * layer_order[j] / kNumColors - rotation;
+			const color_index = color_indices[j];
 			const outer_color = kBeachBallOuterColors[color_index];
 			if (use_gradient) {
 				const inner_color = kBeachBallInnerColors[color_index];
@@ -417,9 +453,59 @@ function CreateBumperGradient(ctx, pos, radius) {
 	let gradient =
 		ctx.createRadialGradient(pos.x, pos.y, inner_r, pos.x, pos.y, radius);
 	gradient.addColorStop(0, kTransparent);
-	gradient.addColorStop(kEpsilon, kOuterColor);
-	gradient.addColorStop(0.5, kInnerColor);
-	gradient.addColorStop(1.0, kOuterColor);
+	gradient.addColorStop(kEpsilon, kBumperOuterColor);
+	gradient.addColorStop(0.5, kBumperInnerColor);
+	gradient.addColorStop(1.0, kBumperOuterColor);
+	return gradient;
+}
+
+function DrawLongBumperEnd(ctx, pos, radius) {
+	DrawGradientCircle(ctx, pos, radius, kBumperInnerColor, kBumperOuterColor);
+}
+
+function DrawLongBumperMiddle(ctx, bumper, thickness) {
+	let norm = bumper.normal_vector.Multiply(thickness);
+	let gradient = ctx.createLinearGradient(
+		bumper.pos.x + norm.x,
+		bumper.pos.y + norm.y,
+		bumper.pos.x - norm.x,
+		bumper.pos.y - norm.y,
+	);
+	gradient.addColorStop(0.0, kBumperOuterColor);
+	gradient.addColorStop(0.5, kBumperInnerColor);
+	gradient.addColorStop(1.0, kBumperOuterColor);
+	ctx.fillStyle = gradient;
+	
+	let region = new Path2D();
+	region.moveTo(
+		bumper.left_endpoint.x + norm.x,
+		bumper.left_endpoint.y + norm.y,
+	);
+	region.lineTo(
+		bumper.left_endpoint.x - norm.x,
+		bumper.left_endpoint.y - norm.y,
+	);
+	region.lineTo(
+		bumper.right_endpoint.x - norm.x,
+		bumper.right_endpoint.y - norm.y,
+	);
+	region.lineTo(
+		bumper.right_endpoint.x + norm.x,
+		bumper.right_endpoint.y + norm.y,
+	);
+	region.closePath();
+	ctx.fill(region);
+}
+
+function CreateWhirlpoolGradient(ctx, pos, radius) {
+	const kOuterColor = "rgba(0, 127, 255, 0.5)";
+	const kInnerColor = "rgba(0, 127, 255, 0)";
+	const kEpsilon = 1e-7;
+	let inner_r = radius / 3.0;
+	let gradient =
+		ctx.createRadialGradient(pos.x, pos.y, inner_r, pos.x, pos.y, radius);
+	gradient.addColorStop(1.0, kInnerColor);
+	gradient.addColorStop(0.0, kOuterColor);
 	return gradient;
 }
 
@@ -460,10 +546,9 @@ function ClearLayerAndReturnContext(layer_id) {
 	return ctx;
 }
 
-function ResizeCanvas() {
-	let board = ActiveMachine(state).board;
+function ResizeCanvas(state, board) {
 	const aspect_ratio = board.width / board.height;
-	const max_height = window.innerHeight - 25;
+	const max_height = window.innerHeight - 35;
 	const max_width = window.innerWidth - 300;
 	state.canvas_scale = Math.min(
 		max_height / board.height,
@@ -482,6 +567,7 @@ function ResizeCanvas() {
 		canvas.width = width;
 	}
 	document.getElementById("outer_table").style.height = height + "px";
+	document.getElementById("speedrun_timer_container").style.width = width + "px";
 
 	const right_ui_width = window.innerWidth - width - 30;
 	let right_ui_cells = document.getElementsByClassName("rightUI");
@@ -650,6 +736,153 @@ function DrawBumpers(bumper_sets, ctx) {
 	}
 }
 
+function DrawLongBumpers(bumper_sets, ctx) {
+	let font_size = 8;
+	for (let i = 0; i < bumper_sets.length; ++i) {
+		const bumpers = bumper_sets[i].targets;
+		for (let j = 0; j < bumpers.length; ++j) {
+			const bumper = bumpers[j];
+			if (!bumper.active) {
+				continue;
+			}
+			let thickness = bumper.thickness;
+			let half_length = bumper.length;
+			console.assert(half_length >= thickness);
+			if (bumper.hit_animation > 0) {
+				thickness += kBumperHitExpandSizes[bumper.hit_animation];
+				half_length += kBumperHitExpandSizes[bumper.hit_animation];
+				bumper.hit_animation -= 1;
+				state.redraw_bumpers = true;
+			}
+			DrawLongBumperEnd(ctx, bumper.left_endpoint, thickness);
+			DrawLongBumperEnd(ctx, bumper.right_endpoint, thickness);
+			DrawLongBumperMiddle(ctx, bumper, thickness, half_length);
+
+			if (bumper.text) {
+				ctx.textAlign = "center";
+				ctx.fillStyle = "#000";
+				ctx.font = font_size + "px sans-serif";
+				let text_width = bumper.draw_radius * 1.5;
+				ctx.fillText(bumper.text, pos.x, pos.y + font_size / 3, text_width);
+			}
+		}
+	}
+}
+
+function DrawWhirlpools(whirlpool_sets, ctx) {
+	let font_size = 8;
+	for (let i = 0; i < whirlpool_sets.length; ++i) {
+		const whirlpools = whirlpool_sets[i].targets;
+		for (let j = 0; j < whirlpools.length; ++j) {
+			const whirlpool = whirlpools[j];
+			if (!whirlpool.active) {
+				continue;
+			}
+			const pos = whirlpool.pos;
+			let radius = whirlpool.draw_radius;
+			ctx.fillStyle = CreateWhirlpoolGradient(ctx, pos, radius);
+			ctx.beginPath();
+			ctx.arc(pos.x, pos.y, radius, 0, 2 * Math.PI);
+			ctx.fill();
+
+			if (whirlpool.text) {
+				ctx.textAlign = "center";
+				ctx.fillStyle = "#000";
+				ctx.font = font_size + "px sans-serif";
+				let text_width = whirlpool.draw_radius * 1.5;
+				ctx.fillText(whirlpool.text, pos.x, pos.y + font_size / 3, text_width);
+			}
+		}
+	}
+}
+
+function DrawPortals(portal_sets, ctx) {
+	const kPortalLineThickness = 3.0;
+	let font_size = 8;
+	for (let i = 0; i < portal_sets.length; ++i) {
+		const portals = portal_sets[i].targets;
+		for (let j = 0; j < portals.length; ++j) {
+			const portal = portals[j];
+			if (!portal.active) {
+				continue;
+			}
+			const pos = portal.pos;
+			const radius = portal.draw_radius;
+			let outer_color = AddAlphaToColorRGB(portal.color, 1.0)
+			let inner_color = AddAlphaToColorRGB(portal.color, 0.0)
+			let inner_r = radius - kPortalLineThickness;
+			let gradient =
+				ctx.createRadialGradient(pos.x, pos.y, inner_r, pos.x, pos.y, radius);
+			gradient.addColorStop(0.0, inner_color);
+			gradient.addColorStop(1.0, outer_color);
+			ctx.fillStyle = gradient;
+			ctx.beginPath();
+			ctx.arc(pos.x, pos.y, radius, 0, 2 * Math.PI);
+			ctx.fill();
+		}
+	}
+}
+
+function DrawPortalInsides(portal_sets) {
+	let canvas = document.getElementById("canvas_portal_inside");
+	let ctx = canvas.getContext("2d");
+	ctx.setTransform(1, 0, 0, 1, 0, 0);
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
+	
+	const scale = state.canvas_scale;
+	const source_canvas = document.getElementById("canvas_balls");
+	
+	let temp_canvas = document.getElementById("portal_inside_temp");
+	let temp_ctx = temp_canvas.getContext("2d");
+	
+	let pos = new Vector(0, 0);
+
+	for (let i = 0; i < portal_sets.length; ++i) {
+		const portals = portal_sets[i].targets;
+		for (let j = 0; j < portals.length; ++j) {
+			const portal = portals[j];
+			if (!portal.active) {
+				continue;
+			}
+			if (!portal.dest_id || !portal.dest_pos || !portal.dest_delta) {
+				console.log("Invalid portal: " + portal.id);
+				continue;
+			}
+			pos.x = portal.pos.x;
+			pos.y = portal.pos.y;
+			pos.MutateMultiply(scale);
+			if (state.april_fools) {
+				pos.x = source_canvas.width - pos.x;
+				pos.y = source_canvas.height - pos.y;
+			}
+			const radius = portal.draw_radius * scale;
+			const diameter = radius * 2;
+			temp_canvas.height = diameter;
+			temp_canvas.width = diameter;
+			temp_ctx.clearRect(0, 0, diameter, diameter);
+			temp_ctx.drawImage(
+				source_canvas,
+				pos.x - radius, pos.y - radius, diameter, diameter,
+				0, 0, diameter, diameter
+			);
+			temp_ctx.globalCompositeOperation='destination-in';
+			temp_ctx.beginPath();
+			temp_ctx.arc(radius, radius, radius, 0, Math.PI*2);
+			temp_ctx.closePath();
+			temp_ctx.fill();
+			
+			pos.x = portal.dest_pos.x;
+			pos.y = portal.dest_pos.y;
+			pos.MutateMultiply(scale);
+			if (state.april_fools) {
+				pos.x = source_canvas.width - pos.x;
+				pos.y = source_canvas.height - pos.y;
+			}
+			ctx.drawImage(temp_canvas, pos.x - radius, pos.y - radius);
+		}
+	}
+}
+
 function DrawHitRateText(x, y, hits, total_balls, ctx) {
 	let rate_text = "--";
 	if (total_balls > 0) {
@@ -663,10 +896,28 @@ function DrawHitRateText(x, y, hits, total_balls, ctx) {
 	ctx.fillText(rate_text, x, y);
 }
 
-function DrawHitRates(stats, target_sets, bumper_sets, ctx) {
-	let total_balls = 0;
+function DrawHitRatesForTargetSets(stats, target_sets, vertical_offset, total_balls, ctx) {
 	for (let i = 0; i < target_sets.length; ++i) {
 		const targets = target_sets[i].targets;
+		for (let j = 0; j < targets.length; ++j) {
+			const target = targets[j];
+			if (target.active) {
+				DrawHitRateText(
+					target.pos.x,
+					target.pos.y - target.draw_radius - vertical_offset,
+					stats.target_hits[target.id],
+					total_balls,
+					ctx
+				);
+			}
+		}
+	}
+}
+
+function DrawHitRates(stats, board, ctx) {
+	let total_balls = 0;
+	for (let i = 0; i < board.target_sets.length; ++i) {
+		const targets = board.target_sets[i].targets;
 		for (let j = 0; j < targets.length; ++j) {
 			const target = targets[j];
 			const hits = stats.target_hits[target.id];
@@ -686,36 +937,10 @@ function DrawHitRates(stats, target_sets, bumper_sets, ctx) {
 	ctx.fillStyle = dark_mode ? "#FFF" : "#000";
 	ctx.strokeStyle = dark_mode ? "#000" : "#FFF";
 	ctx.font = "bold " + kFontSize + "px sans-serif";
-	for (let i = 0; i < target_sets.length; ++i) {
-		const targets = target_sets[i].targets;
-		for (let j = 0; j < targets.length; ++j) {
-			const target = targets[j];
-			if (target.active) {
-				DrawHitRateText(
-					target.pos.x,
-					target.pos.y - target.draw_radius - 2,
-					stats.target_hits[target.id],
-					total_balls,
-					ctx
-				);
-			}
-		}
-	}
-	for (let i = 0; i < bumper_sets.length; ++i) {
-		const bumpers = bumper_sets[i].targets;
-		for (let j = 0; j < bumpers.length; ++j) {
-			const bumper = bumpers[j];
-			if (bumper.active) {
-				DrawHitRateText(
-					bumper.pos.x,
-					bumper.pos.y - bumper.draw_radius - 4,
-					stats.target_hits[bumper.id],
-					total_balls,
-					ctx
-				);
-			}
-		}
-	}
+	DrawHitRatesForTargetSets(stats, board.target_sets, 2, total_balls, ctx);
+	DrawHitRatesForTargetSets(stats, board.bumper_sets, 4, total_balls, ctx);
+	DrawHitRatesForTargetSets(stats, board.long_bumper_sets, 4, total_balls, ctx);
+	DrawHitRatesForTargetSets(stats, board.portal_sets, 2, total_balls, ctx);
 }
 
 function DrawScoreText(score_text, font_size, duration, rise, stroke_color_rgb, ctx) {
@@ -1083,6 +1308,18 @@ function Draw(state) {
 			DrawPegsNoGradient(board.pegs, ctx);
 		}
 	}
+	// Whirlpools
+	if (state.redraw_all || state.redraw_whirlpools) {
+		let ctx = ClearLayerAndReturnContext("whirlpools");
+		state.redraw_whirlpools = false;
+		DrawWhirlpools(machine.board.whirlpool_sets, ctx);
+	}
+	// Portals
+	if (state.redraw_all || state.redraw_portals) {
+		let ctx = ClearLayerAndReturnContext("portals");
+		state.redraw_portals = false;
+		DrawPortals(machine.board.portal_sets, ctx);
+	}
 	// Balls
 	let total_balls = TotalBalls(state);
 	if (state.redraw_all || total_balls > 0 || state.last_drawn.num_balls > 0) {
@@ -1110,6 +1347,11 @@ function Draw(state) {
 				);
 			}
 		}
+		
+		if (machine.board.portal_sets.length > 0) {
+			DrawPortalInsides(machine.board.portal_sets);
+		}
+		
 		state.last_drawn.num_balls = total_balls;
 	}
 	// Bumpers
@@ -1117,6 +1359,7 @@ function Draw(state) {
 		let ctx = ClearLayerAndReturnContext("bumpers");
 		state.redraw_bumpers = false;
 		DrawBumpers(machine.board.bumper_sets, ctx);
+		DrawLongBumpers(machine.board.long_bumper_sets, ctx);
 	}
 	// Targets
 	if (state.reset_target_text) {
@@ -1141,8 +1384,7 @@ function Draw(state) {
 		if (GetSetting("show_hit_rates")) {
 			DrawHitRates(
 				machine.GetSaveData().stats,
-				machine.board.target_sets,
-				machine.board.bumper_sets,
+				machine.board,
 				ctx
 			);
 		}

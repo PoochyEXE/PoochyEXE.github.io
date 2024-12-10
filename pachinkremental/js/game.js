@@ -1,91 +1,10 @@
-const kVersion = "v2.0.16";
+const kVersion = "v2.1.6";
 const kTitleAndVersion = "Pachinkremental " + kVersion;
 
 const kFrameInterval = 1000.0 / kFPS;
 
 const kManualDropCooldown = 80.0;
-const kMinCooldownToDraw = 300.0;
 const kTopCanvasLayer = "canvas_ripples";
-
-function CreateBallWithNoise(x, y, dx, dy, ball_type_index) {
-	let dNoise = SampleGaussianNoise(0.0, 20.0);
-	let angleNoise = SampleGaussianNoise(0.0, 0.1);
-	return object_pool.NewBall(
-		x, y, dx + dNoise.x, dy + dNoise.y, ball_type_index, angleNoise.x, angleNoise.y
-	);
-}
-
-function DropBall(x, y, ball_type_index) {
-	let machine = ActiveMachine(state);
-	let stats = machine.GetSaveData().stats;
-	if (!ball_type_index) {
-		ball_type_index = machine.RollBallType();
-	}
-	const ball_type = machine.BallTypes()[ball_type_index];
-	state.balls_by_type[ball_type_index].push(
-		CreateBallWithNoise(x, y, 0.0, 0.0, ball_type_index)
-	);
-	++stats.balls_dropped;
-	++stats[ball_type.name + "_balls"];
-	state.last_ball_drop = state.current_time;
-	if (ball_type.ripple_color_rgb) {
-		state.ripples.push(
-			object_pool.NewRipple(
-				x,
-				y,
-				ball_type.ripple_color_rgb,
-				kBallRadius
-			)
-		);
-	}
-	state.update_stats_panel = true;
-}
-
-function TotalBalls(state) {
-	let total = 0;
-	for (let i = 0; i < state.balls_by_type.length; ++i) {
-		total += state.balls_by_type[i].length;
-	}
-	return total;
-}
-
-function UpdateScoreHistory(state) {
-	let total = 0;
-	for (let i = 0; i < state.score_history.length; ++i) {
-		total += state.score_history[i];
-		if (i == 0) {
-			state.save_file.stats.score_last5s = total;
-		} else if (i == 2) {
-			state.save_file.stats.score_last15s = total;
-		} else if (i == 11) {
-			state.save_file.stats.score_last60s = total;
-		}
-	}
-	for (let i = state.score_history.length - 1; i > 0; --i) {
-		state.score_history[i] = state.score_history[i - 1];
-	}
-	state.score_history[0] = 0;
-
-	const ball_types = ActiveMachine(state).BallTypes();
-	for (let i = 0; i < ball_types.length; ++i) {
-		let total = 0;
-		let ball_type_history = state.score_history_by_ball_type.per_5s[i];
-		for (let j = 0; j < ball_type_history.length; ++j) {
-			total += ball_type_history[j];
-			if (j == 0) {
-				state.score_history_by_ball_type.last_5s[i] = total;
-			} else if (j == 2) {
-				state.score_history_by_ball_type.last_15s[i] = total;
-			} else if (j == 11) {
-				state.score_history_by_ball_type.last_60s[i] = total;
-			}
-		}
-		for (let j = ball_type_history.length - 1; j > 0; --j) {
-			ball_type_history[j] = ball_type_history[j - 1];
-		}
-		ball_type_history[0] = 0;
-	}
-}
 
 function LoadActiveMachine(state) {
 	state.update_stats_panel = true;
@@ -146,12 +65,14 @@ function LoadActiveMachine(state) {
 	UpdateMachinesHeader(state);
 	UpdateDarkMode();
 	UpdateOpalBallUpgradesStyle();
-	ResizeCanvas();
+	ResizeCanvas(state, machine.board);
 	OnResize();
 }
 
 function InitState() {
 	let state = {
+		game_started: false,
+		all_maxed: false,
 		current_time: performance.now(),
 		machines: [
 			new FirstMachine(kFirstMachineID, "Basic"),
@@ -185,6 +106,8 @@ function InitState() {
 		redraw_stats_overlay: false,
 		redraw_wheel: false,
 		redraw_board_glow: false,
+		redraw_whirlpools: false,
+		redraw_portals: false,
 		reset_target_text: false,
 		update_stats_panel: true,
 		update_upgrades: true,
@@ -282,48 +205,6 @@ function CanDrop(state) {
 		return false;
 	}
 	return true;
-}
-
-function SetCollapsibleHeaderState(id, collapse) {
-	let collapsed_display = document.getElementById(id + "_collapsed");
-	let contents = document.getElementById(id + "_contents");
-	if (contents && collapsed_display) {
-		contents.style.height = collapse ? "0px" : "auto";
-		collapsed_display.innerHTML = collapse ? "[+]" : "[&ndash;]";
-	}
-
-	let header = document.getElementById("button_" + id + "_header");
-	if (header) {
-		let options = header.classList.contains("upgradesSubHeader") ?
-				ActiveMachine(state).GetSaveData().options :
-				state.save_file.options;
-		options.collapsed[id] = collapse;
-	}
-
-	if (!collapse) {
-		let header_new = document.getElementById(id + "_header_new");
-		if (header_new) {
-			header_new.style.display = "none";
-		}
-	}
-}
-
-function UpdateCollapsibles(collapsed_options) {
-	for (let id in collapsed_options) {
-		SetCollapsibleHeaderState(id, collapsed_options[id]);
-	}
-}
-
-function ToggleVisibility(id) {
-	SetCollapsibleHeaderState(id, !IsCollapsed(id));
-}
-
-function IsCollapsed(panel_name) {
-	let contents = document.getElementById(panel_name + "_contents");
-	if (!contents) {
-		return undefined;
-	}
-	return contents.style.height == "0px";
 }
 
 function SwitchMachine(index) {
@@ -481,6 +362,7 @@ function OnAnimationFrame() {
 			UpdateUpgradeButtonsVisible(state);
 		}
 	}
+	UpdateSpeedrunTimer(state);
 
 	requestAnimationFrame(OnAnimationFrame);
 }
@@ -504,6 +386,10 @@ function OnClick(event) {
 		let save_data = machine.GetSaveData();
 		let time_since_prev_drop = state.current_time - state.last_ball_drop;
 		if (time_since_prev_drop >= kManualDropCooldown && CanDrop(state)) {
+			if (!state.game_started) {
+				state.game_started = true;
+				state.save_file.stats.start_time = Date.now();
+			}
 			DropBall(board_x, board_y);
 			++save_data.stats.balls_dropped_manual;
 		}
@@ -517,37 +403,11 @@ function OnClick(event) {
 	}
 }
 
-function UpdateDarkMode() {
-	var color_scheme;
-	if (GetSetting("dark_mode")) {
-		document.body.style.backgroundColor = "#000";
-		color_scheme = "dark";
-	} else {
-		document.body.style.backgroundColor = "#FFF";
-		color_scheme = "light";
-	}
-
-	for (let i = 0; i < kColorSchemeClasses.length; ++i) {
-		let class_mapping = kColorSchemeClasses[i];
-		let elems = document.getElementsByClassName(class_mapping.base);
-		for (let j = elems.length - 1; j >= 0; --j) {
-			let elem = elems[j];
-			for (let k = 0; k < kColorSchemes.length; ++k) {
-				if (kColorSchemes[k] == color_scheme) {
-					elem.classList.add(class_mapping[kColorSchemes[k]]);
-				} else {
-					elem.classList.remove(class_mapping[kColorSchemes[k]]);
-				}
-			}
-		}
-	}
-}
-
 var state = InitState();
 
 function OnResize() {
 	state.redraw_all = true;
-	ResizeCanvas();
+	ResizeCanvas(state, ActiveMachine(state).board);
 	ResizeModals();
 }
 

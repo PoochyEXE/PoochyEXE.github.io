@@ -40,6 +40,7 @@ const kColorSchemeClasses = [
 	new ColorSchemeClassMapping("modalContent", "modalContentLight", "modalContentDark"),
 	new ColorSchemeClassMapping("modalCloseButton", "modalCloseButtonLight", "modalCloseButtonDark"),
 	new ColorSchemeClassMapping("prismaticText", "prismaticTextLight", "prismaticTextDark"),
+	new ColorSchemeClassMapping("speedrunTimerActive", "speedrunTimerActiveLight", "speedrunTimerActiveDark"),
 	new ColorSchemeClassMapping("speedrunTimerCompleted", "speedrunTimerCompletedLight", "speedrunTimerCompletedDark"),
 	new ColorSchemeClassMapping("speedrunTimerSplit", "speedrunTimerSplitLight", "speedrunTimerSplitDark"),
 	new ColorSchemeClassMapping("exportedSave", "exportedSaveLight", "exportedSaveDark"),
@@ -247,6 +248,13 @@ function InitOptionButtons() {
 			text_off: "OFF",
 			default_value: false,
 		}),
+		new BooleanOptionButton({
+			id: "speedrun_timer",
+			display_name: "Speedrun timer",
+			text_on: "ON",
+			text_off: "OFF",
+			default_value: false,
+		}),
 		new ListOptionButton({
 			id: "april_fools_enabled",
 			display_name: "April Fools",
@@ -263,6 +271,14 @@ function InitOptionButtons() {
 			text_on: "Classic",
 			text_off: "Default",
 			default_value: false,
+		}),
+		new BooleanOptionButton({
+			id: "random_rubberband_ball_colors",
+			category: "rubberband_balls",
+			display_name: "Colors",
+			text_on: "Random",
+			text_off: "Static",
+			default_value: true,
 		}),
 		new BooleanOptionButton({
 			id: "auto_save_enabled",
@@ -388,6 +404,8 @@ function InitOptions(state) {
 		html += '<label for="' + id + '">' + display_name + '</label>';
 		if (ball_types[i].name == "opal") {
 			html += '&nbsp;<span id="options_opal_balls"></span>'
+		} else if (ball_types[i].name == "rubberband") {
+			html += '&nbsp;<span id="options_rubberband_balls"></span>'
 		}
 		html += '</div>';
 	}
@@ -501,6 +519,32 @@ function UpdateAutoSaveInterval() {
 		if (state.intervals.auto_save) {
 			clearInterval(state.intervals.auto_save);
 			state.intervals.auto_save = null;
+		}
+	}
+}
+
+function UpdateDarkMode() {
+	var color_scheme;
+	if (GetSetting("dark_mode")) {
+		document.body.style.backgroundColor = "#000";
+		color_scheme = "dark";
+	} else {
+		document.body.style.backgroundColor = "#FFF";
+		color_scheme = "light";
+	}
+
+	for (let i = 0; i < kColorSchemeClasses.length; ++i) {
+		let class_mapping = kColorSchemeClasses[i];
+		let elems = document.getElementsByClassName(class_mapping.base);
+		for (let j = elems.length - 1; j >= 0; --j) {
+			let elem = elems[j];
+			for (let k = 0; k < kColorSchemes.length; ++k) {
+				if (kColorSchemes[k] == color_scheme) {
+					elem.classList.add(class_mapping[kColorSchemes[k]]);
+				} else {
+					elem.classList.remove(class_mapping[kColorSchemes[k]]);
+				}
+			}
 		}
 	}
 }
