@@ -45,7 +45,7 @@ function FormatNumberEngineeringNotationLong(num) {
 }
 
 const kKanji =
-	["", "万", "億", "兆", "京", "垓", "秭", "穣", "溝", "澗", "正", "載", "極"];
+	["", "万", "億", "兆", "京", "垓", "秭", "穣", "溝", "澗", "正", "載", "極", "阿僧祇", "那由他", "那由多", "不可思議", "無量大数"];
 
 function FormatNumberShortKanji(num) {
 	let suffix_index = Math.floor(Math.log10(num) / 4);
@@ -55,7 +55,8 @@ function FormatNumberShortKanji(num) {
 		} else {
 			return num.toFixed(0);
 		}
-	} else if (suffix_index >= kKanji.length) {
+	} else if (suffix_index >= 13) {
+		// Revert to scientific notation because "1000阿僧祇" won't fit into a target.
 		return FormatNumberScientificNotation(num, /*trim_zeros=*/true);
 	}
 	let prefix = Math.round(num / Math.pow(10000, suffix_index));
