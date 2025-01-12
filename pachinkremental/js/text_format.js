@@ -45,7 +45,7 @@ function FormatNumberEngineeringNotationLong(num) {
 }
 
 const kKanji =
-	["", "万", "億", "兆", "京", "垓", "秭", "穣", "溝", "澗", "正", "載", "極", "阿僧祇", "那由他", "那由多", "不可思議", "無量大数"];
+	["", "万", "億", "兆", "京", "垓", "秭", "穣", "溝", "澗", "正", "載", "極", "恒河沙", "阿僧祇", "那由他", "不可思議", "無量大数"];
 
 function FormatNumberShortKanji(num) {
 	let suffix_index = Math.floor(Math.log10(num) / 4);

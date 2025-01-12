@@ -48,6 +48,9 @@ This game uses the [LZString library](https://github.com/pieroxy/lz-string/) to 
 
 **Caution: Spoilers below!**
 
+### v2.1.8-beta (2025-01-13)
+* Fix 漢字 notation using incorrect characters for e52 through e60.
+
 ### v2.1.7-beta (2024-12-16)
 * Allow 漢字 notation to go up to 無量大数 (e68) outside of targets. Targets still fall back to scientific notation at e52 because 1e55 would be rendered as "1000恒河沙" which would be unreadable when squeezed into a target. Everything else now falls back to scientific notation at e72 due to running out of named numbers.
 
