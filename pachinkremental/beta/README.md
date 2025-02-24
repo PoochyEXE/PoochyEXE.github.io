@@ -48,6 +48,15 @@ This game uses the [LZString library](https://github.com/pieroxy/lz-string/) to 
 
 **Caution: Spoilers below!**
 
+### v2.2.0-beta (2025-02-24)
+* Increase framerate from 30 to 120 FPS, with options to limit framerate to 60 or 30 FPS. Benchmark tests show similar performance at 30 FPS compared to the old version, which ran at 30 FPS.
+	* Fix the bonus wheel speed and Spiral Power increase and decrease rate being dependent on physics engine framerate.
+* Internal code cleanup
+	* Refactor drawing logic for each object type into their respective classes
+	* Fix inconsistent whitespace
+	* Remove trailing whitespace before newlines
+* Add preliminary audio support. This isn't used anywhere yet, but I have plans for it.
+
 ### v2.1.8-beta (2025-01-13)
 * Fix 漢字 notation using incorrect characters for e52 through e60.
 
