@@ -57,7 +57,8 @@ class BonusWheel {
 		if (!this.IsSpinning()) {
 			return;
 		}
-		const kBaseDecel = 0.001; // 0.002 revs/frame/frame
+		
+		const kBaseDecel = 0.9 / kPhysicsFPS / kPhysicsFPS; // 1.8 revs/s/s
 		let decel = kBaseDecel * this.machine.bonus_wheel_speed;
 		let delta = Math.sqrt(decel * this.spin_distance);
 		if (this.spin_distance <= delta) {

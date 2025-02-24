@@ -1,7 +1,7 @@
 const kVersion = "v2.1.8-beta";
 const kTitleAndVersion = "Pachinkremental " + kVersion;
 
-const kFrameInterval = 1000.0 / kFPS;
+const kFrameInterval = 1000.0 / kPhysicsFPS;
 
 const kManualDropCooldown = 80.0;
 const kTopCanvasLayer = "canvas_ripples";
@@ -103,6 +103,7 @@ function InitState() {
 		display_points: 0,
 		canvas_scale: 2.0,
 		frames_since_redraw: 0,
+		redraw_rate: 1,
 		redraw_all: true,
 		redraw_targets: false,
 		redraw_auto_drop: false,
@@ -326,7 +327,7 @@ function Update() {
 
 function OnAnimationFrame() {
 	Update();
-	if (state.frames_since_redraw <= 0) {
+	if (state.frames_since_redraw < state.redraw_rate) {
 		requestAnimationFrame(OnAnimationFrame);
 		return;
 	}
@@ -437,6 +438,7 @@ function Load() {
 	DisplayArchivedSaveFileButtons();
 	UpdateDarkMode();
 	UpdateOpalBallUpgradesStyle();
+	UpdateRedrawRate();
 
 	window.onresize = OnResize;
 

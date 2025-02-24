@@ -1784,16 +1784,19 @@ class BumperMachine extends PachinkoMachine {
 
 		if (this.IsUnlocked("unlock_spiral_balls")) {
 			const kMaxSpiralMultiplier = 10;
+			let spiral_decay_rate = 0.3 / kPhysicsFPS;
 			if (this.overdrive && this.IsUnlocked("overdrive_fight_the_power")) {
-				save_data.spiral_power *= 0.995;
-			} else {
-				save_data.spiral_power *= 0.99;
+				spiral_decay_rate /= 2.0;
 			}
+			save_data.spiral_power *= (1.0 - spiral_decay_rate);
 			const spiral_balls =
 				state.balls_by_type[kBumperMachineBallTypeIDs.SPIRAL];
+			const kSpiralFactor = 30.0 / kPhysicsFPS;
+			let total_rotation = 0;
 			for (let i = 0; i < spiral_balls.length; ++i) {
-				save_data.spiral_power += Math.abs(spiral_balls[i].omega);
+				total_rotation += Math.abs(spiral_balls[i].omega);
 			}
+			save_data.spiral_power += total_rotation * kSpiralFactor;
 			let meter_fraction = save_data.spiral_power / this.max_spiral_power;
 			if (!this.IsUnlocked("pierce_the_heavens")) {
 				if (save_data.spiral_power > this.max_spiral_power) {

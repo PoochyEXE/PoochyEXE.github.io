@@ -176,6 +176,13 @@ function InitOptionButtons() {
 				state.redraw_all = true;
 			},
 		}),
+		new ListOptionButton({
+			id: "framerate",
+			display_name: "Framerate Cap",
+			values: ["120 FPS", "60 FPS", "30 FPS"],
+			default_value: 0,
+			on_update_func: UpdateRedrawRate,
+		}),
 		new OptionButton({
 			id: "popup_text",
 			display_name: "Pop-up text",
@@ -614,4 +621,19 @@ function OnNotationToggle() {
 	state.redraw_targets = true;
 	state.update_stats_panel = true;
 	UpdateSpinCounter();
+}
+
+function UpdateRedrawRate() {
+	const framerate_setting = GetSetting("framerate");
+	if (framerate_setting == 1) {
+		// 60 FPS, redraw every 2nd physics frame.
+		state.redraw_rate = 2;
+	} else if (framerate_setting == 2) {
+		// 30 FPS, redraw every 4th physics frame.
+		state.redraw_rate = 4;
+	} else {
+		// 120 FPS, redraw every physics frame.
+		state.redraw_rate = 1;
+	}
+	return;
 }

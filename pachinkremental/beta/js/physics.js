@@ -1,4 +1,4 @@
-const kFPS = 30;
+const kPhysicsFPS = 120;
 const kPhysicsParams = {
 	normal: {
 		accel: 500,
@@ -28,12 +28,12 @@ function CheckForHits(board, ball) {
 }
 
 function UpdateBalls(balls, board, params) {
-	const kEpsilon = 1e-3 / kFPS;
+	const kEpsilon = 1e-3 / kPhysicsFPS;
 	const k2Pi = Math.PI * 2;
 	const kPegSearchRadius = kPegRadius + kBallRadius;
 	let new_pos = new Point(0, 0);
 	for (let b = 0; b < balls.length; ++b) {
-		let time_to_sim = 1.0 / kFPS;
+		let time_to_sim = 1.0 / kPhysicsFPS;
 		let pos = balls[b].pos;
 		let vel = balls[b].vel;
 		let omega = balls[b].omega;
@@ -113,10 +113,10 @@ function UpdateBalls(balls, board, params) {
 		}
 
 		balls[b].omega = omega;
-		balls[b].vel.y += params.accel / kFPS;
-		balls[b].rotation += omega / kFPS;
+		balls[b].vel.y += params.accel / kPhysicsFPS;
+		balls[b].rotation += omega / kPhysicsFPS;
 		balls[b].rotation %= k2Pi;
-		balls[b].total_rotations += Math.abs(omega) / kFPS;
+		balls[b].total_rotations += Math.abs(omega) / kPhysicsFPS;
 	}
 
 	// Remove balls that are inactive or have fallen outside the board.
