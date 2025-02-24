@@ -265,6 +265,7 @@ function UpdateOneFrame(state) {
 	}
 
 	machine.UpdateOneFrame(state);
+	machine.board.UpdateOneFrame(state);
 
 	if (state.last_score_history_update + 5000.0 <= state.current_time) {
 		UpdateScoreHistory(state);

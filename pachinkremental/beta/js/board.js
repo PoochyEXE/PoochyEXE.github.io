@@ -3,7 +3,8 @@ const kBallRadius = 5.5;
 
 const kCellSize = 8.0;
 
-const kBumperHitExpandSizes = [0, 1, 2, 3, 2, 1];
+const kBumperHitExpandSize = 3.0;
+const kBumperHitExpandFrames = 20;
 
 class Target {
 	constructor({ machine, pos, draw_radius, hitbox_radius, color, text, id, active, pass_through }) {
@@ -42,6 +43,8 @@ class Target {
 	}
 
 	ResetText() {}
+
+	UpdateOneFrame(state) {}
 
 	CheckForHit(ball, timestamp) {
 		if (!this.active) {
@@ -166,8 +169,9 @@ class Bumper extends Target {
 		}
 		let radius = this.draw_radius;
 		if (this.hit_animation > 0) {
-			radius += kBumperHitExpandSizes[this.hit_animation];
-			this.hit_animation -= 1;
+			const kMidpointFrame = kBumperHitExpandFrames / 2;
+			let midpoint_frame_delta = Math.abs(this.hit_animation - kMidpointFrame) / kMidpointFrame;
+			radius += kBumperHitExpandSize * (1.0 - midpoint_frame_delta);
 			state.redraw_bumpers = true;
 		}
 		let fill_style = CreateBumperGradient(ctx, this.pos, radius);
@@ -178,8 +182,14 @@ class Bumper extends Target {
 		this.machine.AwardPoints(this.value, ball, null);
 	}
 
+	UpdateOneFrame(state) {
+		if (this.hit_animation > 0) {
+			this.hit_animation -= 1;
+		}
+	}
+
 	OnHit(ball, timestamp) {
-		this.hit_animation = kBumperHitExpandSizes.length - 1;
+		this.hit_animation = kBumperHitExpandFrames;
 		if (this.value) {
 			this.AwardPointsForHit(ball, timestamp);
 		}
@@ -271,8 +281,11 @@ class LongBumper extends Bumper {
 		let half_length = this.length;
 		console.assert(half_length >= thickness);
 		if (this.hit_animation > 0) {
-			thickness += kBumperHitExpandSizes[this.hit_animation];
-			half_length += kBumperHitExpandSizes[this.hit_animation];
+			const kMidpointFrame = kBumperHitExpandFrames / 2;
+			let midpoint_frame_delta = Math.abs(this.hit_animation - kMidpointFrame) / kMidpointFrame;
+			let expand_size = kBumperHitExpandSize * (1.0 - midpoint_frame_delta);
+			thickness += expand_size;
+			half_length += expand_size;
 			this.hit_animation -= 1;
 			state.redraw_bumpers = true;
 		}
@@ -772,5 +785,14 @@ class PegBoard {
 			}
 		}
 		return false;
+	}
+
+	UpdateOneFrame(state) {
+		for (let i = 0; i < this.bumper_sets.length; ++i) {
+			let bumpers = this.bumper_sets[i].targets;
+			for (let j = 0; j < bumpers.length; ++j) {
+				bumpers[j].UpdateOneFrame(state);
+			}
+		}
 	}
 }
