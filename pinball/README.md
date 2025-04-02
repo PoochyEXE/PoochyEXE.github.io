@@ -1,0 +1,1 @@
+A collection of reference materials I've written about pinball, mainly strategy guides for specific games. This is largely meant to be a temporary place to put it where I can still let people see it, until I figure out a longer-term hosting solution.

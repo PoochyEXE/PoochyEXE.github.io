@@ -1,0 +1,21 @@
+My Godzilla (Stern, 2021) strategy:
+
+# Basic strategy points
+
+* First of all, throughout the game, you'll probably start Jet Fighter Attack and Saucer Attack without even trying. In casual play, I'll go out of my way for Jet Fighter Attack until I've earned the extra ball at 10 jet fighters, and likewise Saucer Attack for the extra ball at 3 saucers. In league/tournament play where you have to plunge extra balls, I'll mostly ignore them.
+* For allies, I'll usually prioritize Mothra, then Anguirus, then Rodan last unless I'm about to start a high-value mode.
+
+# Route
+
+1. I start by shooting the ramps to light Kaiju Battle. On most copies I've played, the left ramp is usually tough to hit from an inlane feed, so I'll only go for it from a cradle, and from an inlane feed I'll nudge upwards as the ball reaches the base of the flipper to ski pass to the left flipper, which works pretty consistently on most copies.
+2. I pick Gigan for my first Kaiju Battle, because you shoot the ramps for it, which also progress towards Godzilla Multiball. Right ramp, ski pass to left flipper, right ramp, repeat. Alternating ramps in a combo is worth more points, but if you miss, the time loss costs you a couple million from your Time Bonus at the end, so I'll only make one attempt at the combo on the final shot since the Finishing Bonus is 10M base if you complete Gigan in one try, so it's worth going for the double. Other than that, just right ramp until Gigan goes down.
+3. After Gigan, shoot through the building for both Destruction Jackpot and to light locks for Godzilla MB, then scoop to travel to another city. I usually pick London for the Destruction Jackpot boost, since I rarely go for the loop outside of Destruction Jackpot so Paris's loop boost isn't very useful, and I'll mostly ignore the saucer after Saucer Attack Multiball so New York's Saucer Attack boost isn't very valuable either.
+4. First thing to do in London is to shoot both ramps once each to light Kaiju Battle. Then I try to lock 1-2 balls, shoot the scoop to start Titanosaurus, then shoot the building to lock ball 3 and start Godzilla Multiball. While the Godzilla MB ball save is active, I'll go all gas, no brakes, and with 3 balls ricocheting around I'm likely to make some decent progress on Titanosaurus just from lucky bounces. Once the ball save is flashing quickly, I'll try to catch the balls but I'll still prioritize Titanosaurus shots.
+5. Around this point, I'll prioritize Mechagodzilla Multiball if I haven't already gotten it by accident from hitting the right spinner when missing the scoop. I'll prioritize the left ramp while the ball save is lit, because it's the toughest jackpot to get. This is a good place to use Anguirus because the Super Jackpot can be **very** valuable -- so valuable that it's worth using a Heat Ray to collect just that one shot, if it's about to time out. Alternatively, if you're bad at stage flipping, once you've collected the building and right ramp jackpots, using a Heat Ray to collect that left ramp is also an option.
+6. If I successfully got the Super Jackpot in Mechagodzilla MB, I'll prioritize Terror of Mechagodzilla above everything else the instant I have enough power-ups to reach level 4, since a good ToM is worth over a billion on its own. The start of phase 4 of ToM MB is one of the best places in the entire game to use a Heat Ray, I've gotten 100M+ for just holding down the action button for a second.
+7. Making it at least halfway through two Tier 1 Kaiju Battles unlocks Tier 2, but note that if you failed a Tier 1 in the current city and start a Tier 2, it locks you out of the Tier 1. So I make sure to complete Titanosaurus if I timed it out, then for Tier 2 I find Godzilla & Anguirus VS King Ghidorah & Gigan (bottom) is usually the most valuable. I'll usually select Fight a couple times, unless I have Rodan running in which case I'll pick Flee to double the jackpot before Rodan times out.
+8. If I've made it this far, I'll travel to another city, prioritize Kaiju Battles, then if it's ball 3 and I've qualified Planet X, I'll go for that.
+
+# Additional Resources
+* [Tilt Forums rulesheet](https://tiltforums.com/t/stern-godzilla-rulesheet/7210)
+* [Official rulesheet](https://sternpinball.com/wp-content/uploads/2022/06/Godzilla-Rulesheet.pdf)
