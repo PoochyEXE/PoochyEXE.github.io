@@ -32,6 +32,9 @@ class Target {
 	}
 
 	DrawText(ctx) {
+		if (!this.active) {
+			return;
+		}
 		if (this.text) {
 			const kFontSize = 8;
 			ctx.textAlign = "center";
