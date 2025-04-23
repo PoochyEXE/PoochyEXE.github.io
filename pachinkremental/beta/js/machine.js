@@ -67,6 +67,7 @@ class PachinkoMachine {
 			points: 0,
 			auto_drop_pos: null,
 			stats: {
+				start_time: null,
 				total_score: 0,
 				balls_dropped: 0,
 				balls_dropped_manual: 0,
@@ -78,7 +79,7 @@ class PachinkoMachine {
 				display_popup_text: 0,
 				favicon: -1,
 				collapsed: {}
-			}
+			},
 		}
 
 		for (let upgrade_id in this.upgrades) {
@@ -123,7 +124,11 @@ class PachinkoMachine {
 	}
 
 	GetSaveData() {
-		return state.save_file.machines[this.id];
+		if (state.il_speedrun_active) {
+			return state.il_speedrun_temp_save;
+		} else {
+			return state.save_file.machines[this.id];
+		}
 	}
 
 	GetSetting(id) {
@@ -217,7 +222,17 @@ class PachinkoMachine {
 	CheckMachineMaxed() {
 		let stats = state.save_file.stats;
 		if (this.AreAllUpgradesMaxed()) {
-			if (!stats.machine_maxed_times[this.id]) {
+			if (state.il_speedrun_active) {
+				const timestamp = Date.now();
+				const start_time = this.GetSaveData().stats.start_time;
+				let time_elapsed = timestamp - start_time;
+				const personal_best = stats.il_speedrun_pbs[this.id] || Infinity;
+				let new_pb = time_elapsed < personal_best;
+				if (new_pb) {
+					stats.il_speedrun_pbs[this.id] = time_elapsed;
+				}
+				ILSpeedrunComplete(this.display_name, time_elapsed, new_pb);
+			} else if (!stats.machine_maxed_times[this.id]) {
 				const timestamp = Date.now();
 				stats.machine_maxed_times[this.id] = timestamp;
 				state.update_stats_panel = true;
@@ -226,8 +241,17 @@ class PachinkoMachine {
 				}
 			}
 			UpdateMachinesHeader(state);
-		} else {
+		} else if (!state.il_speedrun_active) {
 			stats.machine_maxed_times[this.id] = null;
+		}
+	}
+
+	CurrentILTime() {
+		const start_time = this.GetSaveData().stats.start_time;
+		if (start_time) {
+			return Date.now() - this.GetSaveData().stats.start_time;
+		} else {
+			return 0;
 		}
 	}
 
@@ -236,7 +260,7 @@ class PachinkoMachine {
 		let play_time = FormatDurationLong(time_elapsed_ms, /*show_ms=*/true);
 		UpdateInnerHTML("machine_maxed_time", play_time);
 		UpdateInnerHTML("maxed_machine_name", this.display_name);
-		document.getElementById("machine_maxed_modal").style.display = "block";
+		UpdateDisplay("machine_maxed_modal", "block");
 	}
 
 	AutoDropOn() {
@@ -297,9 +321,9 @@ function InitMachinesHeader(state) {
 function UpdateMachinesHeader(state) {
 	let container_elem = document.getElementById("machines_container");
 	let is_maxed = [...Array(state.machines.length)].map((_, i) =>
-		state.machines[i].AreAllUpgradesMaxed()
+		state.save_file.stats.machine_maxed_times[state.machines[i].id] != null
 	);
-	if (!is_maxed[0]) {
+	if (!is_maxed[0] && !state.il_speedrun_active) {
 		UpdateDisplay("machines_container", "none");
 		return;
 	}
@@ -307,19 +331,32 @@ function UpdateMachinesHeader(state) {
 
 	for (let i = 0; i < state.machines.length; ++i) {
 		const active = (state.active_machine_index == i);
-		const button_id = "button_machine_" + state.machines[i].id;
+		const machine_id = state.machines[i].id;
+		const button_id = "button_machine_" + machine_id;
 		let visible = true;
 		if (i > 0) {
 			visible = is_maxed[i - 1];
 		}
 		UpdateDisplay(button_id, visible ? "inline" : "none");
-		document.getElementById(button_id).disabled = active || !visible;
 		let html = "<b>" + state.machines[i].display_name + "</b>";
-		if (is_maxed[i]) {
-			html += "<br>Maxed!";
-		}
-		if (active) {
-			html += "<br>(Active)";
+		if (state.holding_shift) {
+			document.getElementById(button_id).disabled = !is_maxed[i];
+			html += "<br>IL PB: ";
+			let il_pb = state.save_file.stats.il_speedrun_pbs[machine_id];
+			if (il_pb) {
+				html += FormatSpeedrunTimer(il_pb, /*show_ms=*/true);
+			} else {
+				html += "--:--:--.---";
+			}
+		} else {
+			document.getElementById(button_id).disabled =
+				(active && !state.il_speedrun_active) || !visible;
+			if (is_maxed[i]) {
+				html += "<br>Maxed!";
+			}
+			if (active) {
+				html += "<br>(Active)";
+			}
 		}
 		UpdateInnerHTML(button_id, html);
 	}

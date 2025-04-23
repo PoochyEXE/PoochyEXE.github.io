@@ -141,6 +141,15 @@
 						<div class="messageBox">You can switch machines here whenever you like. Each machine has its own separate points, upgrades, and stats. You can only play one machine at a time, but you can always return to a previous machine and pick up where you left off.</div>
 						<div class="menuPadding"></div>
 						<div id="machine_buttons" class="machinesContents"></div>
+						<div class="menuPadding"></div>
+						<div class="messageBox">
+							Shift + Click to start an individual level (IL) speedrun on a machine you've already completed.<br>
+							In an IL speedrun, you start with a brand new copy of the selected machine, and the goal is to max out the machine as quickly as you can.<br>
+							The timer starts when you drop your first ball, and stop when you max all upgrades that can be maxed.<br>
+							Progress during an IL speedrun will not be saved. Only your personal best (PB) time per machine will be saved.<br>
+							You can abandon an IL speedrun at any time by switching machines again.<br>
+							Your previous progress will not be affected, and you can pick up where you left off when you exit IL speedrun mode.
+						</div>
 					</div>
 				</div>
 				<div id="stats_container" class="statsContainer">
@@ -281,6 +290,18 @@
 				As a reward, you've unlocked a new machine! Check it out in the Machines menu, between Upgrades and Stats.
 				<br><br>
 				By the way, it's been <span id="machine_maxed_time" class="speedrunTimerSplit"></span> since you started playing on this save file. You can check how long it took you to reach this milestone, as well as any other milestones you've reached, in the Stats menu.
+			</span>
+		</div>
+	</div>
+	<div id="il_speedrun_complete_modal" class="modal">
+		<div id="il_speedrun_complete_modal_content" class="modalContent">
+			<span class="modalCloseButton" onmousedown="CloseModal('il_speedrun_complete_modal')">&#xD7</span>
+			<span style="text-align: center; vertical-align: middle;">
+				<span class="prismaticText"><b>Time!</b></span>
+				<br><br>
+				You maxed the <span id="il_speedrun_complete_machine_name"></span> machine in <span id="il_speedrun_complete_time" class="speedrunTimerSplit"></span>!
+				<br><br>
+				<span id="il_speedrun_new_pb" class="prismaticText">That's a new personal best! Congratulations!</span>
 			</span>
 		</div>
 	</div>

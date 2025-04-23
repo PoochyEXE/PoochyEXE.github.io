@@ -158,17 +158,37 @@ function UpdateSpeedrunTimer(state) {
 		return;
 	}
 	UpdateDisplay("speedrun_timer_container", "block");
-	if (state.all_maxed) {
+	if (state.il_speedrun_complete) {
 		return;
+	} else if (state.il_speedrun_active) {
+		let play_time = FormatSpeedrunTimer(ActiveMachine(state).CurrentILTime(), /*show_ms=*/true);
+		UpdateInnerHTML("speedrun_timer", "IL: " + play_time);
+	} else if (!state.all_maxed) {
+		let play_time = FormatSpeedrunTimer(CurrentPlayTime(), /*show_ms=*/true);
+		UpdateInnerHTML("speedrun_timer", play_time);
 	}
-	let play_time = FormatSpeedrunTimer(CurrentPlayTime(), /*show_ms=*/true);
-	UpdateInnerHTML("speedrun_timer", play_time);
+}
+
+function SpeedrunTimerStarted(state) {
+	let elem = document.getElementById("speedrun_timer");
+	elem.classList.add("speedrunTimerActive");
+	RemoveClassAndVariants(elem, "speedrunTimerCompleted");
+	UpdateDarkMode();
+}
+
+function StopILSpeedrunTimer(state, time_elapsed_ms) {
+	let elem = document.getElementById("speedrun_timer");
+	elem.classList.add("speedrunTimerCompleted");
+	RemoveClassAndVariants(elem, "speedrunTimerActive");
+	let play_time = FormatSpeedrunTimer(time_elapsed_ms, /*show_ms=*/true);
+	UpdateInnerHTML("speedrun_timer", "IL: " + play_time);
+	UpdateDarkMode();
 }
 
 function StopSpeedrunTimer(state) {
 	let elem = document.getElementById("speedrun_timer");
 	elem.classList.add("speedrunTimerCompleted");
-	elem.classList.remove("speedrunTimerActive");
+	RemoveClassAndVariants(elem, "speedrunTimerActive");
 	let machine_maxed_times = state.save_file.stats.machine_maxed_times;
 	let time_to_max_all = 0;
 	const start_time = state.save_file.stats.start_time;
