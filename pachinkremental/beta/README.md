@@ -48,6 +48,11 @@ This game uses the [LZString library](https://github.com/pieroxy/lz-string/) to 
 
 **Caution: Spoilers below!**
 
+### v2.3.0-beta (2025-04-24)
+* Add individual level speedrun mode. When switching machines, Shift + Click on a machine you've already maxed to start an IL speedrun on it.
+* Fix a bug from v2.2.0-beta where text was displaying prematurely for targets before they were unlocked.
+* More internal code cleanup, this time for the light/dark mode code.
+
 ### v2.2.0-beta (2025-02-24)
 * Increase framerate from 30 to 120 FPS, with options to limit framerate to 60 or 30 FPS. Benchmark tests show similar performance at 30 FPS compared to the old version, which ran at 30 FPS.
 	* Fix the bonus wheel speed and Spiral Power increase and decrease rate being dependent on physics engine framerate.
