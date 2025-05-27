@@ -9,7 +9,7 @@ class Notification {
 const kNotificationDuration = 3000.0;
 const kNotificationFadeInTime = 250.0;
 const kNotificationFadeOutTime = 250.0;
-const kNotificationHeight = 30;
+const kNotificationHeight = 34;
 
 function CloseNotification(index) {
 	state.notifications[index].start_time =

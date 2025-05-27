@@ -48,6 +48,14 @@ This game uses the [LZString library](https://github.com/pieroxy/lz-string/) to 
 
 **Caution: Spoilers below!**
 
+### v2.3.1-beta (2025-05-27)
+* Adjust some upgrade descriptions for Basic machine:
+	* Make the Sapphire Balls description more concise and clear.
+	* Make wording more consistent in references to the Gold Ball Value multiplier.
+	* Add example calculations.
+* Use browser font size settings. This also increases the default font size on most browsers with default settings. Zooming out to about 85% should approximately mimic the old size, for players who prefer it.
+* Increase bonus wheel size to match new default font size.
+
 ### v2.3.0-beta (2025-04-24)
 * Add individual level speedrun mode. When switching machines, Shift + Click on a machine you've already maxed to start an IL speedrun on it.
 * Fix a bug from v2.2.0-beta where text was displaying prematurely for targets before they were unlocked.

@@ -764,7 +764,8 @@ class FirstMachine extends PachinkoMachine {
 				machine: this,
 				ball_type: this.ball_types[kFirstMachineBallTypeIDs.SAPPHIRE],
 				ball_description:
-					"Sapphire balls are worth the same as a gold ball, plus the gold ball multiplier is also applied to the number of bonus wheel spins earned by sapphire balls.",
+					'The Gold Ball Value multiplier is applied to both points and spins earned by sapphire balls.' +
+					'<div class="small">Example: If Gold Ball Value is at 3×, then sapphire balls earn 3× points and 3× spins.</div>',
 				cost_func: this.GemstoneBallUnlockCost,
 				visible_func: () => {
 					return this.ShouldDisplayGemstoneBallUpgrades();
@@ -786,7 +787,8 @@ class FirstMachine extends PachinkoMachine {
 				id: "sapphire_ball_exponent",
 				name: "Sapphire Exponent",
 				category: "sapphire_balls",
-				description: "Increases the exponent on the gold ball value multiplier for sapphire balls. Note: The number of spins earned per sapphire ball is rounded down to the nearest whole number.",
+				description: "Exponentiates the number of spins earned by sapphire balls. Note: The number of spins earned per hit is rounded down to the nearest whole number." +
+				'<div class="small">Example: If Gold Ball Value is at 3× and Sapphire Exponent is at 2.0, then sapphire balls earn 3× points and 9× spins.</div>',
 				cost_func: level => 1e15 * Math.pow(5, level),
 				value_func: level => (level / 10.0) + 1,
 				max_level: 20,
@@ -802,7 +804,8 @@ class FirstMachine extends PachinkoMachine {
 				machine: this,
 				ball_type: this.ball_types[kFirstMachineBallTypeIDs.EMERALD],
 				ball_description:
-					"Points scored by emerald balls are multiplied by the square of the gold ball multiplier.",
+					'Points scored by emerald balls are multiplied by the square of the Gold Ball Value multiplier.' +
+					'<div class="small">Example: If Gold Ball Value is at 3×, then emerald balls earn 9× points.</div>',
 				cost_func: this.GemstoneBallUnlockCost,
 				visible_func: () => {
 					return this.ShouldDisplayGemstoneBallUpgrades();
@@ -824,7 +827,7 @@ class FirstMachine extends PachinkoMachine {
 				id: "emerald_ball_exponent",
 				name: "Emerald Exponent",
 				category: "emerald_balls",
-				description: "Increases the exponent on the gold ball value multiplier for emerald balls.",
+				description: "Increases the exponent on the Gold Ball Value multiplier for emerald balls.",
 				cost_func: level => 1e15 * Math.pow(25, level),
 				value_func: level => (level / 10.0) + 2,
 				max_level: 10,

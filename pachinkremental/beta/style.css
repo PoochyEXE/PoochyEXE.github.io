@@ -6,8 +6,8 @@ canvas.board {
 }
 
 canvas.bonusWheel {
-	width: 250px;
-	height: 100px;
+	width: 300px;
+	height: 120px;
 	font-family: sans-serif;
 }
 
@@ -25,7 +25,7 @@ button.bonusWheel {
 	background: #050;
 	border-radius: 20px;
 	font-family: sans-serif;
-	font-size: 14px;
+	font-size: 1em;
 	margin-top: 2.5px;
 	margin-bottom: 2.5px;
 	transition-duration: 250ms;
@@ -60,7 +60,7 @@ button.hyperSystem {
 	background: #550;
 	border-radius: 20px;
 	font-family: sans-serif;
-	font-size: 14px;
+	font-size: 1em;
 	margin-top: 2.5px;
 	margin-bottom: 2.5px;
 	transition-duration: 250ms;
@@ -106,7 +106,7 @@ button.notification {
 	float: right;
 	border: 2px solid #000;
 	border-radius: 5px;
-	font-size: 18px;
+	font-size: 20px;
 	vertical-align: center;
 	overflow-y: hidden;
 	font-family: sans-serif;
@@ -124,7 +124,7 @@ div.flavorText {
 }
 
 div.small {
-	font-size: 10px;
+	font-size: 0.75em;
 }
 
 td.rightUI {
@@ -221,11 +221,11 @@ button.upgradesHeader, button.upgradesSubHeader, button.machinesHeader, button.s
 }
 
 button.upgradesHeader, button.machinesHeader, button.statsHeader, button.optionsHeader {
-	font-size: 20px;
+	font-size: 1.5em;
 }
 
 button.upgradesSubHeader {
-	font-size: 16px;
+	font-size: 1.2em;
 }
 
 button.upgradesHeaderLight, button.upgradesSubHeaderLight {
@@ -269,9 +269,9 @@ button.optionsHeaderDark {
 }
 
 div.upgradesContents, div.machinesContents, div.statsContents, div.optionsContents {
-	line-height: 16px;
+	line-height: 1.2em;
 	font-family: sans-serif;
-	font-size: 14px;
+	font-size: 1em;
 	overflow: hidden;
 }
 
@@ -284,14 +284,14 @@ button.upgradeButton, button.rubyUpgradeButton, button.sapphireUpgradeButton, bu
 	border: 1px solid #000;
 	border-radius: 10px;
 	font-family: sans-serif;
-	font-size: 14px;
+	font-size: 1em;
 	padding: 5px;
 	transition-duration: 250ms;
 }
 
 button.upgradeButtonMaxedShrink {
 	transition-delay: 250ms;
-	font-size: 8.5px;
+	font-size: 0.6em;
 }
 
 button.upgradeButtonLight {
@@ -777,7 +777,7 @@ button.machineButton {
 	border: 1px solid #000;
 	border-radius: 10px;
 	font-family: sans-serif;
-	font-size: 14px;
+	font-size: 1em;
 	padding: 5px;
 	transition-duration: 250ms;
 }
@@ -806,7 +806,7 @@ button.statsButton, button.optionButton, button.optionButtonRed {
 	border: 1px solid #000;
 	border-radius: 20px;
 	font-family: sans-serif;
-	font-size: 14px;
+	font-size: 1em;
 	margin-top: 2.5px;
 	margin-bottom: 2.5px;
 }
@@ -843,6 +843,7 @@ button.optionButtonRedDark {
 
 div.messageBox {
 	display: block;
+	font-size: 1em;
 	font-family: sans-serif;
 }
 
@@ -861,7 +862,7 @@ div.messageBoxDark {
 }
 
 span.messageBoxLarge {
-	font-size: 30px;
+	font-size: 2.2em;
 	font-weight: bolder;
 }
 
@@ -889,7 +890,7 @@ button.dropZone:disabled {
 	position: fixed;
 	z-index: 100;
 	font-family: sans-serif;
-	font-size: 14px;
+	font-size: 1em;
 }
 
 .modal {
@@ -920,7 +921,7 @@ button.dropZone:disabled {
 
 .modalCloseButton {
 	float: right;
-	font-size: 28px;
+	font-size: 2em;
 	font-weight: bold;
 }
 
@@ -1020,7 +1021,7 @@ div.speedrunTimerContainer {
 
 span.speedrunTimer {
 	font-family: monospace;
-	font-size: 18px;
+	font-size: 1.5em;
 	font-weight: bolder;
 }
 
