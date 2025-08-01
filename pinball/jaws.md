@@ -32,5 +32,34 @@ Then I’ll go for Raft Attack and go for the right ramp → center ramp → fin
 
 Make sure to bring Machete into Fourth of July, and use it on the first super jackpot for another 200M or so.
 
+# Shark Hunter (video mode) mini-guide
+
+The Shark Hunter video mode can be quite lucrative with the right strategy -- for me, 75M is pretty meh, 90M is good, and on a good day I can even break 100M. Your basic priorities are getting the extra ball, getting the harpoons that give you 5 more shots, and hitting sharks quickly, in that order.
+
+First of all, pick 3D Enabled. It's easier to see even if you don't have 3D glasses.
+
+Understanding the shark movement and spawn pattern is key. Sharks move along 5 "tracks":
+
+1. Upper left corner to bottom right corner and back, repeating a few times and getting slightly closer each time.
+2. Upper right corner to bottom left corner and back, repeating a few times and getting slightly closer each time. The mirror of track #1.
+3. Charging straight at you along the left harpoon's trajectory.
+4. Charging straight at you along the center harpoon's trajectory.
+5. Charging straight at you along the right harpoon's trajectory.
+
+If a shark reaches the end of a track, it attacks you and ends video mode. Note that if you shoot the shark after the attack animation starts, you get the points for it but it still ends your video mode.
+
+On tracks #1 and #2, the shark can spawn anywhere in the upper half of the track, but is always headed towards the lower coner initially. If it spawns close to the center of the screen, you may not have enough time to react to shoot it immediately with the center harpoon, but I find I can usually still hit it with one of the the outer harpoons (right harpoon for track #1, left harpoon for track #2) before it reaches the corner.
+
+Now, at the start of video mode, 2 sharks always spawn immediately on tracks #1 and #2. So the first thing I always do is look for the 2 sharks, aim for whichever one spawns lower down on the screen by using the harpoon on whichever side it's headed, and then aim for the other shark using the harpoon on the opposite side.
+
+The game tries to keep 2 sharks on the screen. When you hit a shark, and *only* when you hit a shark, another shark will spawn after a fixed delay (about half a second). This means that for maximum points, you want to hit the sharks as soon as possible. In particular, on tracks #1 and #2, a shark that reaches the bottom corner will stay there for about 2 seconds, wasting precious time. Meanwhile, the difference between hitting a shark with the center harpoon vs. hitting it with an outside harpoon on the way down is only about a quarter-second, so your priority is to not let sharks reach the bottom corners.
+
+Also, the new shark will never spawn in the same lane as the other shark on screen. Combined with the fact that a shark spawning in tracks #3, #4, or #5 plays the "dun dun dun dun" sound, this means that there will be one shark each in tracks #1 and #2 most of the time, and you can know whenever this changes thanks to the "dun dun dun dun" sound cue.
+
+Putting this all together: Let's say the mode starts with Shark A on track #1 spawning in the middle of the screen (headed towards the bottom right corner) and Shark B on track #2 spawning in the upper right corner (headed towards the lower left corner). The first thing I do is take aim at Shark A using the right harpoon. I'll make one shot, then immediately switch my focus to Shark B and aim for it using the left harpoon. Assuming I hit Shark A, Shark C will spawn around the time when I'm shooting at Shark B, and most of the time it will spawn on track #1. After taking a shot at shark B, if I hear a "dun dun dun dun", then I immediately look for shark C and shoot at it, otherwise I turn my attention to track #1 and aim for shark C using the right harpoon again. This means I can get into a rhythm, alternating my focus between track #1 + right harpoon and track #2 + left harpoon, and the "dun dun dun dun" sound cue tells me when to shift my focus to looking for a charging shark.
+
+Finally, keep an eye on the timer. If I'm down to 3 harpoons and there's still plenty of time left, I'll hold my fire for a bit and only aim for sharks charging straight at me, in hopes of getting a +5 shots harpoon. If I have plenty of harpoons and only about 5 seconds left on the clock, I'll start spamming harpoons indiscriminately to get some extra points from hitting random stuff.
+
+
 # Additional Resources
 * [Tilt Forums rulesheet](https://tiltforums.com/t/jaws-rulesheet/8781)
