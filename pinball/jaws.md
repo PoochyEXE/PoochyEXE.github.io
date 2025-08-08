@@ -20,7 +20,7 @@ Next I’ll hit the boat captive ball to light Shark Encounter, then hit the sha
 
 For my first mode, I pick Scars since it’s valuable by itself but stacks poorly with multiballs. Shoot the right ramp to start Bounty Hunt, also picking Binoculars if I have another gear piece lit. I like going for Hammerhead first.
 
-On Prem / LE, in phase 2 of Scars the wheel is lit on the Orca upper playfield, I’ll go for that. I’ll trap the ball and use the action button to stop the wheel on +3X Machete, then try to complete Scars. At the end, when the fin pops up for the Encounter Jackpot, I’ll first shoot the center ramp to feed the left inlane, trigger Machete, and use it on the Encounter Jackpot. It’s usually upwards of 40M base so that’s 200M in one shot if you can pull it off.
+On Prem / LE, in phase 2 of Scars the wheel is lit on the Orca upper playfield, I’ll go for that. I’ll trap the ball and use the action button to stop the wheel on +3X Machete, then try to complete Scars. At the end, when the fin pops up for the Encounter Jackpot, I’ll first shoot the center ramp to feed the left inlane, trigger Machete, and use it on the Encounter Jackpot. It’s usually upwards of 20M base so that’s 100M in one shot if you can pull it off.
 
 Next I’ll go for Beachgoers to get the Beach Closed hurry-ups, first on the center and right ramps, then left orbit. Around this point I’ll usually have Jaws Multiball 1 close to ready, so I’ll try to stack it with Night Swim, and go for those 3 shots.
 
