@@ -48,7 +48,7 @@ Understanding the shark movement and spawn pattern is key. Sharks move along 5 "
 
 If a shark reaches the end of a track, it attacks you and ends video mode. Note that if you shoot the shark after the attack animation starts, you get the points for it but it still ends your video mode.
 
-On tracks #1 and #2, the shark can spawn anywhere in the upper half of the track, but is always headed towards the lower coner initially. If it spawns close to the center of the screen, you may not have enough time to react to shoot it immediately with the center harpoon, but I find I can usually still hit it with one of the the outer harpoons (right harpoon for track #1, left harpoon for track #2) before it reaches the corner.
+On tracks #1 and #2, the shark can spawn anywhere in the upper half of the track, but is always headed towards the lower corner initially. If it spawns close to the center of the screen, you may not have enough time to react to shoot it immediately with the center harpoon, but I find I can usually still hit it with one of the the outer harpoons (right harpoon for track #1, left harpoon for track #2) before it reaches the corner.
 
 Now, at the start of video mode, 2 sharks always spawn immediately on tracks #1 and #2. So the first thing I always do is look for the 2 sharks, aim for whichever one spawns lower down on the screen by using the harpoon on whichever side it's headed, and then aim for the other shark using the harpoon on the opposite side.
 
