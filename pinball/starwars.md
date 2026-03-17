@@ -2,7 +2,7 @@ My Star Wars (Stern, 2017) strategy:
 
 # Basic strategy points
 
-* Left ramp is very backhandable.
+* Left ramp (Endor) is very backhandable.
 * Right ramp is *usually* backhandable, but it depends on flipper strength and how steep the machine is set up. Test it out, if it’s backhandable, it’s *much* safer as a backhand.
 * Even the Death Star (left loop) is sometimes backhandable, again dependent on flipper strength and leveling. Worth testing out as well.
 * On balls 2 and 3, consider picking +5 TIE Fighters, especially if you’re within 5 of a TIE Fighter Hurry-Up. That way you can collect the hurry-up with the ball save still running and mash the button with minimal risk of draining. But if you’ve already destroyed enough TIE Fighters to get the extra ball, +5% Score is often more lucrative.
